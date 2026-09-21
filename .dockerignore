@@ -1,0 +1,31 @@
+.git/
+.claude/
+roam-env/
+frontend/node_modules/
+
+__pycache__/
+*.pyc
+.pytest_cache/
+.cache/
+
+# Real land-record documents and training data -- large, and not
+# needed at serve time (only models/roam_layout_v1/roam_layout_best.int8.onnx is).
+data/documents/
+data/raw/
+data/finetune_dataset/
+data/annotations/
+new_test_docs/
+*.pdf
+
+# Large training artifacts not needed for serving.
+models/roam_layout_v1/roam_layout_best.pt
+models/roam_layout_v1/roam_layout_last.pt
+models/roam_layout_v1/roam_layout_best.onnx
+models/roam_layout_v1/roam_layout_best.onnx.data
+models/roam_layout_v1/ROAM_finetune_kaggle.ipynb
+
+scripts/manual_checks/
+
+.env
+.env.*
+!.env.example
