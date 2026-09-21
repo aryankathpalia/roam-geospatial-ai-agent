@@ -13,7 +13,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from app.services.layout_detector import Detection
+from app.services.layout_detector_onnx import Detection
 
 # Small margin so OCR/vision models get a little breathing room around
 # the detected box instead of a hard crop against the text/drawing edge.
