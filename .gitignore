@@ -1,0 +1,101 @@
+# ENVIRONMENT VARIABLES
+
+.env
+.env.*
+!.env.example
+
+# NODE / FRONTEND
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# SvelteKit build output
+.svelte-kit/
+build/
+dist/
+.vercel/
+.output/
+
+# Vite
+vite.config.ts.timestamp-*
+
+# PYTHON / BACKEND
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyc.*
+*.log
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+roam-env/
+
+# DATABASE FILES
+
+*.db
+*.sqlite
+*.sqlite3
+
+# PDF PROCESSING TEMP FILES
+
+*.pdf.tmp
+*.pdf.cache
+
+# OS FILES
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE FILES
+
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# TEST / CACHE
+
+.pytest_cache/
+.cache/
+
+# Claude Code local tooling directory -- not part of the deployed app.
+.claude/
+
+# Regenerable YOLO fine-tune dataset export (rebuild via
+# app/pipeline/prepare_finetune_dataset.py from data/documents +
+# data/annotations any time it's needed).
+data/finetune_dataset/
+data/finetune_dataset.zip
+
+# Real land-record documents (rendered pages, uploads, human review
+# crops) -- these are actual government records with real people's
+# names/addresses/parcel numbers. Kept local only, not pushed publicly.
+# data/annotations/ (small, just class labels) is intentionally NOT
+# excluded -- it documents the training work without exposing document
+# content.
+data/documents/
+data/raw/
+new_test_docs/
+*/review_crops/
+
+# Ad hoc test PDFs dropped at the repo root during model testing.
+/*.pdf
+
+# Superseded/unneeded model artifacts -- roam_layout_best.int8.onnx
+# (the deployed model) and roam_layout_best.pt (used by the PyTorch/
+# CVAT-annotation dev path) are the only weights actually needed and
+# are NOT excluded.
+models/roam_layout_v1/roam_layout_last.pt
+models/roam_layout_v1/roam_layout_best.onnx
+models/roam_layout_v1/roam_layout_best.onnx.data
+
+!frontend/src/routes/documents/

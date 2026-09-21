@@ -1,0 +1,44 @@
+fastapi
+uvicorn[standard]
+gunicorn
+
+sqlalchemy
+psycopg2-binary
+
+pydantic
+pydantic-settings
+python-multipart
+python-dotenv
+httpx
+shapely
+pyproj
+
+# PDF rendering/inspection (app/services/pdf_renderer.py, pdf_inspector.py)
+pymupdf
+
+# Directly imported by our own code (page_analyzer.py, region_cropper.py,
+# layout_detector*.py). numpy/pillow are pinned explicitly; opencv is
+# left to arrive transitively via doclayout_yolo's own dependency chain
+# (albumentations) -- pinning our own opencv variant alongside it caused
+# pip to install THREE conflicting opencv packages side by side and
+# stalled dependency resolution for 20+ minutes. Do not add an explicit
+# opencv pin here.
+numpy
+pillow
+
+openai
+
+# ROAM layout model. onnxruntime + the quantized .onnx weights are the
+# deployed inference path (see app/services/layout_detector_onnx.py).
+# doclayout_yolo/torch are only needed for the PyTorch model path used by
+# app/services/layout_detector.py (CVAT draft-annotation generation, a
+# dev/annotation tool, not the served extraction pipeline).
+onnxruntime
+doclayout_yolo
+
+# OCR. paddlepaddle is PINNED to 3.2.2 -- 3.3.0+ has a regression where
+# its default enable_mkldnn=True crashes CPU inference with
+# "ConvertPirAttribute2RuntimeAttribute not support"
+# (PaddlePaddle/Paddle#77340). Confirmed locally; do not bump this.
+paddlepaddle==3.2.2
+paddleocr

@@ -1,0 +1,3 @@
+# Canonical dependency list is the repository-root requirements.txt.
+# Install from repo root: pip install -r requirements.txt
+-r ../requirements.txt

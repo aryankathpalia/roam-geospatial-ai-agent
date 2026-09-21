@@ -1,0 +1,6 @@
+*.pkl filter=lfs diff=lfs merge=lfs -text
+
+# ROAM model weights. roam_layout_best.pt is ~144MB -- over GitHub's
+# 100MB hard limit without LFS.
+*.pt filter=lfs diff=lfs merge=lfs -text
+*.onnx filter=lfs diff=lfs merge=lfs -text
