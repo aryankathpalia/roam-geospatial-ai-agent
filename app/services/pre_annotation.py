@@ -22,13 +22,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-from app.services.layout_detector import (
-    ROAM_CATEGORIES,
-    ROAM_CATEGORY_IDS,
-    detect_page_layout,
-    get_image_size,
-)
-
 DOCUMENT_ROOT = Path("data/documents")
 
 
@@ -39,7 +32,22 @@ def generate_pre_annotations(document_id: str) -> dict[str, Any]:
 
     Requires that the document has already been processed (rendered
     pages must exist under data/documents/<document_id>/pages).
+
+    Uses the PyTorch/doclayout_yolo layout detector (not the ONNX
+    deployment path) since this is a CVAT-annotation-prep dev tool, not
+    the served pipeline. Imported lazily, inside this function, so
+    torch is only loaded into memory if this endpoint is actually
+    called -- not on every app startup. That matters on a memory-capped
+    deployment (e.g. Cloud Run's free tier), where the served pipeline
+    (app/pipeline/processor.py) uses the much lighter ONNX path.
     """
+
+    from app.services.layout_detector import (
+        ROAM_CATEGORIES,
+        ROAM_CATEGORY_IDS,
+        detect_page_layout,
+        get_image_size,
+    )
 
     document_dir = DOCUMENT_ROOT / document_id
     pages_dir = document_dir / "pages"

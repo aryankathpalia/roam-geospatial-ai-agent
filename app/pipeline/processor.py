@@ -5,7 +5,7 @@ from app.services.pdf_inspector import inspect_pdf
 from app.services.pdf_renderer import render_page
 from app.services.page_analyzer import analyze_page
 from app.services.page_router import route_page
-from app.services.layout_detector import detect_page_layout
+from app.services.layout_detector_onnx import detect_page_layout
 from app.services.region_cropper import extract_region_crops
 
 DOCUMENT_ROOT = Path("data/documents")
