@@ -56,8 +56,14 @@ def get_session() -> ort.InferenceSession:
             )
         opts = ort.SessionOptions()
         opts.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+        # CUDAExecutionProvider is silently skipped by ONNX Runtime if
+        # unavailable (plain CPU-only `onnxruntime` package, no GPU) --
+        # safe to always list it first rather than branching on an env
+        # var the way app/services/ocr.py has to for PaddleOCR.
         _session = ort.InferenceSession(
-            str(ONNX_WEIGHTS_PATH), opts, providers=["CPUExecutionProvider"]
+            str(ONNX_WEIGHTS_PATH),
+            opts,
+            providers=["CUDAExecutionProvider", "CPUExecutionProvider"],
         )
 
     return _session
