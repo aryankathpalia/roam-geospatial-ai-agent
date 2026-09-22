@@ -40,7 +40,11 @@ image = modal.Image.from_dockerfile(
 @app.function(
     image=image,
     cpu=1.0,
-    memory=2048,
+    # Bumped from 2048: measured floor with just the PaddleOCR engine
+    # loaded is 1.13-1.27GB, leaving too little headroom at 2GB for a
+    # dense band's actual working memory. 3GB matches the plan agreed
+    # once a spend-capped card is on the account.
+    memory=3072,
     timeout=180,
 )
 def ocr_band_remote(band_bytes: bytes, y_offset: float) -> list:
