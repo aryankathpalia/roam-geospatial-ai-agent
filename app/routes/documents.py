@@ -3,7 +3,8 @@ from pathlib import Path
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
-from app.pipeline.processor import process_document
+from app.pipeline.extract_regions import extract_page_regions
+from app.pipeline.streaming_processor import process_document_streaming
 from app.services.pre_annotation import generate_pre_annotations
 
 
@@ -54,11 +55,16 @@ async def upload_document(file: UploadFile = File(...)):
     pdf_path.write_bytes(contents)
 
     # --------------------------------------------------
-    # 4. Start ROAM processing pipeline
+    # 4. Run the ROAM processing pipeline: layout detection, streamed
+    # per-page, with each page's regions sent for OCR/vision
+    # extraction as soon as that page is detected (see
+    # app/pipeline/streaming_processor.py).
     # --------------------------------------------------
 
     try:
-        pipeline_result = process_document(document_id)
+        pipeline_result = await process_document_streaming(
+            document_id, extract_page_regions
+        )
 
     except Exception as exc:
         raise HTTPException(
@@ -67,22 +73,7 @@ async def upload_document(file: UploadFile = File(...)):
         ) from exc
 
     # --------------------------------------------------
-    # 5. Generate draft (non-ground-truth) layout annotations
-    #
-    # Best-effort: a failure here should not fail the upload, since the
-    # document was already rendered and analyzed successfully. The
-    # caller can retry via POST /documents/{document_id}/annotate.
-    # --------------------------------------------------
-
-    try:
-        pre_annotation_result = generate_pre_annotations(document_id)
-        pre_annotation_error = None
-    except Exception as exc:
-        pre_annotation_result = None
-        pre_annotation_error = str(exc)
-
-    # --------------------------------------------------
-    # 6. Return processing result
+    # 5. Return processing result
     # --------------------------------------------------
 
     return {
@@ -90,8 +81,6 @@ async def upload_document(file: UploadFile = File(...)):
         "filename": file.filename,
         "status": "processed",
         "result": pipeline_result,
-        "pre_annotation": pre_annotation_result,
-        "pre_annotation_error": pre_annotation_error,
     }
 
 
