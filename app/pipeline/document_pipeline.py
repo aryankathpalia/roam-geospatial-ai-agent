@@ -26,7 +26,7 @@ from app.services.ocr import OCRLine
 from app.services.pdf_inspector import inspect_pdf
 from app.services.pdf_renderer import render_page
 from app.services.region_cropper import extract_region_crops
-from app.services.vision import extract_parcel_geometry
+from app.services.vision import extract_parcel_geometries_batch
 from app.pipeline.page_ocr import (
     band_count_for,
     match_lines_to_regions,
@@ -160,16 +160,14 @@ async def process_document(
     # geometry reconstruction -- OCR alone gives flat text, not
     # structured survey data.
     #
-    # Processed SEQUENTIALLY, not concurrently: Gemini's free tier caps
-    # gemini-3.5-flash-lite at 15 requests/MINUTE, and each ParcelMap
-    # region's tiled extraction already makes several calls on its own
-    # (one per tile, plus one to structure the result). Running
-    # multiple regions concurrently blew through that limit immediately
-    # in testing (confirmed: 429 RESOURCE_EXHAUSTED on half the regions
-    # in a 4-ParcelMap-region document). A document typically has only
-    # a handful of ParcelMap regions, so sequential processing costs
-    # negligible wall-clock time -- not worth a rate-limiting scheme for
-    # this volume.
+    # ALL ParcelMap regions in the document go into ONE batch call
+    # (extract_parcel_geometries_batch), not one call per region --
+    # Gemini's free tier caps gemini-3.5-flash-lite at 15 requests/
+    # MINUTE, and a per-region approach previously needed ~2 calls PER
+    # region (confirmed: 429s on half the regions in a 4-ParcelMap-
+    # region document processed one at a time). Batching means a
+    # document needs 2 Gemini calls total regardless of how many
+    # ParcelMap regions it has.
     # ---------------------------------------------------------
 
     vision_targets = [
@@ -179,18 +177,25 @@ async def process_document(
         if region.get("needs_vision")
     ]
 
-    for entry, region in vision_targets:
-        x, y, w, h = region["bbox"]
-        try:
+    if vision_targets:
+        crops = []
+        for entry, region in vision_targets:
+            x, y, w, h = region["bbox"]
             with Image.open(entry["path"]) as page_image:
-                crop = page_image.convert("RGB").crop((x, y, x + w, y + h))
-            geometry = await loop.run_in_executor(None, extract_parcel_geometry, crop)
-            region["vision_geometry"] = geometry
+                crops.append(page_image.convert("RGB").crop((x, y, x + w, y + h)))
+
+        try:
+            geometries = await loop.run_in_executor(
+                None, extract_parcel_geometries_batch, crops
+            )
+            for (entry, region), geometry in zip(vision_targets, geometries):
+                region["vision_geometry"] = geometry
         except Exception as exc:
             # Vision is an enhancement on top of OCR text, not a hard
             # requirement (e.g. GEMINI_API_KEY not set yet) -- degrade
             # gracefully rather than failing the request.
-            region["vision_error"] = str(exc)
+            for entry, region in vision_targets:
+                region["vision_error"] = str(exc)
 
     pages_result = [
         {"page_number": e["page_number"], "regions": e["regions"]}
