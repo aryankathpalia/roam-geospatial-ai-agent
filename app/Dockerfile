@@ -24,6 +24,20 @@ COPY models/roam_layout_v1/roam_layout_best.int8.onnx models/roam_layout_v1/roam
 
 ENV PYTHONPATH=/code
 
+# Bake PaddleOCR's mobile det/rec models into the image at build time.
+# Without this, every fresh container (and on Modal, every parallel
+# OCR container fanned out via .map()) has to fetch them from
+# PaddleX's model hosters at request time -- slower, and paddlex's own
+# pre-download connectivity check is flaky under Modal's networking
+# ("No model hoster is available!" even though the download itself
+# succeeds right after). PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK skips
+# that flaky check as a second layer of defense.
+ENV PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True
+RUN python -c "\
+from PIL import Image; \
+from app.services.ocr import run_page_ocr; \
+run_page_ocr(Image.new('RGB', (64, 64), 'white'))"
+
 EXPOSE 7860
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "7860"]
