@@ -65,8 +65,8 @@
   border-radius: 9px;
   display: grid;
   place-items: center;
-  color: var(--brand);
-  background: var(--brand-soft);
+  color: var(--accent);
+  background: var(--accent-soft);
   flex: 0 0 auto;
 }
 
@@ -106,13 +106,13 @@
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-muted);
   color: var(--text);
 }
 
 .nav-item.active {
-  background: var(--brand-soft);
-  color: var(--brand);
+  background: var(--accent-soft);
+  color: var(--accent);
   font-weight: 700;
 }
 

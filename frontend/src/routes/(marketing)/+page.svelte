@@ -1,90 +1,163 @@
 <script lang="ts">
-  const stages = [
-    {
-      step: '01',
-      title: 'Understand',
-      body: 'Every page is rendered and run through layout detection — text blocks, tables, seals and parcel-map drawings are located and OCR’d independently.'
-    },
-    {
-      step: '02',
-      title: 'Extract',
-      body: 'Parcel-map regions are escalated to a vision model that reads bearing and distance calls, tie points and basis-of-bearings straight off the drawing.'
-    },
-    {
-      step: '03',
-      title: 'Reconstruct',
-      body: 'The boundary traverse is walked corner-to-corner into real geometry, then projected onto true WGS84 coordinates using a geocoded anchor from the document itself.'
-    },
-    {
-      step: '04',
-      title: 'Validate',
-      body: 'Closure precision, self-intersection and the document’s own stated acreage are cross-checked — every parcel ships with an honest confidence signal, not a guess.'
+  import { onMount } from 'svelte';
+  import ResultMap from '$lib/components/ResultMap.svelte';
+
+  let sample: any = null;
+  let region: any = null;
+
+  onMount(async () => {
+    const res = await fetch('/sample-data/sample-result.json');
+    sample = await res.json();
+    // Page 9's "Parcel 2" -- a real, multi-sided extracted boundary from
+    // an actual live ROAM run, used throughout this page instead of any
+    // placeholder numbers.
+    for (const page of sample.pages) {
+      const found = page.regions.find((r: any) => r.boundary_geojson_wgs84);
+      if (found) {
+        region = found;
+        break;
+      }
     }
-  ];
+  });
 
   const capabilities = [
     'Any quadrant bearing format',
     'Closure-based QA, not a black box',
-    'Free-text address geocoding, no fixed zone',
+    'Free-text address geocoding',
     'GeoJSON out, ready for any GIS stack'
   ];
 </script>
 
 <section class="hero">
   <div class="hero-inner">
-    <div class="hero-copy fade-up">
-      <p class="kicker">ROAM &middot; Reasoning-Oriented Agent for Maps</p>
-      <h1>Turn scanned maps into<br /><span class="accent">verified spatial data.</span></h1>
-      <p class="lede">
-        Upload a scanned deed, survey plat or legacy cadastral map. ROAM reads the boundary
-        calls, reconstructs the parcel geometry, places it on the real map, and tells you exactly
-        how well it closes.
-      </p>
-      <div class="hero-actions">
-        <a href="/workspace" class="btn btn-primary">Open Workspace</a>
-        <a href="#pipeline" class="btn btn-ghost">See how it works</a>
-      </div>
-      <div class="hero-chips">
-        {#each capabilities as c}
-          <span class="chip">{c}</span>
-        {/each}
-      </div>
+    <p class="kicker">ROAM &middot; Reasoning-Oriented Agent for Maps</p>
+    <h1>Turn scanned maps into<br />verified spatial data.</h1>
+    <p class="lede">
+      Upload a scanned deed, survey plat or legacy cadastral map. ROAM reads the boundary
+      calls, reconstructs the parcel geometry, places it on the real map, and tells you
+      exactly how well it closes.
+    </p>
+    <div class="hero-actions">
+      <a href="/workspace" class="btn btn-primary">Open Workspace</a>
+      <a href="#pipeline" class="btn btn-ghost">See how it works</a>
     </div>
-
-    <div class="hero-visual fade-up">
-      <div class="scan-frame">
-        <img src="/images/hero-survey.jpg" alt="1881 survey map of property in the Twelfth Ward of the City of New York, with parcel boundaries outlined" />
-        <span class="scan-tag">SOURCE SCAN &middot; 1881 SURVEY PLAT</span>
-      </div>
-
-      <div class="result-card">
-        <div class="result-head">
-          <span class="status-dot"></span>
-          <span>PARCEL EXTRACTED &middot; LIVE PIPELINE RUN</span>
-        </div>
-        <dl>
-          <div><dt>Closure precision</dt><dd class="mono">1:2.8k</dd></div>
-          <div><dt>Boundary closure</dt><dd class="mono">325.3 ft</dd></div>
-          <div><dt>Output CRS</dt><dd class="mono">WGS84</dd></div>
-        </dl>
-        <span class="result-note">from an actual ROAM run — see /workspace</span>
-      </div>
+    <div class="hero-chips">
+      {#each capabilities as c}
+        <span class="chip">{c}</span>
+      {/each}
     </div>
+  </div>
+
+  <div class="hero-visual">
+    <img src="/images/hero-survey.jpg" alt="1903 plate map of Portland, Maine, showing colored ward and district boundaries" />
   </div>
 </section>
 
-<section id="pipeline" class="pipeline">
+<section id="pipeline" class="story">
   <div class="section-inner">
     <p class="kicker">The pipeline</p>
-    <h2>Four real stages. No manual tracing.</h2>
-    <div class="stage-grid">
-      {#each stages as s}
-        <div class="stage-card">
-          <span class="stage-num mono">{s.step}</span>
-          <h3>{s.title}</h3>
-          <p>{s.body}</p>
+    <h2>From a flat scan to a validated boundary.</h2>
+
+    <div class="story-row">
+      <div class="story-copy">
+        <span class="story-index">01</span>
+        <h3>Read any scan</h3>
+        <p>
+          Every page is rendered and run through layout detection — text blocks, tables,
+          seals and parcel-map drawings are located and OCR'd independently, so a dense
+          survey plat doesn't drown out the deed text around it.
+        </p>
+      </div>
+      <div class="story-visual scan-visual">
+        <img src="/images/gallery-baist-dc.jpg" alt="Detected regions on a scanned real-estate atlas plate" />
+        <div class="detect-box" style="left:8%; top:38%; width:26%; height:20%;">
+          <span>ParcelMap</span>
         </div>
-      {/each}
+        <div class="detect-box" style="left:58%; top:10%; width:20%; height:12%;">
+          <span>Text</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="story-row reverse">
+      <div class="story-copy">
+        <span class="story-index">02</span>
+        <h3>Extract the boundary calls</h3>
+        <p>
+          A vision model reads bearing-and-distance calls, tie points and basis-of-bearings
+          straight off the drawing — filtering out reference citations and interior
+          dimensions that aren't part of the actual boundary.
+        </p>
+      </div>
+      <div class="story-visual">
+        <div class="calls-panel panel">
+          <div class="calls-head">
+            <span class="dot-label">boundary_calls</span>
+            {#if region}<span class="mono small">{region.vision_geometry.parcel_label}</span>{/if}
+          </div>
+          {#if region}
+            {#each region.vision_geometry.boundary_calls.slice(0, 5) as call}
+              <div class="call-row mono">
+                <span>{call.bearing.replace('�', '°')}</span>
+                <span class="muted">{call.distance}</span>
+              </div>
+            {/each}
+          {:else}
+            <div class="calls-loading skeleton" style="height:120px"></div>
+          {/if}
+        </div>
+      </div>
+    </div>
+
+    <div class="story-row">
+      <div class="story-copy">
+        <span class="story-index">03</span>
+        <h3>Reconstruct &amp; georeference</h3>
+        <p>
+          The traverse is walked corner-to-corner into real geometry, then projected onto
+          true WGS84 coordinates using an address geocoded straight out of the document —
+          no fixed coordinate zone assumed.
+        </p>
+      </div>
+      <div class="story-visual map-visual">
+        {#if region}
+          <ResultMap geojson={region.boundary_geojson_wgs84} color="#d9581f" />
+        {:else}
+          <div class="skeleton" style="height:100%"></div>
+        {/if}
+      </div>
+    </div>
+
+    <div class="story-row reverse">
+      <div class="story-copy">
+        <span class="story-index">04</span>
+        <h3>Validate automatically</h3>
+        <p>
+          Closure precision, self-intersection and the document's own stated acreage are
+          cross-checked. Every parcel ships with an honest signal — including when it
+          doesn't pass, like the real example on the right.
+        </p>
+      </div>
+      <div class="story-visual">
+        <div class="validate-panel panel">
+          {#if region}
+            {@const v = region.spatial_validation}
+            <div class="validate-head">
+              <span class="pill {v.valid ? 'ok' : 'high'}">{v.valid ? 'Valid' : 'Needs review'}</span>
+            </div>
+            <dl class="validate-grid">
+              <div><dt>Precision</dt><dd class="mono">{v.precision_ratio ? `1:${v.precision_ratio}` : '—'}</dd></div>
+              <div><dt>Closure</dt><dd class="mono">{region.boundary_geojson_wgs84.properties.closure_error_ft} ft</dd></div>
+              <div><dt>Area</dt><dd class="mono">{v.area_acres ? `${v.area_acres} ac` : '—'}</dd></div>
+            </dl>
+            {#if v.issues?.length}
+              <p class="validate-issue">{v.issues[0]}</p>
+            {/if}
+          {:else}
+            <div class="skeleton" style="height:120px"></div>
+          {/if}
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -112,39 +185,29 @@
 
 <style>
 .hero {
-  padding: 64px 28px 40px;
+  padding: 56px 28px 0;
+  max-width: 1240px;
+  margin: 0 auto;
 }
 
 .hero-inner {
-  max-width: 1240px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: 56px;
-  align-items: center;
+  max-width: 640px;
+  margin-bottom: 40px;
 }
 
 .kicker {
   margin: 0 0 14px;
   text-transform: uppercase;
   font-size: 0.72rem;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   font-weight: 700;
-  color: var(--brand);
+  color: var(--accent);
 }
 
 h1 {
   margin: 0 0 20px;
   font-size: clamp(2.1rem, 4vw, 3.1rem);
   line-height: 1.08;
-  color: var(--text);
-}
-
-.accent {
-  background: linear-gradient(120deg, var(--brand), #7be8c8);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
 }
 
 .lede {
@@ -152,13 +215,13 @@ h1 {
   color: var(--muted);
   font-size: 1.02rem;
   line-height: 1.6;
-  max-width: 46ch;
+  max-width: 52ch;
 }
 
 .hero-actions {
   display: flex;
   gap: 14px;
-  margin-bottom: 30px;
+  margin-bottom: 26px;
 }
 
 .hero-chips {
@@ -176,98 +239,22 @@ h1 {
 }
 
 .hero-visual {
-  position: relative;
-}
-
-.scan-frame {
-  position: relative;
-  border-radius: 18px;
+  border-radius: 16px;
   overflow: hidden;
   border: 1px solid var(--line);
   box-shadow: var(--shadow-float);
 }
 
-.scan-frame img {
+.hero-visual img {
   display: block;
   width: 100%;
-  height: 380px;
+  height: clamp(280px, 44vw, 460px);
   object-fit: cover;
-  filter: saturate(0.92) contrast(1.02);
+  object-position: 20% 30%;
 }
 
-.scan-tag {
-  position: absolute;
-  left: 14px;
-  bottom: 14px;
-  font-family: var(--mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.06em;
-  color: #cfe9df;
-  background: rgba(8, 11, 10, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  padding: 5px 9px;
-  border-radius: 999px;
-  backdrop-filter: blur(6px);
-}
-
-.result-card {
-  position: absolute;
-  right: -18px;
-  bottom: -34px;
-  width: 262px;
-  background: var(--surface-strong);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 16px 18px;
-  box-shadow: var(--shadow-float);
-}
-
-.result-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.64rem;
-  letter-spacing: 0.06em;
-  color: var(--brand);
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-
-.result-card dl {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.result-card dl > div {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-}
-
-.result-card dt {
-  font-size: 0.78rem;
-  color: var(--muted);
-}
-
-.result-card dd {
-  margin: 0;
-  font-size: 0.86rem;
-  color: var(--text);
-  font-weight: 600;
-}
-
-.result-note {
-  display: block;
-  margin-top: 12px;
-  font-size: 0.68rem;
-  color: var(--muted-dim);
-}
-
-.pipeline,
-.gallery {
-  padding: 76px 28px;
+.story {
+  padding: 90px 28px;
   border-top: 1px solid var(--line-soft);
 }
 
@@ -276,42 +263,176 @@ h1 {
   margin: 0 auto;
 }
 
-.pipeline h2,
+.story h2 {
+  margin: 0 0 64px;
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  max-width: 26ch;
+}
+
+.story-row {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 56px;
+  align-items: center;
+  margin-bottom: 76px;
+}
+
+.story-row:last-child {
+  margin-bottom: 0;
+}
+
+.story-row.reverse {
+  grid-template-columns: 1.15fr 0.85fr;
+}
+
+.story-row.reverse .story-copy {
+  order: 2;
+}
+
+.story-index {
+  font-family: var(--mono);
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.story-copy h3 {
+  margin: 10px 0 12px;
+  font-size: 1.4rem;
+}
+
+.story-copy p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+  max-width: 42ch;
+}
+
+.story-visual {
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  min-height: 260px;
+  position: relative;
+}
+
+.scan-visual img {
+  display: block;
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+}
+
+.detect-box {
+  position: absolute;
+  border: 1.5px solid var(--accent);
+  background: rgba(217, 88, 31, 0.08);
+  border-radius: 3px;
+}
+
+.detect-box span {
+  position: absolute;
+  top: -20px;
+  left: -1.5px;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  background: var(--accent);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.map-visual {
+  height: 300px;
+}
+
+.calls-panel,
+.validate-panel {
+  padding: 20px 22px;
+  height: 100%;
+}
+
+.calls-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.dot-label {
+  font-size: 0.72rem;
+  color: var(--muted-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.small {
+  font-size: 0.78rem;
+}
+
+.call-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 0.86rem;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.call-row:last-child {
+  border-bottom: none;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.validate-head {
+  margin-bottom: 16px;
+}
+
+.validate-grid {
+  margin: 0 0 14px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.validate-grid dt {
+  font-size: 0.68rem;
+  color: var(--muted-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.validate-grid dd {
+  margin: 3px 0 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.validate-issue {
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.gallery {
+  padding: 90px 28px;
+  border-top: 1px solid var(--line-soft);
+}
+
 .gallery h2 {
   margin: 0 0 40px;
   font-size: clamp(1.5rem, 2.4vw, 2rem);
   max-width: 22ch;
-}
-
-.stage-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
-}
-
-.stage-card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 22px 20px;
-}
-
-.stage-num {
-  color: var(--brand);
-  font-size: 0.78rem;
-  font-weight: 600;
-}
-
-.stage-card h3 {
-  margin: 10px 0 8px;
-  font-size: 1.05rem;
-}
-
-.stage-card p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.87rem;
-  line-height: 1.55;
 }
 
 .gallery-grid {
@@ -326,12 +447,10 @@ h1 {
   object-fit: cover;
   border-radius: 12px;
   border: 1px solid var(--line);
-  filter: saturate(0.9);
-  transition: filter 0.2s ease, transform 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 .gallery-grid img:hover {
-  filter: saturate(1.05);
   transform: translateY(-2px);
 }
 
@@ -342,7 +461,7 @@ h1 {
 }
 
 .cta {
-  padding: 30px 28px 90px;
+  padding: 30px 28px 100px;
 }
 
 .cta-inner {
@@ -365,20 +484,16 @@ h1 {
   max-width: 46ch;
 }
 
-@media (max-width: 960px) {
-  .hero-inner {
+@media (max-width: 900px) {
+  .story-row,
+  .story-row.reverse {
     grid-template-columns: 1fr;
   }
-  .stage-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .story-row.reverse .story-copy {
+    order: 0;
   }
   .gallery-grid {
     grid-template-columns: 1fr;
-  }
-  .result-card {
-    position: static;
-    width: auto;
-    margin-top: 16px;
   }
 }
 </style>
