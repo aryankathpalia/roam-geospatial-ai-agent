@@ -1,16 +1,17 @@
 """
 Main document processing pipeline: render + detect every page (fast,
-sequential), then fan out per-page OCR concurrently for only the pages
-that actually have OCR-eligible regions.
+sequential), then fan out OCR across every page's BANDS concurrently --
+not per page, per band. See app/pipeline/page_ocr.py for why: a single
+70-region page took 68s on its own, which meant page-level parallelism
+alone still bottlenecked on that one page once every other page had
+finished. Splitting dense pages into bands and flattening ALL bands
+across the WHOLE document into one fan-out means no single page (or
+band) can dominate the total time.
 
-The OCR fan-out is pluggable (`ocr_dispatcher`). Locally, pages just
+The OCR fan-out is pluggable (`ocr_dispatcher`). Locally, bands just
 run one after another in a thread pool -- fine for dev. On Modal,
-modal_app.py overrides DEFAULT_OCR_DISPATCHER with one that fans pages
-out to separate containers via Function.map(), which is what actually
-matters: detection is cheap (~1-2s/page), OCR is the real cost
-(~15-25s/page), and running N pages' OCR in N parallel containers
-turns "sum of every page's OCR time" into "roughly the slowest page's
-OCR time".
+modal_app.py overrides DEFAULT_OCR_DISPATCHER with one that fans bands
+out to separate containers via Function.map().
 """
 
 import asyncio
@@ -18,27 +19,36 @@ from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import Any
 
+from PIL import Image
+
 from app.services.layout_detector_onnx import detect_page_layout
+from app.services.ocr import OCRLine
 from app.services.pdf_inspector import inspect_pdf
 from app.services.pdf_renderer import render_page
 from app.services.region_cropper import extract_region_crops
-from app.pipeline.page_ocr import ocr_and_match_page, page_needs_ocr
+from app.pipeline.page_ocr import (
+    band_count_for,
+    match_lines_to_regions,
+    ocr_band,
+    page_needs_ocr,
+    split_page_into_bands,
+)
 
 DOCUMENT_ROOT = Path("data/documents")
 
-# (page_png_bytes, regions) in -> updated regions out, one pair per OCR job.
-OcrJob = tuple[bytes, list[dict]]
-OcrDispatcher = Callable[[list[OcrJob]], Awaitable[list[list[dict]]]]
+# (band_png_bytes, y_offset) in -> OCR'd lines out, one pair per band.
+BandJob = tuple[bytes, float]
+OcrDispatcher = Callable[[list[BandJob]], Awaitable[list[list[OCRLine]]]]
 
 
-async def _default_ocr_dispatcher(jobs: list[OcrJob]) -> list[list[dict]]:
-    """Local-dev fallback: pages processed one after another in a thread."""
+async def _default_ocr_dispatcher(jobs: list[BandJob]) -> list[list[OCRLine]]:
+    """Local-dev fallback: bands processed one after another in a thread."""
 
     loop = asyncio.get_running_loop()
     results = []
-    for page_bytes, regions in jobs:
-        updated = await loop.run_in_executor(None, ocr_and_match_page, page_bytes, regions)
-        results.append(updated)
+    for band_bytes, y_offset in jobs:
+        lines = await loop.run_in_executor(None, ocr_band, band_bytes, y_offset)
+        results.append(lines)
     return results
 
 
@@ -109,25 +119,38 @@ async def process_document(
         )
 
     # ---------------------------------------------------------
-    # Fan out OCR for only the pages that have something worth
-    # reading -- a pure-Picture or empty page costs nothing here.
+    # Split every OCR-eligible page into bands, and flatten ALL bands
+    # from the WHOLE document into one fan-out -- so a dense page's own
+    # bands run alongside other pages' bands, not just alongside other
+    # whole pages.
     # ---------------------------------------------------------
 
-    ocr_jobs: list[OcrJob] = []
-    ocr_job_entries: list[dict[str, Any]] = []
+    band_jobs: list[BandJob] = []
+    # Parallel list: which page_entries index each band job belongs to.
+    band_owner: list[int] = []
 
-    for entry in page_entries:
-        if page_needs_ocr(entry["regions"]):
-            ocr_jobs.append((entry["path"].read_bytes(), entry["regions"]))
-            ocr_job_entries.append(entry)
-        else:
+    for entry_index, entry in enumerate(page_entries):
+        if not page_needs_ocr(entry["regions"]):
             for region in entry["regions"]:
                 region["extraction_status"] = "skipped"
+            continue
 
-    if ocr_jobs:
-        updated_regions_list = await ocr_dispatcher(ocr_jobs)
-        for entry, updated_regions in zip(ocr_job_entries, updated_regions_list):
-            entry["regions"] = updated_regions
+        with Image.open(entry["path"]) as image:
+            image = image.convert("RGB")
+            num_bands = band_count_for(entry["regions"])
+            for band_bytes, y_offset in split_page_into_bands(image, num_bands):
+                band_jobs.append((band_bytes, y_offset))
+                band_owner.append(entry_index)
+
+    if band_jobs:
+        band_results = await ocr_dispatcher(band_jobs)
+
+        lines_by_page: dict[int, list[OCRLine]] = {}
+        for entry_index, lines in zip(band_owner, band_results):
+            lines_by_page.setdefault(entry_index, []).extend(lines)
+
+        for entry_index, lines in lines_by_page.items():
+            match_lines_to_regions(lines, page_entries[entry_index]["regions"])
 
     pages_result = [
         {"page_number": e["page_number"], "regions": e["regions"]}

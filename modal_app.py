@@ -26,13 +26,15 @@ image = modal.Image.from_dockerfile(
 # was chosen for, so this stays CPU-only.
 #
 # The real fix for per-document latency: OCR is the expensive step
-# (~15-25s/page), detection is cheap (~1-2s/page). Rather than one
-# container OCR'ing every page in sequence, each OCR-eligible page is
-# fanned out to its own container via .map() below -- N pages in
-# parallel containers costs roughly the slowest page's time, not the
-# sum of all of them. This is the same principle production OCR
+# (~15-25s for a light page, ~68s measured for a single 70-region
+# page). Fanning out per PAGE alone wasn't enough -- one dense page
+# still bottlenecks the whole document once every other page is done.
+# So dense pages are split into horizontal bands (see
+# app/pipeline/page_ocr.py) and EVERY band from the WHOLE document is
+# fanned out together via .map() below -- no single page or band can
+# dominate the total time. This is the same principle production OCR
 # services (Textract, etc.) use to hit ~200 pages/2min: parallelism
-# across workers, not a faster single-threaded engine.
+# across many workers, not a faster single-threaded engine.
 
 
 @app.function(
@@ -41,18 +43,18 @@ image = modal.Image.from_dockerfile(
     memory=2048,
     timeout=180,
 )
-def ocr_page_remote(page_bytes: bytes, regions: list[dict]) -> list[dict]:
-    from app.pipeline.page_ocr import ocr_and_match_page
+def ocr_band_remote(band_bytes: bytes, y_offset: float) -> list:
+    from app.pipeline.page_ocr import ocr_band
 
-    return ocr_and_match_page(page_bytes, regions)
+    return ocr_band(band_bytes, y_offset)
 
 
-async def _modal_ocr_dispatcher(jobs: list[tuple[bytes, list[dict]]]) -> list[list[dict]]:
-    page_bytes_list = [job[0] for job in jobs]
-    regions_list = [job[1] for job in jobs]
+async def _modal_ocr_dispatcher(jobs: list[tuple[bytes, float]]) -> list[list]:
+    band_bytes_list = [job[0] for job in jobs]
+    y_offset_list = [job[1] for job in jobs]
 
     results = []
-    async for result in ocr_page_remote.map.aio(page_bytes_list, regions_list):
+    async for result in ocr_band_remote.map.aio(band_bytes_list, y_offset_list):
         results.append(result)
     return results
 
