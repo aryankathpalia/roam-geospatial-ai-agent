@@ -46,13 +46,33 @@ _FEET_TO_METERS = 0.3048
 # (paddleocr) just to read a region-class constant.
 _TEXT_BEARING_CLASSES = {"Text", "Table", "Seal", "ScannedPrintout", "ParcelMap"}
 
-# A US ZIP code (with optional +4) is the single strongest signal that a
-# line is a real postal address rather than survey jargon that happens
-# to contain a place-sounding word.
+# A US ZIP code (with optional +4) is a signal that a line is a real
+# postal address rather than survey jargon that happens to contain a
+# place-sounding word.
 _ZIP_RE = re.compile(r"\b\d{5}(?:-\d{4})?\b")
 # "<word>, XX" or "<word> County, State" -- a state abbreviation or the
-# literal word County near a comma is the next-strongest signal.
+# literal word County near a comma is a weaker signal on its own.
 _STATE_HINT_RE = re.compile(r",\s*[A-Z]{2}\b|\bCounty\b", re.IGNORECASE)
+# An explicit "Project/Site/Property/Subject Address:" label is the
+# STRONGEST signal -- it directly names the parcel's own location,
+# not a form-preparer's or surveying firm's office address. Land-
+# record application forms consistently use one of these labels
+# (confirmed on a real document: "Project Address: 10235 Placerville
+# Road" was present and unambiguous, but scored the same as a firm's
+# Reno office ZIP line before this field-label check existed, and the
+# office address won on tie-break order).
+_ADDRESS_LABEL_RE = re.compile(
+    r"\b(?:project|site|property|subject)\s+address\b", re.IGNORECASE
+)
+# Lines that are almost always a FIRM's or agency's own mailing/
+# letterhead address, not the parcel's -- downweighted rather than
+# excluded outright, since they're still real fallback signal if
+# nothing better exists in the document.
+_OFFICE_HINT_RE = re.compile(
+    r"\b(?:surveyor|engineer|p\.?l\.?s\.?|inc\.?|llc|"
+    r"planning\s+and\s+building|treasurer|development\s+application)\b",
+    re.IGNORECASE,
+)
 
 
 def find_anchor_query(pages_result: list[dict]) -> str | None:
@@ -77,15 +97,27 @@ def find_anchor_query(pages_result: list[dict]) -> str | None:
                     continue
 
                 score = 0
+                if _ADDRESS_LABEL_RE.search(line):
+                    score += 5
                 if _ZIP_RE.search(line):
                     score += 2
                 if _STATE_HINT_RE.search(line):
                     score += 1
+                if _OFFICE_HINT_RE.search(line):
+                    score -= 3
                 if score > best_score:
                     best_score = score
                     best_line = line
 
-    return best_line
+    if best_line is None:
+        return None
+
+    # Strip a leading field label ("Project Address:") before handing
+    # the line to the geocoder -- confirmed empirically that Nominatim
+    # returns zero results for "Project Address: 10235 Placerville
+    # Road" but resolves "10235 Placerville Road" correctly, since the
+    # label isn't part of any real place name it can match against.
+    return _ADDRESS_LABEL_RE.sub("", best_line).lstrip(": ").strip()
 
 
 def georeference_traverse_to_geojson(
