@@ -1,20 +1,13 @@
 <script lang="ts">
-  import Sidebar from '$lib/components/Sidebar.svelte';
   import '../app.css';
-
-  let sidebarCollapsed = false;
 </script>
 
 <svelte:head>
-  <title>ROAM</title>
+  <title>ROAM — Geospatial Document Intelligence</title>
+  <meta
+    name="description"
+    content="ROAM turns scanned deeds, plats and survey documents into verified, georeferenced GIS data."
+  />
 </svelte:head>
 
-<div class="app-shell">
-  <Sidebar bind:collapsed={sidebarCollapsed} />
-
-  <main class="app-main">
-    <div class="page-wrap">
-      <slot />
-    </div>
-  </main>
-</div>
+<slot />

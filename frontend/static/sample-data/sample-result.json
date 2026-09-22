@@ -1,0 +1,349 @@
+{
+  "document_id": "0eef4f6c-8050-47db-9d90-e742a1deaee0",
+  "source_note": "Real ROAM pipeline output from WTPM26-0004_Placerville_app.pdf (live Modal run). Georeferencing recomputed with the corrected anchor heuristic (10235 Placerville Road, Washoe County, NV); spatial_validation recomputed with the current validator.",
+  "anchor_address": "10235 Placerville Road",
+  "anchor_lat": 39.6877843,
+  "anchor_lon": -119.9082479,
+  "pages_needing_review": 10,
+  "total_pages": 11,
+  "pages": [
+    {
+      "page_number": 8,
+      "regions": [
+        {
+          "class": "ParcelMap",
+          "bbox": [
+            55.5,
+            143.5,
+            1934.7,
+            1314.8
+          ],
+          "needs_review": false,
+          "vision_geometry": {
+            "boundary_calls": [],
+            "tie_point": null,
+            "basis_of_bearings": null,
+            "parcel_label": null
+          }
+        }
+      ]
+    },
+    {
+      "page_number": 9,
+      "regions": [
+        {
+          "class": "ParcelMap",
+          "bbox": [
+            333.3,
+            175.0,
+            1830.7,
+            1289.2
+          ],
+          "needs_review": false,
+          "vision_geometry": {
+            "boundary_calls": [
+              {
+                "bearing": "N0\u00b048'45\"E",
+                "distance": "220.00'"
+              },
+              {
+                "bearing": "S89\u00b011'15\"E",
+                "distance": "903.15'"
+              },
+              {
+                "bearing": "N89\u00b011'15\"W",
+                "distance": "1077.90'"
+              },
+              {
+                "bearing": "S0\u00b048'45\"W",
+                "distance": "220.00'"
+              },
+              {
+                "bearing": "N0\u00b048'45\"E",
+                "distance": "2637.36'"
+              },
+              {
+                "bearing": "S89\u00b011'17\"E",
+                "distance": "336.41'"
+              },
+              {
+                "bearing": "S89\u00b011'17\"E",
+                "distance": "329.80'"
+              }
+            ],
+            "tie_point": {
+              "northing": "14926910.28",
+              "easting": "2251599.70",
+              "anchors_corner": "null"
+            },
+            "basis_of_bearings": "THE BASIS OF BEARINGS FOR THIS SURVEY IS NEVADA STATE PLANE, WEST ZONE NAD83(94) BASED ON REAL TIME KINEMATIC (RTK) GPS OBSERVATIONS UTILIZING CORRECTIONS FROM THE NORTHERN NEVADA COOPERATIVE REAL TIME NETWORK. COORDINATES AND DISTANCES HEREON ARE AT GROUND LEVEL BASED ON A COMBINED GRID TO GROUND FACTOR OF 1.000197939.",
+            "parcel_label": "PARCEL 2"
+          },
+          "spatial_validation": {
+            "valid": false,
+            "issues": [
+              "Weak closure: precision ratio 1:2 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.",
+              "Traverse self-intersects -- the walked boundary crosses itself, which isn't a valid parcel shape regardless of closure error.",
+              "Walked area (635,612 sqft) differs from the document's stated area (121,097 sqft) by 425% -- beyond the 15% tolerance."
+            ],
+            "perimeter_ft": 5724.62,
+            "precision_ratio": 2.1,
+            "self_intersects": true,
+            "area_sqft": 635611.75,
+            "area_acres": 14.592,
+            "stated_area_sqft": 121096.79999999999,
+            "area_matches_stated": false
+          },
+          "boundary_geojson_wgs84": {
+            "type": "Feature",
+            "properties": {
+              "closure_error_ft": 2682.77,
+              "unparsed_calls": 0,
+              "anchor_lat": 39.6877843,
+              "anchor_lon": -119.9082479,
+              "georeferenced": "approximate"
+            },
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -119.9082479,
+                    39.6877843
+                  ],
+                  [
+                    -119.9082368,
+                    39.6883882
+                  ],
+                  [
+                    -119.905028,
+                    39.688353
+                  ],
+                  [
+                    -119.9088577,
+                    39.688395
+                  ],
+                  [
+                    -119.9088688,
+                    39.6877911
+                  ],
+                  [
+                    -119.9087359,
+                    39.6950305
+                  ],
+                  [
+                    -119.9075406,
+                    39.6950175
+                  ],
+                  [
+                    -119.9063687,
+                    39.6950046
+                  ],
+                  [
+                    -119.9082479,
+                    39.6877843
+                  ]
+                ]
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "page_number": 10,
+      "regions": [
+        {
+          "class": "ParcelMap",
+          "bbox": [
+            1032.8,
+            210.7,
+            385.5,
+            365.0
+          ],
+          "needs_review": true,
+          "vision_geometry": {
+            "boundary_calls": [
+              {
+                "bearing": "S89\u00b011'17\"E",
+                "distance": "325.30'"
+              }
+            ],
+            "tie_point": {
+              "northing": "14926352.62",
+              "easting": "2253573.04",
+              "anchors_corner": "null"
+            },
+            "basis_of_bearings": null,
+            "parcel_label": "PARCEL 1"
+          },
+          "spatial_validation": {
+            "valid": false,
+            "issues": [
+              "Weak closure: precision ratio 1:1 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.",
+              "Only 1 boundary call(s) parsed -- too few to form a closed shape (need at least 3)."
+            ],
+            "perimeter_ft": 325.3,
+            "precision_ratio": 1.0,
+            "self_intersects": false,
+            "area_sqft": null,
+            "area_acres": null,
+            "stated_area_sqft": null,
+            "area_matches_stated": null
+          },
+          "boundary_geojson_wgs84": {
+            "type": "Feature",
+            "properties": {
+              "closure_error_ft": 325.3,
+              "unparsed_calls": 0,
+              "anchor_lat": 39.6877843,
+              "anchor_lon": -119.9082479,
+              "georeferenced": "approximate"
+            },
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -119.9082479,
+                    39.6877843
+                  ],
+                  [
+                    -119.9070922,
+                    39.6877716
+                  ],
+                  [
+                    -119.9082479,
+                    39.6877843
+                  ]
+                ]
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "page_number": 11,
+      "regions": [
+        {
+          "class": "ParcelMap",
+          "bbox": [
+            332.1,
+            175.4,
+            1846.5,
+            1284.7
+          ],
+          "needs_review": false,
+          "vision_geometry": {
+            "boundary_calls": [
+              {
+                "bearing": "N0\u00b048'45\"E",
+                "distance": "220.00'"
+              },
+              {
+                "bearing": "S89\u00b011'15\"E",
+                "distance": "903.15'"
+              },
+              {
+                "bearing": "N89\u00b011'15\"W",
+                "distance": "1077.90'"
+              },
+              {
+                "bearing": "S0\u00b048'45\"W",
+                "distance": "220.00'"
+              },
+              {
+                "bearing": "N0\u00b048'45\"E",
+                "distance": "2637.36'"
+              },
+              {
+                "bearing": "S89\u00b011'17\"E",
+                "distance": "336.41'"
+              },
+              {
+                "bearing": "S89\u00b011'17\"E",
+                "distance": "329.80'"
+              }
+            ],
+            "tie_point": {
+              "northing": "14926910.28",
+              "easting": "2251599.70",
+              "anchors_corner": "null"
+            },
+            "basis_of_bearings": null,
+            "parcel_label": "PARCEL 2"
+          },
+          "spatial_validation": {
+            "valid": false,
+            "issues": [
+              "Weak closure: precision ratio 1:2 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.",
+              "Traverse self-intersects -- the walked boundary crosses itself, which isn't a valid parcel shape regardless of closure error.",
+              "Walked area (635,612 sqft) differs from the document's stated area (121,097 sqft) by 425% -- beyond the 15% tolerance."
+            ],
+            "perimeter_ft": 5724.62,
+            "precision_ratio": 2.1,
+            "self_intersects": true,
+            "area_sqft": 635611.75,
+            "area_acres": 14.592,
+            "stated_area_sqft": 121096.79999999999,
+            "area_matches_stated": false
+          },
+          "boundary_geojson_wgs84": {
+            "type": "Feature",
+            "properties": {
+              "closure_error_ft": 2682.77,
+              "unparsed_calls": 0,
+              "anchor_lat": 39.6877843,
+              "anchor_lon": -119.9082479,
+              "georeferenced": "approximate"
+            },
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -119.9082479,
+                    39.6877843
+                  ],
+                  [
+                    -119.9082368,
+                    39.6883882
+                  ],
+                  [
+                    -119.905028,
+                    39.688353
+                  ],
+                  [
+                    -119.9088577,
+                    39.688395
+                  ],
+                  [
+                    -119.9088688,
+                    39.6877911
+                  ],
+                  [
+                    -119.9087359,
+                    39.6950305
+                  ],
+                  [
+                    -119.9075406,
+                    39.6950175
+                  ],
+                  [
+                    -119.9063687,
+                    39.6950046
+                  ],
+                  [
+                    -119.9082479,
+                    39.6877843
+                  ]
+                ]
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
