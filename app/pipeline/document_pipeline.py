@@ -21,6 +21,8 @@ from typing import Any
 
 from PIL import Image
 
+from app.services.geocoding import GeocodingError, geocode_place
+from app.services.georeference import find_anchor_query, georeference_traverse_to_geojson
 from app.services.geometry import traverse_to_geojson, walk_traverse
 from app.services.layout_detector_onnx import detect_page_layout
 from app.services.ocr import OCRLine
@@ -155,6 +157,29 @@ async def process_document(
             match_lines_to_regions(lines, page_entries[entry_index]["regions"])
 
     # ---------------------------------------------------------
+    # Find a real-world anchor for georeferencing (see
+    # app/services/georeference.py for why this -- not a state-plane
+    # projection -- is the approach): scan this document's own OCR'd
+    # text for the most address-like line, geocode it ONCE per
+    # document via the existing Nominatim geocoder. None if nothing
+    # plausible is found -- traverses stay local-only, not guessed.
+    # ---------------------------------------------------------
+
+    anchor_lat: float | None = None
+    anchor_lon: float | None = None
+    anchor_query = find_anchor_query(
+        [{"regions": e["regions"]} for e in page_entries]
+    )
+    if anchor_query:
+        try:
+            candidates = await geocode_place(anchor_query, limit=1)
+            if candidates:
+                anchor_lat = candidates[0].latitude
+                anchor_lon = candidates[0].longitude
+        except GeocodingError:
+            pass
+
+    # ---------------------------------------------------------
     # Vision escalation: ParcelMap regions (flagged needs_vision by
     # match_lines_to_regions) get sent to Gemini to pull out the
     # boundary traverse / tie point / basis of bearings needed for
@@ -204,6 +229,18 @@ async def process_document(
                 if calls:
                     traverse = walk_traverse(calls)
                     region["boundary_geojson"] = traverse_to_geojson(traverse)
+
+                    # Project onto the real map if we found an anchor
+                    # for this document -- otherwise this parcel stays
+                    # local-only (flagged, not silently dropped).
+                    if anchor_lat is not None and anchor_lon is not None:
+                        region["boundary_geojson_wgs84"] = georeference_traverse_to_geojson(
+                            traverse, anchor_lat, anchor_lon
+                        )
+                    else:
+                        region["georeference_error"] = (
+                            "no geocodable address found in this document's OCR text"
+                        )
         except Exception as exc:
             # Vision is an enhancement on top of OCR text, not a hard
             # requirement (e.g. GEMINI_API_KEY not set yet) -- degrade
