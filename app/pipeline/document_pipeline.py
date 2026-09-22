@@ -21,6 +21,7 @@ from typing import Any
 
 from PIL import Image
 
+from app.services.geometry import traverse_to_geojson, walk_traverse
 from app.services.layout_detector_onnx import detect_page_layout
 from app.services.ocr import OCRLine
 from app.services.pdf_inspector import inspect_pdf
@@ -190,6 +191,19 @@ async def process_document(
             )
             for (entry, region), geometry in zip(vision_targets, geometries):
                 region["vision_geometry"] = geometry
+
+                # Walk the extracted boundary calls into an actual
+                # polygon. closure_error_ft is a real, standard
+                # surveying QA signal, not something we invented: a
+                # traverse that doesn't return near its start point is
+                # an honest sign the extracted calls are incomplete or
+                # include non-boundary noise -- surfaced rather than
+                # hidden, since a wrong-looking polygon on the eventual
+                # map is worse than an honest "couldn't close" flag.
+                calls = geometry.get("boundary_calls") or []
+                if calls:
+                    traverse = walk_traverse(calls)
+                    region["boundary_geojson"] = traverse_to_geojson(traverse)
         except Exception as exc:
             # Vision is an enhancement on top of OCR text, not a hard
             # requirement (e.g. GEMINI_API_KEY not set yet) -- degrade
