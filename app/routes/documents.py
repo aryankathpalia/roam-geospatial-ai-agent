@@ -3,8 +3,7 @@ from pathlib import Path
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
-from app.pipeline.extract_regions import extract_page_regions
-from app.pipeline.streaming_processor import process_document_streaming
+from app.pipeline.document_pipeline import process_document
 from app.services.pre_annotation import generate_pre_annotations
 
 
@@ -55,16 +54,13 @@ async def upload_document(file: UploadFile = File(...)):
     pdf_path.write_bytes(contents)
 
     # --------------------------------------------------
-    # 4. Run the ROAM processing pipeline: layout detection, streamed
-    # per-page, with each page's regions sent for OCR/vision
-    # extraction as soon as that page is detected (see
-    # app/pipeline/streaming_processor.py).
+    # 4. Run the ROAM processing pipeline: render + detect every page,
+    # then fan out per-page OCR concurrently (see
+    # app/pipeline/document_pipeline.py).
     # --------------------------------------------------
 
     try:
-        pipeline_result = await process_document_streaming(
-            document_id, extract_page_regions
-        )
+        pipeline_result = await process_document(document_id)
 
     except Exception as exc:
         raise HTTPException(

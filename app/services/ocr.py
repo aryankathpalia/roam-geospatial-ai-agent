@@ -1,6 +1,10 @@
 """
-PaddleOCR-based text extraction for Text/Table/Seal/ScannedPrintout
-region crops.
+PaddleOCR-based text extraction, one call per PAGE (not per detected
+region). See app/pipeline/page_ocr.py for why: detecting+reading every
+region separately (up to 185 calls for one document) took ~150s in
+production; running one full-page OCR pass and matching the resulting
+lines back to ROAM's layout regions geometrically cuts that to one call
+per page, fanned out across pages in parallel (see modal_app.py).
 
 Two things had to be fixed empirically before this was usable, not
 assumed from docs:
@@ -12,12 +16,16 @@ assumed from docs:
 
 2. PaddleOCR's default "medium" model preset (PP-OCRv6_medium_*) took
    ~105s for a single mid-sized crop -- unusable. Switching to the
-   "mobile" preset (PP-OCRv5_mobile_det/rec) cut that to ~6s for a dense
-   table crop and ~1s for a typical text crop, with no meaningful
-   accuracy loss (0.96-1.00 confidence on the same content). Always use
-   the mobile preset here; do not switch back to the default.
+   "mobile" preset (PP-OCRv5_mobile_det/rec) cut that dramatically, with
+   no meaningful accuracy loss (0.96-1.00 confidence on the same
+   content). Always use the mobile preset here.
 
-Crops are passed in as numpy arrays / PIL Images -- no disk round-trip.
+GPU was investigated and ruled out: Modal requires a payment method on
+file for any GPU function, even within the free credit, which conflicts
+with this deployment's no-card requirement. A CPU-only alternative
+engine (RapidOCR) was also tested directly against our real documents
+and was slower than this setup even after tuning (16-22s vs 6-8s on the
+same crop) -- not used.
 """
 
 import threading
@@ -27,23 +35,22 @@ import numpy as np
 from paddleocr import PaddleOCR
 from PIL import Image
 
+_engine: PaddleOCR | None = None
+
+# PaddleOCR's underlying predictor is not thread-safe -- calling
+# .predict() on the same engine from two threads at once crashes with
+# "PreconditionNotMetError: Tensor holds no memory." Each Modal
+# container running ocr_page_remote has its own process (and therefore
+# its own engine instance), so this only serializes calls *within* one
+# container, not across the parallel fan-out.
+_engine_lock = threading.Lock()
+
 
 @dataclass
 class OCRLine:
     text: str
     confidence: float
-
-
-_engine: PaddleOCR | None = None
-
-# PaddleOCR's underlying predictor is not thread-safe -- calling
-# .predict() on the same engine from two threads at once (which happens
-# here because the streaming pipeline dispatches extraction for
-# multiple pages concurrently) crashes with
-# "PreconditionNotMetError: Tensor holds no memory." Serializing calls
-# is the fix; the streaming pipeline still overlaps extraction with the
-# NEXT page's layout detection, which is what actually mattered.
-_engine_lock = threading.Lock()
+    bbox: tuple[float, float, float, float]  # x1, y1, x2, y2, page coordinates
 
 
 def get_engine() -> PaddleOCR:
@@ -64,8 +71,12 @@ def get_engine() -> PaddleOCR:
     return _engine
 
 
-def run_ocr(image: Image.Image) -> list[OCRLine]:
-    """Run OCR on one region crop, returning its text lines in reading order."""
+def run_page_ocr(image: Image.Image) -> list[OCRLine]:
+    """
+    Run OCR once on a whole rendered page, returning every detected
+    text line with its bounding box -- callers match lines back to
+    ROAM's layout regions geometrically (app/pipeline/page_ocr.py).
+    """
 
     arr = np.array(image.convert("RGB"))
     with _engine_lock:
@@ -75,7 +86,15 @@ def run_ocr(image: Image.Image) -> list[OCRLine]:
     for page_result in result:
         texts = page_result.get("rec_texts", [])
         scores = page_result.get("rec_scores", [])
-        for text, score in zip(texts, scores):
-            lines.append(OCRLine(text=text, confidence=round(float(score), 3)))
+        boxes = page_result.get("rec_boxes", [])
+        for text, score, box in zip(texts, scores, boxes):
+            x1, y1, x2, y2 = (float(v) for v in box)
+            lines.append(
+                OCRLine(
+                    text=text,
+                    confidence=round(float(score), 3),
+                    bbox=(x1, y1, x2, y2),
+                )
+            )
 
     return lines

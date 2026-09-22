@@ -19,6 +19,43 @@ image = modal.Image.from_dockerfile(
     context_dir=".",
 )
 
+# GPU was ruled out: Modal requires a payment method on file to use ANY
+# GPU function, even within the free monthly credit -- confirmed via a
+# real deploy attempt ("Please add a payment method to use T4 GPU
+# functions"). That violates the no-card requirement this deployment
+# was chosen for, so this stays CPU-only.
+#
+# The real fix for per-document latency: OCR is the expensive step
+# (~15-25s/page), detection is cheap (~1-2s/page). Rather than one
+# container OCR'ing every page in sequence, each OCR-eligible page is
+# fanned out to its own container via .map() below -- N pages in
+# parallel containers costs roughly the slowest page's time, not the
+# sum of all of them. This is the same principle production OCR
+# services (Textract, etc.) use to hit ~200 pages/2min: parallelism
+# across workers, not a faster single-threaded engine.
+
+
+@app.function(
+    image=image,
+    cpu=1.0,
+    memory=2048,
+    timeout=180,
+)
+def ocr_page_remote(page_bytes: bytes, regions: list[dict]) -> list[dict]:
+    from app.pipeline.page_ocr import ocr_and_match_page
+
+    return ocr_and_match_page(page_bytes, regions)
+
+
+async def _modal_ocr_dispatcher(jobs: list[tuple[bytes, list[dict]]]) -> list[list[dict]]:
+    page_bytes_list = [job[0] for job in jobs]
+    regions_list = [job[1] for job in jobs]
+
+    results = []
+    async for result in ocr_page_remote.map.aio(page_bytes_list, regions_list):
+        results.append(result)
+    return results
+
 
 @app.function(
     image=image,
@@ -37,5 +74,11 @@ image = modal.Image.from_dockerfile(
 @modal.asgi_app()
 def fastapi_app():
     from app.main import app as web_app
+    from app.pipeline import document_pipeline
+
+    # Swap in the parallel fan-out dispatcher for this deployment --
+    # process_document() reads this module attribute fresh on every
+    # call, so setting it once here at container startup is enough.
+    document_pipeline.DEFAULT_OCR_DISPATCHER = _modal_ocr_dispatcher
 
     return web_app
