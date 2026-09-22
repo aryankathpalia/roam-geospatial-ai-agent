@@ -752,7 +752,7 @@ h1 {
   display: flex;
   justify-content: center;
   background-image: linear-gradient(rgba(8, 10, 8, 0.42), rgba(8, 10, 8, 0.5)),
-    url('/images/earth/holla-bend-arkansas.jpg');
+    url('/images/earth/vienna-detail.jpg');
   background-size: cover;
   background-position: center;
 }
