@@ -138,6 +138,30 @@ For EACH region, consolidate its own notes into its boundary traverse
 and related data. Use null for anything not present. Do not invent or
 guess values, and do not mix data between regions.
 
+For boundary_calls specifically: only include an entry if it has BOTH
+a bearing AND a distance stated together as a single call on the
+property's OUTER boundary line. Do NOT include:
+- a bare dimension number, curve table length, or interior measurement
+  (e.g. a building or setback dimension)
+- a bearing or distance shown in PARENTHESES -- survey plats use
+  parentheses for reference/record citations (a prior deed's stated
+  bearing, a tie to a section corner), not the as-surveyed boundary
+  call. Only use the un-parenthesized value.
+- a measurement labeled as road frontage, right-of-way, or a
+  quitclaim/dedication area -- those describe the road, not this
+  parcel's boundary.
+Leave a call out entirely rather than pairing it with a null bearing.
+
+The notes were read tile-by-tile, which is NOT the order the calls
+appear walking around the parcel -- you must reorder them yourself.
+Put boundary_calls in true walking sequence around the perimeter
+(consistently clockwise or counter-clockwise, starting anywhere), using
+any positional cues in the notes (corner labels, "top"/"bottom"/"east
+side" mentions, which piece each call came from) to infer the correct
+sequence. A correctly ordered traverse returns close to its starting
+point after the last call -- if your ordering doesn't, re-check it
+before answering.
+
 Return one result per region, in order, each tagged with its
 region_index (1-based, matching the region numbers below).
 
