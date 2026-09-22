@@ -1,9 +1,64 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import ResultMap from '$lib/components/ResultMap.svelte';
 
   let sample: any = null;
   let region: any = null;
+  let previewPath = '';
+  let previewPoints: [number, number][] = [];
+
+  // Mirrors app/services/geometry.py's quadrant-bearing-to-azimuth and
+  // traverse-walking logic in JS, so the small polygon sketch next to
+  // the boundary_calls table is drawn from the SAME real data, not a
+  // decorative stand-in shape.
+  function bearingToAzimuth(bearing: string): number | null {
+    const m = bearing
+      .replace('�', '°')
+      .match(/([NSns])\s*(\d+(?:\.\d+)?)\s*[°*ov]?\s*(?:(\d+(?:\.\d+)?)['′]?\s*)?(?:(\d+(?:\.\d+)?)["″]?\s*)?([EWew])/);
+    if (!m) return null;
+    const angle = parseFloat(m[2]) + (parseFloat(m[3]) || 0) / 60 + (parseFloat(m[4]) || 0) / 3600;
+    const ns = m[1].toUpperCase();
+    const ew = m[5].toUpperCase();
+    if (ns === 'N' && ew === 'E') return angle;
+    if (ns === 'S' && ew === 'E') return 180 - angle;
+    if (ns === 'S' && ew === 'W') return 180 + angle;
+    if (ns === 'N' && ew === 'W') return 360 - angle;
+    return null;
+  }
+
+  function walkTraverse(calls: { bearing: string; distance: string }[]): [number, number][] {
+    let x = 0;
+    let y = 0;
+    const pts: [number, number][] = [[0, 0]];
+    for (const call of calls) {
+      const az = bearingToAzimuth(call.bearing);
+      const dist = parseFloat((call.distance || '').replace(/[^\d.]/g, ''));
+      if (az === null || isNaN(dist)) continue;
+      const rad = (az * Math.PI) / 180;
+      x += dist * Math.sin(rad);
+      y += dist * Math.cos(rad);
+      pts.push([x, y]);
+    }
+    return pts;
+  }
+
+  function pointsToSvgPath(pts: [number, number][], size = 160, pad = 22): string {
+    const xs = pts.map((p) => p[0]);
+    const ys = pts.map((p) => p[1]);
+    const minX = Math.min(...xs);
+    const maxX = Math.max(...xs);
+    const minY = Math.min(...ys);
+    const maxY = Math.max(...ys);
+    const spanX = maxX - minX || 1;
+    const spanY = maxY - minY || 1;
+    const scale = Math.min((size - pad * 2) / spanX, (size - pad * 2) / spanY);
+    return pts
+      .map(([x, y], i) => {
+        const sx = pad + (x - minX) * scale;
+        const sy = size - (pad + (y - minY) * scale); // flip: north (+y) goes up on screen
+        return `${i === 0 ? 'M' : 'L'}${sx.toFixed(1)},${sy.toFixed(1)}`;
+      })
+      .join(' ');
+  }
 
   onMount(async () => {
     const res = await fetch('/sample-data/sample-result.json');
@@ -18,6 +73,10 @@
         break;
       }
     }
+    if (region) {
+      previewPoints = walkTraverse(region.vision_geometry.boundary_calls);
+      previewPath = pointsToSvgPath(previewPoints);
+    }
   });
 
   const capabilities = [
@@ -26,6 +85,13 @@
     'Free-text address geocoding',
     'GeoJSON out, ready for any GIS stack'
   ];
+
+  // A conservative gauge scale for the precision-ratio bar -- see
+  // app/services/spatial_validation.py's own _MIN_ACCEPTABLE_PRECISION_RATIO
+  // comment for why 1:2000 is used as a generic, loose minimum rather
+  // than a claimed regulatory threshold.
+  const GAUGE_MAX = 2500;
+  const GAUGE_THRESHOLD = 2000;
 </script>
 
 <section class="hero">
@@ -95,16 +161,51 @@
             <span class="dot-label">boundary_calls</span>
             {#if region}<span class="mono small">{region.vision_geometry.parcel_label}</span>{/if}
           </div>
-          {#if region}
-            {#each region.vision_geometry.boundary_calls.slice(0, 5) as call}
-              <div class="call-row mono">
-                <span>{call.bearing.replace('�', '°')}</span>
-                <span class="muted">{call.distance}</span>
-              </div>
-            {/each}
-          {:else}
-            <div class="calls-loading skeleton" style="height:120px"></div>
-          {/if}
+          <div class="calls-body">
+            <div class="calls-table">
+              {#if region}
+                {#each region.vision_geometry.boundary_calls as call, i}
+                  <div class="call-row mono">
+                    <span class="call-vertex">{i + 1}</span>
+                    <span class="call-bearing">{call.bearing.replace('�', '°')}</span>
+                    <span class="muted call-distance">{call.distance}</span>
+                  </div>
+                {/each}
+              {:else}
+                <div class="calls-loading skeleton" style="height:200px"></div>
+              {/if}
+            </div>
+            <div class="calls-sketch">
+              {#if previewPath}
+                <svg viewBox="0 0 160 160" width="140" height="140">
+                  <path
+                    d={previewPath}
+                    fill="rgba(217,88,31,0.12)"
+                    stroke="#d9581f"
+                    stroke-width="2"
+                    stroke-linejoin="round"
+                  />
+                  {#each previewPoints as p, i}
+                    {@const xs = previewPoints.map((pt) => pt[0])}
+                    {@const ys = previewPoints.map((pt) => pt[1])}
+                    {@const minX = Math.min(...xs)}
+                    {@const maxX = Math.max(...xs)}
+                    {@const minY = Math.min(...ys)}
+                    {@const maxY = Math.max(...ys)}
+                    {@const scale = Math.min(116 / (maxX - minX || 1), 116 / (maxY - minY || 1))}
+                    {@const sx = 22 + (p[0] - minX) * scale}
+                    {@const sy = 160 - (22 + (p[1] - minY) * scale)}
+                    {#if i < previewPoints.length - 1 || previewPoints.length === 1}
+                      <circle cx={sx} cy={sy} r="2.6" fill="#d9581f" />
+                    {/if}
+                  {/each}
+                </svg>
+                <span class="calls-sketch-label">walked traverse</span>
+              {:else}
+                <div class="skeleton" style="width:140px;height:140px;border-radius:8px"></div>
+              {/if}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -120,11 +221,11 @@
         </p>
       </div>
       <div class="story-visual map-visual">
-        {#if region}
-          <ResultMap geojson={region.boundary_geojson_wgs84} color="#d9581f" />
-        {:else}
-          <div class="skeleton" style="height:100%"></div>
-        {/if}
+        <img
+          src="/images/earth/holla-bend-arkansas.jpg"
+          alt="Landsat imagery of farmland parcels along an Arkansas River oxbow near Holla Bend"
+        />
+        <span class="scan-tag">LANDSAT &middot; HOLLA BEND, AR</span>
       </div>
     </div>
 
@@ -138,23 +239,49 @@
           doesn't pass, like the real example on the right.
         </p>
       </div>
-      <div class="story-visual">
+      <div class="story-visual earth-wash">
         <div class="validate-panel panel">
           {#if region}
             {@const v = region.spatial_validation}
             <div class="validate-head">
               <span class="pill {v.valid ? 'ok' : 'high'}">{v.valid ? 'Valid' : 'Needs review'}</span>
+              <span class="mono small muted">{region.vision_geometry.parcel_label}</span>
             </div>
+
+            <div class="gauge">
+              <div class="gauge-row">
+                <span class="gauge-label">Closure precision</span>
+                <span class="mono gauge-value">{v.precision_ratio ? `1:${v.precision_ratio}` : '—'}</span>
+              </div>
+              <div class="gauge-track">
+                <div
+                  class="gauge-fill"
+                  class:fail={!v.valid}
+                  style="width:{Math.min(100, ((v.precision_ratio || 0) / GAUGE_MAX) * 100)}%"
+                ></div>
+                <div class="gauge-threshold" style="left:{(GAUGE_THRESHOLD / GAUGE_MAX) * 100}%"></div>
+              </div>
+              <div class="gauge-scale">
+                <span>1:0</span>
+                <span>1:{GAUGE_THRESHOLD} min</span>
+              </div>
+            </div>
+
             <dl class="validate-grid">
-              <div><dt>Precision</dt><dd class="mono">{v.precision_ratio ? `1:${v.precision_ratio}` : '—'}</dd></div>
               <div><dt>Closure</dt><dd class="mono">{region.boundary_geojson_wgs84.properties.closure_error_ft} ft</dd></div>
+              <div><dt>Perimeter</dt><dd class="mono">{v.perimeter_ft} ft</dd></div>
               <div><dt>Area</dt><dd class="mono">{v.area_acres ? `${v.area_acres} ac` : '—'}</dd></div>
             </dl>
+
             {#if v.issues?.length}
-              <p class="validate-issue">{v.issues[0]}</p>
+              <ul class="validate-issues">
+                {#each v.issues as issue}
+                  <li>{issue}</li>
+                {/each}
+              </ul>
             {/if}
           {:else}
-            <div class="skeleton" style="height:120px"></div>
+            <div class="skeleton" style="height:200px"></div>
           {/if}
         </div>
       </div>
@@ -345,7 +472,28 @@ h1 {
 }
 
 .map-visual {
+  position: relative;
+}
+
+.map-visual img {
+  display: block;
+  width: 100%;
   height: 300px;
+  object-fit: cover;
+}
+
+.map-visual .scan-tag {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.05em;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 5px 9px;
+  border-radius: 999px;
+  backdrop-filter: blur(4px);
 }
 
 .calls-panel,
@@ -374,11 +522,24 @@ h1 {
   font-size: 0.78rem;
 }
 
-.call-row {
+.calls-body {
   display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  font-size: 0.86rem;
+  gap: 20px;
+  align-items: center;
+}
+
+.calls-table {
+  flex: 1;
+  min-width: 0;
+}
+
+.call-row {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  font-size: 0.84rem;
   border-bottom: 1px solid var(--line-soft);
 }
 
@@ -386,12 +547,104 @@ h1 {
   border-bottom: none;
 }
 
+.call-vertex {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--surface-muted);
+  color: var(--muted);
+  font-size: 0.66rem;
+  display: grid;
+  place-items: center;
+}
+
+.call-distance {
+  text-align: right;
+}
+
 .muted {
   color: var(--muted);
 }
 
+.calls-sketch {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-left: 20px;
+  border-left: 1px solid var(--line-soft);
+}
+
+.calls-sketch-label {
+  font-size: 0.62rem;
+  color: var(--muted-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 .validate-head {
-  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.gauge {
+  margin-bottom: 18px;
+}
+
+.gauge-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 7px;
+}
+
+.gauge-label {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.gauge-value {
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.gauge-track {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  overflow: visible;
+}
+
+.gauge-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--ok);
+  min-width: 3px;
+}
+
+.gauge-fill.fail {
+  background: var(--danger);
+}
+
+.gauge-threshold {
+  position: absolute;
+  top: -3px;
+  width: 2px;
+  height: 14px;
+  background: var(--ink);
+  opacity: 0.35;
+}
+
+.gauge-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 0.66rem;
+  color: var(--muted-dim);
 }
 
 .validate-grid {
@@ -399,6 +652,8 @@ h1 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-soft);
 }
 
 .validate-grid dt {
@@ -414,13 +669,26 @@ h1 {
   font-weight: 600;
 }
 
-.validate-issue {
+.validate-issues {
   margin: 0;
-  padding-top: 14px;
+  padding: 14px 0 0 18px;
   border-top: 1px solid var(--line-soft);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: var(--muted);
   line-height: 1.5;
+}
+
+.validate-issues li + li {
+  margin-top: 6px;
+}
+
+.earth-wash {
+  background-image: linear-gradient(rgba(247, 246, 243, 0.88), rgba(247, 246, 243, 0.88)), url('/images/earth/amazon-river.jpg');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  padding: 18px;
 }
 
 .gallery {
