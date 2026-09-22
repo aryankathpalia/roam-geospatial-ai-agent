@@ -42,3 +42,8 @@ doclayout_yolo
 # (PaddlePaddle/Paddle#77340). Confirmed locally; do not bump this.
 paddlepaddle==3.2.2
 paddleocr
+
+# Vision escalation for ParcelMap crops (bearings/distances/tie-point
+# extraction). google-genai is the current SDK -- google-generativeai
+# is deprecated.
+google-genai

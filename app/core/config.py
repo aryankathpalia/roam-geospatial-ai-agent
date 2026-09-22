@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     OSRM_BASE_URL: str = "https://router.project-osrm.org"
     OPENROUTER_API_KEY: str = ""
     OPENROUTER_MODEL: str = "openrouter/free"
+    MISTRAL_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""
 
 
 settings = Settings()

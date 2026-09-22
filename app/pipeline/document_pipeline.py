@@ -26,6 +26,7 @@ from app.services.ocr import OCRLine
 from app.services.pdf_inspector import inspect_pdf
 from app.services.pdf_renderer import render_page
 from app.services.region_cropper import extract_region_crops
+from app.services.vision import extract_parcel_geometry
 from app.pipeline.page_ocr import (
     band_count_for,
     match_lines_to_regions,
@@ -151,6 +152,44 @@ async def process_document(
 
         for entry_index, lines in lines_by_page.items():
             match_lines_to_regions(lines, page_entries[entry_index]["regions"])
+
+    # ---------------------------------------------------------
+    # Vision escalation: ParcelMap regions (flagged needs_vision by
+    # match_lines_to_regions) get sent to Gemini to pull out the
+    # boundary traverse / tie point / basis of bearings needed for
+    # geometry reconstruction -- OCR alone gives flat text, not
+    # structured survey data. Runs concurrently across however many
+    # ParcelMap regions the document has (typically a handful, not
+    # worth a Modal fan-out for this volume).
+    # ---------------------------------------------------------
+
+    vision_targets = [
+        (entry, region)
+        for entry in page_entries
+        for region in entry["regions"]
+        if region.get("needs_vision")
+    ]
+
+    if vision_targets:
+
+        async def _run_vision(entry: dict[str, Any], region: dict[str, Any]) -> None:
+            x, y, w, h = region["bbox"]
+            try:
+                with Image.open(entry["path"]) as page_image:
+                    crop = page_image.convert("RGB").crop((x, y, x + w, y + h))
+                geometry = await loop.run_in_executor(
+                    None, extract_parcel_geometry, crop
+                )
+                region["vision_geometry"] = geometry
+            except Exception as exc:
+                # Vision is an enhancement on top of OCR text, not a
+                # hard requirement (e.g. GEMINI_API_KEY not set yet) --
+                # degrade gracefully rather than failing the request.
+                region["vision_error"] = str(exc)
+
+        await asyncio.gather(
+            *(_run_vision(entry, region) for entry, region in vision_targets)
+        )
 
     pages_result = [
         {"page_number": e["page_number"], "regions": e["regions"]}
