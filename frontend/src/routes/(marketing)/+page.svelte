@@ -70,10 +70,10 @@
       </div>
       <div class="story-visual scan-visual">
         <img src="/images/gallery-baist-dc.jpg" alt="Detected regions on a scanned real-estate atlas plate" />
-        <div class="detect-box" style="left:8%; top:38%; width:26%; height:20%;">
+        <div class="detect-box" style="left:50.5%; top:47%; width:21%; height:21.5%;">
           <span>ParcelMap</span>
         </div>
-        <div class="detect-box" style="left:58%; top:10%; width:20%; height:12%;">
+        <div class="detect-box" style="left:10.5%; top:13.5%; width:25%; height:9.5%;">
           <span>Text</span>
         </div>
       </div>
@@ -321,8 +321,7 @@ h1 {
 .scan-visual img {
   display: block;
   width: 100%;
-  height: 260px;
-  object-fit: cover;
+  height: auto;
 }
 
 .detect-box {

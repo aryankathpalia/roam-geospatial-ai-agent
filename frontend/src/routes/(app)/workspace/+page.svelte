@@ -44,10 +44,22 @@
   async function renderMap() {
     await ensureLeaflet();
     if (!map) {
-      map = L.map(mapEl, { zoomControl: true }).setView([20, 0], 2);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(map);
+      map = L.map(mapEl, { zoomControl: true, fadeAnimation: false, zoomAnimation: false });
+      // Satellite imagery, not OSM's street-vector style -- a parcel
+      // can sit on undeveloped rural land with almost nothing drawn at
+      // high zoom in the vector style, which reads as "broken" even
+      // when it's rendering correctly. Imagery always has ground detail.
+      L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        { attribution: 'Esri, Maxar, Earthstar Geographics' }
+      ).addTo(map);
+      // Settle the container's real size before the first fitBounds --
+      // calling fitBounds before the size is known (or calling it twice
+      // in quick succession, e.g. an initial setView followed shortly
+      // by a fitBounds) makes Leaflet abandon in-flight tile fetches
+      // for the first view when the second one starts, leaving broken/
+      // half-loaded tile fragments instead of a clean render.
+      map.invalidateSize(false);
     }
 
     if (layerGroup) layerGroup.remove();
@@ -79,10 +91,10 @@
     if (bounds.length) {
       let combined = bounds[0];
       for (const b of bounds.slice(1)) combined = combined.extend(b);
-      map.fitBounds(combined, { padding: [40, 40] });
+      map.fitBounds(combined, { padding: [40, 40], animate: false });
+    } else {
+      map.setView([20, 0], 2);
     }
-
-    requestAnimationFrame(() => map.invalidateSize());
   }
 
   function selectRegion(key: string) {
