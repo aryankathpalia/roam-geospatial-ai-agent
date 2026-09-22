@@ -7,7 +7,7 @@
     <div class="nav-inner">
       <a href="/" class="brand">
         <span class="logo-mark">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path
               d="M12 2 L21 7 V17 L12 22 L3 17 V7 Z"
               stroke="currentColor"
@@ -96,9 +96,9 @@
 }
 
 .logo-mark {
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
   display: grid;
   place-items: center;
   color: var(--ink);
@@ -108,7 +108,7 @@
 .brand-name {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 1.4rem;
   letter-spacing: 0.02em;
   color: var(--text);
 }

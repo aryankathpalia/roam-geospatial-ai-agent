@@ -434,7 +434,14 @@ h1 {
   margin: 0;
   color: var(--muted);
   line-height: 1.65;
-  max-width: 42ch;
+  /* No max-width here on purpose: the grid column itself is already
+     the right reading width. A ch-based cap left unused space at
+     whichever edge of the column faced away from the text's natural
+     start, and since story-copy sits on the LEFT of the gap in rows
+     1/3 but the RIGHT of the gap in rows 2/4 (reverse), that unused
+     space landed on opposite sides -- making the visual gap to the
+     image look bigger in one pair than the other for the same 56px
+     grid gap. Filling the column removes the asymmetry. */
 }
 
 .story-visual {
