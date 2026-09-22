@@ -99,3 +99,16 @@ models/roam_layout_v1/roam_layout_best.onnx
 models/roam_layout_v1/roam_layout_best.onnx.data
 
 !frontend/src/routes/documents/
+
+# Raw frontend design references (source mockups, unoptimized scans) --
+# the actual images used in the built UI are already committed under
+# frontend/static/images/; this is just the working asset library.
+/assets_frontend/
+
+# Ad hoc live-test artifacts dropped at the repo root while verifying
+# Modal deploys this session (pipeline result JSON dumps, curl headers,
+# modal log tails) -- not meant to be committed.
+/doc14_result*.json
+/placerville_result*.json
+/headers*.txt
+/modal_logs.txt
