@@ -66,17 +66,14 @@
 <style>
 .marketing-shell {
   min-height: 100vh;
-  background:
-    radial-gradient(900px 480px at 12% -8%, rgba(52, 224, 161, 0.09), transparent 60%),
-    radial-gradient(700px 420px at 92% 6%, rgba(52, 224, 161, 0.05), transparent 60%),
-    var(--bg);
+  background: var(--bg);
 }
 
 .nav {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: rgba(8, 11, 10, 0.72);
+  background: rgba(247, 246, 243, 0.86);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--line-soft);
 }
@@ -99,13 +96,13 @@
 }
 
 .logo-mark {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
   display: grid;
   place-items: center;
-  color: var(--brand);
-  background: var(--brand-soft);
+  color: var(--ink);
+  background: var(--surface-muted);
 }
 
 .brand-name {

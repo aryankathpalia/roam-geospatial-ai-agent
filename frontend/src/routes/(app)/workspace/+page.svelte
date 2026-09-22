@@ -57,7 +57,7 @@
 
     for (const { page, i, region } of parcelRegions) {
       const valid = region.spatial_validation?.valid;
-      const color = valid ? '#34e0a1' : '#f0637a';
+      const color = valid ? '#2f7a4f' : '#c53b3b';
       const key = regionKey(page, i);
 
       const layer = L.geoJSON(region.boundary_geojson_wgs84, {
@@ -316,7 +316,7 @@
   font-size: 0.7rem;
   letter-spacing: 0.12em;
   font-weight: 700;
-  color: var(--brand);
+  color: var(--accent);
 }
 
 h1 {
@@ -337,8 +337,8 @@ h1 {
 }
 
 .dropzone.drag {
-  border-color: var(--brand);
-  background: var(--brand-soft);
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .dz-state {
@@ -382,7 +382,7 @@ h1 {
 .link-btn {
   background: none;
   border: none;
-  color: var(--brand);
+  color: var(--accent);
   font-size: 0.82rem;
   cursor: pointer;
   padding: 0;
@@ -393,7 +393,7 @@ h1 {
   height: 26px;
   border-radius: 50%;
   border: 2.5px solid var(--line);
-  border-top-color: var(--brand);
+  border-top-color: var(--accent);
   animation: spin 0.8s linear infinite;
 }
 
@@ -479,7 +479,7 @@ h1 {
 
 .region-card.selected {
   border-color: rgba(52, 224, 161, 0.5);
-  background: var(--brand-soft);
+  background: var(--accent-soft);
 }
 
 .region-head {
