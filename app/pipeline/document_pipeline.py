@@ -25,6 +25,7 @@ from app.services.geocoding import GeocodingError, geocode_place
 from app.services.georeference import find_anchor_query, georeference_traverse_to_geojson
 from app.services.geometry import traverse_to_geojson, walk_traverse
 from app.services.layout_detector_onnx import detect_page_layout
+from app.services.spatial_validation import validate_traverse
 from app.services.ocr import OCRLine
 from app.services.pdf_inspector import inspect_pdf
 from app.services.pdf_renderer import render_page
@@ -229,6 +230,9 @@ async def process_document(
                 if calls:
                     traverse = walk_traverse(calls)
                     region["boundary_geojson"] = traverse_to_geojson(traverse)
+                    region["spatial_validation"] = validate_traverse(
+                        traverse, region.get("ocr_text") or ""
+                    )
 
                     # Project onto the real map if we found an anchor
                     # for this document -- otherwise this parcel stays
