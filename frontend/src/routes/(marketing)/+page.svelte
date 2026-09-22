@@ -136,10 +136,10 @@
       </div>
       <div class="story-visual scan-visual">
         <img src="/images/gallery-baist-dc.jpg" alt="Detected regions on a scanned real-estate atlas plate" />
-        <div class="detect-box" style="left:50.5%; top:47%; width:21%; height:21.5%;">
+        <div class="detect-box" style="left:50.5%; top:58.8%; width:21%; height:31.7%;">
           <span>ParcelMap</span>
         </div>
-        <div class="detect-box" style="left:10.5%; top:13.5%; width:25%; height:9.5%;">
+        <div class="detect-box" style="left:10.5%; top:9.5%; width:25%; height:14%;">
           <span>Text</span>
         </div>
       </div>
@@ -222,10 +222,10 @@
       </div>
       <div class="story-visual map-visual">
         <img
-          src="/images/earth/holla-bend-arkansas.jpg"
-          alt="Landsat imagery of farmland parcels along an Arkansas River oxbow near Holla Bend"
+          src="/images/earth/khorinsky-russia.jpg"
+          alt="Satellite imagery of river valleys, ridgelines and scattered clouds over the Khorinsky district, Russia"
         />
-        <span class="scan-tag">LANDSAT &middot; HOLLA BEND, AR</span>
+        <span class="scan-tag">SATELLITE &middot; KHORINSKY DISTRICT</span>
       </div>
     </div>
 
@@ -303,10 +303,12 @@
 </section>
 
 <section id="technology" class="cta">
-  <div class="section-inner cta-inner panel-strong">
-    <h2>From paper deed to living GIS layer.</h2>
-    <p>Extract cadastral geometry with a documented, inspectable pipeline — no manual digitizing.</p>
-    <a href="/workspace" class="btn btn-primary">Open Workspace →</a>
+  <div class="section-inner cta-frame">
+    <div class="cta-box panel-strong">
+      <h2>From paper deed to living GIS layer.</h2>
+      <p>Extract cadastral geometry with a documented, inspectable pipeline — no manual digitizing.</p>
+      <a href="/workspace" class="btn btn-primary">Open Workspace →</a>
+    </div>
   </div>
 </section>
 
@@ -441,14 +443,22 @@ h1 {
   overflow: hidden;
   background: var(--surface);
   box-shadow: var(--shadow-soft);
-  min-height: 260px;
+  height: 320px;
   position: relative;
+  display: flex;
+  align-items: stretch;
 }
 
 .scan-visual img {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  /* Keeps the two annotated targets (title text ~13.5-23%, the lot-grid
+     block ~47-68.5% of the source image) inside the visible crop window
+     at this box's aspect ratio -- recompute this if the image or the
+     detect-box positions below change. */
+  object-position: 50% 22%;
 }
 
 .detect-box {
@@ -478,7 +488,7 @@ h1 {
 .map-visual img {
   display: block;
   width: 100%;
-  height: 300px;
+  height: 100%;
   object-fit: cover;
 }
 
@@ -500,6 +510,8 @@ h1 {
 .validate-panel {
   padding: 20px 22px;
   height: 100%;
+  width: 100%;
+  overflow-y: auto;
 }
 
 .calls-head {
@@ -687,8 +699,9 @@ h1 {
   background-size: cover;
   background-position: center;
   display: flex;
-  align-items: center;
-  padding: 18px;
+  align-items: stretch;
+  padding: 14px;
+  width: 100%;
 }
 
 .gallery {
@@ -731,24 +744,39 @@ h1 {
   padding: 30px 28px 100px;
 }
 
-.cta-inner {
-  padding: 56px 40px;
+.cta-frame {
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  padding: 64px 28px;
+  display: flex;
+  justify-content: center;
+  background-image: linear-gradient(rgba(8, 10, 8, 0.42), rgba(8, 10, 8, 0.5)),
+    url('/images/earth/holla-bend-arkansas.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.cta-box {
+  padding: 40px 44px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 14px;
+  max-width: 480px;
+  background: var(--surface);
 }
 
-.cta-inner h2 {
+.cta-box h2 {
   margin: 0;
-  font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+  font-size: clamp(1.4rem, 2.2vw, 1.8rem);
 }
 
-.cta-inner p {
+.cta-box p {
   margin: 0 0 10px;
   color: var(--muted);
-  max-width: 46ch;
+  max-width: 42ch;
 }
 
 @media (max-width: 900px) {
