@@ -76,6 +76,13 @@ async def _modal_ocr_dispatcher(jobs: list[tuple[bytes, float]]) -> list[list]:
     # burns the free monthly credit; a cold start costs ~5-10s.
     scaledown_window=60,
     min_containers=0,
+    # GEMINI_API_KEY (vision escalation) -- created via:
+    #   modal secret create roam-secrets --from-dotenv .env
+    # pydantic-settings reads real process env vars regardless of
+    # whether a local .env file is present (it isn't, in the deployed
+    # image -- .dockerignore excludes it), so no code change needed
+    # beyond this.
+    secrets=[modal.Secret.from_name("roam-secrets")],
 )
 @modal.asgi_app()
 def fastapi_app():

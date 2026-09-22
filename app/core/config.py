@@ -19,6 +19,15 @@ class Settings(BaseSettings):
     OPENROUTER_MODEL: str = "openrouter/free"
     MISTRAL_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
+    # Not flagship "gemini-3.5-flash": that model's free tier is capped
+    # at 20 requests/day (confirmed via a real 429 from this exact
+    # account), and separately, dense-image detail-extraction calls to
+    # it failed with 503 "high demand" 100% of the time across 3
+    # different flagship models tested. The flash-lite variant fixed
+    # both -- higher quota and no 503s -- and produced accurate results
+    # on a real ParcelMap crop (verified: correct bearings/distances
+    # and basis-of-bearings text matching the source document exactly).
+    GEMINI_MODEL: str = "gemini-3.5-flash-lite"
 
 
 settings = Settings()

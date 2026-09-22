@@ -158,9 +158,18 @@ async def process_document(
     # match_lines_to_regions) get sent to Gemini to pull out the
     # boundary traverse / tie point / basis of bearings needed for
     # geometry reconstruction -- OCR alone gives flat text, not
-    # structured survey data. Runs concurrently across however many
-    # ParcelMap regions the document has (typically a handful, not
-    # worth a Modal fan-out for this volume).
+    # structured survey data.
+    #
+    # Processed SEQUENTIALLY, not concurrently: Gemini's free tier caps
+    # gemini-3.5-flash-lite at 15 requests/MINUTE, and each ParcelMap
+    # region's tiled extraction already makes several calls on its own
+    # (one per tile, plus one to structure the result). Running
+    # multiple regions concurrently blew through that limit immediately
+    # in testing (confirmed: 429 RESOURCE_EXHAUSTED on half the regions
+    # in a 4-ParcelMap-region document). A document typically has only
+    # a handful of ParcelMap regions, so sequential processing costs
+    # negligible wall-clock time -- not worth a rate-limiting scheme for
+    # this volume.
     # ---------------------------------------------------------
 
     vision_targets = [
@@ -170,26 +179,18 @@ async def process_document(
         if region.get("needs_vision")
     ]
 
-    if vision_targets:
-
-        async def _run_vision(entry: dict[str, Any], region: dict[str, Any]) -> None:
-            x, y, w, h = region["bbox"]
-            try:
-                with Image.open(entry["path"]) as page_image:
-                    crop = page_image.convert("RGB").crop((x, y, x + w, y + h))
-                geometry = await loop.run_in_executor(
-                    None, extract_parcel_geometry, crop
-                )
-                region["vision_geometry"] = geometry
-            except Exception as exc:
-                # Vision is an enhancement on top of OCR text, not a
-                # hard requirement (e.g. GEMINI_API_KEY not set yet) --
-                # degrade gracefully rather than failing the request.
-                region["vision_error"] = str(exc)
-
-        await asyncio.gather(
-            *(_run_vision(entry, region) for entry, region in vision_targets)
-        )
+    for entry, region in vision_targets:
+        x, y, w, h = region["bbox"]
+        try:
+            with Image.open(entry["path"]) as page_image:
+                crop = page_image.convert("RGB").crop((x, y, x + w, y + h))
+            geometry = await loop.run_in_executor(None, extract_parcel_geometry, crop)
+            region["vision_geometry"] = geometry
+        except Exception as exc:
+            # Vision is an enhancement on top of OCR text, not a hard
+            # requirement (e.g. GEMINI_API_KEY not set yet) -- degrade
+            # gracefully rather than failing the request.
+            region["vision_error"] = str(exc)
 
     pages_result = [
         {"page_number": e["page_number"], "regions": e["regions"]}
