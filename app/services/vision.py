@@ -32,6 +32,7 @@ Fix, mirroring the same tiling approach that fixed OCR:
 
 import io
 import json
+import math
 import threading
 import time
 from collections import deque
@@ -74,6 +75,81 @@ def _wait_for_rate_limit() -> None:
     with _rate_limit_lock:
         _call_times.append(time.monotonic())
 
+
+# A SEPARATE, second real limit discovered live on a 127-page/56-
+# ParcelMap-region document: gemini-3.5-flash-lite's free tier also
+# caps INPUT TOKENS at 250,000/minute (distinct from the 15
+# requests/minute cap above -- confirmed via a real 429:
+# "GenerateContentInputTokensPerModelPerMinute-FreeTier ... quotaValue:
+# 250000"). Sending every region's tiles in ONE combined call (the fix
+# that solved the requests/minute problem) doesn't help here -- a
+# single oversized call blows the TOKEN budget outright, and it's a
+# per-minute budget shared across calls, not a per-call cap, so
+# multiple smaller calls in the same minute can still add up to a 429.
+#
+# Gemini's documented image tokenization: an image is tiled into
+# 768x768 blocks, each costing 258 tokens (ceil(w/768) * ceil(h/768) *
+# 258). Our tiles are ~700x700 (see _tile_image), so in practice this
+# is almost always exactly 258 tokens/tile -- but the real formula is
+# used anyway rather than a flat constant, so this keeps working
+# correctly if _tile_image's tile_size ever changes.
+_TOKENS_PER_IMAGE_TILE_BLOCK = 258
+_IMAGE_TILE_BLOCK_PX = 768
+# ~4 characters/token is the standard rough estimate for English text
+# (Gemini doesn't expose an official ratio for arbitrary prompt text).
+_CHARS_PER_TOKEN_ESTIMATE = 4
+# Budget each call to well under the real 250,000/minute limit --
+# both because multiple calls can land in the same rolling minute
+# (this budget is also what the token-aware rate limiter below paces
+# against) and because our own token estimate is an approximation, not
+# a guarantee of Gemini's actual count.
+_TOKEN_BUDGET_PER_MINUTE = 180_000
+
+_token_usage: deque[tuple[float, int]] = deque()
+_token_budget_lock = threading.Lock()
+
+
+def _estimate_image_tokens(image: Image.Image) -> int:
+    width, height = image.size
+    tiles_x = math.ceil(width / _IMAGE_TILE_BLOCK_PX)
+    tiles_y = math.ceil(height / _IMAGE_TILE_BLOCK_PX)
+    return tiles_x * tiles_y * _TOKENS_PER_IMAGE_TILE_BLOCK
+
+
+def _estimate_text_tokens(text: str) -> int:
+    return math.ceil(len(text) / _CHARS_PER_TOKEN_ESTIMATE)
+
+
+def _wait_for_token_budget(tokens_needed: int) -> None:
+    """
+    Sliding-window limiter on ESTIMATED input tokens, mirroring
+    _wait_for_rate_limit's request-count version but for the separate
+    per-minute token cap. A single call is allowed to exceed the
+    budget on its own (there's no way to split one region's tiles
+    across calls in the current design) -- it just has to wait for the
+    window to clear first, same as any other call.
+    """
+
+    with _token_budget_lock:
+        now = time.monotonic()
+        while _token_usage and now - _token_usage[0][0] > 60:
+            _token_usage.popleft()
+
+        used = sum(tokens for _, tokens in _token_usage)
+        if used > 0 and used + tokens_needed > _TOKEN_BUDGET_PER_MINUTE:
+            sleep_for = 60 - (now - _token_usage[0][0]) + 0.5
+        else:
+            sleep_for = 0
+
+        if sleep_for <= 0:
+            _token_usage.append((now, tokens_needed))
+            return
+
+    time.sleep(sleep_for)
+    with _token_budget_lock:
+        _token_usage.append((time.monotonic(), tokens_needed))
+
+
 def _get_client() -> genai.Client:
     if not settings.GEMINI_API_KEY:
         raise RuntimeError(
@@ -115,9 +191,11 @@ def extract_parcel_geometry(image: Image.Image) -> dict:
 
 
 _DOCUMENT_TILE_PROMPT_TEMPLATE = """\
-These are pieces of {region_count} different land survey / parcel map
-drawings from one document, grouped by region (Region 1, Region 2,
-...) and piece within that region. For EACH piece, list, exactly as
+These are pieces of {region_count} land survey / parcel map drawings
+from one document, grouped by region number and piece within that
+region (see layout below -- region numbers are this document's real
+region numbers and may not start at 1 or be contiguous, when this is
+only some of the document's regions). For EACH piece, list, exactly as
 written, anything on it that is one of:
 - a boundary bearing and distance call (e.g. N89*11'15"E 903.15')
 - a ground/state-plane coordinate (e.g. "N 14926910.28 E 2251599.70")
@@ -133,10 +211,10 @@ none. Do not mix findings from different regions together.
 
 _BATCH_STRUCTURE_PROMPT = """\
 Below are raw notes read off pieces of {region_count} different survey
-drawings (Region 1 through Region {region_count}), from one document.
-For EACH region, consolidate its own notes into its boundary traverse
-and related data. Use null for anything not present. Do not invent or
-guess values, and do not mix data between regions.
+drawings ({region_list}), from one document. For EACH region,
+consolidate its own notes into its boundary traverse and related data.
+Use null for anything not present. Do not invent or guess values, and
+do not mix data between regions.
 
 For boundary_calls specifically: only include an entry if it has BOTH
 a bearing AND a distance stated together as a single call on the
@@ -162,8 +240,9 @@ sequence. A correctly ordered traverse returns close to its starting
 point after the last call -- if your ordering doesn't, re-check it
 before answering.
 
-Return one result per region, in order, each tagged with its
-region_index (1-based, matching the region numbers below).
+Return one result per region listed above, each tagged with its
+region_index matching that region's actual number above (NOT a 1-based
+position in this list -- use the real region numbers).
 
 NOTES:
 {notes}
@@ -210,16 +289,60 @@ _EMPTY_RESULT = {
 }
 
 
+def _chunk_regions_by_token_budget(
+    images: list[Image.Image],
+) -> list[list[tuple[int, list[Image.Image]]]]:
+    """
+    Groups (1-based global region_index, tiles) into chunks that each
+    stay under _TOKEN_BUDGET_PER_MINUTE of estimated image tokens.
+
+    This is what makes the batching DYNAMIC instead of hardcoded: a
+    document with a handful of ParcelMap regions (a few thousand
+    tokens) gets ONE chunk -- same as before, still just 2 Gemini calls
+    total. A document with 56 regions (a real one that blew the
+    250,000 tokens/minute free-tier quota when sent as a single call --
+    see the module docstring above) gets however many chunks its
+    actual image data needs, computed from Gemini's own documented
+    tiling formula rather than a guessed region count cutoff.
+
+    Regions are packed greedily in order, so a chunk's region_index
+    values are always a contiguous run (e.g. [4, 5, 6]) -- relied on
+    only for readability of the resulting prompts, not required for
+    correctness.
+    """
+
+    chunks: list[list[tuple[int, list[Image.Image]]]] = []
+    current: list[tuple[int, list[Image.Image]]] = []
+    current_tokens = 0
+
+    for region_idx, image in enumerate(images, start=1):
+        tiles = _tile_image(image)
+        region_tokens = sum(_estimate_image_tokens(t) for t in tiles)
+
+        if current and current_tokens + region_tokens > _TOKEN_BUDGET_PER_MINUTE:
+            chunks.append(current)
+            current = []
+            current_tokens = 0
+
+        current.append((region_idx, tiles))
+        current_tokens += region_tokens
+
+    if current:
+        chunks.append(current)
+
+    return chunks
+
+
 def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[dict]:
     """
-    Extracts structured geometry for MULTIPLE ParcelMap regions in just
-    2 Gemini calls total for the whole document, not 2 calls per
-    region -- combines every region's tiles into one labeled multi-part
-    call, then one structuring call that returns an array (one result
-    per region). This is what actually matters given Gemini's
-    free-tier 15 requests/minute cap: a document with several ParcelMap
-    regions previously needed ~2 calls PER region; now it needs 2
-    total, regardless of region count.
+    Extracts structured geometry for MULTIPLE ParcelMap regions,
+    chunked dynamically by estimated Gemini input-token cost (see
+    _chunk_regions_by_token_budget) rather than always sent as one
+    call -- a document with a few regions still needs just 2 Gemini
+    calls total (one to read all tiles, one to structure the result),
+    same as the original all-in-one-call design; a document with many
+    regions automatically gets split into as many read+structure call
+    pairs as its actual token budget requires.
 
     Returns results in the same order as `images`. Raises on failure --
     callers should catch and degrade gracefully.
@@ -229,48 +352,61 @@ def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[dict]:
         return []
 
     client = _get_client()
+    chunks = _chunk_regions_by_token_budget(images)
 
-    all_parts: list[types.Part] = []
-    region_layout_lines = []
-    for region_idx, image in enumerate(images, start=1):
-        tiles = _tile_image(image)
-        region_layout_lines.append(f"Region {region_idx}: {len(tiles)} piece(s)")
-        for tile in tiles:
-            buffer = io.BytesIO()
-            tile.convert("RGB").save(buffer, format="PNG")
-            all_parts.append(
-                types.Part.from_bytes(data=buffer.getvalue(), mime_type="image/png")
-            )
+    by_index: dict[int, dict] = {}
 
-    prompt = _DOCUMENT_TILE_PROMPT_TEMPLATE.format(
-        region_count=len(images),
-        region_layout="\n".join(region_layout_lines),
-    )
+    for chunk in chunks:
+        all_parts: list[types.Part] = []
+        region_layout_lines = []
+        image_tokens = 0
+        for region_idx, tiles in chunk:
+            region_layout_lines.append(f"Region {region_idx}: {len(tiles)} piece(s)")
+            for tile in tiles:
+                image_tokens += _estimate_image_tokens(tile)
+                buffer = io.BytesIO()
+                tile.convert("RGB").save(buffer, format="PNG")
+                all_parts.append(
+                    types.Part.from_bytes(data=buffer.getvalue(), mime_type="image/png")
+                )
 
-    _wait_for_rate_limit()
-    read_response = client.models.generate_content(
-        model=settings.GEMINI_MODEL,
-        contents=all_parts + [prompt],
-    )
-    notes = read_response.text.strip()
+        read_prompt = _DOCUMENT_TILE_PROMPT_TEMPLATE.format(
+            region_count=len(chunk),
+            region_layout="\n".join(region_layout_lines),
+        )
 
-    if not notes:
-        return [dict(_EMPTY_RESULT) for _ in images]
+        _wait_for_rate_limit()
+        _wait_for_token_budget(image_tokens + _estimate_text_tokens(read_prompt))
+        read_response = client.models.generate_content(
+            model=settings.GEMINI_MODEL,
+            contents=all_parts + [read_prompt],
+        )
+        notes = read_response.text.strip()
 
-    _wait_for_rate_limit()
-    structure_response = client.models.generate_content(
-        model=settings.GEMINI_MODEL,
-        contents=[
-            _BATCH_STRUCTURE_PROMPT.format(region_count=len(images), notes=notes)
-        ],
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=_BATCH_RESPONSE_SCHEMA,
-        ),
-    )
-    parsed = json.loads(structure_response.text)
+        if not notes:
+            continue
 
-    by_index = {item["region_index"]: item for item in parsed}
+        region_indices = [region_idx for region_idx, _ in chunk]
+        structure_prompt = _BATCH_STRUCTURE_PROMPT.format(
+            region_count=len(chunk),
+            region_list=", ".join(f"Region {i}" for i in region_indices),
+            notes=notes,
+        )
+
+        _wait_for_rate_limit()
+        _wait_for_token_budget(_estimate_text_tokens(structure_prompt))
+        structure_response = client.models.generate_content(
+            model=settings.GEMINI_MODEL,
+            contents=[structure_prompt],
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=_BATCH_RESPONSE_SCHEMA,
+            ),
+        )
+        parsed = json.loads(structure_response.text)
+        for item in parsed:
+            by_index[item["region_index"]] = item
+
     results = []
     for region_idx in range(1, len(images) + 1):
         item = by_index.get(region_idx)
