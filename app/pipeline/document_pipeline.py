@@ -23,7 +23,12 @@ from PIL import Image
 
 from app.services.geocoding import GeocodingError, geocode_place
 from app.services.georeference import find_anchor_query, georeference_traverse_to_geojson
-from app.services.geometry import traverse_to_geojson, walk_traverse
+from app.services.geometry import (
+    drop_conflicting_axis_duplicates,
+    resolve_ambiguous_calls,
+    traverse_to_geojson,
+    walk_traverse,
+)
 from app.services.layout_detector_onnx import detect_page_layout
 from app.services.spatial_validation import check_combined_tract_dimension, validate_traverse
 from app.services.ocr import OCRLine
@@ -241,6 +246,24 @@ async def process_document(
                     # polygon on the eventual map is worse than an
                     # honest "couldn't close" flag.
                     calls = geometry.get("boundary_calls") or []
+                    # Vision may have flagged some calls as ambiguous
+                    # (a bearing with more than one plausible distance
+                    # reading -- see vision.py's ambiguous_alternates
+                    # field). Resolving which reading is correct is a
+                    # geometry question (which one actually closes the
+                    # traverse), so it happens here in deterministic
+                    # Python rather than asking vision to guess.
+                    if calls and geometry.get("ambiguous_alternates"):
+                        calls = resolve_ambiguous_calls(
+                            calls, geometry["ambiguous_alternates"]
+                        )
+                    # Separate, second deterministic pass: catches
+                    # same-axis opposite-direction calls with mismatched
+                    # distances that vision never linked to each other
+                    # as alternates (see drop_conflicting_axis_duplicates'
+                    # docstring for the real case this was built for).
+                    if calls:
+                        calls = drop_conflicting_axis_duplicates(calls)
                     if calls:
                         traverse = walk_traverse(calls)
                         parcel_result["boundary_geojson"] = traverse_to_geojson(traverse)

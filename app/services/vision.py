@@ -252,6 +252,22 @@ parcel. Before extracting anything:
    THIS parcel's own corners -- never the one that spans into a
    neighbor's territory, even if it's the more prominent or only
    boldly-labeled figure on that line.
+7. If you find MORE THAN ONE candidate distance that could belong to
+   what looks like the same physical line for this parcel (e.g. the
+   same bearing appearing more than once, possibly because it was read
+   off two overlapping tile pieces near a tile boundary, or one piece
+   caught a partial/cut-off reading of a number another piece read
+   differently), do NOT pick one and discard the rest yourself, and do
+   NOT merge them into a single call. Include EVERY distinct candidate
+   you found as its own separate entry, in a NEW array field
+   `ambiguous_alternates` on this parcel (a list of objects, each with
+   a bearing field and a distance field, same shape as boundary_calls)
+   -- these are extra candidate readings for a
+   line ALREADY represented once in boundary_calls (put your best single
+   guess in boundary_calls as usual, and the other candidate reading(s)
+   in ambiguous_alternates). This lets a deterministic downstream check
+   pick between them by testing which one actually makes the traverse
+   close, instead of you guessing.
 
 For boundary_calls specifically: only include an entry if it has BOTH
 a bearing AND a distance stated together as a single call on THAT
@@ -331,6 +347,17 @@ _BATCH_RESPONSE_SCHEMA = {
             "basis_of_bearings": {"type": "string", "nullable": True},
             "parcel_label": {"type": "string", "nullable": True},
             "stated_area_acres": {"type": "string", "nullable": True},
+            "ambiguous_alternates": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "bearing": {"type": "string"},
+                        "distance": {"type": "string"},
+                    },
+                    "required": ["bearing", "distance"],
+                },
+            },
         },
         "required": ["region_index", "boundary_calls"],
     },
@@ -487,6 +514,7 @@ def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[list[dict
                     "basis_of_bearings": item.get("basis_of_bearings"),
                     "parcel_label": item.get("parcel_label"),
                     "stated_area_acres": item.get("stated_area_acres"),
+                    "ambiguous_alternates": item.get("ambiguous_alternates") or [],
                 }
                 for item in parcels
             ]
