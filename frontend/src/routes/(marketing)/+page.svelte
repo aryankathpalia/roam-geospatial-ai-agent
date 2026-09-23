@@ -65,12 +65,18 @@
     sample = await res.json();
     // Page 9's "Parcel 2" -- a real, multi-sided extracted boundary from
     // an actual live ROAM run, used throughout this page instead of any
-    // placeholder numbers.
-    for (const page of sample.pages) {
-      const found = page.regions.find((r: any) => r.boundary_geojson_wgs84);
-      if (found) {
-        region = found;
-        break;
+    // placeholder numbers. A ParcelMap region can hold more than one
+    // parcel (see app/services/vision.py's Parcel Target Resolver), so
+    // this looks one level into region.parcels rather than assuming a
+    // region IS a single parcel.
+    outer: for (const page of sample.pages) {
+      for (const r of page.regions) {
+        for (const parcel of r.parcels ?? []) {
+          if (parcel.boundary_geojson_wgs84) {
+            region = parcel;
+            break outer;
+          }
+        }
       }
     }
     if (region) {
@@ -235,8 +241,8 @@
         <h3>Validate automatically</h3>
         <p>
           Closure precision, self-intersection and the document's own stated acreage are
-          cross-checked. Every parcel ships with an honest signal — including when it
-          doesn't pass, like the real example on the right.
+          cross-checked. Every parcel ships with an honest signal, pass or fail — the
+          example on the right is a real result, not a staged one.
         </p>
       </div>
       <div class="story-visual earth-wash">

@@ -178,18 +178,6 @@ def _tile_image(image: Image.Image, tile_size: int = 700) -> list[Image.Image]:
     return tiles
 
 
-def extract_parcel_geometry(image: Image.Image) -> dict:
-    """
-    Tiles a ParcelMap crop, reads each tile, then structures the
-    combined findings into JSON. Raises on failure -- callers should
-    catch and degrade gracefully (this is an enhancement on top of
-    OCR text, not a hard requirement).
-    """
-
-    results = extract_parcel_geometries_batch([image])
-    return results[0]
-
-
 _DOCUMENT_TILE_PROMPT_TEMPLATE = """\
 These are pieces of {region_count} land survey / parcel map drawings
 from one document, grouped by region number and piece within that
@@ -211,14 +199,40 @@ none. Do not mix findings from different regions together.
 
 _BATCH_STRUCTURE_PROMPT = """\
 Below are raw notes read off pieces of {region_count} different survey
-drawings ({region_list}), from one document. For EACH region,
-consolidate its own notes into its boundary traverse and related data.
-Use null for anything not present. Do not invent or guess values, and
-do not mix data between regions.
+drawings ({region_list}), from one document.
+
+IMPORTANT -- a single region can show MORE THAN ONE parcel. Survey
+exhibits routinely draw two or more adjacent parcels on one sheet (a
+"Parcel Map Exhibit" creating "PARCEL 1" and "PARCEL 2" side by side is
+common), and a region's bounding box wraps the whole sheet, not one
+parcel. Before extracting anything:
+1. For EACH region, scan its notes for every distinct parcel label
+   (e.g. "PARCEL 1", "PARCEL 2", "LOT 3") -- a "RESULTANT PARCEL AREAS"
+   or similar summary table listing multiple labels with their own
+   acreage is a strong signal of exactly how many parcels that region
+   contains.
+2. Return ONE ENTRY PER PARCEL FOUND, not one entry per region. Two
+   entries from the same region share the same region_index but have
+   different parcel_label values and, critically, DISJOINT
+   boundary_calls -- a call belongs to exactly one parcel's traverse,
+   never both, even if two parcels share a common edge (assign a
+   shared edge's call to whichever parcel's label it's written closest
+   to / associated with in the notes, not to both).
+3. If a region's notes only ever mention one parcel label (or none),
+   return exactly one entry for it, same as before.
+4. Only extract parcels that THIS drawing is itself defining the
+   boundary of -- typically the parcel(s) listed in that region's own
+   "RESULTANT PARCEL AREAS" table (or similar), or whose full traverse
+   is walked in the notes. Do NOT extract a "parcel" whose label only
+   ever appears as a NEIGHBOR/CONTEXT citation, e.g. an adjoining
+   owner's name plus a parcel label and APN written near the outer
+   edge for reference ("ROBERT L. CARSEY JR., PARCEL 1B RS 6231 (R3),
+   APN: 086-260-21") -- that names an adjacent property, not one this
+   document is establishing, and has no traverse of its own here.
 
 For boundary_calls specifically: only include an entry if it has BOTH
-a bearing AND a distance stated together as a single call on the
-property's OUTER boundary line. Do NOT include:
+a bearing AND a distance stated together as a single call on THAT
+parcel's own OUTER boundary line. Do NOT include:
 - a bare dimension number, curve table length, or interior measurement
   (e.g. a building or setback dimension)
 - a bearing or distance shown in PARENTHESES -- survey plats use
@@ -226,23 +240,40 @@ property's OUTER boundary line. Do NOT include:
   bearing, a tie to a section corner), not the as-surveyed boundary
   call. Only use the un-parenthesized value.
 - a measurement labeled as road frontage, right-of-way, or a
-  quitclaim/dedication area -- those describe the road, not this
-  parcel's boundary.
-Leave a call out entirely rather than pairing it with a null bearing.
+  quitclaim/dedication area -- those describe the road, not a parcel's
+  boundary.
+- a bearing/distance that TIES the parcel to an outside reference
+  point -- a found section/quarter-section corner, a survey control
+  point, or another monument -- rather than walking corner-to-corner
+  around the parcel itself. This is a distinct exclusion from the
+  parentheses rule above: a tie value is often NOT itself in
+  parentheses (only its alternate record citations are), so check
+  what it CONNECTS, not just its punctuation -- if the notes place it
+  near "TIE", a control-point/monument label, or coordinates for a
+  point outside the parcel's own corners, it's a tie, not a boundary
+  call.
+- a call that visibly belongs to a DIFFERENT parcel's own perimeter
+  (e.g. the far side of an adjacent parcel, or a call the notes
+  associate with a different parcel label than the one you're
+  currently building).
+Leave a call out entirely rather than pairing it with a null bearing,
+and leave it out entirely rather than guessing which parcel it belongs
+to.
 
 The notes were read tile-by-tile, which is NOT the order the calls
-appear walking around the parcel -- you must reorder them yourself.
-Put boundary_calls in true walking sequence around the perimeter
-(consistently clockwise or counter-clockwise, starting anywhere), using
-any positional cues in the notes (corner labels, "top"/"bottom"/"east
-side" mentions, which piece each call came from) to infer the correct
-sequence. A correctly ordered traverse returns close to its starting
-point after the last call -- if your ordering doesn't, re-check it
-before answering.
+appear walking around each parcel -- you must reorder them yourself,
+per parcel. Put each parcel's boundary_calls in true walking sequence
+around ITS OWN perimeter (consistently clockwise or counter-clockwise,
+starting anywhere), using positional cues in the notes (corner labels,
+"top"/"bottom"/"east side" mentions, which piece each call came from)
+to infer the correct sequence. A correctly ordered traverse returns
+close to its starting point after the last call -- if your ordering
+doesn't, re-check both the order AND whether every call truly belongs
+to this parcel before answering.
 
-Return one result per region listed above, each tagged with its
-region_index matching that region's actual number above (NOT a 1-based
-position in this list -- use the real region numbers).
+Tag every entry with its region_index matching that region's actual
+number above (NOT a 1-based position in this list -- use the real
+region numbers).
 
 NOTES:
 {notes}
@@ -279,13 +310,6 @@ _BATCH_RESPONSE_SCHEMA = {
         },
         "required": ["region_index", "boundary_calls"],
     },
-}
-
-_EMPTY_RESULT = {
-    "boundary_calls": [],
-    "tie_point": None,
-    "basis_of_bearings": None,
-    "parcel_label": None,
 }
 
 
@@ -333,7 +357,7 @@ def _chunk_regions_by_token_budget(
     return chunks
 
 
-def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[dict]:
+def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[list[dict]]:
     """
     Extracts structured geometry for MULTIPLE ParcelMap regions,
     chunked dynamically by estimated Gemini input-token cost (see
@@ -344,8 +368,19 @@ def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[dict]:
     regions automatically gets split into as many read+structure call
     pairs as its actual token budget requires.
 
-    Returns results in the same order as `images`. Raises on failure --
-    callers should catch and degrade gracefully.
+    Returns ONE LIST PER input region/image (same order as `images`),
+    and each region's list holds one dict PER PARCEL found in it --
+    not one dict per region. A region's ParcelMap bounding box wraps
+    the whole drawing, not necessarily one parcel: a real "Parcel Map
+    Exhibit" sheet showing two adjacent parcels ("PARCEL 1"/"PARCEL 2"
+    side by side, a common real-world layout) is one region but two
+    parcels, and assuming otherwise was confirmed (via a live diagnostic
+    against a real such document, reproducible even with a single
+    region processed in complete isolation -- not a batching artifact)
+    to make the model interleave both parcels' boundary calls into one
+    nonsensical traverse. Most regions still yield a single-item list.
+
+    Raises on failure -- callers should catch and degrade gracefully.
     """
 
     if not images:
@@ -354,7 +389,7 @@ def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[dict]:
     client = _get_client()
     chunks = _chunk_regions_by_token_budget(images)
 
-    by_index: dict[int, dict] = {}
+    by_index: dict[int, list[dict]] = {}
 
     for chunk in chunks:
         all_parts: list[types.Part] = []
@@ -380,6 +415,9 @@ def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[dict]:
         read_response = client.models.generate_content(
             model=settings.GEMINI_MODEL,
             contents=all_parts + [read_prompt],
+            # Transcription, not creative generation -- same
+            # determinism rationale as the structuring call below.
+            config=types.GenerateContentConfig(temperature=0),
         )
         notes = read_response.text.strip()
 
@@ -401,21 +439,31 @@ def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[dict]:
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
                 response_schema=_BATCH_RESPONSE_SCHEMA,
+                # This step is structured data extraction from fixed
+                # notes, not creative generation -- temperature=0
+                # minimizes run-to-run variance (confirmed via a real
+                # diagnostic: identical input crops produced visibly
+                # different parcel/call attributions across repeated
+                # default-temperature runs).
+                temperature=0,
             ),
         )
         parsed = json.loads(structure_response.text)
         for item in parsed:
-            by_index[item["region_index"]] = item
+            by_index.setdefault(item["region_index"], []).append(item)
 
     results = []
     for region_idx in range(1, len(images) + 1):
-        item = by_index.get(region_idx)
+        parcels = by_index.get(region_idx, [])
         results.append(
-            {
-                "boundary_calls": item.get("boundary_calls", []) if item else [],
-                "tie_point": item.get("tie_point") if item else None,
-                "basis_of_bearings": item.get("basis_of_bearings") if item else None,
-                "parcel_label": item.get("parcel_label") if item else None,
-            }
+            [
+                {
+                    "boundary_calls": item.get("boundary_calls", []),
+                    "tie_point": item.get("tie_point"),
+                    "basis_of_bearings": item.get("basis_of_bearings"),
+                    "parcel_label": item.get("parcel_label"),
+                }
+                for item in parcels
+            ]
         )
     return results

@@ -86,6 +86,7 @@ data/documents/
 data/raw/
 new_test_docs/
 */review_crops/
+/scratch_diag/
 
 # Ad hoc test PDFs dropped at the repo root during model testing.
 /*.pdf

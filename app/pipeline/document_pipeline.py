@@ -212,39 +212,58 @@ async def process_document(
                 crops.append(page_image.convert("RGB").crop((x, y, x + w, y + h)))
 
         try:
-            geometries = await loop.run_in_executor(
+            regions_parcels = await loop.run_in_executor(
                 None, extract_parcel_geometries_batch, crops
             )
-            for (entry, region), geometry in zip(vision_targets, geometries):
-                region["vision_geometry"] = geometry
+            for (entry, region), parcels in zip(vision_targets, regions_parcels):
+                # A region's bounding box wraps the whole drawing, not
+                # necessarily one parcel -- a "Parcel Map Exhibit" sheet
+                # showing two adjacent parcels side by side is one
+                # region but two parcels (confirmed via a live diagnostic
+                # against a real such document: assuming 1 region = 1
+                # parcel made the model interleave both parcels' calls
+                # into one nonsensical traverse, reproducible even with
+                # a single region processed in total isolation). So a
+                # region now holds a LIST of parcels, each walked and
+                # validated independently.
+                region["parcels"] = []
 
-                # Walk the extracted boundary calls into an actual
-                # polygon. closure_error_ft is a real, standard
-                # surveying QA signal, not something we invented: a
-                # traverse that doesn't return near its start point is
-                # an honest sign the extracted calls are incomplete or
-                # include non-boundary noise -- surfaced rather than
-                # hidden, since a wrong-looking polygon on the eventual
-                # map is worse than an honest "couldn't close" flag.
-                calls = geometry.get("boundary_calls") or []
-                if calls:
-                    traverse = walk_traverse(calls)
-                    region["boundary_geojson"] = traverse_to_geojson(traverse)
-                    region["spatial_validation"] = validate_traverse(
-                        traverse, region.get("ocr_text") or ""
-                    )
+                for geometry in parcels:
+                    parcel_result: dict = {"vision_geometry": geometry}
 
-                    # Project onto the real map if we found an anchor
-                    # for this document -- otherwise this parcel stays
-                    # local-only (flagged, not silently dropped).
-                    if anchor_lat is not None and anchor_lon is not None:
-                        region["boundary_geojson_wgs84"] = georeference_traverse_to_geojson(
-                            traverse, anchor_lat, anchor_lon
+                    # Walk the extracted boundary calls into an actual
+                    # polygon. closure_error_ft is a real, standard
+                    # surveying QA signal, not something we invented: a
+                    # traverse that doesn't return near its start point
+                    # is an honest sign the extracted calls are
+                    # incomplete or include non-boundary noise --
+                    # surfaced rather than hidden, since a wrong-looking
+                    # polygon on the eventual map is worse than an
+                    # honest "couldn't close" flag.
+                    calls = geometry.get("boundary_calls") or []
+                    if calls:
+                        traverse = walk_traverse(calls)
+                        parcel_result["boundary_geojson"] = traverse_to_geojson(traverse)
+                        parcel_result["spatial_validation"] = validate_traverse(
+                            traverse, region.get("ocr_text") or ""
                         )
-                    else:
-                        region["georeference_error"] = (
-                            "no geocodable address found in this document's OCR text"
-                        )
+
+                        # Project onto the real map if we found an
+                        # anchor for this document -- otherwise this
+                        # parcel stays local-only (flagged, not
+                        # silently dropped).
+                        if anchor_lat is not None and anchor_lon is not None:
+                            parcel_result["boundary_geojson_wgs84"] = (
+                                georeference_traverse_to_geojson(
+                                    traverse, anchor_lat, anchor_lon
+                                )
+                            )
+                        else:
+                            parcel_result["georeference_error"] = (
+                                "no geocodable address found in this document's OCR text"
+                            )
+
+                    region["parcels"].append(parcel_result)
         except Exception as exc:
             # Vision is an enhancement on top of OCR text, not a hard
             # requirement (e.g. GEMINI_API_KEY not set yet) -- degrade
