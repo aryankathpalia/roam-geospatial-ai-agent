@@ -53,7 +53,11 @@ import re
 
 from shapely.geometry import Polygon
 
-from app.services.geometry import TraverseResult, find_likely_outlier_call
+from app.services.geometry import (
+    TraverseResult,
+    find_likely_outlier_call,
+    find_self_intersecting_segment_pair,
+)
 
 _SQFT_PER_ACRE = 43_560.0
 
@@ -205,10 +209,20 @@ def validate_traverse(
         polygon = Polygon(corners)
         self_intersects = not polygon.is_valid
         if self_intersects:
-            issues.append(
+            message = (
                 "Traverse self-intersects -- the walked boundary crosses itself, "
                 "which isn't a valid parcel shape regardless of closure error."
             )
+            pair = find_self_intersecting_segment_pair(corners, calls) if calls else None
+            if pair:
+                a, b = calls[pair[0]], calls[pair[1]]
+                message += (
+                    f" The edges from call {pair[0] + 1} ({a.get('bearing')} "
+                    f"{a.get('distance')}) and call {pair[1] + 1} ({b.get('bearing')} "
+                    f"{b.get('distance')}) are the ones crossing -- check those two "
+                    "against the source document; not auto-corrected."
+                )
+            issues.append(message)
         area_sqft = round(abs(polygon.area), 2)
     else:
         issues.append(
