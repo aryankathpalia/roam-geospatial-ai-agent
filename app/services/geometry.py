@@ -119,6 +119,156 @@ def walk_traverse(boundary_calls: list[dict]) -> TraverseResult:
     )
 
 
+def _normalize_bearing_key(bearing: str) -> str | None:
+    azimuth = parse_bearing(bearing)
+    return None if azimuth is None else round(azimuth, 2)
+
+
+def resolve_ambiguous_calls(
+    boundary_calls: list[dict], ambiguous_alternates: list[dict]
+) -> list[dict]:
+    """
+    Deterministically picks between competing distance readings for the
+    same bearing, instead of trusting vision to have already guessed
+    correctly. vision.py's structure prompt asks the model to put its
+    best single guess in `boundary_calls` and any other plausible
+    reading of that SAME line (e.g. from an overlapping tile, or a
+    partially cut-off digit near a tile boundary -- a real, observed
+    failure mode) into `ambiguous_alternates`, rather than silently
+    merging or discarding one itself.
+
+    This function tries every combination of (original vs each
+    alternate) for the ambiguous positions and keeps whichever
+    combination makes the traverse close best (lowest closure_error_ft)
+    -- using the same geometric evidence the caller already validates
+    with, not a semantic guess about which number "looks right". Calls
+    with no matching alternate are left untouched. Bounded to at most
+    4 ambiguous positions (16 combinations) to keep this cheap; beyond
+    that, only the first 4 are resolved this way and the rest keep
+    vision's original guess.
+    """
+
+    if not ambiguous_alternates:
+        return boundary_calls
+
+    alternates_by_bearing: dict[float, list[dict]] = {}
+    for alt in ambiguous_alternates:
+        key = _normalize_bearing_key(str(alt.get("bearing") or ""))
+        if key is not None:
+            alternates_by_bearing.setdefault(key, []).append(alt)
+
+    candidates_per_position: list[list[dict]] = []
+    ambiguous_position_count = 0
+    for call in boundary_calls:
+        key = _normalize_bearing_key(str(call.get("bearing") or ""))
+        alts = alternates_by_bearing.get(key) if key is not None else None
+        if alts and ambiguous_position_count < 4:
+            candidates_per_position.append([call, *alts])
+            ambiguous_position_count += 1
+        else:
+            candidates_per_position.append([call])
+
+    if ambiguous_position_count == 0:
+        return boundary_calls
+
+    best_combo = boundary_calls
+    best_closure = math.inf
+    for combo in _iter_combinations(candidates_per_position):
+        closure = walk_traverse(combo).closure_error_ft
+        if closure < best_closure:
+            best_closure = closure
+            best_combo = combo
+
+    return best_combo
+
+
+def drop_conflicting_axis_duplicates(boundary_calls: list[dict]) -> list[dict]:
+    """
+    Catches a second, distinct duplicate-reading failure mode that
+    resolve_ambiguous_calls can't: two calls on the SAME axis (bearings
+    pointing in opposite/anti-parallel directions, e.g. N0*48'45"E and
+    S0*48'45"W) whose distances differ by more than rounding -- a real,
+    observed case (2637.36' vs 2417.36' on the same N-S axis, both in
+    one parcel's boundary_calls, neither flagged by vision as an
+    alternate of the other). This is NOT the same shape as
+    resolve_ambiguous_calls' problem: vision never linked these two as
+    readings of one line, so there's no explicit alternates list to
+    consult -- this is inferred purely from the geometry of the
+    finished call list.
+
+    A genuinely valid parcel routinely has two opposite-direction calls
+    on the same axis with NEARLY EQUAL distance (a rectangle's two
+    N-S sides) -- that's normal and must be left alone. Only a
+    meaningful difference (>2%) between same-axis, opposite-direction
+    distances is treated as a candidate duplicate/misread, since real
+    matching sides agree far more closely than that.
+
+    For each such conflicting pair, tries dropping either call (never
+    both at once, and never more than 2 pairs, to keep this bounded)
+    and keeps whichever variant -- original, drop-first, or drop-second
+    -- yields the lowest closure error, same closure-based evidence
+    resolve_ambiguous_calls uses. Never drops a call that improves
+    closure by only a marginal amount (<10%), since that's within the
+    noise of a legitimately imperfect real survey traverse and dropping
+    real data on a weak signal would be guessing, not evidence.
+    """
+
+    axis_groups: dict[float, list[int]] = {}
+    for i, call in enumerate(boundary_calls):
+        azimuth = parse_bearing(str(call.get("bearing") or ""))
+        if azimuth is None:
+            continue
+        axis_key = round(azimuth % 180, 1)
+        axis_groups.setdefault(axis_key, []).append(i)
+
+    conflicting_pairs: list[tuple[int, int]] = []
+    for indices in axis_groups.values():
+        for a, b in zip(indices, indices[1:]):
+            dist_a = parse_distance(str(boundary_calls[a].get("distance") or ""))
+            dist_b = parse_distance(str(boundary_calls[b].get("distance") or ""))
+            if dist_a is None or dist_b is None:
+                continue
+            if abs(dist_a - dist_b) / max(dist_a, dist_b) > 0.02:
+                conflicting_pairs.append((a, b))
+
+    if not conflicting_pairs:
+        return boundary_calls
+
+    conflicting_pairs = conflicting_pairs[:2]
+    baseline_closure = walk_traverse(boundary_calls).closure_error_ft
+
+    best_calls = boundary_calls
+    best_closure = baseline_closure
+    for drop_choices in _iter_combinations([[None, a, b] for a, b in conflicting_pairs]):
+        dropped_indices = {c for c in drop_choices if c is not None}
+        if not dropped_indices:
+            continue
+        trial = [c for i, c in enumerate(boundary_calls) if i not in dropped_indices]
+        if len(trial) < 3:
+            continue
+        closure = walk_traverse(trial).closure_error_ft
+        if closure < best_closure:
+            best_closure = closure
+            best_calls = trial
+
+    if best_calls is not boundary_calls and baseline_closure > 0:
+        improvement = (baseline_closure - best_closure) / baseline_closure
+        if improvement < 0.10:
+            return boundary_calls
+
+    return best_calls
+
+
+def _iter_combinations(candidates_per_position: list[list[dict]]):
+    if not candidates_per_position:
+        yield []
+        return
+    head, *rest = candidates_per_position
+    for tail in _iter_combinations(rest):
+        for choice in head:
+            yield [choice, *tail]
+
+
 def traverse_to_geojson(result: TraverseResult) -> dict:
     """
     Local-coordinate GeoJSON Polygon (NOT yet georeferenced -- see
