@@ -207,6 +207,10 @@ region numbers and may not start at 1 or be contiguous, when this is
 only some of the document's regions). For EACH piece, list, exactly as
 written, anything on it that is one of:
 - a boundary bearing and distance call (e.g. N89*11'15"E 903.15')
+- a BARE distance written along a boundary line with no bearing next
+  to it (e.g. "550.75'") -- often one parcel's own share of a longer
+  line whose bearing and combined length are labeled elsewhere; say
+  which line it sits on and which parcel label it's nearest
 - a ground/state-plane coordinate (e.g. "N 14926910.28 E 2251599.70")
 - a basis-of-bearings / datum / coordinate-zone statement
 - a parcel/lot label or acreage
@@ -350,12 +354,28 @@ parcel.
    in ambiguous_alternates). This lets a deterministic downstream check
    pick between them by testing which one actually makes the traverse
    close, instead of you guessing.
+8. SEGMENT DISTANCES WITHOUT THEIR OWN BEARING: a long boundary line
+   spanning two adjacent parcels is often labeled once with a bearing
+   and its full combined length (e.g. "S89*11'15"E 903.15'"), with
+   each parcel's own share of that line labeled separately as a bare
+   distance with NO bearing next to it (e.g. "550.75'" and "352.40'",
+   which sum to 903.15'). Those bare segment distances ARE this
+   parcel's real edge lengths -- do not drop them for lacking a
+   bearing. For each parcel whose boundary uses that shared line,
+   put the full combined call in boundary_calls as usual, and add the
+   bare segment distance(s) that sit within THIS parcel's own portion
+   of the line (by position in the notes / the parcel label they're
+   near) to ambiguous_alternates, using the combined line's bearing.
+   If you can't tell which segment belongs to which parcel, add every
+   segment of that line to each parcel's ambiguous_alternates --
+   downstream checks against each parcel's stated acreage will pick.
 
 For boundary_calls specifically: only include an entry if it has BOTH
 a bearing AND a distance stated together as a single call on THAT
 parcel's own OUTER boundary line. Do NOT include:
 - a bare dimension number, curve table length, or interior measurement
-  (e.g. a building or setback dimension)
+  (e.g. a building or setback dimension) -- EXCEPT the segment case
+  below, which goes in ambiguous_alternates instead of being dropped
 - a bearing or distance shown in PARENTHESES -- survey plats use
   parentheses for reference/record citations (a prior deed's stated
   bearing, a tie to a section corner), not the as-surveyed boundary
