@@ -30,7 +30,11 @@ from app.services.geometry import (
     walk_traverse,
 )
 from app.services.layout_detector_onnx import detect_page_layout
-from app.services.spatial_validation import check_combined_tract_dimension, validate_traverse
+from app.services.spatial_validation import (
+    check_combined_tract_dimension,
+    parse_stated_area_acres,
+    validate_traverse,
+)
 from app.services.ocr import OCRLine
 from app.services.pdf_inspector import inspect_pdf
 from app.services.pdf_renderer import render_page
@@ -232,8 +236,11 @@ async def process_document(
                 # region now holds a LIST of parcels, each walked and
                 # validated independently.
                 region["parcels"] = []
+                stated_sqfts = [
+                    parse_stated_area_acres(g.get("stated_area_acres")) for g in parcels
+                ]
 
-                for geometry in parcels:
+                for idx, geometry in enumerate(parcels):
                     parcel_result: dict = {"vision_geometry": geometry}
 
                     # Walk the extracted boundary calls into an actual
@@ -255,7 +262,12 @@ async def process_document(
                     # Python rather than asking vision to guess.
                     if calls and geometry.get("ambiguous_alternates"):
                         calls = resolve_ambiguous_calls(
-                            calls, geometry["ambiguous_alternates"]
+                            calls,
+                            geometry["ambiguous_alternates"],
+                            stated_area_sqft=stated_sqfts[idx],
+                            sibling_stated_sqfts=[
+                                s for j, s in enumerate(stated_sqfts) if j != idx and s
+                            ],
                         )
                     # Separate, second deterministic pass: catches
                     # same-axis opposite-direction calls with mismatched

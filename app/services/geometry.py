@@ -119,67 +119,104 @@ def walk_traverse(boundary_calls: list[dict]) -> TraverseResult:
     )
 
 
-def _normalize_bearing_key(bearing: str) -> str | None:
+def _axis_key(bearing: str) -> float | None:
     azimuth = parse_bearing(bearing)
-    return None if azimuth is None else round(azimuth, 2)
+    return None if azimuth is None else round(azimuth % 180, 1)
+
+
+def _shoelace_area(points: list[tuple[float, float]]) -> float:
+    corners = points[:-1] if len(points) > 1 else points
+    n = len(corners)
+    if n < 3:
+        return 0.0
+    s = sum(
+        corners[i][0] * corners[(i + 1) % n][1] - corners[(i + 1) % n][0] * corners[i][1]
+        for i in range(n)
+    )
+    return abs(s) / 2
+
+
+_AREA_TOLERANCE = 0.15
+_CLOSED_RATIO = 0.01
 
 
 def resolve_ambiguous_calls(
-    boundary_calls: list[dict], ambiguous_alternates: list[dict]
+    boundary_calls: list[dict],
+    ambiguous_alternates: list[dict],
+    stated_area_sqft: float | None = None,
+    sibling_stated_sqfts: list[float] | None = None,
 ) -> list[dict]:
     """
-    Deterministically picks between competing distance readings for the
-    same bearing, instead of trusting vision to have already guessed
-    correctly. vision.py's structure prompt asks the model to put its
-    best single guess in `boundary_calls` and any other plausible
-    reading of that SAME line (e.g. from an overlapping tile, or a
-    partially cut-off digit near a tile boundary -- a real, observed
-    failure mode) into `ambiguous_alternates`, rather than silently
-    merging or discarding one itself.
+    Picks between competing distance readings for boundary lines.
+    Alternates match by AXIS (bearing mod 180), so one alternate can
+    replace both opposite legs of a line -- needed because a shared
+    line's individual segment lengths are often printed as bare
+    distances that inherit the combined line's bearing (see vision.py
+    rule 8), and a rectangle walks that axis twice.
 
-    This function tries every combination of (original vs each
-    alternate) for the ambiguous positions and keeps whichever
-    combination makes the traverse close best (lowest closure_error_ft)
-    -- using the same geometric evidence the caller already validates
-    with, not a semantic guess about which number "looks right". Calls
-    with no matching alternate are left untouched. Bounded to at most
-    4 ambiguous positions (16 combinations) to keep this cheap; beyond
-    that, only the first 4 are resolved this way and the rest keep
-    vision's original guess.
+    When this parcel's own stated acreage is known, combinations are
+    ranked by it -- independent evidence closure alone can't provide,
+    since the combined tract rectangle closes perfectly too. A
+    combination whose area matches THIS parcel plus one or more
+    sibling parcels' stated areas is disqualified outright: that's the
+    signature of the combined tract dimension being used. Without a
+    stated acreage, falls back to lowest closure error.
     """
 
     if not ambiguous_alternates:
         return boundary_calls
 
-    alternates_by_bearing: dict[float, list[dict]] = {}
+    alts_by_axis: dict[float, list[str]] = {}
     for alt in ambiguous_alternates:
-        key = _normalize_bearing_key(str(alt.get("bearing") or ""))
-        if key is not None:
-            alternates_by_bearing.setdefault(key, []).append(alt)
+        key = _axis_key(str(alt.get("bearing") or ""))
+        dist = alt.get("distance")
+        if key is not None and dist:
+            alts_by_axis.setdefault(key, []).append(dist)
 
     candidates_per_position: list[list[dict]] = []
-    ambiguous_position_count = 0
+    ambiguous_positions = 0
     for call in boundary_calls:
-        key = _normalize_bearing_key(str(call.get("bearing") or ""))
-        alts = alternates_by_bearing.get(key) if key is not None else None
-        if alts and ambiguous_position_count < 4:
-            candidates_per_position.append([call, *alts])
-            ambiguous_position_count += 1
+        key = _axis_key(str(call.get("bearing") or ""))
+        dists = alts_by_axis.get(key) if key is not None else None
+        if dists and ambiguous_positions < 6:
+            options = [call] + [
+                {**call, "distance": d} for d in dists if d != call.get("distance")
+            ]
+            candidates_per_position.append(options)
+            ambiguous_positions += 1
         else:
             candidates_per_position.append([call])
 
-    if ambiguous_position_count == 0:
+    if ambiguous_positions == 0:
         return boundary_calls
 
-    best_combo = boundary_calls
-    best_closure = math.inf
-    for combo in _iter_combinations(candidates_per_position):
-        closure = walk_traverse(combo).closure_error_ft
-        if closure < best_closure:
-            best_closure = closure
-            best_combo = combo
+    disqualifying_sums: list[float] = []
+    if stated_area_sqft and sibling_stated_sqfts:
+        total = stated_area_sqft + sum(sibling_stated_sqfts)
+        disqualifying_sums.append(total)
+        disqualifying_sums.extend(stated_area_sqft + s for s in sibling_stated_sqfts)
 
-    return best_combo
+    def rank(combo: list[dict]) -> tuple:
+        traverse = walk_traverse(combo)
+        perimeter = sum(
+            math.hypot(b[0] - a[0], b[1] - a[1])
+            for a, b in zip(traverse.points, traverse.points[1:])
+        ) or 1.0
+        closed = traverse.closure_error_ft <= _CLOSED_RATIO * perimeter
+        if not stated_area_sqft:
+            return (0, traverse.closure_error_ft)
+        area = _shoelace_area(traverse.points)
+        own_diff = abs(area - stated_area_sqft) / stated_area_sqft
+        is_sum_match = any(abs(area - s) / s <= _AREA_TOLERANCE for s in disqualifying_sums)
+        return (
+            0 if closed else 1,
+            1 if is_sum_match else 0,
+            0 if own_diff <= _AREA_TOLERANCE else 1,
+            own_diff,
+            traverse.closure_error_ft,
+        )
+
+    return min(_iter_combinations(candidates_per_position), key=rank)
 
 
 def drop_conflicting_axis_duplicates(boundary_calls: list[dict]) -> list[dict]:
