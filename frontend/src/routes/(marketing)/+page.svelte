@@ -80,7 +80,7 @@
       }
     }
     if (region) {
-      previewPoints = walkTraverse(region.vision_geometry.boundary_calls);
+      previewPoints = walkTraverse(region.resolved_boundary_calls ?? region.vision_geometry.boundary_calls);
       previewPath = pointsToSvgPath(previewPoints);
     }
   });
@@ -170,7 +170,7 @@
           <div class="calls-body">
             <div class="calls-table">
               {#if region}
-                {#each region.vision_geometry.boundary_calls as call, i}
+                {#each region.resolved_boundary_calls ?? region.vision_geometry.boundary_calls as call, i}
                   <div class="call-row mono">
                     <span class="call-vertex">{i + 1}</span>
                     <span class="call-bearing">{call.bearing.replace('�', '°')}</span>

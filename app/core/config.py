@@ -32,8 +32,9 @@ class Settings(BaseSettings):
     # Google's per-model server capacity, not our quota, so a different
     # model often succeeds. Comma-separated; empty disables fallback.
     # Kept to the flash-lite family: flagship gemini-3.5-flash is a
-    # poor fallback (20 req/day free-tier cap, see above).
-    GEMINI_FALLBACK_MODELS: str = "gemini-3.1-flash-lite,gemini-2.5-flash-lite"
+    # poor fallback (20 req/day free-tier cap, see above), and
+    # gemini-2.5-flash-lite returns 404 for new users.
+    GEMINI_FALLBACK_MODELS: str = "gemini-3.1-flash-lite"
 
 
 settings = Settings()

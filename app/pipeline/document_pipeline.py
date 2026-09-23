@@ -278,6 +278,11 @@ async def process_document(
                         calls = drop_conflicting_axis_duplicates(calls)
                     if calls:
                         traverse = walk_traverse(calls)
+                        # The calls actually walked, after the resolvers --
+                        # can differ from vision_geometry.boundary_calls
+                        # (e.g. a parcel's own 352.40' segment replacing
+                        # the combined 903.15' line vision read).
+                        parcel_result["resolved_boundary_calls"] = calls
                         parcel_result["boundary_geojson"] = traverse_to_geojson(traverse)
                         parcel_result["spatial_validation"] = validate_traverse(
                             traverse,
