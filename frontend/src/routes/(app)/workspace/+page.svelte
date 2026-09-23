@@ -24,14 +24,19 @@
     return `${pageNumber}-${i}`;
   }
 
-  // Flattened list of ParcelMap regions that have a georeferenced
-  // polygon, across every page -- what the map and the side list both
-  // render from.
+  // Flattened list of PARCELS (not regions) that have a georeferenced
+  // polygon, across every page. A single ParcelMap region can hold
+  // more than one parcel -- a "Parcel Map Exhibit" sheet showing two
+  // adjacent parcels side by side is one region but two parcels (see
+  // app/services/vision.py's Parcel Target Resolver) -- so this flattens
+  // one level deeper than region: page -> region -> parcel.
   $: parcelRegions = result
     ? (result.pages ?? []).flatMap((p: any) =>
-        (p.regions ?? [])
-          .map((region: any, i: number) => ({ page: p.page_number, i, region }))
-          .filter((r: any) => r.region.boundary_geojson_wgs84)
+        (p.regions ?? []).flatMap((region: any, i: number) =>
+          (region.parcels ?? [])
+            .map((parcel: any, j: number) => ({ page: p.page_number, i: `${i}-${j}`, parcel }))
+            .filter((r: any) => r.parcel.boundary_geojson_wgs84)
+        )
       )
     : [];
 
@@ -67,12 +72,12 @@
 
     const bounds: any[] = [];
 
-    for (const { page, i, region } of parcelRegions) {
-      const valid = region.spatial_validation?.valid;
+    for (const { page, i, parcel } of parcelRegions) {
+      const valid = parcel.spatial_validation?.valid;
       const color = valid ? '#2f7a4f' : '#c53b3b';
       const key = regionKey(page, i);
 
-      const layer = L.geoJSON(region.boundary_geojson_wgs84, {
+      const layer = L.geoJSON(parcel.boundary_geojson_wgs84, {
         style: {
           color,
           weight: selectedKey === key ? 3.5 : 2,
@@ -250,7 +255,7 @@
           <span class="stat-value mono">{result.pages_needing_review ?? '—'}</span>
         </div>
         <div class="stat panel">
-          <span class="stat-label">Parcel regions</span>
+          <span class="stat-label">Parcels</span>
           <span class="stat-value mono">{parcelRegions.length}</span>
         </div>
       </div>
@@ -267,9 +272,9 @@
             </div>
           {/if}
 
-          {#each parcelRegions as { page, i, region } (regionKey(page, i))}
+          {#each parcelRegions as { page, i, parcel } (regionKey(page, i))}
             {@const key = regionKey(page, i)}
-            {@const v = region.spatial_validation}
+            {@const v = parcel.spatial_validation}
             <button
               class="region-card panel"
               class:selected={selectedKey === key}
@@ -277,7 +282,7 @@
             >
               <div class="region-head">
                 <span class="region-title">
-                  {region.vision_geometry?.parcel_label || `Page ${page} region`}
+                  {parcel.vision_geometry?.parcel_label || `Page ${page} parcel`}
                 </span>
                 {#if v}
                   <span class="pill {v.valid ? 'low' : 'high'}">
@@ -289,7 +294,7 @@
               {#if v}
                 <dl class="region-metrics">
                   <div><dt>Precision</dt><dd class="mono">{v.precision_ratio ? `1:${v.precision_ratio}` : '—'}</dd></div>
-                  <div><dt>Closure</dt><dd class="mono">{region.boundary_geojson_wgs84?.properties?.closure_error_ft ?? '—'} ft</dd></div>
+                  <div><dt>Closure</dt><dd class="mono">{parcel.boundary_geojson_wgs84?.properties?.closure_error_ft ?? '—'} ft</dd></div>
                   <div><dt>Area</dt><dd class="mono">{v.area_acres ? `${v.area_acres} ac` : '—'}</dd></div>
                 </dl>
 
