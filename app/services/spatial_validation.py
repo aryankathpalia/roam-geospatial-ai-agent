@@ -24,6 +24,29 @@ check, plus one cross-check against the document's own OCR text:
    against that stated figure is a real, free consistency check: if
    they disagree by a lot, either the extracted calls or the stated
    area is wrong -- worth surfacing either way, not guessing which.
+   The stated figure is preferably the parcel-specific one vision
+   extracted (associated with THIS parcel's own label, not just the
+   first acreage number anywhere in the region), since a region with
+   several parcels has several different stated areas and grabbing
+   the wrong one defeats the check.
+
+4. Combined-tract dimension detection (check_combined_tract_dimension)
+   -- a real, confirmed failure mode: two adjacent parcels sharing one
+   drawn property line can each have their own individual segment
+   length labeled, alongside a longer combined dimension for the two
+   segments together (a real NVZ LLC exhibit: Parcel 2's own edge is
+   550.75ft, a sibling Parcel 1's is 352.40ft, and the sheet also
+   shows 903.15ft for the two combined -- 550.75 + 352.40 = 903.15
+   exactly). A parcel that accidentally walks using the combined
+   dimension instead of its own can still close perfectly (the
+   combined rectangle is a real, valid shape in the drawing -- just
+   the wrong one), so closure alone can't catch it. This check uses
+   acreage as an INDEPENDENT signal: if a parcel's walked area is
+   suspiciously close to the SUM of its own stated area plus one or
+   more sibling parcels' stated areas in the same region, that's
+   direct evidence a combined dimension was used. It never silently
+   substitutes the correct value -- it surfaces the competing evidence
+   and leaves the parcel flagged for review.
 """
 
 import re
@@ -67,6 +90,22 @@ def compute_perimeter_ft(points: list[tuple[float, float]]) -> float:
     )
 
 
+def parse_stated_area_acres(value: str | None) -> float | None:
+    """
+    Parses vision's per-parcel stated_area_acres field (a bare number
+    string like "2.78", no unit) into square feet. Returns None for
+    missing/unparseable input -- callers fall back to scanning OCR
+    text instead of guessing.
+    """
+
+    if not value:
+        return None
+    try:
+        return float(value.strip()) * _SQFT_PER_ACRE
+    except ValueError:
+        return None
+
+
 def find_stated_area_sqft(text: str) -> float | None:
     """
     Scans OCR text for the first area figure (in acres or square feet,
@@ -87,13 +126,24 @@ def find_stated_area_sqft(text: str) -> float | None:
     return value
 
 
-def validate_traverse(traverse: TraverseResult, region_ocr_text: str = "") -> dict:
+def validate_traverse(
+    traverse: TraverseResult,
+    region_ocr_text: str = "",
+    stated_area_acres: str | None = None,
+) -> dict:
     """
     Returns a validation report for a walked traverse. `valid` is the
     overall verdict; `issues` lists the specific, human-readable
     reasons -- surfaced rather than collapsed into a single boolean,
     since a caller (or a future map UI) may want to show which check
     failed, not just that something did.
+
+    `stated_area_acres` is vision's own per-parcel acreage extraction
+    (associated with this specific parcel's label) and is preferred
+    over scanning `region_ocr_text` for the first acreage figure --
+    a region with multiple parcels has multiple different stated
+    areas, and blindly taking the first one in OCR text can silently
+    check a parcel against a SIBLING's area instead of its own.
     """
 
     issues: list[str] = []
@@ -147,7 +197,9 @@ def validate_traverse(traverse: TraverseResult, region_ocr_text: str = "") -> di
             "closed shape (need at least 3)."
         )
 
-    stated_area_sqft = find_stated_area_sqft(region_ocr_text)
+    stated_area_sqft = parse_stated_area_acres(stated_area_acres) or find_stated_area_sqft(
+        region_ocr_text
+    )
     area_match: bool | None = None
     if area_sqft is not None and stated_area_sqft:
         relative_diff = abs(area_sqft - stated_area_sqft) / stated_area_sqft
@@ -171,3 +223,50 @@ def validate_traverse(traverse: TraverseResult, region_ocr_text: str = "") -> di
         "stated_area_sqft": stated_area_sqft,
         "area_matches_stated": area_match,
     }
+
+
+def check_combined_tract_dimension(parcels: list[dict]) -> list[str | None]:
+    """
+    Cross-parcel check across every parcel walked from the SAME
+    region: flags a parcel whose walked area is suspiciously close to
+    the SUM of stated areas across two or more parcels in the group --
+    direct, independent evidence (acreage, not geometry) that a
+    combined/gross tract dimension was used instead of this parcel's
+    own individual segment. See module docstring point 4 for why
+    closure alone can't catch this (the combined rectangle is a real,
+    valid shape in the drawing -- just the wrong one).
+
+    `parcels` is a list of {"parcel_label", "area_sqft",
+    "stated_area_sqft"}, one entry per parcel in the region, any
+    order. Returns a same-length list of either None or a human-
+    readable warning for that index. Never mutates input, and never
+    guesses which dimension is correct or auto-corrects anything --
+    it only surfaces the competing evidence for a human (or the
+    caller's own issues list) to act on.
+    """
+
+    stated_values = [p["stated_area_sqft"] for p in parcels if p.get("stated_area_sqft")]
+    total_stated = sum(stated_values)
+
+    warnings: list[str | None] = [None] * len(parcels)
+    if len(stated_values) < 2 or total_stated <= 0:
+        # Need at least 2 sibling parcels with a known stated area to
+        # have a meaningful sum to compare against.
+        return warnings
+
+    for i, p in enumerate(parcels):
+        area = p.get("area_sqft")
+        if not area:
+            continue
+        relative_diff = abs(area - total_stated) / total_stated
+        if relative_diff <= _AREA_MISMATCH_TOLERANCE:
+            label = p.get("parcel_label") or "This parcel"
+            warnings[i] = (
+                f"{label}'s walked area ({area:,.0f} sqft) is close to the COMBINED "
+                f"stated area of all {len(stated_values)} parcels in this region "
+                f"({total_stated:,.0f} sqft) -- a strong sign one of the extracted "
+                "dimensions is the shared/combined tract width, not this parcel's "
+                "own individual boundary segment. Needs manual review; not "
+                "auto-corrected."
+            )
+    return warnings

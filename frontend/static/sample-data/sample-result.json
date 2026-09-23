@@ -1,6 +1,6 @@
 {
   "document_id": "0eef4f6c-8050-47db-9d90-e742a1deaee0",
-  "source_note": "Real ROAM pipeline output from WTPM26-0004_Placerville_app.pdf (page 9), using the actual OCR text from that page (not a placeholder). The Parcel Target Resolver correctly splits this region into two independently-attributed parcels (PARCEL 1 and PARCEL 2, drawn adjacent on one exhibit sheet) instead of merging them -- but PARCEL 2 still grabbed the combined two-parcel tract width (903.15 ft) instead of its own individual width (550.75 ft), a real, disclosed extraction error. Both parcels correctly fail here: PARCEL 2 closes geometrically but the stated-area cross-check catches it (walked area is 64% off the documents own acreage table); PARCEL 1 fails on closure and area both. This is real, unresolved model behavior, not a staged example -- see the pipeline README/commit history for the ongoing Parcel Target Resolver work.",
+  "source_note": "Real ROAM pipeline output from WTPM26-0004_Placerville_app.pdf (page 9). The Parcel Target Resolver correctly splits this region into two independently-attributed parcels. PARCEL 2 still grabbed the combined two-parcel tract width (903.15 ft) instead of its own individual width (550.75 ft) -- a real, unresolved dimension-selection limitation. What is now fixed: vision independently extracts each parcel is own stated acreage (2.78 / 1.78 ac, both exactly correct), and a new deterministic cross-parcel check uses that acreage as independent evidence -- it flags PARCEL 2 specifically because its walked area is suspiciously close to the COMBINED stated area of both parcels, pinpointing the real cause instead of a generic area-mismatch message. Not auto-corrected on purpose -- surfaced as Needs Review with the competing evidence for a human to resolve.",
   "anchor_address": "10235 Placerville Road",
   "anchor_lat": 39.6877843,
   "anchor_lon": -119.9082479,
@@ -33,18 +33,16 @@
                     "distance": "903.15'"
                   }
                 ],
-                "tie_point": {
-                  "northing": "14926910.28",
-                  "easting": "2251599.70",
-                  "anchors_corner": "null"
-                },
-                "basis_of_bearings": "NEVADA STATE PLANE, WEST ZONE NAD83(94) BASED ON REAL TIME KINEMATIC (RTK) GPS OBSERVATIONS UTILIZING CORRECTIONS FROM THE NORTHERN NEVADA COOPERATIVE REAL TIME NETWORK",
-                "parcel_label": "PARCEL 2"
+                "parcel_label": "PARCEL 2",
+                "tie_point": null,
+                "basis_of_bearings": null,
+                "stated_area_acres": "2.78"
               },
               "spatial_validation": {
                 "valid": false,
                 "issues": [
-                  "Walked area (198,693 sqft) differs from the document's stated area (121,097 sqft) by 64% -- beyond the 15% tolerance."
+                  "Walked area (198,693 sqft) differs from the document's stated area (121,097 sqft) by 64% -- beyond the 15% tolerance.",
+                  "PARCEL 2's walked area (198,693 sqft) is close to the COMBINED stated area of all 2 parcels in this region (198,634 sqft) -- a strong sign one of the extracted dimensions is the shared/combined tract width, not this parcel's own individual boundary segment. Needs manual review; not auto-corrected."
                 ],
                 "perimeter_ft": 2246.3,
                 "precision_ratio": null,
@@ -96,52 +94,53 @@
               "vision_geometry": {
                 "boundary_calls": [
                   {
-                    "bearing": "N0\u00b048'45\"E",
-                    "distance": "2637.36'"
+                    "bearing": "N0\u00b048'45\"W",
+                    "distance": "220.00'"
                   },
                   {
                     "bearing": "N89\u00b011'15\"E",
                     "distance": "1077.91'"
                   },
                   {
-                    "bearing": "S89\u00b011'17\"E",
-                    "distance": "336.41'"
+                    "bearing": "S0\u00b048'45\"W",
+                    "distance": "2637.36'"
                   },
                   {
-                    "bearing": "S89\u00b011'17\"E",
+                    "bearing": "N89\u00b011'17\"W",
+                    "distance": "325.30'"
+                  },
+                  {
+                    "bearing": "N89\u00b011'17\"W",
                     "distance": "329.80'"
                   },
                   {
-                    "bearing": "S89\u00b011'17\"E",
-                    "distance": "325.30'"
+                    "bearing": "N89\u00b011'17\"W",
+                    "distance": "336.41'"
                   }
                 ],
-                "tie_point": {
-                  "northing": "1492989.71",
-                  "easting": "2253610.44",
-                  "anchors_corner": "null"
-                },
-                "basis_of_bearings": "NEVADA STATE PLANE, WEST ZONE NAD83(94) BASED ON REAL TIME KINEMATIC (RTK) GPS OBSERVATIONS UTILIZING CORRECTIONS FROM THE NORTHERN NEVADA COOPERATIVE REAL TIME NETWORK",
-                "parcel_label": "PARCEL 1"
+                "parcel_label": "PARCEL 1",
+                "tie_point": null,
+                "basis_of_bearings": null,
+                "stated_area_acres": "1.78"
               },
               "spatial_validation": {
                 "valid": false,
                 "issues": [
-                  "Weak closure: precision ratio 1:1 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.",
-                  "Walked area (2,309,543 sqft) differs from the document's stated area (121,097 sqft) by 1807% -- beyond the 15% tolerance."
+                  "Weak closure: precision ratio 1:2 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.",
+                  "Walked area (2,313,016 sqft) differs from the document's stated area (77,537 sqft) by 2883% -- beyond the 15% tolerance."
                 ],
-                "perimeter_ft": 4706.78,
-                "precision_ratio": 1.4,
+                "perimeter_ft": 4926.78,
+                "precision_ratio": 2.1,
                 "self_intersects": false,
-                "area_sqft": 2309543.11,
-                "area_acres": 53.02,
-                "stated_area_sqft": 121096.79999999999,
+                "area_sqft": 2313016.33,
+                "area_acres": 53.1,
+                "stated_area_sqft": 77536.8,
                 "area_matches_stated": false
               },
               "boundary_geojson_wgs84": {
                 "type": "Feature",
                 "properties": {
-                  "closure_error_ft": 3376.18,
+                  "closure_error_ft": 2388.22,
                   "unparsed_calls": 0,
                   "anchor_lat": 39.6877843,
                   "anchor_lon": -119.9082479,
@@ -156,24 +155,28 @@
                         39.6877843
                       ],
                       [
-                        -119.908115,
-                        39.6950237
+                        -119.908259,
+                        39.6883882
                       ],
                       [
-                        -119.9042849,
-                        39.6950656
+                        -119.9044293,
+                        39.6884301
                       ],
                       [
-                        -119.9030896,
-                        39.6950525
+                        -119.9045626,
+                        39.6811906
                       ],
                       [
-                        -119.9019177,
-                        39.6950396
+                        -119.9057182,
+                        39.6812033
                       ],
                       [
-                        -119.9007619,
-                        39.6950269
+                        -119.9068898,
+                        39.6812162
+                      ],
+                      [
+                        -119.9080849,
+                        39.6812293
                       ],
                       [
                         -119.9082479,
