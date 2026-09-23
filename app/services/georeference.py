@@ -160,3 +160,80 @@ def georeference_traverse_to_geojson(
             "coordinates": [[[round(lon, 7), round(lat, 7)] for lon, lat in ring_lonlat]],
         },
     }
+
+
+# ---------------------------------------------------------------------
+# Surveyed ground-coordinate placement -- NARROW SCOPE, READ BEFORE REUSE
+#
+# This is NOT general coordinate-system support. It only works when the
+# caller already knows, from the document itself, (a) a surveyed ground
+# coordinate at a specific corner of the parcel, (b) the exact EPSG code
+# of the state-plane zone the sheet states in its basis of bearings, and
+# (c) the sheet's stated grid-to-ground combined factor. Nothing here
+# infers a zone, validates that the coordinate belongs to that zone, or
+# handles datums/units beyond what the caller passes in. It was written
+# for one confirmed case (WTPM26-0004 page 9, NAD83(94) Nevada West,
+# factor 1.000197939) and should not be wired into the general pipeline
+# without that detection/validation work being done first -- guessing a
+# zone wrong silently puts a parcel in the wrong place (see module
+# docstring). It also assumes the traverse's bearings are grid bearings
+# in that same zone (true when the sheet's basis of bearings IS the
+# state-plane zone), so no convergence-angle rotation is applied.
+# ---------------------------------------------------------------------
+
+_CORNER_SCORES = {
+    "NW": lambda x, y: y - x,
+    "NE": lambda x, y: y + x,
+    "SW": lambda x, y: -y - x,
+    "SE": lambda x, y: -y + x,
+}
+
+
+def georeference_traverse_from_ground_corner(
+    traverse: TraverseResult,
+    corner: str,
+    ground_northing_ft: float,
+    ground_easting_ft: float,
+    epsg: int,
+    grid_to_ground_factor: float,
+) -> dict:
+    """
+    Places a walked traverse so its `corner` ("NW"/"NE"/"SW"/"SE" --
+    the vertex extreme in that direction) sits at a surveyed ground
+    coordinate, then converts every vertex to WGS84. Ground coordinates
+    (and the traverse's ground distances) are scaled to grid by dividing
+    by grid_to_ground_factor before projecting. See the scope note above.
+    """
+
+    from pyproj import Transformer
+
+    corners = traverse.points[:-1] if len(traverse.points) > 1 else traverse.points
+    score = _CORNER_SCORES[corner.upper()]
+    ax, ay = max(corners, key=lambda p: score(p[0], p[1]))
+
+    to_wgs84 = Transformer.from_crs(epsg, 4326, always_xy=True)
+    ring_lonlat = []
+    for x, y in traverse.points:
+        grid_e = (ground_easting_ft + (x - ax)) / grid_to_ground_factor
+        grid_n = (ground_northing_ft + (y - ay)) / grid_to_ground_factor
+        lon, lat = to_wgs84.transform(grid_e, grid_n)
+        ring_lonlat.append((lon, lat))
+    if ring_lonlat[0] != ring_lonlat[-1]:
+        ring_lonlat.append(ring_lonlat[0])
+
+    return {
+        "type": "Feature",
+        "properties": {
+            "closure_error_ft": traverse.closure_error_ft,
+            "unparsed_calls": traverse.unparsed_calls,
+            "georeferenced": "surveyed_ground_coordinate",
+            "anchor_corner": corner.upper(),
+            "anchor_ground_ne_ft": [ground_northing_ft, ground_easting_ft],
+            "epsg": epsg,
+            "grid_to_ground_factor": grid_to_ground_factor,
+        },
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [[[round(lon, 8), round(lat, 8)] for lon, lat in ring_lonlat]],
+        },
+    }
