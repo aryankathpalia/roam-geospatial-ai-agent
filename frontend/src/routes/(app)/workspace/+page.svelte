@@ -24,18 +24,30 @@
     return `${pageNumber}-${i}`;
   }
 
-  // Flattened list of PARCELS (not regions) that have a georeferenced
-  // polygon, across every page. A single ParcelMap region can hold
-  // more than one parcel -- a "Parcel Map Exhibit" sheet showing two
-  // adjacent parcels side by side is one region but two parcels (see
-  // app/services/vision.py's Parcel Target Resolver) -- so this flattens
-  // one level deeper than region: page -> region -> parcel.
+  // Flattened list of every PARCEL vision identified (not regions),
+  // across every page -- INCLUDING ones with no boundary geometry. A
+  // single ParcelMap region can hold more than one parcel -- a "Parcel
+  // Map Exhibit" sheet showing two adjacent parcels side by side is
+  // one region but two parcels (see app/services/vision.py's Parcel
+  // Target Resolver) -- so this flattens one level deeper than region:
+  // page -> region -> parcel.
+  //
+  // Deliberately NOT filtered to parcels with boundary_geojson_wgs84:
+  // a parcel vision found a label for but couldn't attribute calls to
+  // (extraction_note) or couldn't georeference (georeference_error) is
+  // real, useful information -- it was silently dropped from this list
+  // before, which meant those two fields were written by the backend
+  // but never actually reached the screen. renderMap skips drawing a
+  // polygon for these (there's nothing to draw) but they still appear
+  // as cards with their reason shown.
   $: parcelRegions = result
     ? (result.pages ?? []).flatMap((p: any) =>
         (p.regions ?? []).flatMap((region: any, i: number) =>
-          (region.parcels ?? [])
-            .map((parcel: any, j: number) => ({ page: p.page_number, i: `${i}-${j}`, parcel }))
-            .filter((r: any) => r.parcel.boundary_geojson_wgs84)
+          (region.parcels ?? []).map((parcel: any, j: number) => ({
+            page: p.page_number,
+            i: `${i}-${j}`,
+            parcel
+          }))
         )
       )
     : [];
@@ -73,6 +85,8 @@
     const bounds: any[] = [];
 
     for (const { page, i, parcel } of parcelRegions) {
+      if (!parcel.boundary_geojson_wgs84) continue; // nothing to draw -- see card for why
+
       const valid = parcel.spatial_validation?.valid;
       const color = valid ? '#2f7a4f' : '#c53b3b';
       const key = regionKey(page, i);
@@ -288,6 +302,8 @@
                   <span class="pill {v.valid ? 'low' : 'high'}">
                     {v.valid ? 'Valid' : 'Needs review'}
                   </span>
+                {:else if parcel.extraction_note || parcel.georeference_error}
+                  <span class="pill high">No geometry</span>
                 {/if}
               </div>
 
@@ -305,6 +321,10 @@
                     {/each}
                   </ul>
                 {/if}
+              {:else if parcel.extraction_note || parcel.georeference_error}
+                <p class="region-note">
+                  {parcel.extraction_note || parcel.georeference_error}
+                </p>
               {/if}
             </button>
           {/each}
@@ -534,6 +554,13 @@ h1 {
 .region-issues {
   margin: 12px 0 0;
   padding-left: 16px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.region-note {
+  margin: 12px 0 0;
   font-size: 0.78rem;
   color: var(--muted);
   line-height: 1.5;
