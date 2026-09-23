@@ -1,6 +1,6 @@
 {
   "document_id": "0eef4f6c-8050-47db-9d90-e742a1deaee0",
-  "source_note": "Real ROAM pipeline output from WTPM26-0004_Placerville_app.pdf (page 9), re-extracted with the Parcel Target Resolver fix -- the region correctly yields one entry per parcel it actually contains (PARCEL 1 and PARCEL 2, drawn adjacent on one exhibit sheet), independently attributed, instead of merging both into one nonsensical traverse. Extraction quality still varies run to run (a real, disclosed limitation of the underlying model, not hidden) -- Parcel 2 closes perfectly here; Parcel 1 still needs review.",
+  "source_note": "Real ROAM pipeline output from WTPM26-0004_Placerville_app.pdf (page 9), using the actual OCR text from that page (not a placeholder). The Parcel Target Resolver correctly splits this region into two independently-attributed parcels (PARCEL 1 and PARCEL 2, drawn adjacent on one exhibit sheet) instead of merging them -- but PARCEL 2 still grabbed the combined two-parcel tract width (903.15 ft) instead of its own individual width (550.75 ft), a real, disclosed extraction error. Both parcels correctly fail here: PARCEL 2 closes geometrically but the stated-area cross-check catches it (walked area is 64% off the documents own acreage table); PARCEL 1 fails on closure and area both. This is real, unresolved model behavior, not a staged example -- see the pipeline README/commit history for the ongoing Parcel Target Resolver work.",
   "anchor_address": "10235 Placerville Road",
   "anchor_lat": 39.6877843,
   "anchor_lon": -119.9082479,
@@ -42,15 +42,17 @@
                 "parcel_label": "PARCEL 2"
               },
               "spatial_validation": {
-                "valid": true,
-                "issues": [],
+                "valid": false,
+                "issues": [
+                  "Walked area (198,693 sqft) differs from the document's stated area (121,097 sqft) by 64% -- beyond the 15% tolerance."
+                ],
                 "perimeter_ft": 2246.3,
                 "precision_ratio": null,
                 "self_intersects": false,
                 "area_sqft": 198693.0,
                 "area_acres": 4.561,
-                "stated_area_sqft": null,
-                "area_matches_stated": null
+                "stated_area_sqft": 121096.79999999999,
+                "area_matches_stated": false
               },
               "boundary_geojson_wgs84": {
                 "type": "Feature",
@@ -125,15 +127,16 @@
               "spatial_validation": {
                 "valid": false,
                 "issues": [
-                  "Weak closure: precision ratio 1:1 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise."
+                  "Weak closure: precision ratio 1:1 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.",
+                  "Walked area (2,309,543 sqft) differs from the document's stated area (121,097 sqft) by 1807% -- beyond the 15% tolerance."
                 ],
                 "perimeter_ft": 4706.78,
                 "precision_ratio": 1.4,
                 "self_intersects": false,
                 "area_sqft": 2309543.11,
                 "area_acres": 53.02,
-                "stated_area_sqft": null,
-                "area_matches_stated": null
+                "stated_area_sqft": 121096.79999999999,
+                "area_matches_stated": false
               },
               "boundary_geojson_wgs84": {
                 "type": "Feature",
