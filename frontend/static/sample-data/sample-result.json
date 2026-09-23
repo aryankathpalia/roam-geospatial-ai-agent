@@ -1,6 +1,6 @@
 {
   "document_id": "0eef4f6c-8050-47db-9d90-e742a1deaee0",
-  "source_note": "Real ROAM pipeline output from WTPM26-0004_Placerville_app.pdf (page 9), generated with all current fixes: tie-line exclusion, tile overlap, forced parcel enumeration, and per-parcel acreage resolution of shared boundary lines. The sheet labels one 903.15 ft line for both parcels plus each parcel's own share (352.40 ft / 550.75 ft); the resolver tests each candidate against the parcel's own stated acreage and rejects the combined-tract reading. Both parcels now close and match their stated areas (1.78 / 2.78 ac). Extraction is non-deterministic; this is a selected run (by per-parcel acreage match, then closure) and a single fresh upload can come out worse. Map placement is approximate: both parcels are anchored to one geocoded street address, so they overlap and sit on the road instead of side by side north of it (known open issue).",
+  "source_note": "Real ROAM pipeline output from WTPM26-0004_Placerville_app.pdf (page 9), generated with all current fixes: tie-line exclusion, tile overlap, forced parcel enumeration, and per-parcel acreage resolution of shared boundary lines. The sheet labels one 903.15 ft line for both parcels plus each parcel's own share (352.40 ft / 550.75 ft); the resolver tests each candidate against the parcel's own stated acreage and rejects the combined-tract reading. Both parcels now close and match their stated areas (1.78 / 2.78 ac). Extraction is non-deterministic; this is a selected run (by per-parcel acreage match, then closure) and a single fresh upload can come out worse. Map placement uses the surveyed ground coordinates printed on the sheet (Nevada State Plane West, NAD83(94), grid-to-ground factor 1.000197939) at each parcel's corner, not a geocoded address. This sample only: the live pipeline still places parcels from a geocoded address, which is approximate.",
   "anchor_address": "10235 Placerville Road",
   "anchor_lat": 39.6877843,
   "anchor_lon": -119.9082479,
@@ -17,10 +17,6 @@
               "vision_geometry": {
                 "boundary_calls": [
                   {
-                    "bearing": "N0\u00b048'45\"E",
-                    "distance": "220.00'"
-                  },
-                  {
                     "bearing": "S89\u00b011'15\"E",
                     "distance": "903.15'"
                   },
@@ -31,177 +27,24 @@
                   {
                     "bearing": "N89\u00b011'15\"W",
                     "distance": "903.15'"
-                  }
-                ],
-                "tie_point": {
-                  "northing": "14926910.28",
-                  "easting": "2251599.70",
-                  "anchors_corner": "northwest corner of Parcel 2"
-                },
-                "basis_of_bearings": "THE BASIS OF BEARINGS FOR THIS SURVEY IS NEVADA STATE PLANE, WEST ZONE NAD83(94) BASED ON REAL TIME KINEMATIC (RTK) GPS OBSERVATIONS UTILIZING CORRECTIONS FROM THE NORTHERN NEVADA COOPERATIVE REAL TIME NETWORK. COORDINATES AND DISTANCES HEREON ARE AT GROUND LEVEL BASED ON A COMBINED GRID TO GROUND FACTOR OF 1.000197939.",
-                "parcel_label": "PARCEL 2",
-                "stated_area_acres": "2.78",
-                "ambiguous_alternates": [
-                  {
-                    "bearing": "S89\u00b011'15\"E",
-                    "distance": "550.75'"
                   },
-                  {
-                    "bearing": "N89\u00b011'15\"W",
-                    "distance": "550.75'"
-                  }
-                ]
-              },
-              "resolved_boundary_calls": [
-                {
-                  "bearing": "N0\u00b048'45\"E",
-                  "distance": "220.00'"
-                },
-                {
-                  "bearing": "S89\u00b011'15\"E",
-                  "distance": "550.75'"
-                },
-                {
-                  "bearing": "S0\u00b048'45\"W",
-                  "distance": "220.00'"
-                },
-                {
-                  "bearing": "N89\u00b011'15\"W",
-                  "distance": "550.75'"
-                }
-              ],
-              "closure_error_ft": 0.0,
-              "boundary_geojson": {
-                "type": "Feature",
-                "properties": {
-                  "closure_error_ft": 0.0,
-                  "unparsed_calls": 0
-                },
-                "geometry": {
-                  "type": "Polygon",
-                  "coordinates": [
-                    [
-                      [
-                        0.0,
-                        0.0
-                      ],
-                      [
-                        3.12,
-                        219.98
-                      ],
-                      [
-                        553.81,
-                        212.17
-                      ],
-                      [
-                        550.69,
-                        -7.81
-                      ],
-                      [
-                        0.0,
-                        0.0
-                      ],
-                      [
-                        0.0,
-                        0.0
-                      ]
-                    ]
-                  ]
-                }
-              },
-              "spatial_validation": {
-                "valid": true,
-                "issues": [],
-                "perimeter_ft": 1541.5,
-                "precision_ratio": null,
-                "self_intersects": false,
-                "area_sqft": 121165.0,
-                "area_acres": 2.782,
-                "stated_area_sqft": 121096.79999999999,
-                "area_matches_stated": true
-              },
-              "boundary_geojson_wgs84": {
-                "type": "Feature",
-                "properties": {
-                  "closure_error_ft": 0.0,
-                  "unparsed_calls": 0,
-                  "anchor_lat": 39.6877843,
-                  "anchor_lon": -119.9082479,
-                  "georeferenced": "approximate"
-                },
-                "geometry": {
-                  "type": "Polygon",
-                  "coordinates": [
-                    [
-                      [
-                        -119.9082479,
-                        39.6877843
-                      ],
-                      [
-                        -119.9082368,
-                        39.6883882
-                      ],
-                      [
-                        -119.9062801,
-                        39.6883667
-                      ],
-                      [
-                        -119.9062912,
-                        39.6877628
-                      ],
-                      [
-                        -119.9082479,
-                        39.6877843
-                      ]
-                    ]
-                  ]
-                }
-              }
-            },
-            {
-              "vision_geometry": {
-                "boundary_calls": [
                   {
                     "bearing": "N0\u00b048'45\"E",
                     "distance": "220.00'"
-                  },
-                  {
-                    "bearing": "S89\u00b011'15\"E",
-                    "distance": "903.15'"
-                  },
-                  {
-                    "bearing": "S0\u00b048'45\"W",
-                    "distance": "220.00'"
-                  },
-                  {
-                    "bearing": "N89\u00b011'15\"W",
-                    "distance": "903.15'"
                   }
                 ],
-                "tie_point": {
-                  "northing": "14926897.47",
-                  "easting": "2252502.76",
-                  "anchors_corner": "northeast corner of Parcel 1"
-                },
-                "basis_of_bearings": "THE BASIS OF BEARINGS FOR THIS SURVEY IS NEVADA STATE PLANE, WEST ZONE NAD83(94) BASED ON REAL TIME KINEMATIC (RTK) GPS OBSERVATIONS UTILIZING CORRECTIONS FROM THE NORTHERN NEVADA COOPERATIVE REAL TIME NETWORK. COORDINATES AND DISTANCES HEREON ARE AT GROUND LEVEL BASED ON A COMBINED GRID TO GROUND FACTOR OF 1.000197939.",
+                "tie_point": null,
+                "basis_of_bearings": null,
                 "parcel_label": "PARCEL 1",
                 "stated_area_acres": "1.78",
                 "ambiguous_alternates": [
                   {
                     "bearing": "S89\u00b011'15\"E",
                     "distance": "352.40'"
-                  },
-                  {
-                    "bearing": "N89\u00b011'15\"W",
-                    "distance": "352.40'"
                   }
                 ]
               },
               "resolved_boundary_calls": [
-                {
-                  "bearing": "N0\u00b048'45\"E",
-                  "distance": "220.00'"
-                },
                 {
                   "bearing": "S89\u00b011'15\"E",
                   "distance": "352.40'"
@@ -213,6 +56,10 @@
                 {
                   "bearing": "N89\u00b011'15\"W",
                   "distance": "352.40'"
+                },
+                {
+                  "bearing": "N0\u00b048'45\"E",
+                  "distance": "220.00'"
                 }
               ],
               "closure_error_ft": 0.0,
@@ -231,16 +78,16 @@
                         0.0
                       ],
                       [
-                        3.12,
-                        219.98
-                      ],
-                      [
-                        355.48,
-                        214.98
-                      ],
-                      [
                         352.36,
                         -5.0
+                      ],
+                      [
+                        349.24,
+                        -224.98
+                      ],
+                      [
+                        -3.12,
+                        -219.98
                       ],
                       [
                         -0.0,
@@ -270,33 +117,180 @@
                 "properties": {
                   "closure_error_ft": 0.0,
                   "unparsed_calls": 0,
-                  "anchor_lat": 39.6877843,
-                  "anchor_lon": -119.9082479,
-                  "georeferenced": "approximate"
+                  "georeferenced": "surveyed_ground_coordinate",
+                  "anchor_corner": "NE",
+                  "anchor_ground_ne_ft": [
+                    14926897.47,
+                    2252502.76
+                  ],
+                  "epsg": 3431,
+                  "grid_to_ground_factor": 1.000197939
                 },
                 "geometry": {
                   "type": "Polygon",
                   "coordinates": [
                     [
                       [
-                        -119.9082479,
-                        39.6877843
+                        -119.90867973,
+                        39.68813903
                       ],
                       [
-                        -119.9082368,
-                        39.6883882
+                        -119.90742789,
+                        39.6881396
                       ],
                       [
-                        -119.9069848,
-                        39.6883745
+                        -119.90742743,
+                        39.6875358
                       ],
                       [
-                        -119.9069959,
-                        39.6877706
+                        -119.90867926,
+                        39.68753523
                       ],
                       [
-                        -119.9082479,
-                        39.6877843
+                        -119.90867973,
+                        39.68813903
+                      ]
+                    ]
+                  ]
+                }
+              }
+            },
+            {
+              "vision_geometry": {
+                "boundary_calls": [
+                  {
+                    "bearing": "S89\u00b011'15\"E",
+                    "distance": "903.15'"
+                  },
+                  {
+                    "bearing": "N0\u00b048'45\"E",
+                    "distance": "220.00'"
+                  },
+                  {
+                    "bearing": "N89\u00b011'15\"W",
+                    "distance": "903.15'"
+                  },
+                  {
+                    "bearing": "S0\u00b048'45\"W",
+                    "distance": "220.00'"
+                  }
+                ],
+                "tie_point": null,
+                "basis_of_bearings": null,
+                "parcel_label": "PARCEL 2",
+                "stated_area_acres": "2.78",
+                "ambiguous_alternates": [
+                  {
+                    "bearing": "S89\u00b011'15\"E",
+                    "distance": "550.75'"
+                  }
+                ]
+              },
+              "resolved_boundary_calls": [
+                {
+                  "bearing": "S89\u00b011'15\"E",
+                  "distance": "550.75'"
+                },
+                {
+                  "bearing": "N0\u00b048'45\"E",
+                  "distance": "220.00'"
+                },
+                {
+                  "bearing": "N89\u00b011'15\"W",
+                  "distance": "550.75'"
+                },
+                {
+                  "bearing": "S0\u00b048'45\"W",
+                  "distance": "220.00'"
+                }
+              ],
+              "closure_error_ft": 0.0,
+              "boundary_geojson": {
+                "type": "Feature",
+                "properties": {
+                  "closure_error_ft": 0.0,
+                  "unparsed_calls": 0
+                },
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [
+                        0.0,
+                        0.0
+                      ],
+                      [
+                        550.69,
+                        -7.81
+                      ],
+                      [
+                        553.81,
+                        212.17
+                      ],
+                      [
+                        3.12,
+                        219.98
+                      ],
+                      [
+                        0.0,
+                        0.0
+                      ],
+                      [
+                        0.0,
+                        0.0
+                      ]
+                    ]
+                  ]
+                }
+              },
+              "spatial_validation": {
+                "valid": true,
+                "issues": [],
+                "perimeter_ft": 1541.5,
+                "precision_ratio": null,
+                "self_intersects": false,
+                "area_sqft": 121165.0,
+                "area_acres": 2.782,
+                "stated_area_sqft": 121096.79999999999,
+                "area_matches_stated": true
+              },
+              "boundary_geojson_wgs84": {
+                "type": "Feature",
+                "properties": {
+                  "closure_error_ft": 0.0,
+                  "unparsed_calls": 0,
+                  "georeferenced": "surveyed_ground_coordinate",
+                  "anchor_corner": "NW",
+                  "anchor_ground_ne_ft": [
+                    14926910.28,
+                    2251599.7
+                  ],
+                  "epsg": 3431,
+                  "grid_to_ground_factor": 1.000197939
+                },
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [
+                        -119.91063569,
+                        39.68753433
+                      ],
+                      [
+                        -119.90867927,
+                        39.68753524
+                      ],
+                      [
+                        -119.90867973,
+                        39.68813904
+                      ],
+                      [
+                        -119.91063617,
+                        39.68813813
+                      ],
+                      [
+                        -119.91063569,
+                        39.68753433
                       ]
                     ]
                   ]
@@ -311,16 +305,16 @@
   "selection_note": "Representative run selected from 3 runs: the run where the most parcels close AND match their own stated acreage. Extraction is non-deterministic; a single fresh upload may come out worse than this.",
   "run_summaries": [
     [
+      "PARCEL 1: 4 calls, closure 0.0 ft, area 1.78 ac (stated 1.78), valid=True",
+      "PARCEL 2: 4 calls, closure 0.0 ft, area 2.782 ac (stated 2.78), valid=True"
+    ],
+    [
       "PARCEL 2: 4 calls, closure 0.0 ft, area 2.782 ac (stated 2.78), valid=True",
       "PARCEL 1: 4 calls, closure 0.0 ft, area 1.78 ac (stated 1.78), valid=True"
     ],
     [
-      "PARCEL 2: 4 calls, closure 0.0 ft, area 2.782 ac (stated 2.78), valid=True",
-      "PARCEL 1: 4 calls, closure 725.71 ft, area 3.487 ac (stated 1.78), valid=False"
-    ],
-    [
-      "PARCEL 2: 4 calls, closure 6.24 ft, area 2.797 ac (stated 2.78), valid=False",
-      "PARCEL 1: 4 calls, closure 0.0 ft, area 1.779 ac (stated 1.78), valid=True"
+      "PARCEL 2: 4 calls, closure 439.96 ft, area 0.015 ac (stated 2.78), valid=False",
+      "PARCEL 1: 4 calls, closure 439.96 ft, area 0.015 ac (stated 1.78), valid=False"
     ]
   ]
 }
