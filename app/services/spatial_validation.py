@@ -53,7 +53,7 @@ import re
 
 from shapely.geometry import Polygon
 
-from app.services.geometry import TraverseResult
+from app.services.geometry import TraverseResult, find_likely_outlier_call
 
 _SQFT_PER_ACRE = 43_560.0
 
@@ -130,6 +130,7 @@ def validate_traverse(
     traverse: TraverseResult,
     region_ocr_text: str = "",
     stated_area_acres: str | None = None,
+    calls: list[dict] | None = None,
 ) -> dict:
     """
     Returns a validation report for a walked traverse. `valid` is the
@@ -144,6 +145,12 @@ def validate_traverse(
     a region with multiple parcels has multiple different stated
     areas, and blindly taking the first one in OCR text can silently
     check a parcel against a SIBLING's area instead of its own.
+
+    `calls` (the original bearing/distance list, same order used to
+    build `traverse`) is optional and only used to name a likely
+    outlier call in the weak-closure message when one stands out (see
+    geometry.find_likely_outlier_call) -- omit it and the message
+    stays generic, same as before.
     """
 
     issues: list[str] = []
@@ -158,11 +165,23 @@ def validate_traverse(
     else:
         precision_ratio = round(perimeter_ft / traverse.closure_error_ft, 1)
         if precision_ratio < _MIN_ACCEPTABLE_PRECISION_RATIO:
-            issues.append(
+            message = (
                 f"Weak closure: precision ratio 1:{precision_ratio:.0f} is below the "
                 f"1:{_MIN_ACCEPTABLE_PRECISION_RATIO} conservative minimum -- the "
                 "extracted boundary calls are likely incomplete or include noise."
             )
+            outlier = find_likely_outlier_call(calls) if calls else None
+            if outlier:
+                call = outlier["call"]
+                message += (
+                    f" The call {call.get('bearing')} {call.get('distance')} looks "
+                    "like the likely culprit -- removing just that one call alone "
+                    f"would cut closure error from {outlier['baseline_closure_ft']:,.0f} ft "
+                    f"to {outlier['closure_without_ft']:,.0f} ft "
+                    f"({outlier['improvement']:.0%} better). Worth checking that value "
+                    "against the source document; not auto-corrected."
+                )
+            issues.append(message)
 
     # walk_traverse's last point is where the traverse ENDS UP after
     # its final call, which -- for a properly closed N-sided

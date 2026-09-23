@@ -288,6 +288,7 @@ async def process_document(
                             traverse,
                             region.get("ocr_text") or "",
                             stated_area_acres=geometry.get("stated_area_acres"),
+                            calls=calls,
                         )
 
                         # Project onto the real map if we found an
