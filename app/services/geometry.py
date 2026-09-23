@@ -319,6 +319,64 @@ def _iter_combinations(candidates_per_position: list[list[dict]]):
             yield [choice, *tail]
 
 
+_OUTLIER_MIN_CALLS = 4  # need >=3 left after removing one candidate
+_OUTLIER_MIN_IMPROVEMENT = 0.5  # candidate must cut closure error by >=50%
+
+
+def find_likely_outlier_call(calls: list[dict]) -> dict | None:
+    """
+    Weak closure is the single most common issue across real documents
+    (confirmed this session across 8 test documents), and the generic
+    "precision ratio below threshold" message never says WHICH call to
+    check. This tries removing each call one at a time and re-walking
+    the rest, looking for ONE removal that explains most of the
+    closure error -- the same kind of geometric evidence
+    resolve_ambiguous_calls already uses (does removing/changing this
+    specific thing make the shape close better?), just applied as a
+    diagnostic instead of a correction.
+
+    Returns None (say nothing specific) unless one candidate's removal
+    cuts closure error by at least _OUTLIER_MIN_IMPROVEMENT -- a
+    generic "somewhat helps" isn't worth pointing a user at a specific
+    call over, and multiple call removal is deliberately not
+    attempted: an evidence-based diagnostic backed by removing ONE
+    value is DEFENSIBLE (as a checkable, "does this change help"
+    fact); guessing that TWO OR MORE distinct values are wrong at once
+    crosses into speculation this function isn't built to make. Never
+    mutates or drops anything -- the caller decides what to do with
+    the pointer, this only identifies it.
+    """
+
+    if len(calls) < _OUTLIER_MIN_CALLS:
+        return None
+
+    baseline = walk_traverse(calls).closure_error_ft
+    if baseline <= 0:
+        return None
+
+    best_idx, best_closure = None, baseline
+    for i in range(len(calls)):
+        trial = calls[:i] + calls[i + 1 :]
+        closure = walk_traverse(trial).closure_error_ft
+        if closure < best_closure:
+            best_idx, best_closure = i, closure
+
+    if best_idx is None:
+        return None
+
+    improvement = (baseline - best_closure) / baseline
+    if improvement < _OUTLIER_MIN_IMPROVEMENT:
+        return None
+
+    return {
+        "call": calls[best_idx],
+        "call_index": best_idx,
+        "baseline_closure_ft": round(baseline, 2),
+        "closure_without_ft": round(best_closure, 2),
+        "improvement": round(improvement, 3),
+    }
+
+
 def traverse_to_geojson(result: TraverseResult) -> dict:
     """
     Local-coordinate GeoJSON Polygon (NOT yet georeferenced -- see
