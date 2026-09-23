@@ -229,6 +229,29 @@ parcel. Before extracting anything:
    edge for reference ("ROBERT L. CARSEY JR., PARCEL 1B RS 6231 (R3),
    APN: 086-260-21") -- that names an adjacent property, not one this
    document is establishing, and has no traverse of its own here.
+5. If this parcel's own stated acreage is given anywhere in the notes
+   (a "RESULTANT PARCEL AREAS" table row, or an acreage written right
+   next to this parcel's own label on the drawing), put it in
+   stated_area_acres -- e.g. "2.78". This is used as an INDEPENDENT
+   check in Python against the traverse actually walked from your
+   boundary_calls, specifically to catch a real, confirmed failure
+   mode: two adjacent parcels sharing one drawn property line can each
+   have their OWN individual segment length labeled, alongside a
+   longer combined dimension for the two segments together (e.g. one
+   parcel's true edge is 550.75', a sibling's is 352.40', and the
+   sheet separately shows 903.15' for the two combined) -- if you
+   accidentally use the combined dimension instead of this parcel's
+   own segment, the traverse can still close perfectly while being
+   the wrong shape. Extracting the real stated acreage lets Python
+   catch that even when you can't. Use null if no acreage for this
+   specific parcel is given.
+6. When a shared edge shows more than one plausible dimension for it
+   (e.g. a shorter span that stays within this parcel's own two
+   corners, and a longer one that continues past your parcel's corner
+   into a neighboring parcel), use the SHORTER one that stays within
+   THIS parcel's own corners -- never the one that spans into a
+   neighbor's territory, even if it's the more prominent or only
+   boldly-labeled figure on that line.
 
 For boundary_calls specifically: only include an entry if it has BOTH
 a bearing AND a distance stated together as a single call on THAT
@@ -307,6 +330,7 @@ _BATCH_RESPONSE_SCHEMA = {
             },
             "basis_of_bearings": {"type": "string", "nullable": True},
             "parcel_label": {"type": "string", "nullable": True},
+            "stated_area_acres": {"type": "string", "nullable": True},
         },
         "required": ["region_index", "boundary_calls"],
     },
@@ -462,6 +486,7 @@ def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[list[dict
                     "tie_point": item.get("tie_point"),
                     "basis_of_bearings": item.get("basis_of_bearings"),
                     "parcel_label": item.get("parcel_label"),
+                    "stated_area_acres": item.get("stated_area_acres"),
                 }
                 for item in parcels
             ]

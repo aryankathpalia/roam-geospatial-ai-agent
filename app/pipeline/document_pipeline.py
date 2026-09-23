@@ -25,7 +25,7 @@ from app.services.geocoding import GeocodingError, geocode_place
 from app.services.georeference import find_anchor_query, georeference_traverse_to_geojson
 from app.services.geometry import traverse_to_geojson, walk_traverse
 from app.services.layout_detector_onnx import detect_page_layout
-from app.services.spatial_validation import validate_traverse
+from app.services.spatial_validation import check_combined_tract_dimension, validate_traverse
 from app.services.ocr import OCRLine
 from app.services.pdf_inspector import inspect_pdf
 from app.services.pdf_renderer import render_page
@@ -245,7 +245,9 @@ async def process_document(
                         traverse = walk_traverse(calls)
                         parcel_result["boundary_geojson"] = traverse_to_geojson(traverse)
                         parcel_result["spatial_validation"] = validate_traverse(
-                            traverse, region.get("ocr_text") or ""
+                            traverse,
+                            region.get("ocr_text") or "",
+                            stated_area_acres=geometry.get("stated_area_acres"),
                         )
 
                         # Project onto the real map if we found an
@@ -264,6 +266,33 @@ async def process_document(
                             )
 
                     region["parcels"].append(parcel_result)
+
+                # Cross-parcel check, run once per region across all of
+                # its parcels together: a parcel that used a combined/
+                # gross tract dimension instead of its own individual
+                # segment can still close perfectly (see
+                # spatial_validation.check_combined_tract_dimension's
+                # docstring for the real confirmed case), so this uses
+                # each parcel's independently-known stated acreage as
+                # separate evidence closure can't provide. Never
+                # auto-corrects -- only appends an explicit warning and
+                # flags the parcel invalid if it wasn't already.
+                combined_warnings = check_combined_tract_dimension(
+                    [
+                        {
+                            "parcel_label": p["vision_geometry"].get("parcel_label"),
+                            "area_sqft": p.get("spatial_validation", {}).get("area_sqft"),
+                            "stated_area_sqft": p.get("spatial_validation", {}).get(
+                                "stated_area_sqft"
+                            ),
+                        }
+                        for p in region["parcels"]
+                    ]
+                )
+                for parcel_result, warning in zip(region["parcels"], combined_warnings):
+                    if warning and "spatial_validation" in parcel_result:
+                        parcel_result["spatial_validation"]["issues"].append(warning)
+                        parcel_result["spatial_validation"]["valid"] = False
         except Exception as exc:
             # Vision is an enhancement on top of OCR text, not a hard
             # requirement (e.g. GEMINI_API_KEY not set yet) -- degrade
