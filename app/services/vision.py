@@ -190,6 +190,37 @@ written, anything on it that is one of:
 - a basis-of-bearings / datum / coordinate-zone statement
 - a parcel/lot label or acreage
 
+You are reading this piece in isolation -- a later step reassembles
+findings from ALL pieces, so it's important you don't pre-filter based
+on guessing what's in OTHER pieces. But WITHIN this one piece, you can
+see real local context (what a number sits next to) that gets lost
+once your findings are flattened into a list -- use it now, while you
+still have it:
+
+- A bearing/distance shown in PARENTHESES is a prior-record citation
+  (an earlier survey's stated value for the same line), not the
+  as-surveyed call -- still list it, but under its own line, and note
+  in your listing that it's in parentheses (don't drop the punctuation
+  when you copy it).
+- A bearing/distance that connects the parcel to an outside reference
+  point -- a found section/quarter-section corner, a survey control
+  point, or another named monument -- rather than walking corner-to-
+  corner around the parcel's own perimeter, is a TIE, not a boundary
+  call. A real, confirmed failure mode: a tie-line distance sitting
+  right next to a "WASHOE COUNTY CONTROL POINT" / brass-cap monument
+  label and GROUND COORDINATES was misread as an ordinary "boundary
+  bearing and distance call" simply because it has the same bearing/
+  distance shape as one -- if a value on THIS piece sits next to a
+  control-point, monument, or "TIE" label, or next to coordinates for
+  a point that isn't one of the parcel's own drawn corners, say so
+  explicitly when you list it (e.g. "N0*48'45"E 2637.36' -- appears to
+  be a TIE to the adjacent WASHOE COUNTY CONTROL POINT monument, not a
+  parcel boundary call") instead of just listing it as a plain
+  boundary call.
+- A measurement labeled as road frontage, right-of-way, or a
+  quitclaim/dedication area describes the road, not the parcel --
+  note that in your listing too.
+
 Label each piece's findings clearly with its region and piece number
 (e.g. "Region 1, Piece 2:"). Say "nothing relevant" for a piece with
 none. Do not mix findings from different regions together.
