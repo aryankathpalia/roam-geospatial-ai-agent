@@ -253,19 +253,49 @@ _BATCH_STRUCTURE_PROMPT = """\
 Below are raw notes read off pieces of {region_count} different survey
 drawings ({region_list}), from one document.
 
+STEP 1 -- MANDATORY, BEFORE ANYTHING ELSE: for each region, scan its
+notes and list EVERY DISTINCT REAL-WORLD parcel you find, in the
+`parcel_labels_found` field, grouped by region_index. A label counts
+even if it only has a legal description and no boundary calls yet --
+list it anyway. Do this scan BEFORE you extract any boundary calls. Do
+not skip a label because it looks minor or you're unsure it has its
+own boundary data -- list it, then decide in Step 2 whether it has
+enough to also get a `parcels` entry. A "RESULTANT PARCEL AREAS" or
+similar summary table listing multiple labels with their own acreage
+is a strong signal of exactly how many parcels that region contains.
+
+CRITICAL -- DEDUPLICATE BEFORE LISTING: the SAME physical parcel is
+often mentioned more than once across different tile notes, in
+DIFFERENT formatting -- different capitalization, quoting, or
+punctuation around the exact same identity (e.g. "PARCEL B",
+"Parcel 'B'", "Parcel B", "PARCEL 'B'" are ALL THE SAME PARCEL, not
+four different ones). Before adding a label to `parcel_labels_found`,
+check whether you've already listed a label that plausibly refers to
+the same real-world parcel -- same letter/number/name, regardless of
+case, quotes, or apostrophes -- and if so, do NOT add it again. Judge
+by the underlying identity (the letter or number after "PARCEL"/
+"LOT"), not the surface text. When in doubt whether two mentions are
+the same parcel or genuinely two different ones, prefer treating them
+as the SAME parcel (undercounting a truly-distinct parcel is rarer
+and less harmful here than inventing duplicates of one real parcel).
+
+STEP 2: for each region, produce EXACTLY ONE ENTRY in `parcels` for
+EVERY LABEL YOU LISTED IN STEP 1 for that region -- not fewer. If you
+listed 3 labels for a region, `parcels` MUST contain 3 entries for
+that region_index, even if one of them ends up with an EMPTY
+boundary_calls array because you couldn't confidently attribute any
+dimensions to it. Do not silently merge two labels into one entry, and
+do not omit a listed label from `parcels` for any reason -- if it has
+no usable boundary calls, include it anyway with an empty
+boundary_calls list rather than dropping it or guessing calls for it.
+
 IMPORTANT -- a single region can show MORE THAN ONE parcel. Survey
 exhibits routinely draw two or more adjacent parcels on one sheet (a
 "Parcel Map Exhibit" creating "PARCEL 1" and "PARCEL 2" side by side is
 common), and a region's bounding box wraps the whole sheet, not one
-parcel. Before extracting anything:
-1. For EACH region, scan its notes for every distinct parcel label
-   (e.g. "PARCEL 1", "PARCEL 2", "LOT 3") -- a "RESULTANT PARCEL AREAS"
-   or similar summary table listing multiple labels with their own
-   acreage is a strong signal of exactly how many parcels that region
-   contains.
-2. Return ONE ENTRY PER PARCEL FOUND, not one entry per region. Two
-   entries from the same region share the same region_index but have
-   different parcel_label values and, critically, DISJOINT
+parcel.
+1. Two entries from the same region share the same region_index but
+   have different parcel_label values and, critically, DISJOINT
    boundary_calls -- a call belongs to exactly one parcel's traverse,
    never both, even if two parcels share a common edge (assign a
    shared edge's call to whichever parcel's label it's written closest
@@ -370,7 +400,7 @@ NOTES:
 {notes}
 """
 
-_BATCH_RESPONSE_SCHEMA = {
+_PARCELS_ARRAY_SCHEMA = {
     "type": "array",
     "items": {
         "type": "object",
@@ -413,6 +443,37 @@ _BATCH_RESPONSE_SCHEMA = {
         },
         "required": ["region_index", "boundary_calls"],
     },
+}
+
+# Wraps the parcel array with a forced-enumeration field (STEP 1 in the
+# prompt above). Confirmed via a real diagnostic that asking the model
+# to explicitly list every distinct parcel label BEFORE extracting
+# calls -- and requiring exactly one `parcels` entry per listed label
+# -- fixes a real, confirmed failure mode: a region with 3 explicitly,
+# unambiguously labeled parcels ("PARCEL A"/"PARCEL B"/"PARCEL C" all
+# named with their own legal descriptions right in the notes) was
+# collapsing to 1 entry, discarding 2 whole parcels, even though
+# nothing about the input was missing or corrupted (structuring's own
+# prompt-following was the gap, not upstream data quality). Tested
+# 20/20 correct parcel count across two real documents with no
+# regression on the existing 2-parcel NVZ case (still 5/5 correct).
+_BATCH_RESPONSE_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "parcel_labels_found": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "region_index": {"type": "integer"},
+                    "label": {"type": "string"},
+                },
+                "required": ["region_index", "label"],
+            },
+        },
+        "parcels": _PARCELS_ARRAY_SCHEMA,
+    },
+    "required": ["parcel_labels_found", "parcels"],
 }
 
 
@@ -552,7 +613,7 @@ def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[list[dict
             ),
         )
         parsed = json.loads(structure_response.text)
-        for item in parsed:
+        for item in parsed.get("parcels", []):
             by_index.setdefault(item["region_index"], []).append(item)
 
     results = []

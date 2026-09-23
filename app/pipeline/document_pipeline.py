@@ -287,6 +287,25 @@ async def process_document(
                             parcel_result["georeference_error"] = (
                                 "no geocodable address found in this document's OCR text"
                             )
+                    else:
+                        # A distinct, confirmed case: vision found this
+                        # parcel (it has its own label/legal description
+                        # in the notes) but couldn't confidently
+                        # attribute any dimensions to it specifically --
+                        # e.g. its notes only ever describe it in prose,
+                        # with no bearing/distance sitting near its own
+                        # label. This is NOT the same as ordinary
+                        # extraction noise (a bad/self-intersecting
+                        # traverse); there's no traverse attempt at all,
+                        # so it must be surfaced distinctly rather than
+                        # left indistinguishable from other empty
+                        # failures in whatever consumes this result.
+                        parcel_result["extraction_note"] = (
+                            "This parcel was identified in the document (it has its own "
+                            "label/description) but no boundary dimensions could be "
+                            "confidently attributed to it specifically -- needs manual "
+                            "review against the source document."
+                        )
 
                     region["parcels"].append(parcel_result)
 
