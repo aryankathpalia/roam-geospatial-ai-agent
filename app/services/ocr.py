@@ -44,6 +44,7 @@ classification doesn't correct for arbitrary in-drawing angles. Still a
 large, confirmed improvement over no orientation handling at all.
 """
 
+import re
 import threading
 from dataclasses import dataclass
 
@@ -153,33 +154,191 @@ def get_parcelmap_engine() -> PaddleOCR:
     return _parcelmap_engine
 
 
+# PaddleOCR silently downscales any image over 4000px on a side before
+# reading it (confirmed via a real diagnostic: a 4637x3615 crop, auto-
+# resized to fit 4000px, recovered only 2 usable bearing/distance
+# values from the whole page; the SAME crop split into 2000-ish px
+# tiles first -- so no downscale ever happens -- recovered 18, with no
+# increase in total detected line count, meaning the downscale wasn't
+# missing text outright, it was blurring away the FINE detail on small
+# dimension numbers specifically while larger labels stayed readable
+# either way). Large real survey sheets are common enough (a full
+# section map, a multi-parcel exhibit) that this isn't an edge case.
+_MAX_OCR_TILE_PX = 2500
+_OCR_TILE_OVERLAP_PX = 150
+
+
+def _tile_for_ocr(image: Image.Image) -> list[tuple[Image.Image, int, int]]:
+    """
+    Grid-splits an image into ~_MAX_OCR_TILE_PX pieces (well under
+    PaddleOCR's 4000px auto-downscale threshold) if needed, else
+    returns the image as a single "tile" at (0, 0). Returns
+    (tile_image, x_offset, y_offset) so callers can translate each
+    tile's detected bounding boxes back into the original crop's
+    coordinate space. Overlap on internal edges only, same rationale
+    as vision.py's _tile_image: a dimension label sitting on a seam
+    would otherwise be split and lost.
+    """
+
+    width, height = image.size
+    if width <= _MAX_OCR_TILE_PX and height <= _MAX_OCR_TILE_PX:
+        return [(image, 0, 0)]
+
+    cols = max(1, -(-width // _MAX_OCR_TILE_PX))  # ceil division
+    rows = max(1, -(-height // _MAX_OCR_TILE_PX))
+    tile_w, tile_h = width / cols, height / rows
+
+    tiles = []
+    for row in range(rows):
+        for col in range(cols):
+            x0, y0 = int(col * tile_w), int(row * tile_h)
+            x1 = width if col == cols - 1 else int((col + 1) * tile_w)
+            y1 = height if row == rows - 1 else int((row + 1) * tile_h)
+
+            ox0 = max(0, x0 - _OCR_TILE_OVERLAP_PX)
+            oy0 = max(0, y0 - _OCR_TILE_OVERLAP_PX)
+            ox1 = min(width, x1 + _OCR_TILE_OVERLAP_PX)
+            oy1 = min(height, y1 + _OCR_TILE_OVERLAP_PX)
+            tiles.append((image.crop((ox0, oy0, ox1, oy1)), ox0, oy0))
+
+    return tiles
+
+
+def _dedupe_overlap_lines(lines: list[OCRLine]) -> list[OCRLine]:
+    """
+    Tile overlap can detect the same real text twice (once per
+    overlapping tile). Drops a later duplicate whose bbox center sits
+    within a few px of an earlier line's -- generous enough to catch
+    the same detection re-run through OCR (which is not pixel-exact
+    even on identical content), tight enough not to merge two
+    genuinely different nearby labels.
+    """
+
+    kept: list[OCRLine] = []
+    for line in lines:
+        cx = (line.bbox[0] + line.bbox[2]) / 2
+        cy = (line.bbox[1] + line.bbox[3]) / 2
+        if any(
+            abs(cx - (k.bbox[0] + k.bbox[2]) / 2) < 20 and abs(cy - (k.bbox[1] + k.bbox[3]) / 2) < 20
+            for k in kept
+        ):
+            continue
+        kept.append(line)
+    return kept
+
+
+# A bearing with NO trailing distance -- the whole (stripped) line ends
+# right after the E/W letter. Confirmed on a real document: the
+# bearing and its distance are sometimes two SEPARATE detected lines
+# (not one bearing+distance string like the common case), so these
+# need to be paired back together by position, not found as one match.
+_BEARING_ONLY_RE = re.compile(
+    r"^[NSns]\s*\d+(?:\.\d+)?\s*[°*ov°]?\s*"
+    r"(?:\d+(?:\.\d+)?\s*[\'′‘’]?\s*)?"
+    r"(?:\d+(?:\.\d+)?\s*[\"″“”]?\s*)?"
+    r"[EWew]\s*$"
+)
+# A bare distance -- a number, optionally with a foot mark, and
+# nothing that looks like a bearing letter anywhere in the line.
+_BARE_DISTANCE_RE = re.compile(r"^\d+(?:\.\d+)?\s*[\'′‘’]?\s*$")
+_MAX_PAIRING_DISTANCE_PX = 250
+
+
+def _pair_split_bearings(lines: list[OCRLine]) -> list[OCRLine]:
+    """
+    When a bearing and its distance were detected as two separate
+    lines (confirmed real case, not garbling -- both values individually
+    correct, just not on the same text line), merge the nearest
+    unclaimed bare-distance line into each bearing-only line by
+    bounding-box-center proximity, capped at _MAX_PAIRING_DISTANCE_PX
+    so an unrelated distant number never gets wrongly attached.
+    Bearing+distance lines that already arrived combined (the more
+    common case) are untouched.
+    """
+
+    bearing_only = [l for l in lines if _BEARING_ONLY_RE.match(l.text.strip())]
+    bare_distances = [l for l in lines if _BARE_DISTANCE_RE.match(l.text.strip())]
+    if not bearing_only or not bare_distances:
+        return lines
+
+    claimed: set[int] = set()
+    merged_ids: set[int] = set()
+    extra: list[OCRLine] = []
+
+    def center(l: OCRLine) -> tuple[float, float]:
+        return (l.bbox[0] + l.bbox[2]) / 2, (l.bbox[1] + l.bbox[3]) / 2
+
+    for bearing in bearing_only:
+        bx, by = center(bearing)
+        best_idx, best_dist = None, _MAX_PAIRING_DISTANCE_PX
+        for i, dist_line in enumerate(bare_distances):
+            if id(dist_line) in claimed:
+                continue
+            dx, dy = center(dist_line)
+            d = ((bx - dx) ** 2 + (by - dy) ** 2) ** 0.5
+            if d < best_dist:
+                best_idx, best_dist = i, d
+        if best_idx is not None:
+            match = bare_distances[best_idx]
+            claimed.add(id(match))
+            merged_ids.add(id(bearing))
+            merged_ids.add(id(match))
+            x1 = min(bearing.bbox[0], match.bbox[0])
+            y1 = min(bearing.bbox[1], match.bbox[1])
+            x2 = max(bearing.bbox[2], match.bbox[2])
+            y2 = max(bearing.bbox[3], match.bbox[3])
+            extra.append(
+                OCRLine(
+                    text=f"{bearing.text.strip()} {match.text.strip()}",
+                    confidence=round(min(bearing.confidence, match.confidence), 3),
+                    bbox=(x1, y1, x2, y2),
+                )
+            )
+
+    kept = [l for l in lines if id(l) not in merged_ids]
+    return kept + extra
+
+
 def run_parcelmap_ocr(image: Image.Image) -> tuple[list[OCRLine], bool]:
     """
-    OCR for a single ParcelMap crop, orientation-corrected. Returns
-    (lines, reliable) -- `reliable` is False when the mean confidence
-    falls below PARCELMAP_OCR_CONFIDENCE_FLOOR, the caller's signal to
-    fall back to Gemini reading the raw image directly rather than
-    trusting a garbled OCR pass (see module docstring: orientation
-    correction fixes whole-page rotation but not every in-drawing
-    angle, so this can still legitimately fail on some crops).
+    OCR for a single ParcelMap crop, orientation-corrected, tiled if
+    oversized (see _tile_for_ocr), with split bearing/distance pairs
+    reunited (see _pair_split_bearings). Returns (lines, reliable) --
+    `reliable` is False when the mean confidence falls below
+    PARCELMAP_OCR_CONFIDENCE_FLOOR, the caller's signal to fall back to
+    Gemini reading the raw image directly rather than trusting a
+    garbled OCR pass (see module docstring: orientation correction
+    fixes whole-page rotation but not every in-drawing angle, so this
+    can still legitimately fail on some crops).
     """
 
-    arr = np.array(image.convert("RGB"))
-    with _parcelmap_engine_lock:
-        result = get_parcelmap_engine().predict(arr)
+    image = image.convert("RGB")
+    tiles = _tile_for_ocr(image)
 
     lines: list[OCRLine] = []
-    for page_result in result:
-        texts = page_result.get("rec_texts", [])
-        scores = page_result.get("rec_scores", [])
-        boxes = page_result.get("rec_boxes", [])
-        for text, score, box in zip(texts, scores, boxes):
-            if not text.strip():
-                continue
-            x1, y1, x2, y2 = (float(v) for v in box)
-            lines.append(
-                OCRLine(text=text, confidence=round(float(score), 3), bbox=(x1, y1, x2, y2))
-            )
+    with _parcelmap_engine_lock:
+        for tile_img, x_off, y_off in tiles:
+            arr = np.array(tile_img)
+            result = get_parcelmap_engine().predict(arr)
+            for page_result in result:
+                texts = page_result.get("rec_texts", [])
+                scores = page_result.get("rec_scores", [])
+                boxes = page_result.get("rec_boxes", [])
+                for text, score, box in zip(texts, scores, boxes):
+                    if not text.strip():
+                        continue
+                    x1, y1, x2, y2 = (float(v) for v in box)
+                    lines.append(
+                        OCRLine(
+                            text=text,
+                            confidence=round(float(score), 3),
+                            bbox=(x1 + x_off, y1 + y_off, x2 + x_off, y2 + y_off),
+                        )
+                    )
+
+    if len(tiles) > 1:
+        lines = _dedupe_overlap_lines(lines)
+    lines = _pair_split_bearings(lines)
 
     mean_confidence = sum(l.confidence for l in lines) / len(lines) if lines else 0.0
     reliable = mean_confidence >= PARCELMAP_OCR_CONFIDENCE_FLOOR
