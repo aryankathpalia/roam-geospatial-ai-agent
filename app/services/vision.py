@@ -32,16 +32,20 @@ Fix, mirroring the same tiling approach that fixed OCR:
 
 import io
 import json
+import logging
 import math
 import threading
 import time
 from collections import deque
 
 from google import genai
+from google.genai import errors as genai_errors
 from google.genai import types
 from PIL import Image
 
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 # Gemini's free tier caps gemini-3.5-flash-lite at 15 requests/MINUTE
 # (confirmed via real 429s from this account). A single ParcelMap
@@ -160,6 +164,27 @@ def _get_client() -> genai.Client:
 
 
 _TILE_OVERLAP_PX = 50
+
+
+def _generate_with_fallback(client: genai.Client, **kwargs):
+    """
+    generate_content on settings.GEMINI_MODEL, falling back to each of
+    settings.GEMINI_FALLBACK_MODELS in turn ONLY on a 503 -- Google's
+    per-model server capacity ("high demand"), which a different model
+    often doesn't share. Anything else (429 quota, 400, bad schema)
+    re-raises immediately: another model wouldn't fix those, and
+    silently switching models on them would hide real problems.
+    """
+
+    fallbacks = [m.strip() for m in settings.GEMINI_FALLBACK_MODELS.split(",") if m.strip()]
+    models = [settings.GEMINI_MODEL, *fallbacks]
+    for i, model in enumerate(models):
+        try:
+            return client.models.generate_content(model=model, **kwargs)
+        except genai_errors.ServerError as exc:
+            if exc.code != 503 or i == len(models) - 1:
+                raise
+            logger.warning("Gemini %s returned 503; falling back to %s", model, models[i + 1])
 
 
 def _tile_image(image: Image.Image, tile_size: int = 700, overlap: int = _TILE_OVERLAP_PX) -> list[Image.Image]:
@@ -596,8 +621,8 @@ def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[list[dict
 
         _wait_for_rate_limit()
         _wait_for_token_budget(image_tokens + _estimate_text_tokens(read_prompt))
-        read_response = client.models.generate_content(
-            model=settings.GEMINI_MODEL,
+        read_response = _generate_with_fallback(
+            client,
             contents=all_parts + [read_prompt],
             # Transcription, not creative generation -- same
             # determinism rationale as the structuring call below.
@@ -617,8 +642,8 @@ def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[list[dict
 
         _wait_for_rate_limit()
         _wait_for_token_budget(_estimate_text_tokens(structure_prompt))
-        structure_response = client.models.generate_content(
-            model=settings.GEMINI_MODEL,
+        structure_response = _generate_with_fallback(
+            client,
             contents=[structure_prompt],
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
