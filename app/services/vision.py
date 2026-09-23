@@ -159,8 +159,24 @@ def _get_client() -> genai.Client:
     return genai.Client(api_key=settings.GEMINI_API_KEY)
 
 
-def _tile_image(image: Image.Image, tile_size: int = 700) -> list[Image.Image]:
-    """Grid-split an image into ~tile_size x ~tile_size pieces."""
+_TILE_OVERLAP_PX = 50
+
+
+def _tile_image(image: Image.Image, tile_size: int = 700, overlap: int = _TILE_OVERLAP_PX) -> list[Image.Image]:
+    """
+    Grid-split an image into ~tile_size x ~tile_size pieces, padded by
+    `overlap` px on every INTERNAL edge (not the image's own outer
+    edges). Confirmed via a real diagnostic (a label sitting exactly on
+    a tile seam, e.g. "352.40'", was invisible -- genuinely bisected,
+    illegible half on each side -- in 0/5 runs with no overlap) that a
+    tight, non-overlapping grid silently drops any text straddling a
+    seam. The overlap makes such text appear whole on at least one
+    tile. Also empirically improved read reliability for text that
+    isn't actually split but sits close to a seam (a call's last digit
+    went from 1/5 to 5/5 present with overlap added, despite being
+    fully inside the tile either way) -- extra surrounding context
+    seems to help the model's own read, not just coverage.
+    """
 
     width, height = image.size
     cols = max(1, round(width / tile_size))
@@ -173,7 +189,12 @@ def _tile_image(image: Image.Image, tile_size: int = 700) -> list[Image.Image]:
             x0, y0 = int(col * tile_w), int(row * tile_h)
             x1 = int(width) if col == cols - 1 else int((col + 1) * tile_w)
             y1 = int(height) if row == rows - 1 else int((row + 1) * tile_h)
-            tiles.append(image.crop((x0, y0, x1, y1)))
+
+            ox0 = max(0, x0 - overlap)
+            oy0 = max(0, y0 - overlap)
+            ox1 = min(int(width), x1 + overlap)
+            oy1 = min(int(height), y1 + overlap)
+            tiles.append(image.crop((ox0, oy0, ox1, oy1)))
 
     return tiles
 
