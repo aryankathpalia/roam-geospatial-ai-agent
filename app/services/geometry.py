@@ -25,10 +25,23 @@ from dataclasses import dataclass
 _BEARING_RE = re.compile(
     # Degree symbol shows up as *, o, v, or the real ° depending on how
     # the model renders it in JSON -- confirmed empirically ("N0v48'45"E"
-    # in real Gemini output, not a typo in our prompt).
+    # in real Gemini output, not a typo in our prompt). Also confirmed:
+    # TYPOGRAPHIC/curly quote marks for the minute and second symbols --
+    # U+2019 RIGHT SINGLE QUOTATION MARK ('), U+2018 LEFT SINGLE
+    # QUOTATION MARK ('), U+201D RIGHT DOUBLE QUOTATION MARK ("), and
+    # U+201C LEFT DOUBLE QUOTATION MARK (") -- instead of the straight
+    # ' " or true prime ′ ″ marks (e.g. "S89°33'38"W" with curly marks,
+    # confirmed by inspecting the raw JSON codepoints directly, not
+    # assumed from a terminal print -- a console/redirect encoding
+    # issue elsewhere in this codebase had displayed these as the
+    # Unicode replacement character U+FFFD, which is NOT what Gemini
+    # actually returns and is NOT matched here). Without the curly
+    # variants, those calls silently failed to parse and were dropped
+    # as unparsed (confirmed: a real parcel's 4 calls, 3 in this
+    # format, parsed as only 1).
     r"([NSns])\s*(\d+(?:\.\d+)?)\s*[°*ov°]?\s*"
-    r"(?:(\d+(?:\.\d+)?)\s*[\'′]?\s*)?"
-    r"(?:(\d+(?:\.\d+)?)\s*[\"″]?\s*)?"
+    r"(?:(\d+(?:\.\d+)?)\s*[\'′‘’]?\s*)?"
+    r"(?:(\d+(?:\.\d+)?)\s*[\"″“”]?\s*)?"
     r"([EWew])"
 )
 _DISTANCE_RE = re.compile(r"(\d+(?:\.\d+)?)")
