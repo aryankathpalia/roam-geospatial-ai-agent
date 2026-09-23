@@ -26,6 +26,22 @@ with this deployment's no-card requirement. A CPU-only alternative
 engine (RapidOCR) was also tested directly against our real documents
 and was slower than this setup even after tuning (16-22s vs 6-8s on the
 same crop) -- not used.
+
+ParcelMap crops specifically use a SEPARATE engine (get_parcelmap_engine
+/ run_parcelmap_ocr below), with orientation detection turned back ON --
+scoped narrowly to ParcelMap crops rather than flipping it on for
+get_engine() (used for every other page's OCR in production). Confirmed
+directly on real documents: with orientation detection off, a rotated
+survey page (a real, common case -- confirmed while annotating this
+corpus that ParcelMap sheets are rotated far more often than the rest
+of a document) reads as pure noise (0.00-0.60 confidence, no real
+words at all); with it on, the same page reads real, mostly-correct
+text (0.7-1.0 confidence on most lines). It doesn't fully solve
+everything -- a dimension label drawn at its own diagonal angle WITHIN
+an otherwise right-side-up drawing (not the whole page being rotated)
+can still come out garbled, since 4-way page/textline orientation
+classification doesn't correct for arbitrary in-drawing angles. Still a
+large, confirmed improvement over no orientation handling at all.
 """
 
 import threading
@@ -36,6 +52,18 @@ from paddleocr import PaddleOCR
 from PIL import Image
 
 _engine: PaddleOCR | None = None
+_parcelmap_engine: PaddleOCR | None = None
+_parcelmap_engine_lock = threading.Lock()
+
+# Below this mean confidence, treat the OCR pass as unreliable rather
+# than trusting garbled text -- callers should fall back to Gemini
+# vision reading the raw image directly. Chosen from real data: the
+# rotated-page failure case averaged well under this (many 0.00-0.20
+# lines dragging the mean down); a correctly-oriented real page (NVZ,
+# and the same document after orientation correction) averaged well
+# above it. Not a precisely tuned threshold -- a coarse gate to catch
+# the "this OCR pass was garbage" case, not a quality score.
+PARCELMAP_OCR_CONFIDENCE_FLOOR = 0.6
 
 # PaddleOCR's underlying predictor is not thread-safe -- calling
 # .predict() on the same engine from two threads at once crashes with
@@ -98,3 +126,61 @@ def run_page_ocr(image: Image.Image) -> list[OCRLine]:
             )
 
     return lines
+
+
+def get_parcelmap_engine() -> PaddleOCR:
+    """
+    Separate PaddleOCR instance for ParcelMap crops only, with
+    orientation detection enabled (see module docstring for why this
+    is scoped here rather than changed on get_engine()). A distinct
+    engine instance because PaddleOCR bakes preprocessing config in at
+    construction time -- there's no way to toggle orientation
+    detection per-call on a shared engine.
+    """
+
+    global _parcelmap_engine
+
+    if _parcelmap_engine is None:
+        _parcelmap_engine = PaddleOCR(
+            use_doc_orientation_classify=True,
+            use_doc_unwarping=False,
+            use_textline_orientation=True,
+            text_detection_model_name="PP-OCRv5_mobile_det",
+            text_recognition_model_name="PP-OCRv5_mobile_rec",
+            cpu_threads=8,
+        )
+
+    return _parcelmap_engine
+
+
+def run_parcelmap_ocr(image: Image.Image) -> tuple[list[OCRLine], bool]:
+    """
+    OCR for a single ParcelMap crop, orientation-corrected. Returns
+    (lines, reliable) -- `reliable` is False when the mean confidence
+    falls below PARCELMAP_OCR_CONFIDENCE_FLOOR, the caller's signal to
+    fall back to Gemini reading the raw image directly rather than
+    trusting a garbled OCR pass (see module docstring: orientation
+    correction fixes whole-page rotation but not every in-drawing
+    angle, so this can still legitimately fail on some crops).
+    """
+
+    arr = np.array(image.convert("RGB"))
+    with _parcelmap_engine_lock:
+        result = get_parcelmap_engine().predict(arr)
+
+    lines: list[OCRLine] = []
+    for page_result in result:
+        texts = page_result.get("rec_texts", [])
+        scores = page_result.get("rec_scores", [])
+        boxes = page_result.get("rec_boxes", [])
+        for text, score, box in zip(texts, scores, boxes):
+            if not text.strip():
+                continue
+            x1, y1, x2, y2 = (float(v) for v in box)
+            lines.append(
+                OCRLine(text=text, confidence=round(float(score), 3), bbox=(x1, y1, x2, y2))
+            )
+
+    mean_confidence = sum(l.confidence for l in lines) / len(lines) if lines else 0.0
+    reliable = mean_confidence >= PARCELMAP_OCR_CONFIDENCE_FLOOR
+    return lines, reliable
