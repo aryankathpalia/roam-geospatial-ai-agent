@@ -28,6 +28,12 @@ class Settings(BaseSettings):
     # on a real ParcelMap crop (verified: correct bearings/distances
     # and basis-of-bearings text matching the source document exactly).
     GEMINI_MODEL: str = "gemini-3.5-flash-lite"
+    # Tried in order when the primary returns 503 "high demand" --
+    # Google's per-model server capacity, not our quota, so a different
+    # model often succeeds. Comma-separated; empty disables fallback.
+    # Kept to the flash-lite family: flagship gemini-3.5-flash is a
+    # poor fallback (20 req/day free-tier cap, see above).
+    GEMINI_FALLBACK_MODELS: str = "gemini-3.1-flash-lite,gemini-2.5-flash-lite"
 
 
 settings = Settings()
