@@ -283,15 +283,42 @@ Below are raw notes read off pieces of {region_count} different survey
 drawings ({region_list}), from one document.
 
 STEP 1 -- MANDATORY, BEFORE ANYTHING ELSE: for each region, scan its
-notes and list EVERY DISTINCT REAL-WORLD parcel you find, in the
-`parcel_labels_found` field, grouped by region_index. A label counts
-even if it only has a legal description and no boundary calls yet --
-list it anyway. Do this scan BEFORE you extract any boundary calls. Do
-not skip a label because it looks minor or you're unsure it has its
-own boundary data -- list it, then decide in Step 2 whether it has
-enough to also get a `parcels` entry. A "RESULTANT PARCEL AREAS" or
-similar summary table listing multiple labels with their own acreage
-is a strong signal of exactly how many parcels that region contains.
+notes and list EVERY DISTINCT REAL-WORLD parcel THAT THIS DRAWING
+ITSELF IS DEFINING THE BOUNDARY OF, in the `parcel_labels_found`
+field, grouped by region_index. A label counts even if it only has a
+legal description and no boundary calls yet -- list it anyway. Do
+this scan BEFORE you extract any boundary calls. Do not skip a label
+because it looks minor or you're unsure it has its own boundary data
+-- list it, then decide in Step 2 whether it has enough to also get a
+`parcels` entry. A "RESULTANT PARCEL AREAS" or similar summary table
+listing multiple labels with their own acreage is a strong signal of
+exactly how many parcels that region contains.
+
+DO NOT LIST A REFERENCE/CONTEXT-ONLY LABEL -- the SAME exclusion as
+rule 4 below applies HERE, at listing time, not just at extraction
+time. Do not add a label to `parcel_labels_found` if it only ever
+appears as: an adjoining owner's name plus a parcel label/APN written
+near the outer edge for reference; a citation to a DIFFERENT
+document/survey (e.g. "PARCEL 1 ROS No. 226" citing a prior Record of
+Survey, or a plat/lot the notes mention only as an adjoiner); or a
+parent/portion tax-parcel number the notes describe as being
+"combined with" or "portion of" some OTHER final lot -- that parent
+APN is not itself a final parcel here even though its number appears.
+When several parcel/tax-parcel numbers are named only as the
+ingredients being combined into new lots (e.g. "Lot 1" and "Lot 2"),
+list ONLY the resulting new lots, not the ingredient parcels. If
+unsure whether a label is this drawing's own parcel or a reference to
+something else, check whether the notes ever give it a full walked
+boundary (a sequence of its own bearing/distance calls) or its own
+"RESULTANT...AREAS"-style acreage -- if not, it's very likely a
+reference, not a real entry.
+
+EACH LISTED LABEL MUST BE ONE ATOMIC IDENTIFIER, never a fusion of
+adjacent text. If the notes show two different tagged items next to
+each other (e.g. a road/right-of-way label immediately followed by a
+separate parcel/lot label), these are TWO items -- list the actual
+parcel/lot label alone, and do not concatenate it with the road,
+easement, or any other unrelated label sitting near it in the notes.
 
 CRITICAL -- DEDUPLICATE BEFORE LISTING: the SAME physical parcel is
 often mentioned more than once across different tile notes, in
