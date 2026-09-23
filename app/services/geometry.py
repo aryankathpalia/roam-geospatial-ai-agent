@@ -377,6 +377,38 @@ def find_likely_outlier_call(calls: list[dict]) -> dict | None:
     }
 
 
+def find_self_intersecting_segment_pair(
+    corners: list[tuple[float, float]], calls: list[dict]
+) -> tuple[int, int] | None:
+    """
+    Names WHICH two edges cross, instead of just "self-intersects" --
+    checks every pair of non-adjacent edges (adjacent edges share a
+    vertex, which isn't a crossing) for a real intersection using
+    shapely, the same library already used for the validity check
+    itself. Returns the pair of CALL indices (0-indexed into `calls`,
+    same order used to build `corners`) whose edges cross, or None if
+    no single pair explains it (e.g. three-way overlap, or corners
+    don't line up 1:1 with calls). Purely diagnostic -- never changes
+    the traverse.
+    """
+
+    from shapely.geometry import LineString
+
+    n = len(corners)
+    if n < 4 or len(calls) != n:
+        return None
+
+    edges = [LineString([corners[i], corners[(i + 1) % n]]) for i in range(n)]
+
+    for i in range(n):
+        for j in range(i + 2, n):
+            if i == 0 and j == n - 1:
+                continue  # adjacent (wraps around), shares a vertex
+            if edges[i].intersects(edges[j]):
+                return (i, j)
+    return None
+
+
 def traverse_to_geojson(result: TraverseResult) -> dict:
     """
     Local-coordinate GeoJSON Polygon (NOT yet georeferenced -- see
