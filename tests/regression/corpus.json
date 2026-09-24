@@ -1,0 +1,78 @@
+{
+  "_comment": "Fixed regression corpus for the extraction pipeline. Selected from documents that already have a human-verified final_human_annotation/instances_default.json (real ParcelMap region locations, not guessed). Document content is land-record data and stays out of git per repo policy -- this file only records IDs and known behavior, never document text/images.",
+  "documents": [
+    {
+      "id": "2f896c95-b0f3-4a49-a447-4b3ca6129c27",
+      "pages": 8,
+      "parcelmap_regions": 4,
+      "why_included": "5-parcel stacked shared-edge case (pages 6-8). Known open issue: Parcel 1 area comes out ~50% off. Included to track whether future changes make this better, worse, or don't touch it.",
+      "known_baseline_notes": "Confirmed recoverable overall but Parcel 1 accuracy miss was left open as of KNOWN_ISSUES.md."
+    },
+    {
+      "id": "27211ae5-0099-4b0d-8176-f1483897b766",
+      "pages": 13,
+      "parcelmap_regions": 3,
+      "why_included": "Known duplicate-region-detection issue (same parcel enumerated twice across a batch boundary). Low priority but real; corpus should show if a future batching change fixes or worsens it.",
+      "known_baseline_notes": "Flagged, not fixed, in KNOWN_ISSUES.md."
+    },
+    {
+      "id": "3affa529-5b4f-42d7-b336-596315433572",
+      "pages": 15,
+      "parcelmap_regions": 4,
+      "why_included": "Real 7-call self-intersecting traverse. Used to verify find_self_intersecting_segment_pair keeps correctly naming the crossing edges (call 1 x call 6) as prompts/geometry code change.",
+      "known_baseline_notes": "As of 6f45e4f: self-intersection message correctly names call 1 and call 6."
+    },
+    {
+      "id": "65be453d-f014-4024-84d6-60a2d0052aeb",
+      "pages": 8,
+      "parcelmap_regions": 6,
+      "why_included": "Region 5 / page 8 was rerun 15-20x this session to measure real success rate under non-determinism -- already has a rough base-rate reference point. Good canary for batching/enumeration regressions.",
+      "known_baseline_notes": "Base success rate measured this session; exact figure lives in scratch_diag/ (gitignored) -- rerun to refresh before trusting it as a hard baseline."
+    },
+    {
+      "id": "a1136318-03ef-438d-9f02-8fcdcb5dca30",
+      "pages": 5,
+      "parcelmap_regions": 3,
+      "why_included": "Small, simple document where the OCR-grounded structuring experiment showed a real WIN. Keep in corpus so any future OCR work has to prove it doesn't regress this too.",
+      "known_baseline_notes": "OCR-integration test: improved here. Vision-only pipeline baseline should be captured fresh."
+    },
+    {
+      "id": "db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b",
+      "pages": 15,
+      "parcelmap_regions": 5,
+      "why_included": "The OCR-grounded structuring experiment TOTALLY FAILED here. This is the single most important regression canary in the corpus -- any future OCR/structuring change must be run against this document first.",
+      "known_baseline_notes": "OCR-integration test: total failure. Vision-only pipeline baseline should be captured fresh."
+    },
+    {
+      "id": "798850fc-1be3-4bc6-9f53-1441c39cbd04",
+      "pages": 29,
+      "parcelmap_regions": 1,
+      "why_included": "Sparse case -- only one ParcelMap region across 29 pages. Tests that the pipeline doesn't over-enumerate or hallucinate regions on mostly-text documents.",
+      "known_baseline_notes": "Not deeply tested this session -- first real baseline run will establish it."
+    },
+    {
+      "id": "83ab22d0-b950-4f5d-ad33-5f0fd6105dbe",
+      "pages": 12,
+      "parcelmap_regions": 2,
+      "why_included": "Small, simple, 2-region document -- fast canary for quick sanity checks between larger runs.",
+      "known_baseline_notes": "Not deeply tested this session -- first real baseline run will establish it."
+    },
+    {
+      "id": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+      "pages": 103,
+      "parcelmap_regions": 74,
+      "why_included": "Largest ParcelMap-region density in the corpus (74 regions). Stress test for batching/enumeration at scale, where over-enumeration and duplicate-label bugs are most likely to surface.",
+      "known_baseline_notes": "Not deeply tested this session -- first real baseline run will establish it."
+    },
+    {
+      "id": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+      "pages": 196,
+      "parcelmap_regions": 28,
+      "why_included": "Largest document by page count in the corpus. Tests pipeline behavior (timeouts, batching, memory) at the far end of document size.",
+      "known_baseline_notes": "Not deeply tested this session -- first real baseline run will establish it."
+    }
+  ],
+  "not_yet_added": {
+    "nvz_placerville": "WTPM26-0004_Placerville_app.pdf (the tie-line / Track-B / curly-quote document this whole session centered on) should be in this corpus too, but its document-id in data/documents/ wasn't confirmed against the UUIDs above before writing this file -- don't guess it, confirm it (e.g. by grepping page text for 'NVZ LLC' or '352.40') and add it as a normal entry before the first baseline run."
+  }
+}
