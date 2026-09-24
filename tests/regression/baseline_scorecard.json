@@ -1,0 +1,26 @@
+{
+  "generated_at": "20260924_124250",
+  "runs_per_document": 1,
+  "documents": {
+    "83ab22d0-b950-4f5d-ad33-5f0fd6105dbe": {
+      "runs_completed": 1,
+      "runs_errored": 0,
+      "errors": [],
+      "n_regions_by_run": [
+        1
+      ],
+      "n_parcels_by_run": [
+        2
+      ],
+      "mean_valid_rate": 0.0,
+      "valid_rate_by_run": [
+        0.0
+      ],
+      "mean_area_match_rate": null,
+      "issue_totals_across_runs": {
+        "weak_closure": 1,
+        "too_few_calls": 1
+      }
+    }
+  }
+}
