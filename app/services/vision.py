@@ -167,19 +167,28 @@ def _get_client() -> genai.Client:
 _TILE_OVERLAP_PX = 50
 _ALL_MODELS_BUSY_BACKOFF_S = [20, 60]
 
+# Used only as a targeted per-region retry (see document_pipeline.py's
+# lite-then-escalate), never as the default model: this account's free
+# tier caps it at 20 requests/day (see app/core/config.py), and it's
+# ~8.6x slower per call than the default (measured: 143s vs 17s mean).
+ESCALATION_MODEL = "gemini-3.5-flash"
 
-def _generate_with_fallback(client: genai.Client, **kwargs):
+
+def _generate_with_fallback(client: genai.Client, primary_model: str | None = None, **kwargs):
     """
-    generate_content on settings.GEMINI_MODEL, falling back to each of
-    settings.GEMINI_FALLBACK_MODELS in turn ONLY on a 503 -- Google's
-    per-model server capacity ("high demand"), which a different model
-    often doesn't share. Anything else (429 quota, 400, bad schema)
-    re-raises immediately: another model wouldn't fix those, and
-    silently switching models on them would hide real problems.
+    generate_content on settings.GEMINI_MODEL (or `primary_model`, when
+    a caller needs a specific model for this call only -- e.g. the
+    lite-then-escalate retry in document_pipeline.py), falling back to
+    each of settings.GEMINI_FALLBACK_MODELS in turn ONLY on a 503 --
+    Google's per-model server capacity ("high demand"), which a
+    different model often doesn't share. Anything else (429 quota,
+    400, bad schema) re-raises immediately: another model wouldn't fix
+    those, and silently switching models on them would hide real
+    problems.
     """
 
     fallbacks = [m.strip() for m in settings.GEMINI_FALLBACK_MODELS.split(",") if m.strip()]
-    models = [settings.GEMINI_MODEL, *fallbacks]
+    models = [primary_model or settings.GEMINI_MODEL, *fallbacks]
     # When every model is at capacity at once (seen in the regression
     # run: one such moment blanked all 27 regions of a document), wait
     # and go round again -- these spikes are minutes long, not hours.
@@ -730,7 +739,9 @@ def _classify_batch(client: genai.Client, images: list[Image.Image]) -> dict[int
     return found
 
 
-def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[list[dict] | Exception]:
+def extract_parcel_geometries_batch(
+    images: list[Image.Image], model: str | None = None
+) -> list[list[dict] | Exception]:
     """
     Extracts structured geometry for MULTIPLE ParcelMap regions,
     chunked dynamically by estimated Gemini input-token cost (see
@@ -756,6 +767,12 @@ def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[list[dict
     A chunk that still fails after retries yields its exception in
     place of each of its regions' lists, so one failure doesn't blank
     the rest of the document. Setup failures (e.g. no API key) raise.
+
+    `model` overrides settings.GEMINI_MODEL for this call only (the
+    configured fallbacks still apply behind it) -- used by the
+    lite-then-escalate retry in document_pipeline.py to re-run a
+    single failed region on a stronger model without touching the
+    default model every other call still uses.
     """
 
     if not images:
@@ -791,6 +808,7 @@ def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[list[dict
             _wait_for_token_budget(image_tokens + _estimate_text_tokens(read_prompt))
             read_response = _generate_with_fallback(
                 client,
+                primary_model=model,
                 contents=all_parts + [read_prompt],
                 # Transcription, not creative generation -- same
                 # determinism rationale as the structuring call below.
@@ -812,6 +830,7 @@ def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[list[dict
             _wait_for_token_budget(_estimate_text_tokens(structure_prompt))
             structure_response = _generate_with_fallback(
                 client,
+                primary_model=model,
                 contents=[structure_prompt],
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",

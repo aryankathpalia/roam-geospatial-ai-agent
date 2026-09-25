@@ -15,6 +15,7 @@ out to separate containers via Function.map().
 """
 
 import asyncio
+import logging
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import Any
@@ -41,7 +42,7 @@ from app.services.ocr import OCRLine
 from app.services.pdf_inspector import inspect_pdf
 from app.services.pdf_renderer import render_page
 from app.services.region_cropper import extract_region_crops
-from app.services.vision import extract_parcel_geometries_batch
+from app.services.vision import ESCALATION_MODEL, extract_parcel_geometries_batch
 from app.pipeline.page_ocr import (
     band_count_for,
     match_lines_to_regions,
@@ -51,6 +52,8 @@ from app.pipeline.page_ocr import (
 )
 
 DOCUMENT_ROOT = Path("data/documents")
+
+logger = logging.getLogger(__name__)
 
 # (band_png_bytes, y_offset) in -> OCR'd lines out, one pair per band.
 BandJob = tuple[bytes, float]
@@ -430,6 +433,54 @@ async def run_vision_stage(
                 region["parcels"] = walk_region_parcels(
                     parcels, region.get("ocr_text") or "", anchor_lat, anchor_lon
                 )
+
+            # Lite-then-escalate: a region that didn't reach Valid on
+            # the default (cheap, fast) model gets ONE retry on a
+            # stronger model -- scoped per-region, not per-document, so
+            # a document with 5 regions where only 1 failed only pays
+            # the stronger model's cost/latency for that 1. Measured
+            # this session: on 3 simple, human-legible plats that
+            # consistently failed on the default model, the stronger
+            # model reached Valid 5/5 runs on one of them (0/5 before)
+            # -- a real fix, not a marginal one -- but only a
+            # completeness gain (still didn't close) on the other two.
+            # The stronger model is NOT swapped in as the default: its
+            # free-tier quota is documented in app/core/config.py as
+            # capped at 20 requests/DAY on this account (confirmed via
+            # a real 429), so it can only be a rare, targeted retry.
+            failed = [
+                (entry, region, crop)
+                for (entry, region), crop in zip(vision_targets, crops)
+                if not any(
+                    (p.get("spatial_validation") or {}).get("valid")
+                    for p in region.get("parcels", [])
+                )
+            ]
+            if failed:
+                escalated_crops = [crop for _, _, crop in failed]
+                try:
+                    escalated_results = await loop.run_in_executor(
+                        None,
+                        extract_parcel_geometries_batch,
+                        escalated_crops,
+                        ESCALATION_MODEL,
+                    )
+                except Exception as exc:  # noqa: BLE001 -- keep the lite result
+                    logger.warning("Escalation call failed, keeping lite result: %s", exc)
+                    escalated_results = [exc] * len(failed)
+                for (entry, region, _crop), parcels in zip(failed, escalated_results):
+                    region["vision_escalated"] = True
+                    if isinstance(parcels, Exception):
+                        continue  # keep the lite result as-is -- see docstring above
+                    escalated_parcels = walk_region_parcels(
+                        parcels, region.get("ocr_text") or "", anchor_lat, anchor_lon
+                    )
+                    if any(
+                        (p.get("spatial_validation") or {}).get("valid")
+                        for p in escalated_parcels
+                    ):
+                        region["parcels"] = escalated_parcels
+                        region["vision_escalated_won"] = True
         except Exception as exc:
             # Vision is an enhancement on top of OCR text, not a hard
             # requirement (e.g. GEMINI_API_KEY not set yet) -- degrade

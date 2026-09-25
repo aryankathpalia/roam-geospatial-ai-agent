@@ -85,6 +85,12 @@ three as one number — see `tests/regression/scoring.py` for why that split mat
   Does not fix subdivision-plat completeness on its own — that's the same per-lot
   missing-sides problem as before, now unblocked from closing once completeness
   improves elsewhere.
+- **Model escalation (lite→flash on failure)** — implemented, safe, zero-regression,
+  hard fallback to lite result always preserved. Confirmed working (5 regions fixed
+  in corpus test) but bounded by Gemini's 20-requests/day free-tier cap on the
+  stronger model (~10 real escalation attempts/day account-wide) — not a meaningful
+  lever on stage-2 accuracy at current scale or document volume. Would need
+  paid-tier quota to matter at real scale.
 
 ## Explicitly held, not shipped
 
