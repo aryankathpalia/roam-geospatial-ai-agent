@@ -64,16 +64,30 @@ _STATE_HINT_RE = re.compile(r",\s*[A-Z]{2}\b|\bCounty\b", re.IGNORECASE)
 _ADDRESS_LABEL_RE = re.compile(
     r"\b(?:project|site|property|subject)\s+address\b", re.IGNORECASE
 )
+# US land-record documents routinely phrase a place as "City of X" /
+# "Town of X" / "Village of X" -- confirmed empirically that Nominatim
+# returns zero results for "City of Payette, Idaho" but resolves
+# "Payette, Payette County, Idaho" correctly once this municipal
+# prefix is stripped, the same kind of label-vs-place-name mismatch
+# _ADDRESS_LABEL_RE already handles for "Project Address:".
+_MUNICIPAL_PREFIX_RE = re.compile(
+    # \s* (not \s+) after "of" -- OCR sometimes glues the following
+    # word on with no space at all ("CITY OFPAYETTE"), confirmed on
+    # this exact document.
+    r"\b(?:city|town|village)\s+of\s*",
+    re.IGNORECASE,
+)
 # Lines that are almost always a FIRM's or agency's own mailing/
 # letterhead address, not the parcel's -- downweighted rather than
 # excluded outright, since they're still real fallback signal if
-# nothing better exists in the document.
+# nothing better exists in the document. "surveying" added alongside
+# "surveyor" -- a firm name like "Sawtooth Land Surveying" uses the
+# noun form, not "surveyor".
 _OFFICE_HINT_RE = re.compile(
-    r"\b(?:surveyor|engineer|p\.?l\.?s\.?|inc\.?|llc|"
+    r"\b(?:surveyor|surveying|engineer|p\.?l\.?s\.?|inc\.?|llc|"
     r"planning\s+and\s+building|treasurer|development\s+application)\b",
     re.IGNORECASE,
 )
-
 
 def find_anchor_query(pages_result: list[dict]) -> str | None:
     """
@@ -81,6 +95,22 @@ def find_anchor_query(pages_result: list[dict]) -> str | None:
     for the single most address-like line, to hand to the geocoder.
     Returns None if nothing plausible is found -- callers must degrade
     gracefully (no anchor means no georeferencing, not a guessed one).
+
+    Scoring is otherwise unchanged from the original version. A more
+    ambitious version of this function was tried and reverted: scoring
+    a candidate line higher for sitting on/near the ParcelMap page, or
+    for its OCR block containing a PLSS section/township/range
+    description, looked like a clean fix for one real case (a 29-page
+    city-council-meeting PDF where the actual parcel's location lost
+    to city-hall letterhead purely on page order) but regressed
+    several OTHER corpus documents when tested directly: a real,
+    clean, ZIP-qualified address elsewhere in the document lost to a
+    bare county name, or to a sentence containing a deed recording
+    book/page number that happens to look like a ZIP code, just for
+    sitting near the drawing. Confirmed via a direct before/after
+    comparison across all 10 regression-corpus documents -- reverted
+    rather than shipped once that showed up, same discipline as every
+    other reverted fix this session (see KNOWN_ISSUES.md).
     """
 
     best_line: str | None = None
@@ -112,12 +142,12 @@ def find_anchor_query(pages_result: list[dict]) -> str | None:
     if best_line is None:
         return None
 
-    # Strip a leading field label ("Project Address:") before handing
-    # the line to the geocoder -- confirmed empirically that Nominatim
-    # returns zero results for "Project Address: 10235 Placerville
-    # Road" but resolves "10235 Placerville Road" correctly, since the
-    # label isn't part of any real place name it can match against.
-    return _ADDRESS_LABEL_RE.sub("", best_line).lstrip(": ").strip()
+    # Strip a leading field label ("Project Address:") and any
+    # "City/Town/Village of" municipal prefix before handing the line
+    # to the geocoder -- neither is part of a real place name Nominatim
+    # can match against (see the two regexes' docstrings above).
+    cleaned = _ADDRESS_LABEL_RE.sub("", best_line).lstrip(": ").strip()
+    return _MUNICIPAL_PREFIX_RE.sub("", cleaned).strip()
 
 
 def georeference_traverse_to_geojson(
