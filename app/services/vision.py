@@ -44,6 +44,7 @@ from google.genai import types
 from PIL import Image
 
 from app.core.config import settings
+from app.services.ocr import upright
 
 logger = logging.getLogger(__name__)
 
@@ -164,6 +165,7 @@ def _get_client() -> genai.Client:
 
 
 _TILE_OVERLAP_PX = 50
+_ALL_MODELS_BUSY_BACKOFF_S = [20, 60]
 
 
 def _generate_with_fallback(client: genai.Client, **kwargs):
@@ -178,13 +180,21 @@ def _generate_with_fallback(client: genai.Client, **kwargs):
 
     fallbacks = [m.strip() for m in settings.GEMINI_FALLBACK_MODELS.split(",") if m.strip()]
     models = [settings.GEMINI_MODEL, *fallbacks]
-    for i, model in enumerate(models):
-        try:
-            return client.models.generate_content(model=model, **kwargs)
-        except genai_errors.ServerError as exc:
-            if exc.code != 503 or i == len(models) - 1:
-                raise
-            logger.warning("Gemini %s returned 503; falling back to %s", model, models[i + 1])
+    # When every model is at capacity at once (seen in the regression
+    # run: one such moment blanked all 27 regions of a document), wait
+    # and go round again -- these spikes are minutes long, not hours.
+    for attempt, delay in enumerate([*_ALL_MODELS_BUSY_BACKOFF_S, None]):
+        for i, model in enumerate(models):
+            try:
+                return client.models.generate_content(model=model, **kwargs)
+            except genai_errors.ServerError as exc:
+                if exc.code != 503:
+                    raise
+                if delay is None and i == len(models) - 1:
+                    raise
+                logger.warning("Gemini %s returned 503 (round %d)", model, attempt + 1)
+        logger.warning("All Gemini models returned 503; retrying in %ss", delay)
+        time.sleep(delay)
 
 
 def _tile_image(image: Image.Image, tile_size: int = 700, overlap: int = _TILE_OVERLAP_PX) -> list[Image.Image]:
@@ -236,6 +246,14 @@ written, anything on it that is one of:
   to it (e.g. "550.75'") -- often one parcel's own share of a longer
   line whose bearing and combined length are labeled elsewhere; say
   which line it sits on and which parcel label it's nearest
+- a CURVE on the parcel's own boundary (not a curve for a road
+  centerline or an adjoining parcel) -- list its delta angle (Δ),
+  radius (R), and arc length (L) exactly as shown (e.g.
+  "Δ=41°18'14" R=200.00' L=144.18'"), and say which two straight
+  boundary calls it sits between if that's visible. If the drawing
+  states which way the curve turns (e.g. "curve to the left/right", or
+  a bulge direction relative to the line of travel), say so; otherwise
+  don't guess it.
 - a ground/state-plane coordinate (e.g. "N 14926910.28 E 2251599.70")
 - a basis-of-bearings / datum / coordinate-zone statement
 - a parcel/lot label or acreage
@@ -422,12 +440,30 @@ parcel.
    segment of that line to each parcel's ambiguous_alternates --
    downstream checks against each parcel's stated acreage will pick.
 
+9. CURVED BOUNDARY SEGMENTS: if the notes describe a curve (delta
+   angle Δ, radius R, arc length L) on THIS parcel's own outer
+   boundary -- not a road centerline curve or an adjoining parcel's
+   curve -- add it to a SEPARATE array field `curve_calls`, in the
+   same true walking sequence as boundary_calls, positioned where it
+   falls between straight calls (e.g. if the curve comes after the
+   2nd straight boundary call and before the 3rd, note that in
+   `after_call_index`: 1 for 0-indexed, meaning "after boundary_calls
+   index 1"; use -1 if the curve is the very first thing walked,
+   before any straight call). Each curve_calls entry needs delta,
+   radius, and arc_length exactly as printed (strings, with their
+   units/symbols, e.g. delta: "41°18'14"", radius: "200.00'",
+   arc_length: "144.18'"). Include turn: "L" or "R" ONLY if the
+   drawing states or clearly shows which way the curve turns;
+   otherwise use null -- do not guess it. Do not put curve data in
+   boundary_calls.
+
 For boundary_calls specifically: only include an entry if it has BOTH
 a bearing AND a distance stated together as a single call on THAT
 parcel's own OUTER boundary line. Do NOT include:
-- a bare dimension number, curve table length, or interior measurement
-  (e.g. a building or setback dimension) -- EXCEPT the segment case
-  below, which goes in ambiguous_alternates instead of being dropped
+- a bare dimension number or interior measurement (e.g. a building or
+  setback dimension) -- EXCEPT the segment case below, which goes in
+  ambiguous_alternates instead of being dropped, and EXCEPT curve data,
+  which goes in curve_calls per rule 9 above, not here
 - a bearing or distance shown in PARENTHESES -- survey plats use
   parentheses for reference/record citations (a prior deed's stated
   bearing, a tie to a section corner), not the as-surveyed boundary
@@ -512,6 +548,20 @@ _PARCELS_ARRAY_SCHEMA = {
                     "required": ["bearing", "distance"],
                 },
             },
+            "curve_calls": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "delta": {"type": "string"},
+                        "radius": {"type": "string"},
+                        "arc_length": {"type": "string"},
+                        "turn": {"type": "string", "nullable": True},
+                        "after_call_index": {"type": "integer"},
+                    },
+                    "required": ["delta", "radius", "arc_length", "after_call_index"],
+                },
+            },
         },
         "required": ["region_index", "boundary_calls"],
     },
@@ -576,7 +626,9 @@ def _chunk_regions_by_token_budget(
     current_tokens = 0
 
     for region_idx, image in enumerate(images, start=1):
-        tiles = _tile_image(image)
+        # Survey sheets are often scanned sideways; tile-reading
+        # sideways text was confirmed to return no calls at all.
+        tiles = _tile_image(upright(image))
         region_tokens = sum(_estimate_image_tokens(t) for t in tiles)
 
         if current and current_tokens + region_tokens > _TOKEN_BUDGET_PER_MINUTE:
@@ -593,7 +645,92 @@ def _chunk_regions_by_token_budget(
     return chunks
 
 
-def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[list[dict]]:
+_TRIAGE_THUMBNAIL_PX = 1024
+_TRIAGE_BATCH_SIZE = 12
+_TRIAGE_CATEGORIES = ["boundary_plat", "undimensioned_drawing", "not_a_parcel_drawing"]
+_TRIAGE_PROMPT = """You are sorting {count} images cut from land-use / land-record documents.
+They are numbered 1 to {count} in the order given. For EACH image, choose exactly one category:
+
+- boundary_plat: a survey drawing (record of survey, plat, parcel map, lot line adjustment,
+  final plat, boundary survey) whose property lines carry bearing/distance labels such as
+  N 21°13'27" W 159.18' or S89°33'38"W 352.40'. The drawing may be sideways or small.
+- undimensioned_drawing: shows parcel/lot lines but WITHOUT bearing/distance labels on the
+  boundary -- assessor/tax parcel maps, site plans, grading/utility plans, preliminary plats
+  showing only lot numbers/areas, exhibits with only parcel numbers or lat/long points.
+- not_a_parcel_drawing: aerial/satellite photos, vicinity/location maps, road or route maps,
+  zoning maps, flood maps, cross-sections/profiles, or anything else.
+
+If you are unsure whether an image has bearing/distance labels, choose boundary_plat."""
+_TRIAGE_SCHEMA = {
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "image_number": {"type": "integer"},
+            "category": {"type": "string", "enum": _TRIAGE_CATEGORIES},
+        },
+        "required": ["image_number", "category"],
+    },
+}
+
+
+def classify_regions(images: list[Image.Image]) -> list[str]:
+    """
+    Cheap pre-pass that sorts ParcelMap crops before the expensive
+    tiled read: the layout detector labels aerials, vicinity maps and
+    cross-sections as ParcelMap too (72 of 132 hand-labeled regions in
+    the regression corpus), and sending them to extraction only
+    produced invented parcels. Sent in batches of
+    _TRIAGE_BATCH_SIZE -- one 81-image request failed three full retry
+    rounds on every model while every small request got through.
+    Anything the model doesn't return a category for is treated as
+    boundary_plat, so a triage miss can only cost quota, never drop a
+    region silently.
+    """
+
+    if not images:
+        return []
+    client = _get_client()
+    categories = ["boundary_plat"] * len(images)
+    for start in range(0, len(images), _TRIAGE_BATCH_SIZE):
+        batch = images[start : start + _TRIAGE_BATCH_SIZE]
+        for idx, category in _classify_batch(client, batch).items():
+            categories[start + idx] = category
+    return categories
+
+
+def _classify_batch(client: genai.Client, images: list[Image.Image]) -> dict[int, str]:
+    parts: list = []
+    tokens = 0
+    for image in images:
+        thumb = upright(image).copy()
+        thumb.thumbnail((_TRIAGE_THUMBNAIL_PX, _TRIAGE_THUMBNAIL_PX))
+        tokens += _estimate_image_tokens(thumb)
+        buffer = io.BytesIO()
+        thumb.convert("RGB").save(buffer, format="PNG")
+        parts.append(types.Part.from_bytes(data=buffer.getvalue(), mime_type="image/png"))
+    prompt = _TRIAGE_PROMPT.format(count=len(images))
+
+    _wait_for_rate_limit()
+    _wait_for_token_budget(tokens + _estimate_text_tokens(prompt))
+    response = _generate_with_fallback(
+        client,
+        contents=parts + [prompt],
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_schema=_TRIAGE_SCHEMA,
+            temperature=0,
+        ),
+    )
+    found: dict[int, str] = {}
+    for item in json.loads(response.text):
+        idx = item.get("image_number", 0) - 1
+        if 0 <= idx < len(images) and item.get("category") in _TRIAGE_CATEGORIES:
+            found[idx] = item["category"]
+    return found
+
+
+def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[list[dict] | Exception]:
     """
     Extracts structured geometry for MULTIPLE ParcelMap regions,
     chunked dynamically by estimated Gemini input-token cost (see
@@ -616,7 +753,9 @@ def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[list[dict
     to make the model interleave both parcels' boundary calls into one
     nonsensical traverse. Most regions still yield a single-item list.
 
-    Raises on failure -- callers should catch and degrade gracefully.
+    A chunk that still fails after retries yields its exception in
+    place of each of its regions' lists, so one failure doesn't blank
+    the rest of the document. Setup failures (e.g. no API key) raise.
     """
 
     if not images:
@@ -627,69 +766,78 @@ def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[list[dict
 
     by_index: dict[int, list[dict]] = {}
 
+    failed: dict[int, Exception] = {}
     for chunk in chunks:
-        all_parts: list[types.Part] = []
-        region_layout_lines = []
-        image_tokens = 0
-        for region_idx, tiles in chunk:
-            region_layout_lines.append(f"Region {region_idx}: {len(tiles)} piece(s)")
-            for tile in tiles:
-                image_tokens += _estimate_image_tokens(tile)
-                buffer = io.BytesIO()
-                tile.convert("RGB").save(buffer, format="PNG")
-                all_parts.append(
-                    types.Part.from_bytes(data=buffer.getvalue(), mime_type="image/png")
-                )
+        try:
+            all_parts: list[types.Part] = []
+            region_layout_lines = []
+            image_tokens = 0
+            for region_idx, tiles in chunk:
+                region_layout_lines.append(f"Region {region_idx}: {len(tiles)} piece(s)")
+                for tile in tiles:
+                    image_tokens += _estimate_image_tokens(tile)
+                    buffer = io.BytesIO()
+                    tile.convert("RGB").save(buffer, format="PNG")
+                    all_parts.append(
+                        types.Part.from_bytes(data=buffer.getvalue(), mime_type="image/png")
+                    )
 
-        read_prompt = _DOCUMENT_TILE_PROMPT_TEMPLATE.format(
-            region_count=len(chunk),
-            region_layout="\n".join(region_layout_lines),
-        )
+            read_prompt = _DOCUMENT_TILE_PROMPT_TEMPLATE.format(
+                region_count=len(chunk),
+                region_layout="\n".join(region_layout_lines),
+            )
 
-        _wait_for_rate_limit()
-        _wait_for_token_budget(image_tokens + _estimate_text_tokens(read_prompt))
-        read_response = _generate_with_fallback(
-            client,
-            contents=all_parts + [read_prompt],
-            # Transcription, not creative generation -- same
-            # determinism rationale as the structuring call below.
-            config=types.GenerateContentConfig(temperature=0),
-        )
-        notes = read_response.text.strip()
+            _wait_for_rate_limit()
+            _wait_for_token_budget(image_tokens + _estimate_text_tokens(read_prompt))
+            read_response = _generate_with_fallback(
+                client,
+                contents=all_parts + [read_prompt],
+                # Transcription, not creative generation -- same
+                # determinism rationale as the structuring call below.
+                config=types.GenerateContentConfig(temperature=0),
+            )
+            notes = read_response.text.strip()
 
-        if not notes:
-            continue
+            if not notes:
+                continue
 
-        region_indices = [region_idx for region_idx, _ in chunk]
-        structure_prompt = _BATCH_STRUCTURE_PROMPT.format(
-            region_count=len(chunk),
-            region_list=", ".join(f"Region {i}" for i in region_indices),
-            notes=notes,
-        )
+            region_indices = [region_idx for region_idx, _ in chunk]
+            structure_prompt = _BATCH_STRUCTURE_PROMPT.format(
+                region_count=len(chunk),
+                region_list=", ".join(f"Region {i}" for i in region_indices),
+                notes=notes,
+            )
 
-        _wait_for_rate_limit()
-        _wait_for_token_budget(_estimate_text_tokens(structure_prompt))
-        structure_response = _generate_with_fallback(
-            client,
-            contents=[structure_prompt],
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-                response_schema=_BATCH_RESPONSE_SCHEMA,
-                # This step is structured data extraction from fixed
-                # notes, not creative generation -- temperature=0
-                # minimizes run-to-run variance (confirmed via a real
-                # diagnostic: identical input crops produced visibly
-                # different parcel/call attributions across repeated
-                # default-temperature runs).
-                temperature=0,
-            ),
-        )
-        parsed = json.loads(structure_response.text)
-        for item in parsed.get("parcels", []):
-            by_index.setdefault(item["region_index"], []).append(item)
+            _wait_for_rate_limit()
+            _wait_for_token_budget(_estimate_text_tokens(structure_prompt))
+            structure_response = _generate_with_fallback(
+                client,
+                contents=[structure_prompt],
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=_BATCH_RESPONSE_SCHEMA,
+                    # This step is structured data extraction from fixed
+                    # notes, not creative generation -- temperature=0
+                    # minimizes run-to-run variance (confirmed via a real
+                    # diagnostic: identical input crops produced visibly
+                    # different parcel/call attributions across repeated
+                    # default-temperature runs).
+                    temperature=0,
+                ),
+            )
+            parsed = json.loads(structure_response.text)
+            for item in parsed.get("parcels", []):
+                by_index.setdefault(item["region_index"], []).append(item)
+        except Exception as exc:  # noqa: BLE001 -- isolate one chunk's failure
+            logger.warning("Vision chunk failed for regions %s: %s", [r for r, _ in chunk], exc)
+            for region_idx, _ in chunk:
+                failed[region_idx] = exc
 
-    results = []
+    results: list[list[dict] | Exception] = []
     for region_idx in range(1, len(images) + 1):
+        if region_idx in failed:
+            results.append(failed[region_idx])
+            continue
         parcels = by_index.get(region_idx, [])
         results.append(
             [
@@ -700,6 +848,7 @@ def extract_parcel_geometries_batch(images: list[Image.Image]) -> list[list[dict
                     "parcel_label": item.get("parcel_label"),
                     "stated_area_acres": item.get("stated_area_acres"),
                     "ambiguous_alternates": item.get("ambiguous_alternates") or [],
+                    "curve_calls": item.get("curve_calls") or [],
                 }
                 for item in parcels
             ]

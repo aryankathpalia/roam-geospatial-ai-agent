@@ -154,6 +154,41 @@ def get_parcelmap_engine() -> PaddleOCR:
     return _parcelmap_engine
 
 
+_orientation_model = None
+_orientation_lock = threading.Lock()
+
+# Measured on the 23 hand-labeled plats in tests/regression: every
+# truly rotated plat scored 0.84-0.92, every wrong guess on an upright
+# plat scored <= 0.69. Acting only above 0.8 caught 5/5 rotated plats
+# with 0/18 false rotations.
+ORIENTATION_MIN_CONFIDENCE = 0.8
+
+
+def upright(image: Image.Image) -> Image.Image:
+    """
+    Returns `image` rotated upright if PaddleOCR's page-orientation
+    classifier is confident it's turned 90/180/270 degrees, otherwise
+    `image` unchanged. The classifier's label is the counter-clockwise
+    rotation that fixes the page (verified: a crop labeled "270" reads
+    "0" after PIL rotate(270)).
+    """
+
+    global _orientation_model
+    from paddleocr import DocImgOrientationClassification
+
+    with _orientation_lock:
+        if _orientation_model is None:
+            _orientation_model = DocImgOrientationClassification(
+                model_name="PP-LCNet_x1_0_doc_ori"
+            )
+        result = list(_orientation_model.predict(np.array(image.convert("RGB"))))[0]
+
+    angle = int(result["label_names"][0])
+    if angle == 0 or float(result["scores"][0]) < ORIENTATION_MIN_CONFIDENCE:
+        return image
+    return image.rotate(angle, expand=True)
+
+
 # PaddleOCR silently downscales any image over 4000px on a side before
 # reading it (confirmed via a real diagnostic: a 4637x3615 crop, auto-
 # resized to fit 4000px, recovered only 2 usable bearing/distance

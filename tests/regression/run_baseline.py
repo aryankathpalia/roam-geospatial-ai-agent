@@ -19,10 +19,12 @@ Usage:
     python tests/regression/run_baseline.py             # N=3 runs/doc
     python tests/regression/run_baseline.py --runs 5
     python tests/regression/run_baseline.py --doc 2f896c95-b0f3-4a49-a447-4b3ca6129c27
+    python tests/regression/run_baseline.py --vision-only scratch_diag/regression_baseline/X_full.json --out tests/regression/vision_scorecard.json
 """
 
 import argparse
 import asyncio
+import copy
 import json
 import sys
 import time
@@ -31,7 +33,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from app.pipeline.document_pipeline import process_document  # noqa: E402
+from app.pipeline.document_pipeline import DOCUMENT_ROOT, process_document, run_vision_stage  # noqa: E402
+from tests.regression.scoring import score_full_results  # noqa: E402
 
 CORPUS_PATH = Path(__file__).parent / "corpus.json"
 FULL_OUTPUT_DIR = Path("scratch_diag/regression_baseline")
@@ -111,14 +114,40 @@ def _summarize_run(result: dict) -> dict:
     }
 
 
-async def _run_document(doc_id: str, runs: int) -> dict:
+_VISION_OUTPUT_KEYS = ("parcels", "vision_error", "vision_triage")
+
+
+async def _vision_only(doc_id: str, stored_result: dict) -> dict:
+    """Re-runs just the vision stage on a stored run's layout/OCR output
+    (deterministic, and ~all of a full run's wall time)."""
+
+    result = copy.deepcopy(stored_result)
+    page_entries = []
+    for page in result["pages"]:
+        for region in page["regions"]:
+            for key in _VISION_OUTPUT_KEYS:
+                region.pop(key, None)
+        page_entries.append(
+            {
+                "path": DOCUMENT_ROOT / doc_id / "pages" / f"page_{page['page_number']:03d}.png",
+                "regions": page["regions"],
+            }
+        )
+    await run_vision_stage(page_entries)
+    return result
+
+
+async def _run_document(doc_id: str, runs: int, stored_result: dict | None = None) -> dict:
     full_runs = []
     summaries = []
     for i in range(runs):
         print(f"  run {i + 1}/{runs}...", flush=True)
         start = time.time()
         try:
-            result = await process_document(doc_id)
+            if stored_result is not None:
+                result = await _vision_only(doc_id, stored_result)
+            else:
+                result = await process_document(doc_id)
         except Exception as exc:  # noqa: BLE001 -- a failed run is itself a result
             full_runs.append({"run": i, "error": str(exc)})
             summaries.append({"run": i, "error": str(exc)})
@@ -163,16 +192,26 @@ def _aggregate_summaries(summaries: list[dict]) -> dict:
 async def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--runs", type=int, default=3, help="Runs per document (default 3)")
-    parser.add_argument("--doc", type=str, default=None, help="Only run this document id")
+    parser.add_argument("--doc", type=str, default=None, help="Only run these document ids (comma-separated)")
+    parser.add_argument(
+        "--vision-only",
+        type=str,
+        default=None,
+        help="Stored *_full.json to take layout/OCR from; only the vision stage is re-run",
+    )
+    parser.add_argument("--out", type=str, default=None, help="Scorecard path (default baseline_scorecard.json)")
     args = parser.parse_args()
 
     corpus = json.loads(CORPUS_PATH.read_text())["documents"]
     if args.doc:
-        corpus = [d for d in corpus if d["id"] == args.doc]
+        corpus = [d for d in corpus if d["id"] in args.doc.split(",")]
         if not corpus:
             print(f"Document {args.doc} not in corpus.json")
             return
 
+    vision_source = (
+        json.loads(Path(args.vision_only).read_text(encoding="utf-8")) if args.vision_only else None
+    )
     FULL_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     timestamp = time.strftime("%Y%m%d_%H%M%S")
 
@@ -182,7 +221,11 @@ async def main() -> None:
     for doc in corpus:
         doc_id = doc["id"]
         print(f"[{doc_id}] ({doc['pages']} pages, {doc['parcelmap_regions']} parcelmap regions)")
-        run_data = await _run_document(doc_id, args.runs)
+        stored_result = None
+        if args.vision_only:
+            stored_runs = vision_source[doc_id]["full_runs"]
+            stored_result = next(r["result"] for r in stored_runs if "result" in r)
+        run_data = await _run_document(doc_id, args.runs, stored_result)
         full_results[doc_id] = run_data
         scorecard["documents"][doc_id] = _aggregate_summaries(run_data["summaries"])
 
@@ -190,8 +233,10 @@ async def main() -> None:
     full_path.write_text(json.dumps(full_results, indent=2, default=str))
     print(f"\nFull results (local only, gitignored): {full_path}")
 
-    SCORECARD_PATH.write_text(json.dumps(scorecard, indent=2))
-    print(f"Scorecard (safe to commit): {SCORECARD_PATH}")
+    scorecard["labeled"] = score_full_results(full_results)
+    out = Path(args.out) if args.out else SCORECARD_PATH
+    out.write_text(json.dumps(scorecard, indent=2))
+    print(f"Scorecard (safe to commit): {out}")
 
 
 if __name__ == "__main__":
