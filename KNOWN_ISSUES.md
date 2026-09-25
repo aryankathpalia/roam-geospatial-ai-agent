@@ -150,6 +150,41 @@ three as one number — see `tests/regression/scoring.py` for why that split mat
   sub-cause above (simple, fully-legible plats that still fail, like `2f896c95`
   p6) — not a general model swap, and not the subdivision-completeness problem,
   which is architectural rather than a model-strength question.
+- **Phantom-label call misattribution** (`db54d473`, `27211ae5`, `798850fc`
+  pattern) — root cause: structuring's generation step sometimes attributes real
+  `boundary_calls` (belonging to a genuine parcel) to a second, illegitimate
+  label (a citation, reference, or otherwise non-existent parcel) that happens to
+  be enumerated. This is NOT detectable post-hoc: the misattributed calls are
+  indistinguishable from real content once generated (same format, same
+  plausibility, sometimes MORE complete than the real parcel's own calls), and
+  the raw-notes context that might explain the mistake is itself non-deterministic
+  across reruns (may or may not contain a citation marker near the phantom label,
+  depending on tile-read variance).
+
+  Four independent fix attempts, all failed, all reverted:
+  1. Rule-1 Pattern A/B rewrite (explicit shared-edge handling in-prompt) —
+     regressed real parcel extraction on previously-working pages.
+  2. Enumeration-exclusion broadening alone (minimal, isolated version of #1) —
+     also regressed real parcels, confirming the issue isn't prompt verbosity.
+  3. Region-level content-density signal (bearing/distance token count per
+     region) — doesn't target the bug at all; phantom labels can appear in
+     content-rich regions.
+  4. Per-label citation-context regex check (post-hoc, on stored structuring
+     output) — mechanically unreliable: no position-linking field exists between
+     a label and its supporting text, and even a string-search approach fails on
+     the motivating case because the citation text is itself non-deterministic
+     across tile-read runs, and misattributed calls carry no distinguishing
+     signature from legitimate ones.
+
+  Conclusion: this cannot be fixed by prompt engineering or post-hoc filtering
+  with current architecture. A real fix would require either (a) structural
+  change to how calls are linked to labels at generation time — e.g. requiring
+  the model to cite which raw-notes line each call came from, creating
+  traceability that doesn't currently exist — or (b) accepting this as a known
+  failure mode and ensuring it's always caught downstream by existing validation
+  (acreage mismatch, closure failure), which already happens today (these pages
+  already correctly show Needs Review, never false-Valid). Not pursued further
+  this session.
 
 No further extraction fixes were made after this point in either session; the above
 reflects a deliberate stopping point for re-scoping, not an exhaustive fix pass.
