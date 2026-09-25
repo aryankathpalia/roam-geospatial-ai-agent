@@ -186,5 +186,48 @@ three as one number — see `tests/regression/scoring.py` for why that split mat
   already correctly show Needs Review, never false-Valid). Not pursued further
   this session.
 
+- **Georeferencing anchor selection picks the wrong address on documents with
+  irrelevant text-heavy content** (`798850fc`'s pattern: a 29-page scanned
+  packet — city council meeting minutes — with one embedded survey plat).
+  `find_anchor_query` (`app/services/georeference.py`) scores every OCR'd
+  line in the whole document for how address-like it looks and geocodes the
+  winner; on this document the winner was City Hall's letterhead address from
+  an unrelated page, not the parcel's own stated location, because both
+  scored identically and the letterhead was encountered first.
+
+  Three escalating attempts to fix this via proximity-to-the-plat-page and
+  PLSS (section/township/range) context signals were tried and reverted:
+  1. Proximity + PLSS + length-tiebreak as additive score bonuses — fixed
+     the target case but regressed all 10 other corpus documents: a real,
+     ZIP-qualified address elsewhere in a document started losing to a bare
+     county name, or to a deed's "recorded in Book X, Page Y" sentence,
+     because a bare 5-digit number (a book/page number, a date fragment)
+     false-matches the ZIP regex and got boosted just for sitting near the
+     plat page.
+  2. Gating those bonuses on already-address-shaped text (state/county hint
+     present) — cut it to 8 regressions, still broad.
+  3. Restructuring so proximity/PLSS can only break an exact tie in the
+     original score, never outrank a genuinely higher-scoring candidate —
+     down to 1 real regression, but that regression was itself a new
+     problem: a naive length-based tiebreak (shorter line wins) picked the
+     survey firm's own office address (a different town, ~15 miles away)
+     over city hall, with no regard for actual relevance.
+
+  Reverted to the original scoring untouched. The one change kept: stripping
+  a "City of X" / "Town of X" prefix before geocoding (Nominatim reliably
+  returns zero results for "City of Payette, Idaho" but resolves "Payette,
+  Payette County, Idaho" correctly) — confirmed safe (0/10 corpus documents'
+  output changed) and confirmed to help in isolation, since it's applied
+  after the original selection, not part of it.
+
+  Root-caused the specific target case beyond the anchor bug itself: even
+  with perfect anchor selection, `798850fc` p28 would still fail to
+  georeference, because its winning candidate contains a real OCR typo
+  ("Avefue" instead of "Avenue") that breaks Nominatim's matching regardless
+  of phrasing or which line is chosen — confirmed directly (the
+  correctly-spelled version geocodes; every garbled variant tested does
+  not). No text-selection heuristic can fix a misread street name. Not
+  pursued further this session.
+
 No further extraction fixes were made after this point in either session; the above
 reflects a deliberate stopping point for re-scoping, not an exhaustive fix pass.
