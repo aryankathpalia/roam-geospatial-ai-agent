@@ -43,7 +43,7 @@ from app.services.ocr import OCRLine
 from app.services.pdf_inspector import inspect_pdf
 from app.services.pdf_renderer import render_page
 from app.services.region_cropper import extract_region_crops
-from app.services.vision import ESCALATION_MODEL, extract_parcel_geometries_batch
+from app.services.vision import ESCALATION_MODEL, classify_regions, extract_parcel_geometries_batch
 from app.pipeline.page_ocr import (
     band_count_for,
     match_lines_to_regions,
@@ -184,7 +184,7 @@ async def process_document(
     anchor_lat: float | None = None
     anchor_lon: float | None = None
     anchor_query = find_anchor_query(
-        [{"regions": e["regions"]} for e in page_entries]
+        [{"page_number": e["page_number"], "regions": e["regions"]} for e in page_entries]
     )
     if anchor_query:
         try:
@@ -228,6 +228,8 @@ async def process_document(
         "inspection": inspection,
         "pages": pages_result,
         "pages_needing_review": pages_needing_review,
+        "anchor_lat": anchor_lat,
+        "anchor_lon": anchor_lon,
     }
 
 
@@ -444,6 +446,52 @@ def walk_region_parcels(
     return parcel_results
 
 
+def recompute_parcel_from_calls(
+    calls: list[dict],
+    stated_area_acres: str | None = None,
+    region_ocr_text: str = "",
+    anchor_lat: float | None = None,
+    anchor_lon: float | None = None,
+) -> dict:
+    """
+    Recompute geometry + validation for a human-edited boundary_calls
+    list. Used by the review UI's editable call table: a reviewer edits
+    a bearing/distance, adds a missing call, or removes a bad one, and
+    this returns the updated polygon/closure/validity immediately.
+
+    Deliberately skips the resolver/assembly stage (resolve_ambiguous_calls,
+    drop_conflicting_axis_duplicates, assemble_traverse) -- those exist to
+    make sense of raw, unreviewed vision output, and re-running them on
+    calls a human already edited would silently reorder or drop what the
+    reviewer just typed. Curve calls are also expected pre-merged (the
+    caller passes whatever mix of line/curve dicts it wants walked, in
+    the exact order to walk them).
+    """
+
+    parcel_result: dict = {"resolved_boundary_calls": calls}
+    if not calls:
+        parcel_result["extraction_note"] = "No boundary calls to walk."
+        return parcel_result
+
+    traverse = walk_traverse(calls)
+    parcel_result["boundary_geojson"] = traverse_to_geojson(traverse)
+    parcel_result["spatial_validation"] = validate_traverse(
+        traverse,
+        region_ocr_text,
+        stated_area_acres=stated_area_acres,
+        calls=calls,
+    )
+    if anchor_lat is not None and anchor_lon is not None:
+        parcel_result["boundary_geojson_wgs84"] = georeference_traverse_to_geojson(
+            traverse, anchor_lat, anchor_lon
+        )
+    else:
+        parcel_result["georeference_error"] = (
+            "no geocodable address found in this document's OCR text"
+        )
+    return parcel_result
+
+
 async def run_vision_stage(
     page_entries: list[dict[str, Any]],
     anchor_lat: float | None = None,
@@ -472,14 +520,20 @@ async def run_vision_stage(
             with Image.open(entry["path"]) as page_image:
                 crops.append(page_image.convert("RGB").crop((x, y, x + w, y + h)))
 
-        # Triage (vision.classify_regions) is NOT wired in here yet --
-        # measured on the regression corpus, it drops 9 real-plat
+        # classify_regions is wired in as a DISPLAY LABEL only, never a
+        # gate -- measured on the regression corpus, it drops 9 real-plat
         # region-runs out of 23 (one page missed in all 3 runs), which
-        # fails the bar for shipping a filter that can silently lose a
-        # document's only geometry. The classifier itself is tested
-        # and available (see tests/regression/eval_triage.py); every
-        # needs_vision region still goes to extraction until triage's
-        # false-negative rate is fixed.
+        # fails the bar for silently skipping extraction. Every
+        # needs_vision region still goes to extraction regardless of what
+        # this returns; the review UI uses region["category"] to sort/
+        # filter which regions a human sees first, with the rest always
+        # one click away, never hidden.
+        try:
+            categories = await loop.run_in_executor(None, classify_regions, crops)
+            for (entry, region), category in zip(vision_targets, categories):
+                region["category"] = category
+        except Exception as exc:  # noqa: BLE001 -- display-only, never fatal
+            logger.warning("Region classification failed, leaving uncategorized: %s", exc)
 
     if vision_targets:
         try:

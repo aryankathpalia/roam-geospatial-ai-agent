@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
+  const LAST_DOCUMENT_KEY = 'roam:lastDocumentId';
 
   type Phase = 'idle' | 'uploading' | 'error' | 'done';
 
@@ -11,12 +12,67 @@
   let fileInput: HTMLInputElement;
 
   let result: any = null;
+  let documentId: string | null = null;
   let usingSample = false;
+  let showAllCategories = false;
+
+  // Reprocessing a document re-runs it through Gemini from scratch --
+  // expensive, slow, and non-deterministic (a fresh run can score worse
+  // than the one you were just looking at). The result is now persisted
+  // server-side (data/documents/{id}/result.json), so remembering the
+  // last document_id here lets a page refresh resume it via GET instead
+  // of forcing a full reupload.
+  let lastDocumentId: string | null = null;
+  let resuming = false;
+
+  onMount(() => {
+    try {
+      lastDocumentId = localStorage.getItem(LAST_DOCUMENT_KEY);
+    } catch {
+      // localStorage unavailable (private window, blocked storage) --
+      // resume just won't be offered, upload still works normally.
+    }
+  });
+
+  function rememberDocumentId(id: string | null) {
+    documentId = id;
+    if (!id) return;
+    try {
+      localStorage.setItem(LAST_DOCUMENT_KEY, id);
+    } catch {
+      // best-effort only
+    }
+  }
+
+  async function resumeLastDocument() {
+    if (!lastDocumentId) return;
+    resuming = true;
+    errorMessage = '';
+    try {
+      const res = await fetch(`${API_BASE}/documents/${lastDocumentId}`);
+      if (!res.ok) {
+        const body = await res.text();
+        throw new Error(`${res.status}: ${body.slice(0, 200)}`);
+      }
+      const data = await res.json();
+      result = data.result;
+      rememberDocumentId(data.document_id ?? lastDocumentId);
+      usingSample = false;
+      phase = 'done';
+      queueMicrotask(renderMap);
+    } catch (err: any) {
+      errorMessage = `Could not resume the last document: ${err.message}`;
+      phase = 'error';
+    } finally {
+      resuming = false;
+    }
+  }
 
   let map: any;
   let mapEl: HTMLDivElement;
   let L: any;
   let layerGroup: any;
+  let lastFitBounds: any = null;
 
   let selectedKey: string | null = null;
 
@@ -40,17 +96,32 @@
   // but never actually reached the screen. renderMap skips drawing a
   // polygon for these (there's nothing to draw) but they still appear
   // as cards with their reason shown.
-  $: parcelRegions = result
+  $: allParcelRegions = result
     ? (result.pages ?? []).flatMap((p: any) =>
-        (p.regions ?? []).flatMap((region: any, i: number) =>
-          (region.parcels ?? []).map((parcel: any, j: number) => ({
+        (p.regions ?? []).flatMap((region: any, regionIndex: number) =>
+          (region.parcels ?? []).map((parcel: any, parcelIndex: number) => ({
             page: p.page_number,
-            i: `${i}-${j}`,
+            regionIndex,
+            parcelIndex,
+            i: `${regionIndex}-${parcelIndex}`,
+            category: region.category ?? null,
             parcel
           }))
         )
       )
     : [];
+
+  // Region classification (idea 7) is a DISPLAY filter, never a drop --
+  // every region still gets extracted server-side regardless of
+  // category. "not_a_parcel_drawing" content is deprioritized by
+  // default (it was the majority, 72/132, of noise in the labeled
+  // corpus) but always one click away via showAllCategories, so a
+  // misclassification costs a click, never a lost parcel.
+  $: parcelRegions = showAllCategories
+    ? allParcelRegions
+    : allParcelRegions.filter((r: any) => r.category !== 'not_a_parcel_drawing');
+
+  $: hiddenCount = allParcelRegions.length - parcelRegions.length;
 
   async function ensureLeaflet() {
     if (!L) {
@@ -110,7 +181,18 @@
     if (bounds.length) {
       let combined = bounds[0];
       for (const b of bounds.slice(1)) combined = combined.extend(b);
+      lastFitBounds = combined;
       map.fitBounds(combined, { padding: [40, 40], animate: false });
+    } else {
+      lastFitBounds = null;
+      map.setView([20, 0], 2);
+    }
+  }
+
+  function recenter() {
+    if (!map) return;
+    if (lastFitBounds) {
+      map.fitBounds(lastFitBounds, { padding: [40, 40] });
     } else {
       map.setView([20, 0], 2);
     }
@@ -118,13 +200,140 @@
 
   function selectRegion(key: string) {
     selectedKey = selectedKey === key ? null : key;
+    if (selectedKey !== key) {
+      editingKey = null;
+    }
     renderMap();
+  }
+
+  // ---------------------------------------------------------------
+  // Human-in-the-loop review: editable call table with live recompute
+  // (idea 1), plus a per-parcel re-extract button (idea 2, scoped
+  // down -- see the small-crop re-read rationale in the backend
+  // endpoint's docstring). Neither is available on the static sample
+  // result, since there's no real backend document behind it.
+  // ---------------------------------------------------------------
+
+  let editingKey: string | null = null;
+  let editCalls: { bearing: string; distance: string }[] = [];
+  let recomputing = false;
+  let recomputeError = '';
+
+  let reextracting: string | null = null;
+  let reextractError = '';
+  let suggestions: Record<string, any> = {};
+
+  function callsToEdit(parcel: any) {
+    const source = parcel.resolved_boundary_calls ?? parcel.vision_geometry?.boundary_calls ?? [];
+    return source.map((c: any) => ({ bearing: c.bearing ?? '', distance: c.distance ?? '' }));
+  }
+
+  function startEdit(entry: any) {
+    const key = regionKey(entry.page, entry.i);
+    if (editingKey === key) {
+      editingKey = null;
+      return;
+    }
+    editingKey = key;
+    editCalls = callsToEdit(entry.parcel);
+    recomputeError = '';
+  }
+
+  function addCallRow() {
+    editCalls = [...editCalls, { bearing: '', distance: '' }];
+  }
+
+  function removeCallRow(idx: number) {
+    editCalls = editCalls.filter((_, i) => i !== idx);
+  }
+
+  async function submitRecompute(entry: any) {
+    if (!documentId) return;
+    recomputing = true;
+    recomputeError = '';
+    try {
+      const res = await fetch(`${API_BASE}/documents/${documentId}/recompute`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          page_number: entry.page,
+          region_index: entry.regionIndex,
+          parcel_index: entry.parcelIndex,
+          boundary_calls: editCalls.filter((c) => c.bearing.trim() || c.distance.trim())
+        })
+      });
+      if (!res.ok) {
+        const body = await res.text();
+        throw new Error(`${res.status}: ${body.slice(0, 200)}`);
+      }
+      const data = await res.json();
+      // Merge the recomputed fields back into the in-memory result so
+      // the map/card update without a full reload.
+      Object.assign(entry.parcel, data.parcel);
+      result = result; // re-trigger reactivity
+      editingKey = null;
+      queueMicrotask(renderMap);
+    } catch (err: any) {
+      recomputeError = `Recompute failed: ${err.message}`;
+    } finally {
+      recomputing = false;
+    }
+  }
+
+  async function submitReextract(entry: any) {
+    if (!documentId) return;
+    const key = regionKey(entry.page, entry.i);
+    reextracting = key;
+    reextractError = '';
+    try {
+      const res = await fetch(`${API_BASE}/documents/${documentId}/reextract`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          page_number: entry.page,
+          region_index: entry.regionIndex,
+          parcel_index: entry.parcelIndex
+        })
+      });
+      if (!res.ok) {
+        const body = await res.text();
+        throw new Error(`${res.status}: ${body.slice(0, 200)}`);
+      }
+      const data = await res.json();
+      suggestions = { ...suggestions, [key]: data.vision_geometry };
+    } catch (err: any) {
+      reextractError = `Re-extraction failed: ${err.message}`;
+    } finally {
+      reextracting = null;
+    }
+  }
+
+  function acceptSuggestion(entry: any) {
+    const key = regionKey(entry.page, entry.i);
+    const suggestion = suggestions[key];
+    if (!suggestion) return;
+    editingKey = key;
+    editCalls = (suggestion.boundary_calls ?? []).map((c: any) => ({
+      bearing: c.bearing ?? '',
+      distance: c.distance ?? ''
+    }));
+    const rest = { ...suggestions };
+    delete rest[key];
+    suggestions = rest;
+  }
+
+  function dismissSuggestion(entry: any) {
+    const key = regionKey(entry.page, entry.i);
+    const rest = { ...suggestions };
+    delete rest[key];
+    suggestions = rest;
   }
 
   async function loadSample() {
     errorMessage = '';
     const res = await fetch('/sample-data/sample-result.json');
     result = await res.json();
+    documentId = result.document_id ?? null; // sample is not a real backend document -- not remembered for resume
     usingSample = true;
     phase = 'done';
     queueMicrotask(renderMap);
@@ -155,6 +364,7 @@
       }
       const data = await res.json();
       result = data.result;
+      rememberDocumentId(data.document_id ?? null);
       phase = 'done';
       queueMicrotask(renderMap);
     } catch (err: any) {
@@ -181,8 +391,12 @@
   function reset() {
     phase = 'idle';
     result = null;
+    documentId = null;
     errorMessage = '';
     selectedKey = null;
+    editingKey = null;
+    suggestions = {};
+    showAllCategories = false;
   }
 
   onDestroy(() => {
@@ -245,6 +459,11 @@
 
       <div class="dz-footer">
         <span>API target: <code class="mono">{API_BASE}</code></span>
+        {#if lastDocumentId}
+          <button class="link-btn" on:click={resumeLastDocument} disabled={resuming}>
+            {resuming ? 'Resuming…' : 'Resume last document →'}
+          </button>
+        {/if}
         <button class="link-btn" on:click={loadSample}>View a sample result instead →</button>
       </div>
     </section>
@@ -277,63 +496,162 @@
       <div class="results-grid">
         <div class="map-panel panel">
           <div bind:this={mapEl} class="map-container"></div>
+          <button
+            class="recenter-btn"
+            on:click={recenter}
+            disabled={!lastFitBounds}
+            title={lastFitBounds
+              ? 'Recenter on parcels'
+              : 'No georeferenced parcels to center on -- this document had no geocodable address'}
+            aria-label="Recenter map on parcels"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+            </svg>
+          </button>
         </div>
 
         <div class="region-list">
-          {#if parcelRegions.length === 0}
+          {#if parcelRegions.length === 0 && allParcelRegions.length === 0}
             <div class="panel empty-state">
               <p>No georeferenced parcel geometry in this result yet — vision extraction may not have found boundary calls on this document's ParcelMap regions.</p>
             </div>
           {/if}
 
-          {#each parcelRegions as { page, i, parcel } (regionKey(page, i))}
-            {@const key = regionKey(page, i)}
-            {@const v = parcel.spatial_validation}
-            <button
-              class="region-card panel"
-              class:selected={selectedKey === key}
-              on:click={() => selectRegion(key)}
-            >
-              <div class="region-head">
-                <span class="region-title">
-                  {parcel.vision_geometry?.parcel_label || `Page ${page} parcel`}
-                </span>
-                {#if v}
-                  <span class="pill {v.valid ? 'low' : 'high'}">
-                    {v.valid ? 'Valid' : 'Needs review'}
-                  </span>
-                {:else if parcel.extraction_note || parcel.georeference_error}
-                  <span class="pill high">No geometry</span>
-                {/if}
-              </div>
-
-              {#if v}
-                <dl class="region-metrics">
-                  <div><dt>Precision</dt><dd class="mono">{v.precision_ratio ? `1:${v.precision_ratio}` : '—'}</dd></div>
-                  <div><dt>Closure</dt><dd class="mono">{parcel.boundary_geojson_wgs84?.properties?.closure_error_ft ?? '—'} ft</dd></div>
-                  <div><dt>Area</dt><dd class="mono">{v.area_acres ? `${v.area_acres} ac` : '—'}</dd></div>
-                </dl>
-
-                {#if selectedKey === key && v.issues?.length}
-                  <ul class="region-issues">
-                    {#each v.issues as issue}
-                      <li>{issue}</li>
-                    {/each}
-                  </ul>
-                {/if}
-                {#if selectedKey === key && parcel.assembly_notes?.length}
-                  <ul class="region-notes">
-                    {#each parcel.assembly_notes as note}
-                      <li>{note}</li>
-                    {/each}
-                  </ul>
-                {/if}
-              {:else if parcel.extraction_note || parcel.georeference_error}
-                <p class="region-note">
-                  {parcel.extraction_note || parcel.georeference_error}
-                </p>
-              {/if}
+          {#if hiddenCount > 0}
+            <button class="category-banner panel" on:click={() => (showAllCategories = true)}>
+              {hiddenCount} region{hiddenCount === 1 ? '' : 's'} likely not a boundary map (aerial, vicinity map, certificate) hidden — click to show
             </button>
+          {:else if showAllCategories && allParcelRegions.length}
+            <button class="category-banner panel" on:click={() => (showAllCategories = false)}>
+              Showing all regions — click to hide likely non-plat content again
+            </button>
+          {/if}
+
+          {#each parcelRegions as entry (regionKey(entry.page, entry.i))}
+            {@const key = regionKey(entry.page, entry.i)}
+            {@const parcel = entry.parcel}
+            {@const v = parcel.spatial_validation}
+            <div class="region-card panel" class:selected={selectedKey === key}>
+              <button class="region-card-head-btn" on:click={() => selectRegion(key)}>
+                <div class="region-head">
+                  <span class="region-title">
+                    {parcel.vision_geometry?.parcel_label || `Page ${entry.page} parcel`}
+                    {#if parcel.human_edited}<span class="edited-badge">edited</span>{/if}
+                  </span>
+                  {#if v}
+                    <span class="pill {v.valid ? 'low' : 'high'}">
+                      {v.valid ? 'Valid' : 'Needs review'}
+                    </span>
+                  {:else if parcel.extraction_note || parcel.georeference_error}
+                    <span class="pill high">No geometry</span>
+                  {/if}
+                </div>
+
+                {#if v}
+                  <dl class="region-metrics">
+                    <div><dt>Precision</dt><dd class="mono">{v.precision_ratio ? `1:${v.precision_ratio}` : '—'}</dd></div>
+                    <div><dt>Closure</dt><dd class="mono">{parcel.boundary_geojson_wgs84?.properties?.closure_error_ft ?? '—'} ft</dd></div>
+                    <div><dt>Area</dt><dd class="mono">{v.area_acres ? `${v.area_acres} ac` : '—'}</dd></div>
+                  </dl>
+
+                  {#if selectedKey === key && v.issues?.length}
+                    <ul class="region-issues">
+                      {#each v.issues as issue}
+                        <li>{issue}</li>
+                      {/each}
+                    </ul>
+                  {/if}
+                  {#if selectedKey === key && parcel.assembly_notes?.length}
+                    <ul class="region-notes">
+                      {#each parcel.assembly_notes as note}
+                        <li>{note}</li>
+                      {/each}
+                    </ul>
+                  {/if}
+                {:else if parcel.extraction_note || parcel.georeference_error}
+                  <p class="region-note">
+                    {parcel.extraction_note || parcel.georeference_error}
+                  </p>
+                {/if}
+              </button>
+
+              {#if selectedKey === key && documentId}
+                <div class="review-tools">
+                  <div class="review-tools-row">
+                    <button class="btn btn-ghost btn-sm" on:click={() => startEdit(entry)}>
+                      {editingKey === key ? 'Cancel edit' : 'Edit calls'}
+                    </button>
+                    <button
+                      class="btn btn-ghost btn-sm"
+                      disabled={reextracting === key}
+                      on:click={() => submitReextract(entry)}
+                    >
+                      {reextracting === key ? 'Re-extracting…' : 'Re-extract this parcel'}
+                    </button>
+                  </div>
+
+                  {#if reextractError}
+                    <p class="review-error">{reextractError}</p>
+                  {/if}
+
+                  {#if suggestions[key]}
+                    <div class="suggestion-box">
+                      <p class="suggestion-title">
+                        New reading found {suggestions[key].boundary_calls?.length ?? 0} call(s)
+                        {suggestions[key].stated_area_acres ? ` · ${suggestions[key].stated_area_acres} ac stated` : ''}
+                      </p>
+                      <ul class="suggestion-calls">
+                        {#each suggestions[key].boundary_calls ?? [] as c}
+                          <li class="mono">{c.bearing} — {c.distance}</li>
+                        {/each}
+                      </ul>
+                      <div class="review-tools-row">
+                        <button class="btn btn-primary btn-sm" on:click={() => acceptSuggestion(entry)}>
+                          Load into table
+                        </button>
+                        <button class="btn btn-ghost btn-sm" on:click={() => dismissSuggestion(entry)}>
+                          Dismiss
+                        </button>
+                      </div>
+                    </div>
+                  {/if}
+
+                  {#if editingKey === key}
+                    <div class="call-editor">
+                      <table class="call-table">
+                        <thead>
+                          <tr><th>Bearing</th><th>Distance</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                          {#each editCalls as call, idx}
+                            <tr>
+                              <td><input class="mono" bind:value={call.bearing} placeholder="N 45°00'00&quot; W" /></td>
+                              <td><input class="mono" bind:value={call.distance} placeholder="100.00'" /></td>
+                              <td><button class="row-remove" on:click={() => removeCallRow(idx)} aria-label="Remove call">×</button></td>
+                            </tr>
+                          {/each}
+                        </tbody>
+                      </table>
+                      <div class="review-tools-row">
+                        <button class="btn btn-ghost btn-sm" on:click={addCallRow}>+ Add call</button>
+                        <button
+                          class="btn btn-primary btn-sm"
+                          disabled={recomputing}
+                          on:click={() => submitRecompute(entry)}
+                        >
+                          {recomputing ? 'Recomputing…' : 'Recompute'}
+                        </button>
+                      </div>
+                      {#if recomputeError}
+                        <p class="review-error">{recomputeError}</p>
+                      {/if}
+                    </div>
+                  {/if}
+                </div>
+              {/if}
+            </div>
           {/each}
         </div>
       </div>
@@ -493,12 +811,40 @@ h1 {
 .map-panel {
   padding: 6px;
   overflow: hidden;
+  position: relative;
 }
 
 .map-container {
   height: 560px;
   border-radius: 12px;
   overflow: hidden;
+}
+
+.recenter-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 500;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.recenter-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.recenter-btn:hover {
+  background: var(--accent-soft);
 }
 
 .region-list {
@@ -515,8 +861,7 @@ h1 {
 
 .region-card {
   text-align: left;
-  padding: 14px 16px;
-  cursor: pointer;
+  padding: 0;
   background: var(--surface);
   transition: border-color 0.15s ease, background 0.15s ease;
 }
@@ -524,6 +869,136 @@ h1 {
 .region-card.selected {
   border-color: rgba(52, 224, 161, 0.5);
   background: var(--accent-soft);
+}
+
+.region-card-head-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 14px 16px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+}
+
+.category-banner {
+  padding: 10px 14px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-align: left;
+  cursor: pointer;
+  background: var(--surface);
+  border: none;
+  width: 100%;
+}
+
+.edited-badge {
+  margin-left: 8px;
+  font-size: 0.64rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 1px 6px;
+  vertical-align: middle;
+}
+
+.review-tools {
+  padding: 0 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid var(--line);
+  margin-top: 4px;
+  padding-top: 12px;
+}
+
+.review-tools-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 0.76rem;
+}
+
+.review-error {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--danger);
+}
+
+.suggestion-box {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.suggestion-title {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.suggestion-calls {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.call-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.call-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.call-table th {
+  text-align: left;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted-dim);
+  padding: 0 6px 6px;
+}
+
+.call-table td {
+  padding: 3px;
+}
+
+.call-table input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5px 7px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.78rem;
+}
+
+.row-remove {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 4px;
 }
 
 .region-head {
