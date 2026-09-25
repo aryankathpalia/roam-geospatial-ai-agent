@@ -400,6 +400,106 @@ def drop_conflicting_axis_duplicates(boundary_calls: list[dict]) -> list[dict]:
     return best_calls
 
 
+_BORROW_MIN_PRECISION = 2_000  # same bar as validate_traverse's "valid" cutoff
+
+
+def borrow_sibling_call(
+    calls: list[dict],
+    own_stated_sqft: float | None,
+    siblings: list[tuple[str | None, list[dict]]],
+    disqualifying_areas: list[float],
+) -> tuple[list[dict], str | None]:
+    """
+    Generalizes Track B (resolve_ambiguous_calls) past the 2-parcel case
+    it was built for. Track B only resolves AMBIGUITY -- it picks between
+    candidate readings vision already offered for one of THIS parcel's
+    own calls. It has no mechanism for a side that's missing outright,
+    which is the common case on an N-lot subdivision plat: a shared line
+    between two lots is often labeled once, next to whichever lot's
+    label the drafter put it closest to, and vision's own extraction
+    rule (deliberately, to avoid cross-attributing calls) never assigns
+    it to the OTHER lot at all -- so that lot's boundary_calls simply
+    never contains it, not even as an alternate.
+
+    This tries, ONE AT A TIME, appending a call from a SIBLING parcel's
+    own already-resolved boundary (same region, extracted in the same
+    vision call) to `calls`, keeping the borrow only if the resulting
+    traverse both closes (>= _BORROW_MIN_PRECISION) AND its area matches
+    THIS parcel's own stated acreage -- the same acreage-match discipline
+    Track B already uses to reject a combined-tract mistake, extended
+    here to also reject a borrow whose area matches a SIBLING's stated
+    acreage instead (a different tell: it means the borrowed line traced
+    the sibling's shape, not this parcel's own). `siblings` must already
+    be ordered nearest-first by the caller (adjacency in extraction
+    order is the only proxy available without real coordinates -- see
+    this session's scoping note on why that's a real, accepted limit).
+
+    Limited to exactly ONE borrowed call -- stacking multiple borrows
+    compounds the false-positive risk for a first version. Returns the
+    original `calls` unchanged (and None) if nothing validates.
+    """
+
+    if len(calls) < 2 or not own_stated_sqft:
+        return calls, None
+
+    baseline = walk_traverse(calls)
+    baseline_perimeter = sum(
+        math.hypot(b[0] - a[0], b[1] - a[1]) for a, b in zip(baseline.points, baseline.points[1:])
+    ) or 1.0
+    if baseline.closure_error_ft <= 0 or baseline_perimeter / baseline.closure_error_ft >= _BORROW_MIN_PRECISION:
+        return calls, None  # already closes; nothing to borrow for
+
+    for label, sibling_calls in siblings:
+        for base_candidate in sibling_calls:
+            bearing_str = str(base_candidate.get("bearing") or "")
+            if parse_bearing(bearing_str) is None:
+                continue
+            if parse_distance(str(base_candidate.get("distance") or "")) is None:
+                continue
+
+            # Same "which end was this line labeled from" ambiguity
+            # assemble_traverse already resolves for a parcel's OWN
+            # calls -- a borrowed line is just as likely to need
+            # walking in the opposite direction from how the sibling
+            # printed it, since it's still just one physical line with
+            # two possible walking directions.
+            candidates = [base_candidate, {**base_candidate, "bearing": _reverse_bearing(bearing_str)}]
+
+            for candidate in candidates:
+                trial = calls + [candidate]
+                traverse = walk_traverse(trial)
+                perimeter = sum(
+                    math.hypot(b[0] - a[0], b[1] - a[1])
+                    for a, b in zip(traverse.points, traverse.points[1:])
+                ) or 1.0
+                if traverse.closure_error_ft <= 0:
+                    precision = float("inf")
+                else:
+                    precision = perimeter / traverse.closure_error_ft
+                if precision < _BORROW_MIN_PRECISION:
+                    continue
+
+                area = _shoelace_area(traverse.points)
+                own_diff = abs(area - own_stated_sqft) / own_stated_sqft
+                if own_diff > _AREA_TOLERANCE:
+                    continue
+                if any(abs(area - s) / s <= _AREA_TOLERANCE for s in disqualifying_areas if s > 0):
+                    continue
+
+                note = (
+                    f"Borrowed the call {candidate.get('bearing')} {candidate.get('distance')} "
+                    f"from {label or 'a neighboring parcel'} in this region to close the "
+                    f"traverse -- this parcel's own extraction never included it, but the "
+                    f"resulting area matches this parcel's own stated acreage "
+                    f"({own_stated_sqft:,.0f} sqft, {own_diff:.0%} off) and does not match "
+                    f"any sibling parcel's acreage. Worth checking against the source "
+                    f"document; not auto-corrected beyond this one borrowed value."
+                )
+                return trial, note
+
+    return calls, None
+
+
 def _iter_combinations(candidates_per_position: list[list[dict]]):
     if not candidates_per_position:
         yield []

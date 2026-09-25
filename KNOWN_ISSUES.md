@@ -91,6 +91,10 @@ three as one number — see `tests/regression/scoring.py` for why that split mat
   stronger model (~10 real escalation attempts/day account-wide) — not a meaningful
   lever on stage-2 accuracy at current scale or document volume. Would need
   paid-tier quota to matter at real scale.
+- **Sibling-boundary borrowing (single call)** — implemented, zero regressions,
+  zero false positives on bucket-2, currently zero measured benefit on bucket-1
+  because real subdivision lots in this corpus typically need 2+ borrowed sides,
+  not 1. Multi-borrow extension not yet scoped.
 
 ## Explicitly held, not shipped
 

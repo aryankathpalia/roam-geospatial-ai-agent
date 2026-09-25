@@ -26,6 +26,7 @@ from app.services.geocoding import GeocodingError, geocode_place
 from app.services.georeference import find_anchor_query, georeference_traverse_to_geojson
 from app.services.geometry import (
     assemble_traverse,
+    borrow_sibling_call,
     drop_conflicting_axis_duplicates,
     merge_curve_calls,
     resolve_ambiguous_calls,
@@ -354,6 +355,65 @@ def walk_region_parcels(
             )
 
         parcel_results.append(parcel_result)
+
+    # Sibling-boundary borrowing: a SECOND pass, only possible once every
+    # parcel in the region has its own resolved_boundary_calls (this is
+    # why it's a separate loop, not folded into the one above). Track B
+    # (resolve_ambiguous_calls, above) only resolves AMBIGUITY -- it
+    # picks between candidate readings vision already offered for one of
+    # THIS parcel's own calls. It has no mechanism for a side that's
+    # missing outright, which is the common case on an N-lot subdivision
+    # plat: a shared line between two lots is labeled once, near
+    # whichever lot's label the drafter put it closest to, and vision's
+    # own extraction rule never assigns it to the other lot at all. This
+    # generalizes past Track B's original 2-parcel case by searching
+    # SIBLING parcels' own already-resolved calls for the missing side,
+    # nearest sibling first (index distance in the extraction order is
+    # the only adjacency proxy available without real coordinates), and
+    # keeping a borrow only under the same acreage-match discipline
+    # Track B already uses (see borrow_sibling_call's docstring).
+    for idx, parcel_result in enumerate(parcel_results):
+        calls = parcel_result.get("resolved_boundary_calls")
+        if not calls or parcel_result.get("spatial_validation", {}).get("valid"):
+            continue
+        own_sqft = stated_sqfts[idx]
+        if not own_sqft:
+            continue
+        siblings = sorted(
+            (
+                (j, parcel_results[j]["vision_geometry"].get("parcel_label"))
+                for j in range(len(parcel_results))
+                if j != idx and parcel_results[j].get("resolved_boundary_calls")
+            ),
+            key=lambda pair: abs(pair[0] - idx),
+        )
+        sibling_calls = [
+            (label, parcel_results[j]["resolved_boundary_calls"]) for j, label in siblings
+        ]
+        sibling_sqfts = [stated_sqfts[j] for j, _ in siblings if stated_sqfts[j]]
+        disqualifying_areas = list(sibling_sqfts)
+        disqualifying_areas.extend(own_sqft + s for s in sibling_sqfts)
+        if sibling_sqfts:
+            disqualifying_areas.append(own_sqft + sum(sibling_sqfts))
+
+        borrowed_calls, note = borrow_sibling_call(calls, own_sqft, sibling_calls, disqualifying_areas)
+        if note is None:
+            continue
+
+        traverse = walk_traverse(borrowed_calls)
+        parcel_result["resolved_boundary_calls"] = borrowed_calls
+        parcel_result["boundary_geojson"] = traverse_to_geojson(traverse)
+        parcel_result["spatial_validation"] = validate_traverse(
+            traverse,
+            region_ocr_text,
+            stated_area_acres=parcel_result["vision_geometry"].get("stated_area_acres"),
+            calls=borrowed_calls,
+        )
+        parcel_result.setdefault("assembly_notes", []).append(note)
+        if anchor_lat is not None and anchor_lon is not None:
+            parcel_result["boundary_geojson_wgs84"] = georeference_traverse_to_geojson(
+                traverse, anchor_lat, anchor_lon
+            )
 
     # Cross-parcel check, run once per region across all of
     # its parcels together: a parcel that used a combined/
