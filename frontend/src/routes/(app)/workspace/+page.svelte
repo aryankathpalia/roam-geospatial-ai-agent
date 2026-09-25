@@ -321,6 +321,13 @@
                     {/each}
                   </ul>
                 {/if}
+                {#if selectedKey === key && parcel.assembly_notes?.length}
+                  <ul class="region-notes">
+                    {#each parcel.assembly_notes as note}
+                      <li>{note}</li>
+                    {/each}
+                  </ul>
+                {/if}
               {:else if parcel.extraction_note || parcel.georeference_error}
                 <p class="region-note">
                   {parcel.extraction_note || parcel.georeference_error}
@@ -557,6 +564,15 @@ h1 {
   font-size: 0.78rem;
   color: var(--muted);
   line-height: 1.5;
+}
+
+.region-notes {
+  margin: 8px 0 0;
+  padding-left: 16px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.5;
+  font-style: italic;
 }
 
 .region-note {

@@ -24,7 +24,9 @@ from PIL import Image
 from app.services.geocoding import GeocodingError, geocode_place
 from app.services.georeference import find_anchor_query, georeference_traverse_to_geojson
 from app.services.geometry import (
+    assemble_traverse,
     drop_conflicting_axis_duplicates,
+    merge_curve_calls,
     resolve_ambiguous_calls,
     traverse_to_geojson,
     walk_traverse,
@@ -206,159 +208,7 @@ async def process_document(
     # ParcelMap regions it has.
     # ---------------------------------------------------------
 
-    vision_targets = [
-        (entry, region)
-        for entry in page_entries
-        for region in entry["regions"]
-        if region.get("needs_vision")
-    ]
-
-    if vision_targets:
-        crops = []
-        for entry, region in vision_targets:
-            x, y, w, h = region["bbox"]
-            with Image.open(entry["path"]) as page_image:
-                crops.append(page_image.convert("RGB").crop((x, y, x + w, y + h)))
-
-        try:
-            regions_parcels = await loop.run_in_executor(
-                None, extract_parcel_geometries_batch, crops
-            )
-            for (entry, region), parcels in zip(vision_targets, regions_parcels):
-                # A region's bounding box wraps the whole drawing, not
-                # necessarily one parcel -- a "Parcel Map Exhibit" sheet
-                # showing two adjacent parcels side by side is one
-                # region but two parcels (confirmed via a live diagnostic
-                # against a real such document: assuming 1 region = 1
-                # parcel made the model interleave both parcels' calls
-                # into one nonsensical traverse, reproducible even with
-                # a single region processed in total isolation). So a
-                # region now holds a LIST of parcels, each walked and
-                # validated independently.
-                region["parcels"] = []
-                stated_sqfts = [
-                    parse_stated_area_acres(g.get("stated_area_acres")) for g in parcels
-                ]
-
-                for idx, geometry in enumerate(parcels):
-                    parcel_result: dict = {"vision_geometry": geometry}
-
-                    # Walk the extracted boundary calls into an actual
-                    # polygon. closure_error_ft is a real, standard
-                    # surveying QA signal, not something we invented: a
-                    # traverse that doesn't return near its start point
-                    # is an honest sign the extracted calls are
-                    # incomplete or include non-boundary noise --
-                    # surfaced rather than hidden, since a wrong-looking
-                    # polygon on the eventual map is worse than an
-                    # honest "couldn't close" flag.
-                    calls = geometry.get("boundary_calls") or []
-                    # Vision may have flagged some calls as ambiguous
-                    # (a bearing with more than one plausible distance
-                    # reading -- see vision.py's ambiguous_alternates
-                    # field). Resolving which reading is correct is a
-                    # geometry question (which one actually closes the
-                    # traverse), so it happens here in deterministic
-                    # Python rather than asking vision to guess.
-                    if calls and geometry.get("ambiguous_alternates"):
-                        calls = resolve_ambiguous_calls(
-                            calls,
-                            geometry["ambiguous_alternates"],
-                            stated_area_sqft=stated_sqfts[idx],
-                            sibling_stated_sqfts=[
-                                s for j, s in enumerate(stated_sqfts) if j != idx and s
-                            ],
-                        )
-                    # Separate, second deterministic pass: catches
-                    # same-axis opposite-direction calls with mismatched
-                    # distances that vision never linked to each other
-                    # as alternates (see drop_conflicting_axis_duplicates'
-                    # docstring for the real case this was built for).
-                    if calls:
-                        calls = drop_conflicting_axis_duplicates(calls)
-                    if calls:
-                        traverse = walk_traverse(calls)
-                        # The calls actually walked, after the resolvers --
-                        # can differ from vision_geometry.boundary_calls
-                        # (e.g. a parcel's own 352.40' segment replacing
-                        # the combined 903.15' line vision read).
-                        parcel_result["resolved_boundary_calls"] = calls
-                        parcel_result["boundary_geojson"] = traverse_to_geojson(traverse)
-                        parcel_result["spatial_validation"] = validate_traverse(
-                            traverse,
-                            region.get("ocr_text") or "",
-                            stated_area_acres=geometry.get("stated_area_acres"),
-                            calls=calls,
-                        )
-
-                        # Project onto the real map if we found an
-                        # anchor for this document -- otherwise this
-                        # parcel stays local-only (flagged, not
-                        # silently dropped).
-                        if anchor_lat is not None and anchor_lon is not None:
-                            parcel_result["boundary_geojson_wgs84"] = (
-                                georeference_traverse_to_geojson(
-                                    traverse, anchor_lat, anchor_lon
-                                )
-                            )
-                        else:
-                            parcel_result["georeference_error"] = (
-                                "no geocodable address found in this document's OCR text"
-                            )
-                    else:
-                        # A distinct, confirmed case: vision found this
-                        # parcel (it has its own label/legal description
-                        # in the notes) but couldn't confidently
-                        # attribute any dimensions to it specifically --
-                        # e.g. its notes only ever describe it in prose,
-                        # with no bearing/distance sitting near its own
-                        # label. This is NOT the same as ordinary
-                        # extraction noise (a bad/self-intersecting
-                        # traverse); there's no traverse attempt at all,
-                        # so it must be surfaced distinctly rather than
-                        # left indistinguishable from other empty
-                        # failures in whatever consumes this result.
-                        parcel_result["extraction_note"] = (
-                            "This parcel was identified in the document (it has its own "
-                            "label/description) but no boundary dimensions could be "
-                            "confidently attributed to it specifically -- needs manual "
-                            "review against the source document."
-                        )
-
-                    region["parcels"].append(parcel_result)
-
-                # Cross-parcel check, run once per region across all of
-                # its parcels together: a parcel that used a combined/
-                # gross tract dimension instead of its own individual
-                # segment can still close perfectly (see
-                # spatial_validation.check_combined_tract_dimension's
-                # docstring for the real confirmed case), so this uses
-                # each parcel's independently-known stated acreage as
-                # separate evidence closure can't provide. Never
-                # auto-corrects -- only appends an explicit warning and
-                # flags the parcel invalid if it wasn't already.
-                combined_warnings = check_combined_tract_dimension(
-                    [
-                        {
-                            "parcel_label": p["vision_geometry"].get("parcel_label"),
-                            "area_sqft": p.get("spatial_validation", {}).get("area_sqft"),
-                            "stated_area_sqft": p.get("spatial_validation", {}).get(
-                                "stated_area_sqft"
-                            ),
-                        }
-                        for p in region["parcels"]
-                    ]
-                )
-                for parcel_result, warning in zip(region["parcels"], combined_warnings):
-                    if warning and "spatial_validation" in parcel_result:
-                        parcel_result["spatial_validation"]["issues"].append(warning)
-                        parcel_result["spatial_validation"]["valid"] = False
-        except Exception as exc:
-            # Vision is an enhancement on top of OCR text, not a hard
-            # requirement (e.g. GEMINI_API_KEY not set yet) -- degrade
-            # gracefully rather than failing the request.
-            for entry, region in vision_targets:
-                region["vision_error"] = str(exc)
+    await run_vision_stage(page_entries, anchor_lat, anchor_lon)
 
     pages_result = [
         {"page_number": e["page_number"], "regions": e["regions"]}
@@ -375,3 +225,214 @@ async def process_document(
         "pages": pages_result,
         "pages_needing_review": pages_needing_review,
     }
+
+
+def walk_region_parcels(
+    parcels: list[dict],
+    region_ocr_text: str = "",
+    anchor_lat: float | None = None,
+    anchor_lon: float | None = None,
+) -> list[dict]:
+    """
+    Deterministic post-extraction stage for one region: resolves,
+    walks, validates and (if anchored) georeferences each parcel vision
+    returned. Split out of process_document so the regression harness
+    can replay stored vision output through the exact production code
+    without calling Gemini.
+    """
+
+    # A region's bounding box wraps the whole drawing, not
+    # necessarily one parcel -- a "Parcel Map Exhibit" sheet
+    # showing two adjacent parcels side by side is one
+    # region but two parcels (confirmed via a live diagnostic
+    # against a real such document: assuming 1 region = 1
+    # parcel made the model interleave both parcels' calls
+    # into one nonsensical traverse, reproducible even with
+    # a single region processed in total isolation). So a
+    # region now holds a LIST of parcels, each walked and
+    # validated independently.
+    parcel_results: list[dict] = []
+    stated_sqfts = [
+        parse_stated_area_acres(g.get("stated_area_acres")) for g in parcels
+    ]
+
+    for idx, geometry in enumerate(parcels):
+        parcel_result: dict = {"vision_geometry": geometry}
+
+        # Walk the extracted boundary calls into an actual
+        # polygon. closure_error_ft is a real, standard
+        # surveying QA signal, not something we invented: a
+        # traverse that doesn't return near its start point
+        # is an honest sign the extracted calls are
+        # incomplete or include non-boundary noise --
+        # surfaced rather than hidden, since a wrong-looking
+        # polygon on the eventual map is worse than an
+        # honest "couldn't close" flag.
+        calls = geometry.get("boundary_calls") or []
+        # Vision may have flagged some calls as ambiguous
+        # (a bearing with more than one plausible distance
+        # reading -- see vision.py's ambiguous_alternates
+        # field). Resolving which reading is correct is a
+        # geometry question (which one actually closes the
+        # traverse), so it happens here in deterministic
+        # Python rather than asking vision to guess.
+        if calls and geometry.get("ambiguous_alternates"):
+            calls = resolve_ambiguous_calls(
+                calls,
+                geometry["ambiguous_alternates"],
+                stated_area_sqft=stated_sqfts[idx],
+                sibling_stated_sqfts=[
+                    s for j, s in enumerate(stated_sqfts) if j != idx and s
+                ],
+            )
+        # Separate, second deterministic pass: catches
+        # same-axis opposite-direction calls with mismatched
+        # distances that vision never linked to each other
+        # as alternates (see drop_conflicting_axis_duplicates'
+        # docstring for the real case this was built for).
+        if calls:
+            calls = drop_conflicting_axis_duplicates(calls)
+            # Curve calls are merged in AFTER the resolvers above --
+            # none of them understand call_type "curve" (they only
+            # match on bearing axis), so a curve call must stay out of
+            # their input and only join the walking order right before
+            # walk_traverse actually needs it.
+            calls = merge_curve_calls(calls, geometry.get("curve_calls") or [])
+            calls, assembly_notes = assemble_traverse(calls, stated_sqfts[idx])
+            if assembly_notes:
+                parcel_result["assembly_notes"] = assembly_notes
+        if calls:
+            traverse = walk_traverse(calls)
+            # The calls actually walked, after the resolvers --
+            # can differ from vision_geometry.boundary_calls
+            # (e.g. a parcel's own 352.40' segment replacing
+            # the combined 903.15' line vision read).
+            parcel_result["resolved_boundary_calls"] = calls
+            parcel_result["boundary_geojson"] = traverse_to_geojson(traverse)
+            parcel_result["spatial_validation"] = validate_traverse(
+                traverse,
+                region_ocr_text,
+                stated_area_acres=geometry.get("stated_area_acres"),
+                calls=calls,
+            )
+
+            # Project onto the real map if we found an
+            # anchor for this document -- otherwise this
+            # parcel stays local-only (flagged, not
+            # silently dropped).
+            if anchor_lat is not None and anchor_lon is not None:
+                parcel_result["boundary_geojson_wgs84"] = (
+                    georeference_traverse_to_geojson(
+                        traverse, anchor_lat, anchor_lon
+                    )
+                )
+            else:
+                parcel_result["georeference_error"] = (
+                    "no geocodable address found in this document's OCR text"
+                )
+        else:
+            # A distinct, confirmed case: vision found this
+            # parcel (it has its own label/legal description
+            # in the notes) but couldn't confidently
+            # attribute any dimensions to it specifically --
+            # e.g. its notes only ever describe it in prose,
+            # with no bearing/distance sitting near its own
+            # label. This is NOT the same as ordinary
+            # extraction noise (a bad/self-intersecting
+            # traverse); there's no traverse attempt at all,
+            # so it must be surfaced distinctly rather than
+            # left indistinguishable from other empty
+            # failures in whatever consumes this result.
+            parcel_result["extraction_note"] = (
+                "This parcel was identified in the document (it has its own "
+                "label/description) but no boundary dimensions could be "
+                "confidently attributed to it specifically -- needs manual "
+                "review against the source document."
+            )
+
+        parcel_results.append(parcel_result)
+
+    # Cross-parcel check, run once per region across all of
+    # its parcels together: a parcel that used a combined/
+    # gross tract dimension instead of its own individual
+    # segment can still close perfectly (see
+    # spatial_validation.check_combined_tract_dimension's
+    # docstring for the real confirmed case), so this uses
+    # each parcel's independently-known stated acreage as
+    # separate evidence closure can't provide. Never
+    # auto-corrects -- only appends an explicit warning and
+    # flags the parcel invalid if it wasn't already.
+    combined_warnings = check_combined_tract_dimension(
+        [
+            {
+                "parcel_label": p["vision_geometry"].get("parcel_label"),
+                "area_sqft": p.get("spatial_validation", {}).get("area_sqft"),
+                "stated_area_sqft": p.get("spatial_validation", {}).get(
+                    "stated_area_sqft"
+                ),
+            }
+            for p in parcel_results
+        ]
+    )
+    for parcel_result, warning in zip(parcel_results, combined_warnings):
+        if warning and "spatial_validation" in parcel_result:
+            parcel_result["spatial_validation"]["issues"].append(warning)
+            parcel_result["spatial_validation"]["valid"] = False
+    return parcel_results
+
+
+async def run_vision_stage(
+    page_entries: list[dict[str, Any]],
+    anchor_lat: float | None = None,
+    anchor_lon: float | None = None,
+) -> None:
+    """
+    Triage, extract and walk every needs_vision region, writing results
+    into the region dicts in place. Each entry needs "path" (the
+    rendered page PNG) and "regions" (with bbox / needs_vision /
+    ocr_text). Separate from process_document so the regression
+    harness can re-run just this stage on stored OCR/layout output.
+    """
+
+    loop = asyncio.get_running_loop()
+    vision_targets = [
+        (entry, region)
+        for entry in page_entries
+        for region in entry["regions"]
+        if region.get("needs_vision")
+    ]
+
+    if vision_targets:
+        crops = []
+        for entry, region in vision_targets:
+            x, y, w, h = region["bbox"]
+            with Image.open(entry["path"]) as page_image:
+                crops.append(page_image.convert("RGB").crop((x, y, x + w, y + h)))
+
+        # Triage (vision.classify_regions) is NOT wired in here yet --
+        # measured on the regression corpus, it drops 9 real-plat
+        # region-runs out of 23 (one page missed in all 3 runs), which
+        # fails the bar for shipping a filter that can silently lose a
+        # document's only geometry. The classifier itself is tested
+        # and available (see tests/regression/eval_triage.py); every
+        # needs_vision region still goes to extraction until triage's
+        # false-negative rate is fixed.
+
+    if vision_targets:
+        try:
+            regions_parcels = await loop.run_in_executor(
+                None, extract_parcel_geometries_batch, crops
+            )
+            for (entry, region), parcels in zip(vision_targets, regions_parcels):
+                if isinstance(parcels, Exception):
+                    region["vision_error"] = str(parcels)
+                    continue
+                region["parcels"] = walk_region_parcels(
+                    parcels, region.get("ocr_text") or "", anchor_lat, anchor_lon
+                )
+        except Exception as exc:
+            # Vision is an enhancement on top of OCR text, not a hard
+            # requirement (e.g. GEMINI_API_KEY not set yet) -- degrade
+            # gracefully rather than failing the request.
+            for entry, region in vision_targets:
+                region["vision_error"] = str(exc)

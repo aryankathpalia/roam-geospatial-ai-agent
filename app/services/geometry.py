@@ -18,6 +18,7 @@ the right state-plane zone and doing that conversion correctly is its
 own piece of work, not something to bolt on here.
 """
 
+import itertools
 import math
 import re
 from dataclasses import dataclass
@@ -87,36 +88,126 @@ def parse_distance(distance: str) -> float | None:
     return float(match.group(1)) if match else None
 
 
+# Same DMS shape as a bearing's angle, but with no N/S/E/W letters --
+# a curve's delta angle is printed as e.g. "41*18'14"" on its own.
+_DELTA_RE = re.compile(
+    r"(\d+(?:\.\d+)?)\s*[°*ov°]?\s*"
+    r"(?:(\d+(?:\.\d+)?)\s*[\'′‘’]?\s*)?"
+    r"(?:(\d+(?:\.\d+)?)\s*[\"″“”]?\s*)?"
+)
+
+
+def parse_delta(delta: str) -> float | None:
+    """Converts a curve's delta angle (e.g. "41*18'14\"") to decimal
+    degrees. Returns None if it doesn't look like an angle at all."""
+
+    match = _DELTA_RE.search(delta)
+    if not match or not match.group(1):
+        return None
+    deg, minutes, seconds = match.groups()
+    return float(deg) + float(minutes or 0) / 60 + float(seconds or 0) / 3600
+
+
+def merge_curve_calls(boundary_calls: list[dict], curve_calls: list[dict]) -> list[dict]:
+    """
+    Interleaves vision's separately-reported curve_calls (delta/
+    radius/arc_length, each tagged with the 0-indexed straight call it
+    walks after -- -1 meaning "before the first call") back into
+    boundary_calls' walking order, producing ONE ordered list
+    walk_traverse can walk straight through. A no-op when there are no
+    curves, so every existing caller (resolve_ambiguous_calls,
+    drop_conflicting_axis_duplicates, assemble_traverse -- none of
+    which understand curve calls) keeps working unchanged on
+    straight-line-only traverses.
+    """
+
+    if not curve_calls:
+        return boundary_calls
+
+    by_index: dict[int, list[dict]] = {}
+    for curve in curve_calls:
+        index = curve.get("after_call_index")
+        if index is None:
+            continue
+        by_index.setdefault(index, []).append({**curve, "call_type": "curve"})
+
+    merged = list(by_index.get(-1, []))
+    for i, call in enumerate(boundary_calls):
+        merged.append(call)
+        merged.extend(by_index.get(i, []))
+    return merged
+
+
+def _curve_chord(
+    tangent_in_azimuth: float, delta_deg: float, radius: float, turn: str | None
+) -> tuple[float, float, float]:
+    """
+    Standard circular-curve relationship: a curve's chord bearing sits
+    exactly half its delta angle off the tangent-in direction, turned
+    toward whichever side the curve bows to (R = clockwise/right, L =
+    counter-clockwise/left); the tangent-out direction (this curve's
+    exit bearing, and the next call's tangent-in) is the full delta off
+    tangent-in, same side. Plats don't always print which side a curve
+    turns -- defaults to "R" when not given by vision, an explicit,
+    documented default rather than a guess dressed up as certainty; a
+    curve that turns the wrong way here shows up honestly as a weak
+    closure, same as any other extraction miss.
+    """
+
+    sign = -1.0 if (turn or "R").upper() == "L" else 1.0
+    chord_azimuth = (tangent_in_azimuth + sign * delta_deg / 2) % 360
+    chord_distance = 2 * radius * math.sin(math.radians(delta_deg / 2))
+    tangent_out_azimuth = (tangent_in_azimuth + sign * delta_deg) % 360
+    return chord_azimuth, chord_distance, tangent_out_azimuth
+
+
 def walk_traverse(boundary_calls: list[dict]) -> TraverseResult:
     """
-    Walks a sequence of {bearing, distance} calls as vectors from an
-    arbitrary origin, producing the polygon's corner points in order.
+    Walks a sequence of calls as vectors from an arbitrary origin,
+    producing the polygon's corner points in order. Each call is
+    either a straight line ({bearing, distance}) or, if merge_curve_
+    calls has tagged it call_type "curve" ({delta, radius, arc_length,
+    turn}), a circular curve walked chord-to-chord (see _curve_chord).
     Calls that don't parse are skipped (counted in unparsed_calls)
-    rather than aborting the whole traverse.
+    rather than aborting the whole traverse; a curve as the very FIRST
+    call is also skipped and counted, since there's no preceding
+    tangent direction to compute its chord from.
     """
 
     x, y = 0.0, 0.0
     points = [(x, y)]
     unparsed = 0
+    tangent_azimuth: float | None = None
 
     for call in boundary_calls:
-        bearing_str = str(call.get("bearing") or "")
-        distance_str = str(call.get("distance") or "")
+        if call.get("call_type") == "curve":
+            delta = parse_delta(str(call.get("delta") or ""))
+            radius = parse_distance(str(call.get("radius") or ""))
+            if delta is None or radius is None or radius <= 0 or tangent_azimuth is None:
+                unparsed += 1
+                continue
+            azimuth, distance, tangent_azimuth = _curve_chord(
+                tangent_azimuth, delta, radius, call.get("turn")
+            )
+        else:
+            bearing_str = str(call.get("bearing") or "")
+            distance_str = str(call.get("distance") or "")
 
-        # Gemini sometimes returns a bare dimension number (a curve
-        # table length, an interior measurement) as a "boundary call"
-        # with bearing explicitly "null" -- that's not a traverse leg,
-        # it's a call the model itself flagged as incomplete. Skip
-        # rather than counting it as noise to blame on our parser.
-        if bearing_str.strip().lower() == "null" or distance_str.strip().lower() == "null":
-            continue
+            # Gemini sometimes returns a bare dimension number (an
+            # interior measurement) as a "boundary call" with bearing
+            # explicitly "null" -- that's not a traverse leg, it's a
+            # call the model itself flagged as incomplete. Skip rather
+            # than counting it as noise to blame on our parser.
+            if bearing_str.strip().lower() == "null" or distance_str.strip().lower() == "null":
+                continue
 
-        azimuth = parse_bearing(bearing_str)
-        distance = parse_distance(distance_str)
+            azimuth = parse_bearing(bearing_str)
+            distance = parse_distance(distance_str)
 
-        if azimuth is None or distance is None:
-            unparsed += 1
-            continue
+            if azimuth is None or distance is None:
+                unparsed += 1
+                continue
+            tangent_azimuth = azimuth
 
         radians = math.radians(azimuth)
         x += distance * math.sin(radians)
@@ -375,6 +466,143 @@ def find_likely_outlier_call(calls: list[dict]) -> dict | None:
         "closure_without_ft": round(best_closure, 2),
         "improvement": round(improvement, 3),
     }
+
+
+_ASSEMBLY_MIN_PRECISION = 2_000
+_ASSEMBLY_MAX_CALLS = 16
+_ASSEMBLY_MAX_DROPS = 2
+
+
+def _reverse_bearing(bearing: str) -> str:
+    match = _BEARING_RE.search(bearing)
+    ns, deg, minutes, seconds, ew = match.groups()
+    ns = "S" if ns.upper() == "N" else "N"
+    ew = "W" if ew.upper() == "E" else "E"
+    text = f"{ns}{deg}°"
+    if minutes is not None:
+        text += f"{minutes}'"
+    if seconds is not None:
+        text += f'{seconds}"'
+    return text + ew
+
+
+def _is_simple_polygon(vectors) -> bool:
+    from shapely.geometry import Polygon
+
+    points = [(0.0, 0.0)]
+    for dx, dy in vectors[:-1]:
+        points.append((points[-1][0] + dx, points[-1][1] + dy))
+    return len(points) >= 3 and Polygon(points).is_valid
+
+
+def _polygon_area(vectors) -> float:
+    points = [(0.0, 0.0)]
+    for dx, dy in vectors:
+        points.append((points[-1][0] + dx, points[-1][1] + dy))
+    return _shoelace_area(points)
+
+
+def assemble_traverse(
+    calls: list[dict], stated_area_sqft: float | None = None
+) -> tuple[list[dict], list[str]]:
+    """
+    Plats label each line's bearing from whichever end the drafter
+    chose, and vision lists lines in reading order, not walking order
+    -- so a fully correct set of extracted lines can still "fail" to
+    close (confirmed on the regression corpus: a 40-acre parcel with
+    all four sides read correctly closed at 1:7 as listed, 1:601,203
+    once two directions were reversed). This finds the direction
+    assignment that closes the traverse and, only if the given order
+    then crosses itself, falls back to walking the lines in bearing
+    order (the convex arrangement).
+
+    Reversing a line's direction doesn't change the line, so it's
+    applied whenever it reaches the closure bar -- tested against
+    random lines from unrelated parcels, direction flips alone never
+    produced a false closure. Dropping lines is far easier to fool, so
+    up to two drops are allowed only when the parcel's own stated
+    acreage independently agrees with the result. Returns the
+    (possibly unchanged) calls plus human-readable notes on every
+    change made; never changes a distance or bearing angle.
+    """
+
+    import numpy as np
+
+    parsed = []
+    for call in calls:
+        azimuth = parse_bearing(str(call.get("bearing") or ""))
+        distance = parse_distance(str(call.get("distance") or ""))
+        if azimuth is not None and distance:
+            r = math.radians(azimuth)
+            parsed.append((call, (distance * math.sin(r), distance * math.cos(r))))
+    n = len(parsed)
+    if n < 3 or n > _ASSEMBLY_MAX_CALLS or n != len(calls):
+        return calls, []
+
+    vectors = np.array([v for _, v in parsed])
+    lengths = np.hypot(vectors[:, 0], vectors[:, 1])
+    baseline_closure = float(np.hypot(*vectors.sum(axis=0)))
+    if baseline_closure == 0 or lengths.sum() / baseline_closure >= _ASSEMBLY_MIN_PRECISION:
+        return calls, []
+
+    max_drops = _ASSEMBLY_MAX_DROPS if stated_area_sqft else 0
+    best = None
+    for k in range(max_drops + 1):
+        for dropped in itertools.combinations(range(n), k):
+            keep = [i for i in range(n) if i not in dropped]
+            if len(keep) < 3:
+                continue
+            sub = vectors[keep]
+            signs = np.array(list(itertools.product([1, -1], repeat=len(keep) - 1)))
+            signs = np.hstack([np.ones((len(signs), 1)), signs])
+            totals = signs @ sub
+            closures = np.hypot(totals[:, 0], totals[:, 1])
+            j = int(closures.argmin())
+            precision = lengths[keep].sum() / max(float(closures[j]), 1e-9)
+            if precision < _ASSEMBLY_MIN_PRECISION:
+                continue
+            signed = sub * signs[j][:, None]
+            order = list(range(len(keep)))
+            if not _is_simple_polygon(signed):
+                order = sorted(order, key=lambda i: math.atan2(signed[i][0], signed[i][1]) % (2 * math.pi))
+                if not _is_simple_polygon(signed[order]):
+                    continue
+            area = _polygon_area(signed[order])
+            if k and abs(area - stated_area_sqft) / stated_area_sqft > _AREA_TOLERANCE:
+                continue
+            if best is None or precision > best[0]:
+                best = (precision, keep, signs[j], order, dropped)
+        if best:
+            break
+
+    if best is None:
+        return calls, []
+
+    _, keep, sign_row, order, dropped = best
+    assembled = []
+    reversed_count = 0
+    for pos in order:
+        call = parsed[keep[pos]][0]
+        if sign_row[pos] < 0:
+            call = {**call, "bearing": _reverse_bearing(str(call["bearing"]))}
+            reversed_count += 1
+        assembled.append(call)
+
+    notes = []
+    if reversed_count:
+        notes.append(
+            f"Walked {reversed_count} line(s) in the opposite direction to how the "
+            "bearing is printed (same line, other end) so the traverse closes."
+        )
+    if order != sorted(order):
+        notes.append("Reordered lines into walking order; the extracted order crossed itself.")
+    for i in dropped:
+        c = parsed[i][0]
+        notes.append(
+            f"Left out {c.get('bearing')} {c.get('distance')}: the remaining lines close "
+            "and match the stated acreage without it -- check it against the source."
+        )
+    return assembled, notes
 
 
 def find_self_intersecting_segment_pair(
