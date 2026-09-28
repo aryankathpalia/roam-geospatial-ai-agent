@@ -121,10 +121,18 @@ three as one number — see `tests/regression/scoring.py` for why that split mat
   pattern Track B fixed for NVZ's 2-parcel case), but with N>2 parcels stacked. Track
   B's resolver was built and tested for the 2-parcel case only; it has not been
   extended or verified for N>2.
-- **Duplicate region detection on layout-overlapping pages** — `27211ae5` page 13
-  produced two identical regions (same labels, same calls) for what appears to be one
-  drawing, likely from the layout detector finding two overlapping boxes. Not
-  investigated further.
+- **Duplicate region detection on layout-overlapping pages** — FIXED. Root-caused:
+  the layout detector (documented as "NMS-free by design") emitted two overlapping
+  boxes for one drawing on 13 region-pairs across 5 of the 10 corpus documents
+  (`27211ae5`, `3affa529`, `8d75d3ed` x6, `510ea60f` x3, plus a live case on a Derry,
+  NH lot-line-adjustment plat), confirmed at 79-97% IoU. Each duplicate got its own
+  independent vision call, and since extraction is already non-deterministic run to
+  run, the two came back with DIFFERENT incomplete readings instead of one correct
+  one -- doubling vision cost and leaving the reviewer looking at whichever of two
+  competing partial results happened to have data, with no indication a
+  near-identical twin existed. Fixed with a safety-net NMS pass in
+  `layout_detector_onnx.py` (IoU >= 0.6, same class -> keep only the higher-
+  confidence box), applied before anything downstream sees the detections.
 - **Genuinely undimensioned parcels** — some parcels have no boundary dimensions
   anywhere in the source document for that specific parcel (confirmed by direct
   inspection of source pages, not assumed): their boundary is only implied by

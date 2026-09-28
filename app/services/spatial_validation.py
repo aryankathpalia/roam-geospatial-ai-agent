@@ -94,6 +94,26 @@ def compute_perimeter_ft(points: list[tuple[float, float]]) -> float:
     )
 
 
+def _signed_shoelace_area(points: list[tuple[float, float]]) -> float:
+    """
+    Signed polygon area (positive or negative depending on winding
+    direction), in the exact (x, y) convention walk_traverse itself
+    uses. Unlike shapely's Polygon.area (always non-negative), the sign
+    here is meaningful -- needed so a curve's signed segment-area
+    correction (see geometry.py's curve_diagnostics) gets added with
+    the right sign regardless of which way this particular traverse
+    happens to be wound.
+    """
+
+    total = 0.0
+    n = len(points)
+    for i in range(n):
+        x1, y1 = points[i]
+        x2, y2 = points[(i + 1) % n]
+        total += x1 * y2 - x2 * y1
+    return total / 2
+
+
 def parse_stated_area_acres(value: str | None) -> float | None:
     """
     Parses vision's per-parcel stated_area_acres field (a bare number
@@ -128,6 +148,42 @@ def find_stated_area_sqft(text: str) -> float | None:
     if unit.startswith("ac"):
         return value * _SQFT_PER_ACRE
     return value
+
+
+# "CONTAINING X.XX Acres" (or "more or less") is standard, near-
+# universal boilerplate closing a US legal description with a
+# parcel's OWN recorded acreage -- a much stronger signal than a bare
+# area figure anywhere in the text, and confirmed more reliable than
+# vision's own per-parcel stated_area_acres field on a real document:
+# vision extracted a wrong, much larger acreage for a 1.03-acre
+# easement (evidently confused by a nearby "the parent tract... is
+# recorded in Book 834 at page 104" reference sentence in the same
+# paragraph), while this pattern correctly isolated "CONTAINING 1.03
+# Acres more or less" -- the parcel's own explicit statement.
+_CONTAINING_ACREAGE_RE = re.compile(
+    r"\bCONTAINING\s+(\d[\d,]*\.?\d*)\s*(acres?|ac\.?|sq\.?\s?ft\.?|sf)\b",
+    re.IGNORECASE,
+)
+
+
+def find_containing_acreage_sqft(text: str) -> float | None:
+    """
+    Returns the acreage stated via a "CONTAINING X Acres" phrase, but
+    ONLY when exactly one such phrase appears in the given text --
+    same caution as find_stated_area_sqft's docstring: a region
+    covering multiple parcels can have multiple different "CONTAINING"
+    statements, one per parcel, and blindly taking the first would
+    silently check one parcel against a sibling's acreage. Returns
+    None for zero or 2+ matches, not a guess.
+    """
+
+    matches = list(_CONTAINING_ACREAGE_RE.finditer(text))
+    if len(matches) != 1:
+        return None
+
+    value = float(matches[0].group(1).replace(",", ""))
+    unit = matches[0].group(2).lower()
+    return value * _SQFT_PER_ACRE if unit.startswith("ac") else value
 
 
 def validate_traverse(
@@ -188,17 +244,24 @@ def validate_traverse(
             issues.append(message)
 
     # walk_traverse's last point is where the traverse ENDS UP after
-    # its final call, which -- for a properly closed N-sided
-    # traverse -- lands back on (or very near) the start point. That
-    # makes it a near-duplicate of points[0], not a distinct corner:
-    # feeding it to shapely as-is produces a degenerate zero-length
-    # closing segment that gets flagged as a false self-intersection
-    # (confirmed on a real, genuinely valid rectangle -- shapely's
-    # own explain_validity() named it "Ring Self-intersection" at
-    # exactly that near-duplicate vertex). Dropping it and letting
-    # shapely close the ring itself (corner N back to corner 0) is
-    # correct regardless of how well the traverse actually closed.
-    corners = points[:-1] if len(points) > 1 else points
+    # its final call. For a well-closed traverse that's a near-
+    # duplicate of points[0], not a distinct corner -- feeding it to
+    # shapely as-is produces a degenerate zero-length closing segment
+    # that gets flagged as a false self-intersection (confirmed on a
+    # real, genuinely valid rectangle). But it is NOT safe to drop
+    # unconditionally "regardless of how well the traverse closed", as
+    # this used to claim: confirmed on a real curve-ending traverse
+    # tested against multiple candidate tangent bearings -- when the
+    # closure error was large (the traverse genuinely didn't return
+    # near its start), area_sqft came out byte-identical across every
+    # candidate, because the one point that actually differed between
+    # them (the final call's real endpoint) was being discarded before
+    # shapely ever saw it, and shapely silently drew its own straight
+    # closing line instead of using the real final call. Only drop the
+    # last point when it's ACTUALLY near-duplicate of the first.
+    closure_error_ft = traverse.closure_error_ft
+    near_duplicate_close = closure_error_ft <= max(1.0, 0.01 * perimeter_ft)
+    corners = points[:-1] if len(points) > 1 and near_duplicate_close else points
 
     # A traverse needs at least 3 distinct corners to form a polygon at
     # all -- fewer than that isn't a self-intersection question, it's
@@ -223,7 +286,26 @@ def validate_traverse(
                     "against the source document; not auto-corrected."
                 )
             issues.append(message)
+
+        # polygon.area (shapely) is the CHORD-polygon area -- correct for
+        # straight-only traverses, but for any curve it silently treats
+        # the curve as its chord, missing the circular-segment sliver
+        # between chord and true arc (confirmed analytically and
+        # numerically before this was added: for a real 15°13'50",
+        # R=435' curve, that sliver is ~295 sqft, not a rounding-level
+        # effect). walk_traverse's curve_diagnostics carries a signed
+        # correction per curve (see its "signed_segment_area_sqft" for
+        # the sign derivation); applied here against the polygon's own
+        # signed shoelace area (not shapely's always-positive .area, so
+        # the correction's sign is meaningful) before taking the final
+        # absolute value.
         area_sqft = round(abs(polygon.area), 2)
+        if traverse.curve_diagnostics:
+            signed_area = _signed_shoelace_area(corners)
+            signed_area += sum(
+                c["signed_segment_area_sqft"] for c in traverse.curve_diagnostics
+            )
+            area_sqft = round(abs(signed_area), 2)
     else:
         issues.append(
             f"Only {len(corners)} boundary call(s) parsed -- too few to form a "
@@ -234,8 +316,10 @@ def validate_traverse(
         region_ocr_text
     )
     area_match: bool | None = None
+    area_diff_pct: float | None = None
     if area_sqft is not None and stated_area_sqft:
         relative_diff = abs(area_sqft - stated_area_sqft) / stated_area_sqft
+        area_diff_pct = round(relative_diff * 100, 2)
         area_match = relative_diff <= _AREA_MISMATCH_TOLERANCE
         if not area_match:
             issues.append(
@@ -255,6 +339,8 @@ def validate_traverse(
         "area_acres": round(area_sqft / _SQFT_PER_ACRE, 3) if area_sqft is not None else None,
         "stated_area_sqft": stated_area_sqft,
         "area_matches_stated": area_match,
+        "area_diff_pct": area_diff_pct,
+        "curve_diagnostics": traverse.curve_diagnostics,
     }
 
 

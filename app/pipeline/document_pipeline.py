@@ -22,8 +22,15 @@ from typing import Any
 
 from PIL import Image
 
-from app.services.geocoding import GeocodingError, geocode_place
-from app.services.georeference import find_anchor_query, georeference_traverse_to_geojson
+from app.services.geocoding import geocode_anchor
+from app.services.georeference import (
+    ANCHOR_SURVEYED,
+    classify_anchor_query,
+    find_anchor_candidates,
+    find_explicit_coordinates,
+    find_surveyed_coordinates,
+    georeference_traverse_to_geojson,
+)
 from app.services.geometry import (
     assemble_traverse,
     borrow_sibling_call,
@@ -34,13 +41,16 @@ from app.services.geometry import (
     walk_traverse,
 )
 from app.services.layout_detector_onnx import detect_page_layout
+from app.services.legal_description import parse_legal_descriptions
 from app.services.spatial_validation import (
     check_combined_tract_dimension,
+    find_containing_acreage_sqft,
     parse_stated_area_acres,
     validate_traverse,
 )
 from app.services.ocr import OCRLine
 from app.services.pdf_inspector import inspect_pdf
+from app.services import progress as progress_tracker
 from app.services.pdf_renderer import render_page
 from app.services.region_cropper import extract_region_crops
 from app.services.vision import ESCALATION_MODEL, classify_regions, extract_parcel_geometries_batch
@@ -90,9 +100,14 @@ async def process_document(
     if not pdf_path.exists():
         raise FileNotFoundError(f"Document not found: {document_id}")
 
+    progress_tracker.start(document_id)
+
     inspection = inspect_pdf(str(pdf_path))
     pages_dir = document_dir / "pages"
     review_crops_dir = document_dir / "review_crops"
+    progress_tracker.update(
+        document_id, "rendering", f"{inspection['page_count']} pages"
+    )
 
     loop = asyncio.get_running_loop()
     page_entries: list[dict[str, Any]] = []
@@ -138,6 +153,16 @@ async def process_document(
             {"page_number": page_number, "path": output_path, "regions": regions}
         )
 
+    total_regions = sum(len(e["regions"]) for e in page_entries)
+    parcelmap_regions = sum(
+        1 for e in page_entries for r in e["regions"] if r["class"] == "ParcelMap"
+    )
+    progress_tracker.update(
+        document_id,
+        "layout_detection",
+        f"{total_regions} regions detected, {parcelmap_regions} parcel map(s)",
+    )
+
     # ---------------------------------------------------------
     # Split every OCR-eligible page into bands, and flatten ALL bands
     # from the WHOLE document into one fan-out -- so a dense page's own
@@ -172,28 +197,81 @@ async def process_document(
         for entry_index, lines in lines_by_page.items():
             match_lines_to_regions(lines, page_entries[entry_index]["regions"])
 
+    progress_tracker.update(
+        document_id, "ocr", f"{len(band_jobs)} regions read" if band_jobs else "no text regions to read"
+    )
+
     # ---------------------------------------------------------
     # Find a real-world anchor for georeferencing (see
     # app/services/georeference.py for why this -- not a state-plane
-    # projection -- is the approach): scan this document's own OCR'd
-    # text for the most address-like line, geocode it ONCE per
-    # document via the existing Nominatim geocoder. None if nothing
-    # plausible is found -- traverses stay local-only, not guessed.
+    # projection -- is the approach).
+    #
+    # First choice: literal "Lat X Long Y" coordinates printed on the
+    # drawing itself (some documents -- e.g. utility easement exhibits
+    # labeling pole locations -- state these directly). Exact, no
+    # address-matching ambiguity, no geocoder round-trip at all, so
+    # this is checked before any address-based candidate.
+    #
+    # Fallback: scan this document's own OCR'd text for the most
+    # address-like line, geocode it via the existing Nominatim
+    # geocoder. None if nothing plausible is found -- traverses stay
+    # local-only, not guessed.
     # ---------------------------------------------------------
 
     anchor_lat: float | None = None
     anchor_lon: float | None = None
-    anchor_query = find_anchor_query(
-        [{"page_number": e["page_number"], "regions": e["regions"]} for e in page_entries]
+    anchor: dict | None = None
+    progress_tracker.update(document_id, "georeferencing", "searching document text for a location")
+
+    explicit_coords = find_explicit_coordinates(
+        [{"regions": e["regions"]} for e in page_entries]
     )
-    if anchor_query:
-        try:
-            candidates = await geocode_place(anchor_query, limit=1)
-            if candidates:
-                anchor_lat = candidates[0].latitude
-                anchor_lon = candidates[0].longitude
-        except GeocodingError:
-            pass
+    if explicit_coords:
+        anchor_lat, anchor_lon = explicit_coords
+        anchor = {"precision": ANCHOR_SURVEYED, "source": "coordinates printed on the document"}
+        progress_tracker.update(
+            document_id,
+            "georeferencing",
+            f"anchored to coordinates printed on the document ({anchor_lat:.5f}, {anchor_lon:.5f})",
+        )
+    else:
+        anchor_candidates = find_anchor_candidates(
+            [{"regions": e["regions"]} for e in page_entries], limit=6
+        )
+        geocoded, matched_query = await geocode_anchor(anchor_candidates)
+        if geocoded:
+            anchor_lat = geocoded[0].latitude
+            anchor_lon = geocoded[0].longitude
+            anchor = {
+                "precision": classify_anchor_query(matched_query),
+                "source": f'geocoded "{matched_query}"',
+            }
+            # A geocoded address is only ever approximate. If this
+            # document also prints a state-plane corner coordinate (a
+            # real surveyed tie point), try converting it now that the
+            # geocode tells us which STATE to look in -- see
+            # find_surveyed_coordinates' docstring for why this can only
+            # make the anchor more precise, never wrong in a new way.
+            if geocoded[0].region:
+                surveyed = find_surveyed_coordinates(
+                    [{"regions": e["regions"]} for e in page_entries],
+                    geocoded[0].region,
+                    anchor_lat,
+                    anchor_lon,
+                )
+                if surveyed:
+                    anchor_lat, anchor_lon = surveyed
+                    anchor = {
+                        "precision": ANCHOR_SURVEYED,
+                        "source": "state-plane coordinate printed on the document",
+                    }
+            progress_tracker.update(
+                document_id, "georeferencing", f"anchored near {geocoded[0].name}"
+            )
+        else:
+            progress_tracker.update(
+                document_id, "georeferencing", "no geocodable location found in document text"
+            )
 
     # ---------------------------------------------------------
     # Vision escalation: ParcelMap regions (flagged needs_vision by
@@ -212,7 +290,18 @@ async def process_document(
     # ParcelMap regions it has.
     # ---------------------------------------------------------
 
+    needs_vision_count = sum(
+        1 for e in page_entries for r in e["regions"] if r.get("needs_vision")
+    )
+    progress_tracker.update(
+        document_id,
+        "vision_extraction",
+        f"reading {needs_vision_count} parcel map region(s)" if needs_vision_count else "no parcel map regions to read",
+    )
+
     await run_vision_stage(page_entries, anchor_lat, anchor_lon)
+    apply_legal_descriptions(page_entries, anchor_lat, anchor_lon)
+    flag_spurious_duplicate_parcelmap_regions(page_entries)
 
     pages_result = [
         {"page_number": e["page_number"], "regions": e["regions"]}
@@ -223,6 +312,24 @@ async def process_document(
         1 for page in pages_result if any(r["needs_review"] for r in page["regions"])
     )
 
+    valid_parcels = sum(
+        1
+        for page in pages_result
+        for region in page["regions"]
+        for parcel in region.get("parcels", [])
+        if (parcel.get("spatial_validation") or {}).get("valid")
+    )
+    total_parcels = sum(
+        len(region.get("parcels", []))
+        for page in pages_result
+        for region in page["regions"]
+    )
+    progress_tracker.update(
+        document_id,
+        "done",
+        f"{valid_parcels} of {total_parcels} parcel(s) closed" if total_parcels else "no parcels extracted",
+    )
+
     return {
         "document_id": document_id,
         "inspection": inspection,
@@ -230,7 +337,65 @@ async def process_document(
         "pages_needing_review": pages_needing_review,
         "anchor_lat": anchor_lat,
         "anchor_lon": anchor_lon,
+        "anchor": anchor,
     }
+
+
+def flag_spurious_duplicate_parcelmap_regions(page_entries: list[dict]) -> None:
+    """
+    A layout region classified ParcelMap can be a genuine detailed
+    survey/plat drawing OR a small locus/vicinity-map inset that
+    happens to share the same visual features (lines, labels, a north
+    arrow) and gets the same class -- confirmed on a real document
+    where a certification page's inset locus map got its own,
+    much-smaller ParcelMap region, and vision attached a real
+    parcel_label to it that duplicated a parcel already correctly
+    read from the actual detailed drawing elsewhere in the document.
+
+    This is a different failure than the same-region IoU dedup in
+    layout_detector_onnx.py's _deduplicate -- these are two genuinely
+    separate, non-overlapping regions that happen to collide on the
+    same label text, not one region detected twice.
+
+    When the same parcel_label shows up in ParcelMap regions of very
+    different area on the same document, flag the parcel from the
+    much smaller region as a likely-spurious duplicate -- flagged,
+    not silently dropped, consistent with this pipeline's convention
+    elsewhere (assembly_notes, georeference_error, etc.) of surfacing
+    an automated judgment call rather than hiding it.
+    """
+
+    by_label: dict[str, list[tuple[float, dict]]] = {}
+    for entry in page_entries:
+        for region in entry["regions"]:
+            if region.get("class") != "ParcelMap":
+                continue
+            bbox = region.get("bbox")
+            area = bbox[2] * bbox[3] if bbox else 0
+            for parcel in region.get("parcels") or []:
+                label = (parcel.get("vision_geometry", {}).get("parcel_label") or "").strip().upper()
+                if not label:
+                    continue
+                by_label.setdefault(label, []).append((area, parcel))
+
+    for occurrences in by_label.values():
+        if len(occurrences) < 2:
+            continue
+        occurrences.sort(key=lambda t: -t[0])
+        largest_area = occurrences[0][0]
+        for area, parcel in occurrences[1:]:
+            # Only flag a LOPSIDED size mismatch -- two legitimately
+            # similar-sized ParcelMap regions sharing a label (e.g. a
+            # real cross-page duplicate) should stay a normal, visible
+            # review item, not get silently downgraded here.
+            if largest_area > 0 and area < largest_area * 0.2:
+                parcel["likely_duplicate_region"] = True
+                parcel["duplicate_note"] = (
+                    f"Same parcel_label also found in a ~{largest_area / area:.0f}x larger "
+                    "ParcelMap region on this document -- this is likely a vicinity/locus "
+                    "map inset misclassified as a real boundary drawing, not a genuine "
+                    "second parcel."
+                )
 
 
 def walk_region_parcels(
@@ -261,6 +426,42 @@ def walk_region_parcels(
     stated_sqfts = [
         parse_stated_area_acres(g.get("stated_area_acres")) for g in parcels
     ]
+    # Cross-check/override vision's own per-parcel acreage field against
+    # a "CONTAINING X Acres" legal-description phrase, when the region
+    # has exactly one parcel AND exactly one such phrase (both required
+    # -- see find_containing_acreage_sqft's docstring on why an
+    # ambiguous multi-match region falls back to vision's field
+    # unchanged, same as before). Confirmed on a real document: vision
+    # extracted an unrelated, much larger acreage for a 1.03-acre
+    # easement (confused by a nearby "parent tract...recorded in Book
+    # 834" reference in the same paragraph); the CONTAINING phrase
+    # correctly isolated the parcel's own stated 1.03 acres, and once
+    # that was corrected, assemble_traverse (already the automatic
+    # drop/reorder search for every parcel) closed the traverse and
+    # dropped the one bad call with zero manual editing.
+    if len(parcels) == 1:
+        containing_sqft = find_containing_acreage_sqft(region_ocr_text)
+        if containing_sqft:
+            stated_sqfts[0] = containing_sqft
+            # Overwrite vision's own field too, not just the local
+            # stated_sqfts array -- validate_traverse and sibling-
+            # borrowing both re-read parcels[0]["stated_area_acres"]
+            # directly later in this function, so leaving it
+            # unchanged would silently un-fix the override for those.
+            parcels[0]["stated_area_acres"] = str(round(containing_sqft / 43_560.0, 3))
+
+    # validate_traverse falls back to scanning region_ocr_text for the
+    # first bare "<number> acres/sqft" figure when vision's own
+    # per-parcel field is empty. That fallback is only safe for a
+    # single-parcel region -- a multi-parcel "Parcel Map Exhibit" sheet
+    # has one stated area PER parcel (confirmed on a real 2-parcel
+    # subdivision plat: both parcels got compared against the same
+    # mis-scanned figure -- an OCR-garbled "335 AC" that should have
+    # read "3.35 AC", which is the TOTAL of both parcels combined, not
+    # either one's own area -- producing a false ~99% area mismatch on
+    # both). Passing "" instead of the real text makes the fallback
+    # return None (skip the check) rather than guess wrong.
+    area_check_text = region_ocr_text if len(parcels) == 1 else ""
 
     for idx, geometry in enumerate(parcels):
         parcel_result: dict = {"vision_geometry": geometry}
@@ -317,7 +518,7 @@ def walk_region_parcels(
             parcel_result["boundary_geojson"] = traverse_to_geojson(traverse)
             parcel_result["spatial_validation"] = validate_traverse(
                 traverse,
-                region_ocr_text,
+                area_check_text,
                 stated_area_acres=geometry.get("stated_area_acres"),
                 calls=calls,
             )
@@ -407,7 +608,7 @@ def walk_region_parcels(
         parcel_result["boundary_geojson"] = traverse_to_geojson(traverse)
         parcel_result["spatial_validation"] = validate_traverse(
             traverse,
-            region_ocr_text,
+            area_check_text,
             stated_area_acres=parcel_result["vision_geometry"].get("stated_area_acres"),
             calls=borrowed_calls,
         )
@@ -446,12 +647,95 @@ def walk_region_parcels(
     return parcel_results
 
 
+_LEGAL_ACREAGE_MATCH = 0.05
+
+
+def apply_legal_descriptions(
+    page_entries: list[dict[str, Any]],
+    anchor_lat: float | None = None,
+    anchor_lon: float | None = None,
+) -> None:
+    """
+    Parses written metes-and-bounds descriptions out of each page's OCR
+    text (see app/services/legal_description.py) and uses any that
+    close as the authoritative boundary. A vision parcel whose stated
+    acreage matches the description's and isn't already valid gets its
+    calls replaced; a description with no matching parcel is added as
+    its own parcel, since vision reading the drawing can miss or merge
+    parcels that the prose states unambiguously.
+    """
+
+    all_parcels = [
+        p
+        for e in page_entries
+        for r in e["regions"]
+        for p in r.get("parcels", [])
+    ]
+
+    for entry in page_entries:
+        text = "\n".join((r.get("ocr_text") or "") for r in entry["regions"])
+        for desc in parse_legal_descriptions(text):
+            acres = desc["stated_area_acres"]
+            target = None
+            if acres:
+                wanted = float(acres)
+                for parcel in all_parcels:
+                    stated = parcel["vision_geometry"].get("stated_area_acres")
+                    try:
+                        stated_f = float(stated) if stated else None
+                    except ValueError:
+                        stated_f = None
+                    if stated_f and abs(stated_f - wanted) / wanted <= _LEGAL_ACREAGE_MATCH:
+                        target = parcel
+                        break
+            if target and (target.get("spatial_validation") or {}).get("valid"):
+                continue
+
+            updated = recompute_parcel_from_calls(
+                desc["boundary_calls"],
+                stated_area_acres=acres,
+                anchor_lat=anchor_lat,
+                anchor_lon=anchor_lon,
+            )
+            note = (
+                f"Boundary taken from the written legal description on page "
+                f"{entry['page_number']} -- it closes and is read deterministically, "
+                "so it replaces the drawing-based reading."
+            )
+            updated["assembly_notes"] = [note]
+
+            if target:
+                for key in (
+                    "extraction_note", "georeference_error", "boundary_geojson",
+                    "boundary_geojson_wgs84", "spatial_validation", "assembly_notes",
+                ):
+                    target.pop(key, None)
+                target.update(updated)
+                continue
+
+            region = next(
+                (r for r in entry["regions"] if r["class"] == "ParcelMap"),
+                max(entry["regions"], key=lambda r: len(r.get("ocr_text") or "")),
+            )
+            new_parcel = {
+                "vision_geometry": {
+                    "parcel_label": f"Legal description (page {entry['page_number']})",
+                    "boundary_calls": desc["boundary_calls"],
+                    "stated_area_acres": acres,
+                },
+                **updated,
+            }
+            region.setdefault("parcels", []).append(new_parcel)
+            all_parcels.append(new_parcel)
+
+
 def recompute_parcel_from_calls(
     calls: list[dict],
     stated_area_acres: str | None = None,
     region_ocr_text: str = "",
     anchor_lat: float | None = None,
     anchor_lon: float | None = None,
+    auto_fix: bool = False,
 ) -> dict:
     """
     Recompute geometry + validation for a human-edited boundary_calls
@@ -459,16 +743,37 @@ def recompute_parcel_from_calls(
     a bearing/distance, adds a missing call, or removes a bad one, and
     this returns the updated polygon/closure/validity immediately.
 
-    Deliberately skips the resolver/assembly stage (resolve_ambiguous_calls,
-    drop_conflicting_axis_duplicates, assemble_traverse) -- those exist to
-    make sense of raw, unreviewed vision output, and re-running them on
-    calls a human already edited would silently reorder or drop what the
-    reviewer just typed. Curve calls are also expected pre-merged (the
-    caller passes whatever mix of line/curve dicts it wants walked, in
-    the exact order to walk them).
+    By default, deliberately skips the resolver/assembly stage
+    (resolve_ambiguous_calls, drop_conflicting_axis_duplicates,
+    assemble_traverse) -- those exist to make sense of raw, unreviewed
+    vision output, and re-running them on calls a human already edited
+    would silently reorder or drop what the reviewer just typed. Curve
+    calls are also expected pre-merged (the caller passes whatever mix
+    of line/curve dicts it wants walked, in the exact order to walk
+    them).
+
+    auto_fix=True is the one deliberate exception: it runs the edited
+    calls through assemble_traverse before walking -- the same bounded,
+    deterministic reversal/reorder/drop search already proven this
+    session (0%->3% Valid on real plats), scored against closure AND
+    the parcel's own stated acreage, never against vision's plausibility
+    alone. This is the "auto-fix" button in the review UI: instead of a
+    human guessing which call's direction is flipped by trial and
+    error, or reaching for a fresh LLM call with no way to verify its
+    guess, it runs the same explainable search that already works,
+    surfaces exactly what it changed via assembly_notes, and reports
+    plainly when it can't find a closing configuration rather than
+    guessing one.
     """
 
+    assembly_notes: list[str] = []
+    if auto_fix and calls:
+        stated_area_sqft = parse_stated_area_acres(stated_area_acres)
+        calls, assembly_notes = assemble_traverse(calls, stated_area_sqft)
+
     parcel_result: dict = {"resolved_boundary_calls": calls}
+    if assembly_notes:
+        parcel_result["assembly_notes"] = assembly_notes
     if not calls:
         parcel_result["extraction_note"] = "No boundary calls to walk."
         return parcel_result
@@ -481,6 +786,12 @@ def recompute_parcel_from_calls(
         stated_area_acres=stated_area_acres,
         calls=calls,
     )
+    if auto_fix and not assembly_notes and not parcel_result["spatial_validation"]["valid"]:
+        parcel_result["assembly_notes"] = [
+            "Auto-fix couldn't find a call reversal, reorder or drop that "
+            "closes this traverse and matches the stated acreage -- needs "
+            "manual correction."
+        ]
     if anchor_lat is not None and anchor_lon is not None:
         parcel_result["boundary_geojson_wgs84"] = georeference_traverse_to_geojson(
             traverse, anchor_lat, anchor_lon
@@ -547,6 +858,40 @@ async def run_vision_stage(
                 region["parcels"] = walk_region_parcels(
                     parcels, region.get("ocr_text") or "", anchor_lat, anchor_lon
                 )
+
+            # A later "boundary_plat" region whose parcels are ALL too
+            # incomplete to form any polygon (fewer than 3 resolved
+            # calls each -- spatial_validation.area_sqft stays null),
+            # once an EARLIER boundary_plat region in this same document
+            # already extracted at least one real polygon, is far more
+            # likely to be a garbled re-read of the same drawing than a
+            # genuine new lot -- confirmed on a real 2-lot subdivision
+            # packet that reprints its own parcel exhibit on a later,
+            # lower-quality-OCR sheet: the reprint's extraction found
+            # only 1 call and mislabeled it with the pre-subdivision
+            # parent APN, producing a spurious "3rd parcel" next to the
+            # 2 real ones. Only suppressed once a real geometry has
+            # already been seen, so the FIRST region to attempt
+            # extraction is never hidden even if it's the one that fails.
+            seen_real_geometry = False
+            for entry, region in vision_targets:
+                if region.get("category") != "boundary_plat":
+                    continue
+                parcels = region.get("parcels") or []
+                region_has_real_geometry = any(
+                    (p.get("spatial_validation") or {}).get("area_sqft") is not None
+                    for p in parcels
+                )
+                if parcels and not region_has_real_geometry and seen_real_geometry:
+                    region["duplicate_note"] = (
+                        "Every parcel extracted here is too incomplete to form a "
+                        "shape, and a real ParcelMap on an earlier page already "
+                        "extracted successfully -- likely a garbled re-read of "
+                        "the same drawing rather than a new lot; not shown."
+                    )
+                    region["parcels"] = []
+                elif region_has_real_geometry:
+                    seen_real_geometry = True
 
             # Lite-then-escalate: a region that didn't reach Valid on
             # the default (cheap, fast) model gets ONE retry on a
