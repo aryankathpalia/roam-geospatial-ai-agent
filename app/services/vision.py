@@ -309,17 +309,52 @@ _BATCH_STRUCTURE_PROMPT = """\
 Below are raw notes read off pieces of {region_count} different survey
 drawings ({region_list}), from one document.
 
+STEP 0 -- CLASSIFY, NOT JUST DETECT: this application creates/modifies
+specific parcels -- typically the new lot(s) a subdivision, parcel
+map, or lot-line adjustment is establishing. A survey sheet almost
+always ALSO shows other parcels/features that are NOT what this
+document creates, purely for context. For every label you find
+anywhere on the sheet, decide which of these it is:
+- "target": a parcel THIS document is creating or modifying -- it has
+  its own full walked boundary here (a real traverse of its own, or a
+  "RESULTANT PARCEL AREAS"-style entry), and the sheet's own language
+  treats it as an output of this survey/division (e.g. "PARCEL 1",
+  "REMAINDER PARCEL", a newly assigned lot number).
+- "parent": the source parcel being divided or combined -- named as
+  the "before" parcel this survey starts from (e.g. an APN the notes
+  describe as being split, or a prior Record-of-Survey parcel number
+  that this new survey carves target parcels out of). Reference only,
+  never a target, even though it may have its own dimensions shown.
+- "adjacent": a neighboring/adjoining parcel shown only for context
+  (an adjoiner's name + APN near the outer edge, a parcel from a
+  DIFFERENT survey/plat cited as a boundary reference).
+- "easement_row": an easement, right-of-way, road, or dedication area
+  -- not a parcel at all.
+- "other": anything else with a label/boundary that isn't a parcel --
+  a materials pit/yard, an improvement-district facility, a vicinity
+  or key map feature, a title/certificate block, etc.
+Only "target" labels belong in this document's parcel inventory. When
+genuinely unsure between "target" and one of the others, prefer the
+NON-target classification -- a real, confirmed failure mode on an
+actual document was including an unrelated parent-survey parcel
+("17-2-1-1") and an adjacent improvement-district materials yard as if
+they were parcels this application created, when the document's own
+inventory was really just "PARCEL 1" and "REMAINDER PARCEL 17-2-1-4".
+Getting this wrong by inventing an extra parcel card is worse than
+getting it wrong by being cautious.
+
 STEP 1 -- MANDATORY, BEFORE ANYTHING ELSE: for each region, scan its
 notes and list EVERY DISTINCT REAL-WORLD parcel THAT THIS DRAWING
 ITSELF IS DEFINING THE BOUNDARY OF, in the `parcel_labels_found`
-field, grouped by region_index. A label counts even if it only has a
-legal description and no boundary calls yet -- list it anyway. Do
-this scan BEFORE you extract any boundary calls. Do not skip a label
-because it looks minor or you're unsure it has its own boundary data
--- list it, then decide in Step 2 whether it has enough to also get a
-`parcels` entry. A "RESULTANT PARCEL AREAS" or similar summary table
-listing multiple labels with their own acreage is a strong signal of
-exactly how many parcels that region contains.
+field, grouped by region_index, each tagged with the `role` you
+decided in STEP 0. A label counts even if it only has a legal
+description and no boundary calls yet -- list it anyway, with its
+role. Do this scan BEFORE you extract any boundary calls. Do not skip
+a label because it looks minor or you're unsure it has its own
+boundary data -- list it, then decide in Step 2 whether it has enough
+to also get a `parcels` entry. A "RESULTANT PARCEL AREAS" or similar
+summary table listing multiple labels with their own acreage is a
+strong signal of exactly how many TARGET parcels that region contains.
 
 DO NOT LIST A REFERENCE/CONTEXT-ONLY LABEL -- the SAME exclusion as
 rule 4 below applies HERE, at listing time, not just at extraction
@@ -511,7 +546,12 @@ to this parcel before answering.
 
 Tag every entry with its region_index matching that region's actual
 number above (NOT a 1-based position in this list -- use the real
-region numbers).
+region numbers), and with the same `role` you gave this label in Step
+0/`parcel_labels_found` ("target", "parent", "adjacent",
+"easement_row", or "other"). Only "target" entries are this
+document's actual output parcels -- a downstream, deterministic check
+drops every non-"target" entry before it ever becomes a parcel card,
+so classify honestly rather than defaulting everything to "target".
 
 NOTES:
 {notes}
@@ -545,6 +585,10 @@ _PARCELS_ARRAY_SCHEMA = {
             },
             "basis_of_bearings": {"type": "string", "nullable": True},
             "parcel_label": {"type": "string", "nullable": True},
+            "role": {
+                "type": "string",
+                "enum": ["target", "parent", "adjacent", "easement_row", "other"],
+            },
             "stated_area_acres": {"type": "string", "nullable": True},
             "ambiguous_alternates": {
                 "type": "array",
@@ -572,7 +616,7 @@ _PARCELS_ARRAY_SCHEMA = {
                 },
             },
         },
-        "required": ["region_index", "boundary_calls"],
+        "required": ["region_index", "boundary_calls", "role"],
     },
 }
 
@@ -598,8 +642,12 @@ _BATCH_RESPONSE_SCHEMA = {
                 "properties": {
                     "region_index": {"type": "integer"},
                     "label": {"type": "string"},
+                    "role": {
+                        "type": "string",
+                        "enum": ["target", "parent", "adjacent", "easement_row", "other"],
+                    },
                 },
-                "required": ["region_index", "label"],
+                "required": ["region_index", "label", "role"],
             },
         },
         "parcels": _PARCELS_ARRAY_SCHEMA,
@@ -859,17 +907,47 @@ def extract_parcel_geometries_batch(
             continue
         parcels = by_index.get(region_idx, [])
         results.append(
-            [
-                {
-                    "boundary_calls": item.get("boundary_calls", []),
-                    "tie_point": item.get("tie_point"),
-                    "basis_of_bearings": item.get("basis_of_bearings"),
-                    "parcel_label": item.get("parcel_label"),
-                    "stated_area_acres": item.get("stated_area_acres"),
-                    "ambiguous_alternates": item.get("ambiguous_alternates") or [],
-                    "curve_calls": item.get("curve_calls") or [],
-                }
-                for item in parcels
-            ]
+            filter_target_parcels(
+                [
+                    {
+                        "boundary_calls": item.get("boundary_calls", []),
+                        "tie_point": item.get("tie_point"),
+                        "basis_of_bearings": item.get("basis_of_bearings"),
+                        "parcel_label": item.get("parcel_label"),
+                        "role": item.get("role"),
+                        "stated_area_acres": item.get("stated_area_acres"),
+                        "ambiguous_alternates": item.get("ambiguous_alternates") or [],
+                        "curve_calls": item.get("curve_calls") or [],
+                    }
+                    for item in parcels
+                ]
+            )
         )
     return results
+
+
+# Final, deterministic guard -- runs regardless of how well the prompt
+# above was followed. A document's parcel inventory must be exactly
+# the parcel(s) THIS application creates/modifies, never every
+# labeled boundary Gemini happened to notice on the sheet (confirmed
+# on a real document: an unrelated parent-survey parcel and an
+# adjacent improvement-district materials yard both got turned into
+# full parcel cards alongside the two real target parcels). Vision is
+# asked to self-classify each parcel's `role`; this function is the
+# part that actually enforces it, so a classification lapse in the
+# model can't silently produce a fabricated parcel card. General on
+# purpose -- filters on the `role` field alone, never on any
+# document-specific label/name.
+_NON_TARGET_ROLES = {"parent", "adjacent", "easement_row", "other"}
+
+
+def filter_target_parcels(parcels: list[dict]) -> list[dict]:
+    """
+    Drops every parcel entry NOT explicitly classified "target" by
+    vision. A missing/null role (an older cached result, or a
+    genuine model omission) is treated as target -- this guard can
+    only ever remove a parcel the model explicitly said isn't one of
+    this document's own outputs, never one it simply forgot to tag.
+    """
+
+    return [p for p in parcels if p.get("role") not in _NON_TARGET_ROLES]

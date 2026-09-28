@@ -21,7 +21,7 @@ own piece of work, not something to bolt on here.
 import itertools
 import math
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 _BEARING_RE = re.compile(
     # Degree symbol shows up as *, o, v, or the real ° depending on how
@@ -53,6 +53,14 @@ class TraverseResult:
     points: list[tuple[float, float]]  # local (x, y) in feet, origin at (0, 0)
     closure_error_ft: float
     unparsed_calls: int
+    # Diagnostics for each curve actually walked -- start/end points
+    # (local x,y), tangent-in/out azimuths, chord bearing/distance, and
+    # whether this curve used an explicit start_tangent_bearing or
+    # inherited its tangent from the previous call (see _curve_chord's
+    # docstring on why that matters). Empty for a traverse with no
+    # curves. Index is the position within boundary_calls, not within
+    # this list, so a caller can line a diagnostic back up to its call.
+    curve_diagnostics: list[dict] = field(default_factory=list)
 
 
 def parse_bearing(bearing: str) -> float | None:
@@ -169,25 +177,84 @@ def walk_traverse(boundary_calls: list[dict]) -> TraverseResult:
     calls has tagged it call_type "curve" ({delta, radius, arc_length,
     turn}), a circular curve walked chord-to-chord (see _curve_chord).
     Calls that don't parse are skipped (counted in unparsed_calls)
-    rather than aborting the whole traverse; a curve as the very FIRST
-    call is also skipped and counted, since there's no preceding
-    tangent direction to compute its chord from.
+    rather than aborting the whole traverse.
+
+    By default a curve's tangent-in direction is INHERITED from the
+    previous call's exit azimuth -- correct only when the adjoining
+    line is genuinely tangent to the curve. Real plats frequently note
+    the opposite case explicitly: a lot line meeting a curve at a
+    right angle is printed with an "RB=" (radial bearing) label
+    instead of being drawn as a tangent continuation, precisely
+    because the tangent-chaining assumption does NOT hold there.
+    Passing an explicit {start_tangent_bearing: "<quadrant bearing>"}
+    on a curve call overrides the inherited azimuth entirely -- makes
+    that curve's placement independent of whatever the previous call's
+    bearing happens to be, including when it's a curve, the FIRST
+    call in the traverse, or a genuinely non-tangent (radial) lot
+    line. Never inferred or guessed here: a curve without this field
+    keeps the previous tangent-chaining behavior unchanged.
     """
 
     x, y = 0.0, 0.0
     points = [(x, y)]
     unparsed = 0
     tangent_azimuth: float | None = None
+    curve_diagnostics: list[dict] = []
 
-    for call in boundary_calls:
+    for idx, call in enumerate(boundary_calls):
         if call.get("call_type") == "curve":
             delta = parse_delta(str(call.get("delta") or ""))
             radius = parse_distance(str(call.get("radius") or ""))
-            if delta is None or radius is None or radius <= 0 or tangent_azimuth is None:
+            explicit_tangent = parse_bearing(str(call.get("start_tangent_bearing") or ""))
+            curve_tangent_in = explicit_tangent if explicit_tangent is not None else tangent_azimuth
+            if delta is None or radius is None or radius <= 0 or curve_tangent_in is None:
                 unparsed += 1
                 continue
+            start_point = points[-1]
             azimuth, distance, tangent_azimuth = _curve_chord(
-                tangent_azimuth, delta, radius, call.get("turn")
+                curve_tangent_in, delta, radius, call.get("turn")
+            )
+            arc_length = parse_distance(str(call.get("arc_length") or ""))
+            true_arc_length = radius * math.radians(delta)
+            turn = (call.get("turn") or "R").upper()
+            # Signed circular-segment area (the sliver between the chord
+            # and the true arc) -- see _segment_area_correction below for
+            # the sign derivation. Stored here, not just computed inline
+            # in spatial_validation.py, so the diagnostic payload itself
+            # shows exactly what correction each curve contributed.
+            segment_area_sqft = 0.5 * radius**2 * (math.radians(delta) - math.sin(math.radians(delta)))
+            curve_diagnostics.append(
+                {
+                    "call_index": idx,
+                    "start_point": [round(start_point[0], 2), round(start_point[1], 2)],
+                    "radius_ft": radius,
+                    "delta_deg": delta,
+                    "turn": turn,
+                    "tangent_in_azimuth": round(curve_tangent_in, 4),
+                    "tangent_out_azimuth": round(tangent_azimuth, 4),
+                    "used_explicit_start_tangent": explicit_tangent is not None,
+                    "chord_azimuth": round(azimuth, 4),
+                    "chord_distance_ft": round(distance, 2),
+                    "computed_arc_length_ft": round(true_arc_length, 2),
+                    "stated_arc_length_ft": arc_length,
+                    # Signed relative to the SAME (x=sin*dist, y=cos*dist)
+                    # convention walk_traverse itself uses: a "R" (right/
+                    # clockwise) curve's true area is the chord-polygon
+                    # area MINUS this segment; "L" is PLUS. Verified
+                    # numerically (fine-grained arc polyline vs chord,
+                    # both turn directions) before implementing, not
+                    # assumed from a textbook sign convention.
+                    "signed_segment_area_sqft": round(
+                        segment_area_sqft if turn == "L" else -segment_area_sqft, 3
+                    ),
+                    # A stated arc that disagrees with radius+delta's own
+                    # implied arc length (radius * delta_in_radians) means
+                    # the three curve numbers on the sheet are internally
+                    # inconsistent -- surfaced, not silently ignored.
+                    "arc_length_mismatch_ft": (
+                        round(abs(true_arc_length - arc_length), 2) if arc_length else None
+                    ),
+                }
             )
         else:
             bearing_str = str(call.get("bearing") or "")
@@ -213,6 +280,8 @@ def walk_traverse(boundary_calls: list[dict]) -> TraverseResult:
         x += distance * math.sin(radians)
         y += distance * math.cos(radians)
         points.append((x, y))
+        if call.get("call_type") == "curve" and curve_diagnostics:
+            curve_diagnostics[-1]["end_point"] = [round(x, 2), round(y, 2)]
 
     closure_error = math.hypot(points[-1][0] - points[0][0], points[-1][1] - points[0][1])
 
@@ -220,6 +289,7 @@ def walk_traverse(boundary_calls: list[dict]) -> TraverseResult:
         points=points,
         closure_error_ft=round(closure_error, 2),
         unparsed_calls=unparsed,
+        curve_diagnostics=curve_diagnostics,
     )
 
 
@@ -753,6 +823,7 @@ def traverse_to_geojson(result: TraverseResult) -> dict:
         "properties": {
             "closure_error_ft": result.closure_error_ft,
             "unparsed_calls": result.unparsed_calls,
+            "curve_diagnostics": result.curve_diagnostics,
         },
         "geometry": {
             "type": "Polygon",

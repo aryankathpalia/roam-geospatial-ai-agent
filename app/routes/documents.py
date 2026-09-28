@@ -1,8 +1,13 @@
+import asyncio
 import json
+import logging
 from uuid import uuid4
 from pathlib import Path
 
+import io
+
 from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi.responses import StreamingResponse
 from PIL import Image
 from pydantic import BaseModel
 
@@ -10,8 +15,14 @@ from app.pipeline.document_pipeline import (
     process_document,
     recompute_parcel_from_calls,
 )
+from app.services import progress as progress_tracker
 from app.services.pre_annotation import generate_pre_annotations
-from app.services.vision import extract_parcel_geometries_batch
+from app.services.geometry import TraverseResult, traverse_to_geojson
+from app.services.region_cropper import PARCELMAP_CROP_MARGIN_FRAC, PARCELMAP_CROP_MARGIN_MIN_PX
+from app.services.georeference import georeference_traverse_to_geojson
+from app.services.spatial_validation import validate_traverse
+
+logger = logging.getLogger(__name__)
 
 
 router = APIRouter(
@@ -81,33 +92,55 @@ async def upload_document(file: UploadFile = File(...)):
     pdf_path.write_bytes(contents)
 
     # --------------------------------------------------
-    # 4. Run the ROAM processing pipeline: render + detect every page,
-    # then fan out per-page OCR concurrently (see
-    # app/pipeline/document_pipeline.py).
+    # 4. Kick off the ROAM processing pipeline in the background and
+    # return immediately -- render + detect every page, fan out OCR,
+    # vision extraction and georeferencing (see
+    # app/pipeline/document_pipeline.py) can take minutes on a large
+    # scan, and the review UI polls GET /{id}/progress to show real
+    # per-stage status instead of blocking on one request for all of
+    # it.
     # --------------------------------------------------
 
-    try:
-        pipeline_result = await process_document(document_id)
-
-    except Exception as exc:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Document processing failed: {exc}",
-        ) from exc
-
-    # --------------------------------------------------
-    # 5. Persist the result so it can be reloaded for review later --
-    # otherwise it only ever existed in this response.
-    # --------------------------------------------------
-
-    _save_result(document_id, pipeline_result)
+    asyncio.create_task(_process_and_save(document_id))
 
     return {
         "document_id": document_id,
         "filename": file.filename,
-        "status": "processed",
-        "result": pipeline_result,
+        "status": "processing",
     }
+
+
+async def _process_and_save(document_id: str) -> None:
+    try:
+        pipeline_result = await process_document(document_id)
+    except Exception as exc:  # noqa: BLE001 -- reported via progress, not raised
+        logger.exception("Document processing failed for %s", document_id)
+        progress_tracker.fail(document_id, str(exc))
+        return
+
+    # Persist the result so it can be reloaded for review later --
+    # otherwise it only ever existed in this background task.
+    _save_result(document_id, pipeline_result)
+
+
+@router.get("/{document_id}/progress")
+def get_progress(document_id: str):
+    """
+    Polled by the review UI while a document is processing. Returns
+    the current pipeline stage and a human-readable detail string that
+    fills in with real counts once each stage completes (see
+    app/services/progress.py). 404 if nothing has started processing
+    for this document_id -- distinct from a legitimate in-progress
+    state, so the frontend can tell "never uploaded" from "still
+    working".
+    """
+
+    state = progress_tracker.get(document_id)
+    if state is None:
+        raise HTTPException(
+            status_code=404, detail=f"No processing found for document: {document_id}"
+        )
+    return {"document_id": document_id, **state}
 
 
 @router.get("/{document_id}")
@@ -125,11 +158,86 @@ def get_document(document_id: str):
     }
 
 
+@router.get("/{document_id}/pages/{page_number}.png")
+def get_page_image(document_id: str, page_number: int):
+    """
+    The full rendered page, for the review UI's reference viewer --
+    a region crop can cut off labels (a legend, an acreage table, a
+    corner coordinate) that sit just outside the detected bbox.
+    """
+
+    page_path = DOCUMENT_ROOT / document_id / "pages" / f"page_{page_number:03d}.png"
+    if not page_path.exists():
+        raise HTTPException(status_code=404, detail=f"Rendered page not found: {page_path}")
+    return StreamingResponse(open(page_path, "rb"), media_type="image/png")
+
+
+@router.get("/{document_id}/pages/{page_number}/regions/{region_index}/crop.png")
+def get_region_crop(document_id: str, page_number: int, region_index: int):
+    """
+    Crops and returns one region's own source image straight from the
+    rendered page PNG, using the same bbox vision reads from -- so the
+    review UI can show a reviewer the actual drawing next to the
+    editable call table, instead of them needing to reopen the
+    original PDF and hunt for the right page to check a correction
+    against.
+
+    Applies the same ParcelMap padding region_cropper.py applies at
+    ingestion time, HERE too, at serve time -- not just once at
+    ingestion. A document processed before that padding existed (or
+    before any future retuning of it) has an unpadded bbox baked into
+    its stored result.json forever; re-deriving the padding on every
+    request means a bug fix here covers every already-processed
+    document immediately, not only new ones. Confirmed on a real case:
+    a ParcelMap region's bottom edge was cut off in the review UI on a
+    document ingested before the ingestion-time padding was added.
+    """
+
+    result = _load_result(document_id)
+    page = next((p for p in result["pages"] if p["page_number"] == page_number), None)
+    if page is None:
+        raise HTTPException(status_code=404, detail=f"No page {page_number}")
+    if not (0 <= region_index < len(page["regions"])):
+        raise HTTPException(status_code=404, detail="Region index out of range")
+    region = page["regions"][region_index]
+
+    page_path = DOCUMENT_ROOT / document_id / "pages" / f"page_{page_number:03d}.png"
+    if not page_path.exists():
+        raise HTTPException(status_code=404, detail=f"Rendered page not found: {page_path}")
+
+    x, y, w, h = region["bbox"]
+    with Image.open(page_path) as page_image:
+        page_image = page_image.convert("RGB")
+        page_w, page_h = page_image.size
+        if region.get("class") == "ParcelMap":
+            margin_x = max(PARCELMAP_CROP_MARGIN_MIN_PX, w * PARCELMAP_CROP_MARGIN_FRAC)
+            margin_y = max(PARCELMAP_CROP_MARGIN_MIN_PX, h * PARCELMAP_CROP_MARGIN_FRAC)
+        else:
+            margin_x = margin_y = 0
+        x1 = max(0, x - margin_x)
+        y1 = max(0, y - margin_y)
+        x2 = min(page_w, x + w + margin_x)
+        y2 = min(page_h, y + h + margin_y)
+        crop = page_image.crop((x1, y1, x2, y2))
+
+    buffer = io.BytesIO()
+    crop.save(buffer, format="PNG")
+    buffer.seek(0)
+    return StreamingResponse(buffer, media_type="image/png")
+
+
 class RecomputeRequest(BaseModel):
     page_number: int
     region_index: int
     parcel_index: int
     boundary_calls: list[dict]
+    auto_fix: bool = False
+    # Lets a reviewer pin this parcel's anchor by hand instead of trusting
+    # the pipeline's geocoded/state-plane guess -- stored on the parcel
+    # itself (not the document-level anchor) so it survives independently
+    # of every other parcel on the same page.
+    anchor_lat: float | None = None
+    anchor_lon: float | None = None
 
 
 @router.post("/{document_id}/recompute")
@@ -155,12 +263,24 @@ def recompute_parcel(document_id: str, body: RecomputeRequest):
         raise HTTPException(status_code=404, detail="Parcel index out of range")
     parcel = parcels[body.parcel_index]
 
+    manual_anchor = body.anchor_lat is not None and body.anchor_lon is not None
+    anchor_lat = body.anchor_lat if manual_anchor else result.get("anchor_lat")
+    anchor_lon = body.anchor_lon if manual_anchor else result.get("anchor_lon")
+
+    # See walk_region_parcels' area_check_text comment in
+    # document_pipeline.py: the region-OCR-scan area fallback can only
+    # be trusted when this parcel is the only one in its region --
+    # otherwise it risks validating against a sibling's (or the
+    # region's combined) stated area instead of this parcel's own.
+    area_check_text = region.get("ocr_text") or "" if len(parcels) == 1 else ""
+
     updated = recompute_parcel_from_calls(
         body.boundary_calls,
         stated_area_acres=parcel.get("vision_geometry", {}).get("stated_area_acres"),
-        region_ocr_text=region.get("ocr_text") or "",
-        anchor_lat=result.get("anchor_lat"),
-        anchor_lon=result.get("anchor_lon"),
+        region_ocr_text=area_check_text,
+        anchor_lat=anchor_lat,
+        anchor_lon=anchor_lon,
+        auto_fix=body.auto_fix,
     )
 
     # Keep the original vision_geometry (what the model originally read)
@@ -175,25 +295,56 @@ def recompute_parcel(document_id: str, body: RecomputeRequest):
     parcel.pop("spatial_validation", None)
     parcel.update(updated)
     parcel["human_edited"] = True
+    if manual_anchor:
+        # Per-parcel override -- distinct from result["anchor"], which is
+        # the document-wide pipeline guess every other parcel still uses.
+        parcel["anchor_override"] = {"lat": body.anchor_lat, "lon": body.anchor_lon}
 
     _save_result(document_id, result)
 
     return {"document_id": document_id, "parcel": parcel}
 
 
-class ReextractRequest(BaseModel):
+class ConfirmBoundaryRequest(BaseModel):
     page_number: int
     region_index: int
     parcel_index: int
+    # Vertices in the SAME pixel space as the region crop image
+    # (GET .../regions/{region_index}/crop.png), e.g. [[x, y], ...],
+    # ring not necessarily closed. This is a prototype for the
+    # confirm-and-edit boundary review screen: it stores the
+    # human-confirmed shape as-is, with no attempt to back-derive
+    # bearing/distance calls from it (see scoping discussion -- a
+    # dragged polygon is still useful ground truth even without a
+    # perfectly reverse-engineered call list).
+    vertices: list[list[float]]
+    crop_width: float
+    crop_height: float
+    # Same ring, already projected back into the parcel's ORIGINAL
+    # local (anchor-relative, feet) traverse coordinate system by the
+    # frontend -- the exact inverse of whatever affine it used to seed
+    # pixel vertices from boundary_geojson in the first place. Any
+    # vertex the user never dragged round-trips to its exact original
+    # local coordinate; a dragged/added one gets an approximate local
+    # position at the same display scale. Null when this parcel had no
+    # original traverse ring to invert against (nothing to project).
+    local_vertices: list[list[float]] | None = None
 
 
-@router.post("/{document_id}/reextract")
-async def reextract_parcel(document_id: str, body: ReextractRequest):
+@router.post("/{document_id}/confirm-boundary")
+def confirm_boundary(document_id: str, body: ConfirmBoundaryRequest):
     """
-    Re-run vision extraction on just one parcel's own region crop (a
-    small, single-drawing image reads more reliably than the whole
-    sheet) and return the fresh reading for the reviewer to accept or
-    reject -- never applied automatically.
+    Confirm-and-edit boundary review: stores a human-confirmed/
+    corrected polygon (in region-crop pixel space) on the parcel, and,
+    when local_vertices is provided, feeds that SAME shape into the
+    normal geometry pipeline in place of the vision-extracted
+    traverse -- replacing boundary_geojson/boundary_geojson_wgs84/
+    spatial_validation with ones built from the confirmed contour,
+    still walked against this document's own anchor and re-validated
+    the normal way (see validate_traverse), so /workspace renders the
+    confirmed shape exactly like it would any other parcel. The
+    original vision_geometry/resolved_boundary_calls are left alone
+    for comparison -- only the derived geometry is replaced.
     """
 
     result = _load_result(document_id)
@@ -209,30 +360,59 @@ async def reextract_parcel(document_id: str, body: ReextractRequest):
     parcels = region.get("parcels") or []
     if not (0 <= body.parcel_index < len(parcels)):
         raise HTTPException(status_code=404, detail="Parcel index out of range")
+    parcel = parcels[body.parcel_index]
 
-    page_path = DOCUMENT_ROOT / document_id / "pages" / f"page_{body.page_number:03d}.png"
-    if not page_path.exists():
-        raise HTTPException(status_code=404, detail=f"Rendered page not found: {page_path}")
+    if len(body.vertices) < 3:
+        raise HTTPException(status_code=400, detail="A boundary needs at least 3 vertices")
 
-    x, y, w, h = region["bbox"]
-    with Image.open(page_path) as page_image:
-        crop = page_image.convert("RGB").crop((x, y, x + w, y + h))
+    parcel["confirmed_boundary_pixels"] = {
+        "vertices": body.vertices,
+        "crop_width": body.crop_width,
+        "crop_height": body.crop_height,
+    }
+    parcel["human_confirmed"] = True
 
-    geometries = extract_parcel_geometries_batch([crop])
-    parcels_found = geometries[0]
-    if isinstance(parcels_found, Exception):
-        raise HTTPException(
-            status_code=502, detail=f"Re-extraction failed: {parcels_found}"
+    georeferenced_from_confirmation = False
+
+    anchor_override = parcel.get("anchor_override") or {}
+    anchor_lat = anchor_override.get("lat", result.get("anchor_lat"))
+    anchor_lon = anchor_override.get("lon", result.get("anchor_lon"))
+
+    if body.local_vertices and len(body.local_vertices) >= 3 and anchor_lat is not None and anchor_lon is not None:
+        points = [(float(x), float(y)) for x, y in body.local_vertices]
+        # The confirmed ring is already closed by construction (it's a
+        # human-drawn shape, not a directional walk) -- closure_error_ft
+        # is 0 here, honestly, not because closure was achieved but
+        # because there's no accumulated-error walk to measure.
+        traverse = TraverseResult(points=points, closure_error_ft=0.0, unparsed_calls=0)
+
+        parcel["boundary_geojson"] = traverse_to_geojson(traverse)
+        parcel["boundary_geojson_wgs84"] = georeference_traverse_to_geojson(
+            traverse, anchor_lat, anchor_lon
         )
-    if body.parcel_index >= len(parcels_found):
-        raise HTTPException(
-            status_code=404,
-            detail="Re-extraction returned fewer parcels than expected for this region",
+        parcel["boundary_geojson_wgs84"]["properties"]["georeferenced"] = "from_confirmed_boundary"
+
+        # Re-run the normal area-mismatch/self-intersection checks
+        # against the CONFIRMED shape, using whatever calls vision
+        # already resolved for this parcel purely as the source of the
+        # stated-area/OCR-text cross-check -- not to re-walk anything.
+        region_ocr_text = region.get("ocr_text") or "" if len(parcels) == 1 else ""
+        parcel["spatial_validation"] = validate_traverse(
+            traverse,
+            region_ocr_text,
+            stated_area_acres=parcel.get("vision_geometry", {}).get("stated_area_acres"),
+            calls=parcel.get("resolved_boundary_calls"),
         )
+        parcel["boundary_source"] = "manual_confirmed"
+        parcel.pop("georeference_error", None)
+        georeferenced_from_confirmation = True
+
+    _save_result(document_id, result)
 
     return {
         "document_id": document_id,
-        "vision_geometry": parcels_found[body.parcel_index],
+        "parcel": parcel,
+        "georeferenced_from_confirmation": georeferenced_from_confirmation,
     }
 
 

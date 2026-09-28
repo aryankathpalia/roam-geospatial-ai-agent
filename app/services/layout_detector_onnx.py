@@ -126,7 +126,42 @@ def detect_page_layout(image_path: str, conf: float = 0.25) -> list[Detection]:
             )
         )
 
-    return detections
+    return _deduplicate(detections)
+
+
+# YOLOv10 is NMS-free by design (see module docstring above), but that's
+# a property of training, not a guarantee -- confirmed on a real page
+# where it emitted two ParcelMap boxes for the same drawing at 92% IoU.
+# Each duplicate got its own independent vision call, and since vision
+# extraction is already known to be non-deterministic run to run, the
+# two came back with DIFFERENT incomplete readings instead of one
+# correct one -- doubling extraction cost and leaving the reviewer
+# looking at whichever of two competing, partial results happened to
+# have data, with no indication a near-identical twin existed. This is
+# a safety-net NMS pass, not a claim the model needs it in general.
+_DEDUPE_IOU_THRESHOLD = 0.6
+
+
+def _iou(a: "Detection", b: "Detection") -> float:
+    ix1, iy1 = max(a.x, b.x), max(a.y, b.y)
+    ix2, iy2 = min(a.x + a.width, b.x + b.width), min(a.y + a.height, b.y + b.height)
+    iw, ih = max(0.0, ix2 - ix1), max(0.0, iy2 - iy1)
+    intersection = iw * ih
+    union = a.width * a.height + b.width * b.height - intersection
+    return intersection / union if union else 0.0
+
+
+def _deduplicate(detections: list["Detection"]) -> list["Detection"]:
+    kept: list[Detection] = []
+    for detection in sorted(detections, key=lambda d: -d.confidence):
+        if any(
+            detection.roam_class == other.roam_class
+            and _iou(detection, other) >= _DEDUPE_IOU_THRESHOLD
+            for other in kept
+        ):
+            continue
+        kept.append(detection)
+    return kept
 
 
 def get_image_size(image_path: str) -> tuple[int, int]:
