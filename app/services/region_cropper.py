@@ -19,6 +19,19 @@ from app.services.layout_detector_onnx import Detection
 # the detected box instead of a hard crop against the text/drawing edge.
 CROP_MARGIN_PX = 6
 
+# ParcelMap boxes need a much bigger margin than other classes: the
+# layout model's box is a bounding estimate, not a guaranteed-tight
+# fit, and for every other class a few missed pixels cost nothing --
+# for ParcelMap a miss can crop off the actual boundary line or a
+# corner coordinate, corrupting the geometry read from it. Confirmed
+# on a real document where the model's box fell ~120px (~7.5% of the
+# box's own height) short of the drawing's real bottom edge, visibly
+# truncating a parcel's boundary in both the vision-facing crop and
+# the review UI. Proportional (not a fixed pixel count) so it scales
+# with how large the drawing itself is.
+PARCELMAP_CROP_MARGIN_FRAC = 0.08
+PARCELMAP_CROP_MARGIN_MIN_PX = 40
+
 
 @dataclass
 class RegionCrop:
@@ -53,18 +66,29 @@ def extract_region_crops(
         crops: list[RegionCrop] = []
 
         for i, detection in enumerate(detections):
-            x1 = max(0, detection.x - CROP_MARGIN_PX)
-            y1 = max(0, detection.y - CROP_MARGIN_PX)
-            x2 = min(page_width, detection.x + detection.width + CROP_MARGIN_PX)
-            y2 = min(page_height, detection.y + detection.height + CROP_MARGIN_PX)
+            if detection.roam_class == "ParcelMap":
+                margin_x = max(PARCELMAP_CROP_MARGIN_MIN_PX, detection.width * PARCELMAP_CROP_MARGIN_FRAC)
+                margin_y = max(PARCELMAP_CROP_MARGIN_MIN_PX, detection.height * PARCELMAP_CROP_MARGIN_FRAC)
+            else:
+                margin_x = margin_y = CROP_MARGIN_PX
+
+            x1 = max(0, detection.x - margin_x)
+            y1 = max(0, detection.y - margin_y)
+            x2 = min(page_width, detection.x + detection.width + margin_x)
+            y2 = min(page_height, detection.y + detection.height + margin_y)
 
             crop_image = page_image.crop((x1, y1, x2, y2))
 
+            # bbox reflects the ACTUAL padded crop, not the raw detection
+            # box -- this is what every downstream consumer (recompute,
+            # the review UI's own re-crop endpoint, boundary-review)
+            # keys off, so it needs to match what vision itself read
+            # from, not a narrower box that silently disagrees with it.
             crop = RegionCrop(
                 roam_class=detection.roam_class,
                 confidence=detection.confidence,
                 needs_review=detection.needs_review,
-                bbox=(detection.x, detection.y, detection.width, detection.height),
+                bbox=(x1, y1, x2 - x1, y2 - y1),
                 image=crop_image,
             )
 
