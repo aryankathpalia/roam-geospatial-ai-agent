@@ -130,6 +130,32 @@ three as one number — see `tests/regression/scoring.py` for why that split mat
   never mutated by confirm-boundary itself, so this stays immune to the
   repeat-confirm self-contamination risk the raw-calls version was
   already built to avoid.
+- **Edge-corroboration scale check discarded every edge with more than
+  one nearby printed number, which is the common case, not the rare
+  one.** `calibration.calibrate`'s independent edge-based scale estimate
+  only trusted an edge if EXACTLY ONE OCR number proximity-matched it,
+  on the theory that multiple candidates meant unresolvable ambiguity.
+  In practice, real plats routinely print more than one number near the
+  same physical line: a phantom combined-tract distance sharing the
+  edge with its own corrected value (confirmed on NVZ: edge3 has both
+  the true `550.75'` and the phantom `903.15'` within a few pixels of
+  each other), or a parenthetical prior-deed reference bearing sitting
+  next to the real one (confirmed on NVZ edge0: `220.00'` next to
+  `(N0*02'31"W 250.00") (R4)`). The "exactly one candidate" rule
+  silently excluded every edge that actually had a valid, correct label
+  on it, leaving only edges whose sole nearby number was an unrelated
+  stray (a legend figure, tax ID fragment) to vote on scale -- producing
+  a nonsense "corroborated" scale that disagreed with the area-based one
+  by 88% on a first live test, even though the document's real printed
+  dimensions agreed with the area-based scale to within 0.3-2%. Fixed by
+  using the area-based scale as a loose (20%) sanity prefilter among an
+  edge's candidates, then taking whichever remaining candidate best
+  matches that edge's own predicted length, instead of requiring
+  single-candidacy (`app/services/calibration.py`). Confirmed on NVZ
+  Parcel 1 (352.40' corroborates twice at 2.0-2.2% error, 220.00' at
+  2.15%, the phantom 903.15' correctly rejected at 302% error) and
+  Parcel 2 (550.75' at 0.30%, 220.00' at 0.37%, 903.15' rejected at
+  64.5% error) -- both now reach `cross_validated`.
 
 ## Still open, not fixed this session
 

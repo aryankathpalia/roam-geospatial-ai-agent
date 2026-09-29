@@ -40,6 +40,11 @@ _EDGE_ASSOC_MAX_ORIENT_DIFF_DEG = 15
 _EDGE_MATCH_TOLERANCE_PCT = 3.0
 _SCALE_AGREEMENT_TOLERANCE_PCT = 5.0
 _ROTATION_AGREEMENT_TOLERANCE_DEG = 5.0
+# Loose sanity prefilter used only to pick, among several candidates
+# proximity-matched to the same edge, which one is even plausibly that
+# edge's own dimension -- not itself a pass/fail tolerance (that's
+# _EDGE_MATCH_TOLERANCE_PCT / _SCALE_AGREEMENT_TOLERANCE_PCT below).
+_EDGE_PREFILTER_TOLERANCE_PCT = 20.0
 
 
 @dataclass
@@ -225,15 +230,43 @@ def calibrate(
             continue
         by_edge.setdefault(edge_idx, []).append({**cand, "dist_px": dist_px, "length_px": length_px, "angle_px": angle_px})
 
-    # Independent per-edge scale estimate: for edges with exactly one
-    # proximally-matched candidate, implied_scale = printed_ft / edge_px.
-    # (Edges with multiple candidates are ambiguous on their own --
-    # excluded from the independent scale estimate, same reasoning as
-    # the seed-trust problem found in the association test: "exactly
-    # one candidate" isn't automatically trustworthy, but MULTIPLE
-    # candidates on one edge means genuine ambiguity we can't resolve
-    # by proximity alone, so that edge just doesn't vote on scale.)
-    best_per_edge = {i: v[0] for i, v in by_edge.items() if len(v) == 1}
+    # Independent per-edge scale estimate. Real plats routinely have
+    # MORE THAN ONE printed number proximity-matched to the same edge --
+    # a phantom combined-tract distance sharing the same physical line
+    # (confirmed on NVZ: edge3's true 550.75' sits right next to the
+    # combined tract's 903.15'), or a parenthetical prior-deed reference
+    # bearing (confirmed on NVZ edge0: "(N0*02'31"W 250.00") (R4)" sits
+    # right next to the true 220.00'). Requiring "exactly one candidate"
+    # on an edge to trust it means every edge with a co-located
+    # phantom/reference number gets silently excluded, and only truly
+    # unrelated stray numbers (legend figures, tax IDs) that happen to
+    # be sole occupants of an edge get through -- backwards from what's
+    # actually trustworthy.
+    #
+    # Instead: use scale_from_area as a loose (20%) sanity filter among
+    # an edge's candidates to reject numbers that clearly aren't that
+    # edge's own dimension (10x-off legend figures, etc.), then take
+    # WHICHEVER remaining candidate best matches the area-predicted
+    # length for that edge. This is still an independent check (a
+    # phantom/reference value is rejected because it disagrees with the
+    # true edge's own pixel length, not because of who reported it) --
+    # it just resolves multi-candidate edges by best fit instead of
+    # discarding them.
+    best_per_edge: dict[int, dict] = {}
+    if scale_from_area:
+        for edge_idx, cands in by_edge.items():
+            length_px, _ = _edge_geom(polygon_page_px, edge_idx)
+            predicted_ft = length_px * scale_from_area
+            best, best_err = None, None
+            for c in cands:
+                if not predicted_ft:
+                    continue
+                pct_err = abs(c["value"] - predicted_ft) / predicted_ft * 100
+                if pct_err <= _EDGE_PREFILTER_TOLERANCE_PCT and (best_err is None or pct_err < best_err):
+                    best, best_err = c, pct_err
+            if best is not None:
+                best_per_edge[edge_idx] = best
+
     implied_scales = [c["value"] / c["length_px"] for c in best_per_edge.values() if c["length_px"]]
 
     scale_from_edges = None
