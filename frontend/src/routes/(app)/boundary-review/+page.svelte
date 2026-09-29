@@ -640,6 +640,26 @@
             {#if saveStatus === 'error'}<span class="error">save failed</span>{/if}
           </div>
 
+          {#if selected.parcel.calibration}
+            <div class="calibration-banner calibration-{selected.parcel.calibration.status}">
+              <strong>
+                {#if selected.parcel.calibration.status === 'cross_validated'}✓ Cross-validated
+                {:else if selected.parcel.calibration.status === 'single_source'}⚠ Single-source
+                {:else}✗ Unverified placement{/if}
+              </strong>
+              {#if selected.parcel.calibration.scale_ft_per_px}
+                — scale {selected.parcel.calibration.scale_ft_per_px.toFixed(4)} ft/px
+                {#if selected.parcel.calibration.rotation_deg !== null}, rotation {selected.parcel.calibration.rotation_deg.toFixed(1)}°{/if}
+                ({selected.parcel.calibration.corroborating_edge_count} corroborating edge(s))
+              {/if}
+              {#if selected.parcel.calibration.notes?.length}
+                <ul class="calibration-notes">
+                  {#each selected.parcel.calibration.notes as note}<li>{note}</li>{/each}
+                </ul>
+              {/if}
+            </div>
+          {/if}
+
           <div class="stage">
             <img bind:this={cropImgEl} src={cropSrc} alt="source crop" on:load={onCropLoad} />
             {#if cropWidth > 0}
@@ -725,6 +745,34 @@
   }
   .warn {
     color: #b45f00;
+  }
+  .calibration-banner {
+    margin: 0.3rem 0 0.6rem 0;
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    border: 1px solid;
+  }
+  .calibration-cross_validated {
+    background: #eaf7ec;
+    border-color: #2e7d32;
+    color: #1b5e20;
+  }
+  .calibration-single_source {
+    background: #fff6e5;
+    border-color: #b45f00;
+    color: #8a4700;
+  }
+  .calibration-unverified {
+    background: #fdecea;
+    border-color: #c0392b;
+    color: #8e2318;
+  }
+  .calibration-notes {
+    margin: 0.3rem 0 0 1rem;
+    padding: 0;
+    font-size: 0.75rem;
+    font-weight: normal;
   }
   .spacer {
     flex: 1;
