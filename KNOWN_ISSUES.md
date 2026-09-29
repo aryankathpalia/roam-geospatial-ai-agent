@@ -111,6 +111,39 @@ three as one number — see `tests/regression/scoring.py` for why that split mat
 
 ## Still open, not fixed this session
 
+- **Pre-calibration confirmed placements used an unvalidated display-fit
+  scale, not a measured one.** Before `app/services/calibration.py` existed,
+  `confirm_boundary` reprojected confirmed vertices by inheriting whatever
+  scale/rotation the original (possibly wrong) vision-extracted seed implied
+  -- a scale chosen only to fit the seed ring into ~85% of the crop image for
+  display, never checked against anything printed on the page. Confirmed
+  concretely on NVZ Parcel 1: the pre-calibration scale was 0.490 ft/px, but
+  independently deriving scale from stated acreage and cross-checking it
+  against the sheet's own printed `352.40'`/`220.00'` calls (see
+  predict-and-verify, and `calibration.py`) gives ~0.594-0.656 ft/px instead
+  -- roughly a 20-30% discrepancy. The pre-calibration placement still looked
+  approximately right on a zoomed-out satellite basemap (not obviously wrong
+  at a glance), which is why this went unnoticed until the scale was actually
+  checked against printed evidence. **Do not treat any pre-calibration
+  confirmed boundary's stored coordinates as ground truth** -- only the
+  calibration status (`cross_validated`/`single_source`/`unverified`) now
+  stored per parcel indicates whether a placement's scale/rotation were
+  actually checked against the document's own printed numbers.
+- **A document's own printed graphic scale bar cannot be trusted as a
+  calibration source, even when OCR reads it correctly.** Confirmed on NVZ:
+  OCR cleanly read "GRAPHIC SCALE" + "1inch = 40 ft." off the page, which at
+  this pipeline's 200 DPI render implies 0.20 ft/px -- but the real scale
+  (independently corroborated: a confirmed boundary's edge matched a printed
+  `220.00'` call within 0.5% error) is 0.705 ft/px, a 3.5x discrepancy.
+  Likely cause: county-recorded sheets are frequently reduced from their
+  original full-size plot (e.g. D-size to letter) before filing/scanning,
+  which silently invalidates the printed scale-bar ratio relative to the
+  rendered page's actual pixel scale. Reading the scale-bar text is not the
+  hard part -- trusting its value without independently verifying the
+  document wasn't rescaled is the risk. Do not use a printed scale
+  annotation as a calibration source without a second, independent check
+  (e.g. a stated acreage cross-check, as the predict-and-verify approach
+  uses instead).
 - **Batching-completeness non-determinism** — both the tile-read and structuring
   stages have been shown to return different results on identical input across
   repeated calls (confirmed via direct rerun tests, not inferred). Neither reducing

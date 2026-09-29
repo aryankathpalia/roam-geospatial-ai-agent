@@ -17,8 +17,10 @@ from app.pipeline.document_pipeline import (
 )
 from app.services import progress as progress_tracker
 from app.services.pre_annotation import generate_pre_annotations
-from app.services.geometry import TraverseResult, traverse_to_geojson
+from app.services.geometry import TraverseResult, traverse_to_geojson, walk_traverse
 from app.services.region_cropper import PARCELMAP_CROP_MARGIN_FRAC, PARCELMAP_CROP_MARGIN_MIN_PX
+from app.services.ocr import run_parcelmap_ocr
+from app.services import calibration as calibration_service
 from app.services.georeference import georeference_traverse_to_geojson
 from app.services.spatial_validation import validate_traverse
 
@@ -379,7 +381,98 @@ def confirm_boundary(document_id: str, body: ConfirmBoundaryRequest):
     anchor_lon = anchor_override.get("lon", result.get("anchor_lon"))
 
     if body.local_vertices and len(body.local_vertices) >= 3 and anchor_lat is not None and anchor_lon is not None:
-        points = [(float(x), float(y)) for x, y in body.local_vertices]
+        old_local_points = [(float(x), float(y)) for x, y in body.local_vertices]
+
+        # --- calibrated reprojection ---
+        # Try to independently verify scale AND rotation against this
+        # document's own printed evidence (stated acreage + OCR'd
+        # bearing/distance calls near the CONFIRMED edges) before
+        # trusting them, instead of blindly inheriting whatever
+        # scale/rotation the original (possibly wrong) vision-extracted
+        # seed implied. See app/services/calibration.py.
+        calibration_info = None
+        try:
+            page_path = DOCUMENT_ROOT / document_id / "pages" / f"page_{body.page_number:03d}.png"
+            with Image.open(page_path) as page_img:
+                page_w, page_h = page_img.size
+                bx, by, bw, bh = region["bbox"]
+                if region.get("class") == "ParcelMap":
+                    mx = max(PARCELMAP_CROP_MARGIN_MIN_PX, bw * PARCELMAP_CROP_MARGIN_FRAC)
+                    my = max(PARCELMAP_CROP_MARGIN_MIN_PX, bh * PARCELMAP_CROP_MARGIN_FRAC)
+                else:
+                    mx = my = 0
+                origin_x = max(0, bx - mx)
+                origin_y = max(0, by - my)
+                polygon_page_px = [(origin_x + x, origin_y + y) for x, y in body.vertices]
+                ocr_lines, _ = run_parcelmap_ocr(page_img)
+
+                # The pivot the ORIGINAL (uncalibrated) seed transform
+                # used: crop center in pixels <-> the true vision-
+                # extracted ring's own bounding-box center in local
+                # feet. Re-derived fresh from vision_geometry.boundary_calls
+                # every time (never from parcel["boundary_geojson"],
+                # which a PRIOR confirm may have already overwritten) so
+                # repeat confirms can't contaminate this reference.
+                crop_w = min(page_w, bx + bw + mx) - origin_x
+                crop_h = min(page_h, by + bh + my) - origin_y
+                page_pivot = (origin_x + crop_w / 2, origin_y + crop_h / 2)
+                local_pivot = None
+                # The pivot the ORIGINAL (uncalibrated) seed transform
+                # used: crop center in pixels <-> the true vision-
+                # extracted ring's own bounding-box center in local
+                # feet. Re-derived fresh from vision_geometry.boundary_calls
+                # every time (never from parcel["boundary_geojson"],
+                # which a PRIOR confirm may have already overwritten) so
+                # repeat confirms can't contaminate this reference.
+                original_calls = parcel.get("vision_geometry", {}).get("boundary_calls")
+                if original_calls:
+                    try:
+                        original_ring = walk_traverse(original_calls).points[:-1]
+                        rxs = [p[0] for p in original_ring]
+                        rys = [p[1] for p in original_ring]
+                        local_pivot = ((min(rxs) + max(rxs)) / 2, (min(rys) + max(rys)) / 2)
+                    except Exception:  # noqa: BLE001 -- fall through to "no pivot" below
+                        local_pivot = None
+
+            stated_sqft = None
+            stated_acres_str = parcel.get("vision_geometry", {}).get("stated_area_acres")
+            if stated_acres_str:
+                try:
+                    stated_sqft = float(stated_acres_str) * 43560.0
+                except (TypeError, ValueError):
+                    stated_sqft = None
+
+            calibration_info = calibration_service.calibrate(
+                polygon_page_px, ocr_lines, stated_sqft,
+                old_local_points=old_local_points, page_pivot=page_pivot, local_pivot=local_pivot,
+            )
+        except Exception as exc:  # noqa: BLE001 -- calibration is best-effort; never blocks a save
+            calibration_info = calibration_service.CalibrationResult(
+                status="unverified", scale_ft_per_px=None, rotation_deg=None,
+                scale_from_area=None, scale_from_edges=None, scale_agreement_pct=None,
+                corroborating_edge_count=0, notes=[f"calibration attempt failed: {exc}"],
+            )
+
+        if calibration_info.status in ("cross_validated", "single_source") and calibration_info.rotation_deg is not None:
+            # Rebuild the local-feet ring using the CALIBRATED scale and
+            # rotation, pivoted at the SAME (page_pivot -> local_pivot)
+            # point the original transform used -- so only scale/
+            # rotation get upgraded, translation stays exactly as
+            # approximate as it already was (still just the document's
+            # geocoded/surveyed anchor, per confirm-boundary's existing
+            # behavior). NOT the shape's own centroid -- see
+            # reproject_page_px_to_local's docstring for why that's wrong.
+            points = calibration_service.reproject_page_px_to_local(
+                polygon_page_px, calibration_info.scale_ft_per_px, calibration_info.rotation_deg,
+                page_pivot, local_pivot,
+            )
+            boundary_source = "manual_confirmed_calibrated"
+        else:
+            points = old_local_points
+            boundary_source = "manual_confirmed_uncalibrated"
+            if calibration_info.status == "unverified" and not calibration_info.notes:
+                calibration_info.notes.append("no calibration evidence found; using inherited scale/rotation from the original seed.")
+
         # The confirmed ring is already closed by construction (it's a
         # human-drawn shape, not a directional walk) -- closure_error_ft
         # is 0 here, honestly, not because closure was achieved but
@@ -403,7 +496,17 @@ def confirm_boundary(document_id: str, body: ConfirmBoundaryRequest):
             stated_area_acres=parcel.get("vision_geometry", {}).get("stated_area_acres"),
             calls=parcel.get("resolved_boundary_calls"),
         )
-        parcel["boundary_source"] = "manual_confirmed"
+        parcel["boundary_source"] = boundary_source
+        parcel["calibration"] = {
+            "status": calibration_info.status,
+            "scale_ft_per_px": calibration_info.scale_ft_per_px,
+            "rotation_deg": calibration_info.rotation_deg,
+            "scale_from_area": calibration_info.scale_from_area,
+            "scale_from_edges": calibration_info.scale_from_edges,
+            "scale_agreement_pct": calibration_info.scale_agreement_pct,
+            "corroborating_edge_count": calibration_info.corroborating_edge_count,
+            "notes": calibration_info.notes,
+        }
         parcel.pop("georeference_error", None)
         georeferenced_from_confirmation = True
 
