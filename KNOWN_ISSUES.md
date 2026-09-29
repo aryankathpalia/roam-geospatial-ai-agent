@@ -109,6 +109,28 @@ three as one number — see `tests/regression/scoring.py` for why that split mat
   `run_vision_stage` — every `needs_vision` region still goes to extraction until
   triage's false-negative rate on real plats is fixed.
 
+## Fixed and committed this session (2026-09-29)
+
+- **Calibrated-reprojection pivot used the wrong ring's bounding-box
+  center.** `confirm_boundary` re-derived the reprojection pivot (the
+  point the scale/rotation transform is applied around) from
+  `vision_geometry.boundary_calls` -- the RAW, uncorrected vision-extracted
+  calls -- instead of `resolved_boundary_calls`, the Track-B-corrected
+  calls the pipeline actually walks to produce `boundary_geojson` (and
+  therefore the ring the frontend's own `computeLocalTransform` pivots
+  against when it first seeds pixel vertices). On NVZ this is the
+  difference between a combined-tract 903.15'-wide rectangle (raw) and
+  the correctly split 352.40'/550.75'-wide one (resolved) -- two rings
+  with very different bounding-box centers. Pivoting around the wrong
+  center is a translation error independent of the scale/rotation values
+  themselves being correct: reprojecting with a perfectly-calibrated
+  scale and rotation still lands the whole parcel on the wrong spot if
+  the pivot point itself is wrong. Fixed by reading
+  `resolved_boundary_calls` instead (`app/routes/documents.py`); it is
+  never mutated by confirm-boundary itself, so this stays immune to the
+  repeat-confirm self-contamination risk the raw-calls version was
+  already built to avoid.
+
 ## Still open, not fixed this session
 
 - **Pre-calibration confirmed placements used an unvalidated display-fit
