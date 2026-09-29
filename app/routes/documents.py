@@ -417,14 +417,20 @@ def confirm_boundary(document_id: str, body: ConfirmBoundaryRequest):
                 crop_h = min(page_h, by + bh + my) - origin_y
                 page_pivot = (origin_x + crop_w / 2, origin_y + crop_h / 2)
                 local_pivot = None
-                # The pivot the ORIGINAL (uncalibrated) seed transform
-                # used: crop center in pixels <-> the true vision-
-                # extracted ring's own bounding-box center in local
-                # feet. Re-derived fresh from vision_geometry.boundary_calls
-                # every time (never from parcel["boundary_geojson"],
-                # which a PRIOR confirm may have already overwritten) so
-                # repeat confirms can't contaminate this reference.
-                original_calls = parcel.get("vision_geometry", {}).get("boundary_calls")
+                # NOTE: this must be resolved_boundary_calls, not
+                # vision_geometry.boundary_calls -- the pipeline seeds
+                # boundary_geojson (and therefore the frontend's original
+                # pivot) from resolved_boundary_calls (post Track-B
+                # combined-tract-width correction), never from the raw
+                # vision-extracted calls. Using the raw calls here pivots
+                # off the wrong ring's bbox center whenever Track B
+                # resolved a different width than vision extracted
+                # (confirmed on NVZ: 352.40'/550.75' resolved vs 903.15'
+                # raw). resolved_boundary_calls is never mutated by
+                # confirm-boundary itself, so this stays immune to
+                # repeat-confirm contamination the same way the raw-calls
+                # version was.
+                original_calls = parcel.get("resolved_boundary_calls")
                 if original_calls:
                     try:
                         original_ring = walk_traverse(original_calls).points[:-1]
