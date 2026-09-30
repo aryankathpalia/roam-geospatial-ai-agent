@@ -238,20 +238,42 @@ def calibrate(
         )
 
     # Externally associated candidates (Gemini reading the polygon
-    # overlay). Association is already done (proximity/orientation are
-    # the OCR association step, not corroboration), but everything
-    # downstream -- area-guided prefilter, 3% match, 5% scale agreement,
-    # rotation consensus, 180deg disambiguation -- is the SAME code path.
-    for cand in extra_candidates or []:
-        edge_idx = cand["edge_index"]
-        if not 0 <= edge_idx < n_edges or not cand.get("value"):
-            continue
-        length_px, angle_px = _edge_geom(polygon_page_px, edge_idx)
-        by_edge.setdefault(edge_idx, []).append({
-            "line": None, "value": cand["value"], "azimuth": cand.get("azimuth"),
-            "source": cand.get("source", "gemini_association"),
-            "dist_px": 0.0, "length_px": length_px, "angle_px": angle_px,
-        })
+    # overlay). Gemini's own edge_index is NOT trusted for which edge a
+    # value belongs to -- confirmed on a real document (MAP 7 LOT 48)
+    # that Gemini reads the correct printed values but mislabels which
+    # edge 4 of 7 belong to, each at under 1.2% error against a
+    # DIFFERENT edge than the one it reported, causing zero corroboration
+    # despite every value being genuinely legible. Re-deriving the edge
+    # from the value itself (same method that surfaced the bug) instead
+    # of trusting the label fixes this without asking Gemini to track
+    # more structure per call, which this session has repeatedly shown
+    # degrades results rather than improving them. Only the ASSOCIATION
+    # (which edge) is re-derived this way; the value/bearing themselves
+    # are still exactly what Gemini transcribed, and still have to pass
+    # the same 3%/5% corroboration checks below as everything else --
+    # this cannot manufacture a match that wasn't already within
+    # tolerance of some edge's predicted length.
+    if scale_from_area:
+        for cand in extra_candidates or []:
+            if not cand.get("value"):
+                continue
+            best_idx, best_err = None, None
+            for edge_idx in range(n_edges):
+                length_px, _ = _edge_geom(polygon_page_px, edge_idx)
+                predicted_ft = length_px * scale_from_area
+                if not predicted_ft:
+                    continue
+                err = abs(cand["value"] - predicted_ft) / predicted_ft * 100
+                if best_err is None or err < best_err:
+                    best_idx, best_err = edge_idx, err
+            if best_idx is None:
+                continue
+            length_px, angle_px = _edge_geom(polygon_page_px, best_idx)
+            by_edge.setdefault(best_idx, []).append({
+                "line": None, "value": cand["value"], "azimuth": cand.get("azimuth"),
+                "source": cand.get("source", "gemini_association"),
+                "dist_px": 0.0, "length_px": length_px, "angle_px": angle_px,
+            })
 
     # Independent per-edge scale estimate. Real plats routinely have
     # MORE THAN ONE printed number proximity-matched to the same edge --
