@@ -508,3 +508,60 @@ readings still yield no azimuth at all (would need a letter-less DMS parser with
 curve-delta/tie-angle false-positive risk); not built. (4) A flipped edge's
 bearing is made to agree, so only its DISTANCE is independent evidence, yet it
 counts toward `cross_validated`; consumers should look at `quadrant_resolved`.
+
+## Absolute placement of confirmed parcels (2026-09-30) -- verified on ONE sheet only
+
+**Problem found.** Calibration verifies scale and rotation only. Position came from
+the document-level anchor placed at local (0,0), never checked to be a point of the
+parcel. On NVZ page 9 that anchor was the first printed N/E pair -- a Washoe County
+section-corner CONTROL MONUMENT -- and the colon-only coordinate regex missed the
+sheet's own parcel-corner coordinates (`N 14926897.47` / `E2252502.76`, "PER THIS MAP").
+Confirmed Parcel 1 was ~2,600 ft from its printed NE corner (~5,480 ft once the stated
+ground factor is applied) while the map drew it as placeable / "Verified".
+
+**What was built** (`app/services/placement.py`, wired into `/confirm-boundary`, stored
+as `parcel.placement`): (1) every printed N/E pair is classified by surrounding text --
+control points / section and 1/4 corners / brass caps / benchmarks are monuments and are
+never bound; only "PER THIS MAP" pairs are parcel corners; (2) a parcel corner binds to
+the confirmed vertex its label sits beside, only if unambiguously nearest; (3) zone,
+NAD83 and the grid-to-ground factor must all be stated on the sheet; (4) the calibrated
+polygon is placed through `georeference_traverse_from_ground_corner` (now accepts a
+vertex index). Any further bound corner must agree within 2%, else nothing is placed.
+`placement.status` is `surveyed_corner` or `approximate`; the workspace only shows a
+confirmed parcel's location as verified for `surveyed_corner` (or a manual anchor).
+
+**Result on NVZ page 9 (the only sheet tested).** Parcel 1 binds vertex 2 to its printed
+NE corner; Parcel 2 binds vertex 1 to its printed NW corner. Independent checks, in the
+sheet's ground coordinates: Parcel 1's NW vertex is 7.8 ft from the point predicted by
+Parcel 2's printed corner; the two separately placed parcels' shared boundary agrees to
+5.7 ft / 8.7 ft; areas 1.7798 / 2.7797 ac vs stated 1.78 / 2.78. Residuals match the
+~2% hand-placement error of the confirmed polygons (345 ft drawn vs 352.40 printed).
+
+**NOT verified -- READ THIS.** The ground -> lat/lon step rests on assumptions the sheet
+does not state and that could not be checked externally (the cloud environment blocks
+Washoe County GIS, NGS, Esri imagery and OSM): US survey feet, and ground = grid x factor
+scaled about the CRS origin. The second alone is a ~2,990 ft question on this sheet.
+Needs one external check (county parcel GIS polygon for the APN, a published position
+for control point N22SM01029, or imagery) before any lat/lon is trusted.
+
+**Still open.** Label-proximity binding and the monument/"PER THIS MAP" vocabulary are
+tuned on one sheet; sheets that label corners differently (POB, coordinate tables,
+numbered corners) fall back to `approximate` -- untested. Non-confirmed parcels still use
+the document anchor as their POB. `parcel.boundary_geojson` (local ft) still uses the
+old crop-center pivot; only the WGS84 geometry is re-placed.
+
+## Shape robustness -- separate track, open, untested beyond 3 documents
+
+Kept apart from placement on purpose. Only 5 parcels in 3 documents (NVZ, MAP 7, the
+Easement document) have been live-tested; Ada County and Payette have not.
+- MAP 7 LOT 48-3: 3/5 live runs give `single_source` rotation 70.61 deg, ~85 deg wrong
+  (page truth ~335.3): LOT 48's own 66.91 call, misread E for W, attached to a LOT 48-3
+  edge of similar length. A single bearing cannot check itself.
+- Neighbor-call misassociation: Gemini candidates are attached to the edge of nearest
+  predicted LENGTH, so a neighbor parcel's call with a coincidental length corroborates
+  (LOT 48 run1 edge1 = LOT 48-3's `N22 51'56"W` with 184.66 misread 164.66). This was the
+  most common real error in live runs, more than quadrant misreads.
+- Planned Utility Easement: confirmed polygon predicts ~301 x 150 ft edges vs a printed
+  669.6 x ~70 ft easement; nothing passes the distance gate, so it is untestable as-is.
+- Same-sheet scale inconsistency: NVZ Parcel 1 and 2 calibrate to 0.594 vs 0.655 ft/px on
+  one page (each from its own stated area); not investigated.

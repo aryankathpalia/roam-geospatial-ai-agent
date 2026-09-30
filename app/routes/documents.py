@@ -23,6 +23,7 @@ from app.services.region_cropper import PARCELMAP_CROP_MARGIN_FRAC, PARCELMAP_CR
 from app.services.ocr import run_parcelmap_ocr
 from app.services import calibration as calibration_service
 from app.services import gemini_edge_association
+from app.services import placement as placement_service
 from app.services.georeference import georeference_traverse_to_geojson
 from app.services.spatial_validation import validate_traverse
 
@@ -393,6 +394,8 @@ def confirm_boundary(document_id: str, body: ConfirmBoundaryRequest):
         # scale/rotation the original (possibly wrong) vision-extracted
         # seed implied. See app/services/calibration.py.
         calibration_info = None
+        calibration_ocr_lines = None
+        polygon_page_px = None
         try:
             page_path = DOCUMENT_ROOT / document_id / "pages" / f"page_{body.page_number:03d}.png"
             with Image.open(page_path) as page_img:
@@ -407,6 +410,7 @@ def confirm_boundary(document_id: str, body: ConfirmBoundaryRequest):
                 origin_y = max(0, by - my)
                 polygon_page_px = [(origin_x + x, origin_y + y) for x, y in body.vertices]
                 ocr_lines, _ = run_parcelmap_ocr(page_img)
+                calibration_ocr_lines = ocr_lines
 
                 # One Gemini call, one polygon, one crop (see
                 # gemini_edge_association). Best-effort: failure (no key,
@@ -514,6 +518,31 @@ def confirm_boundary(document_id: str, body: ConfirmBoundaryRequest):
             traverse, anchor_lat, anchor_lon
         )
         parcel["boundary_geojson_wgs84"]["properties"]["georeferenced"] = "from_confirmed_boundary"
+
+        # --- absolute placement (separate from calibration) ---
+        # The line above puts local (0,0) at the document anchor, which is
+        # never checked to be a point of THIS parcel (on NVZ it is a section-
+        # corner control monument, ~2,600 ft away). Replace it only when a
+        # confirmed vertex can be bound to a printed parcel-corner coordinate
+        # in a CRS the sheet states; otherwise keep it but mark it approximate.
+        # Needs calibrated shape AND orientation, so only when calibration is placeable.
+        placement_info = {"status": placement_service.PLACEMENT_APPROXIMATE,
+                          "notes": ["position comes from the document-level anchor, which is not tied to any vertex of this parcel"]}
+        if boundary_source == "manual_confirmed_calibrated" and calibration_ocr_lines is not None:
+            try:
+                sheet_text = "\n".join(
+                    [ln.text for ln in calibration_ocr_lines]
+                    + [r.get("ocr_text") or "" for pg in result.get("pages", []) for r in pg.get("regions", [])]
+                )
+                placed = placement_service.place(polygon_page_px, points, calibration_ocr_lines, sheet_text)
+                placement_info = {"status": placed.status, "notes": placed.notes, "details": placed.details}
+                if placed.geojson is not None:
+                    parcel["boundary_geojson_wgs84"] = placed.geojson
+            except Exception as exc:  # noqa: BLE001 -- placement is best-effort; never blocks a save
+                placement_info["notes"].append(f"placement attempt failed: {exc}")
+        elif boundary_source != "manual_confirmed_calibrated":
+            placement_info["notes"].append("scale/rotation not calibrated, so no vertex can be bound to a surveyed coordinate")
+        parcel["placement"] = placement_info
 
         # Re-run the normal area-mismatch/self-intersection checks
         # against the CONFIRMED shape, using whatever calls vision
