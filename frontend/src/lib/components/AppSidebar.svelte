@@ -2,7 +2,8 @@
   import { page } from '$app/stores';
 
   const navItems = [
-    { name: 'Workspace', href: '/workspace' }
+    { name: 'Workspace', href: '/workspace' },
+    { name: 'Boundary review', href: '/boundary-review' }
   ];
 </script>
 

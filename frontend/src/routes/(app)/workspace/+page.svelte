@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
+  import { boundaryRefs } from '$lib/boundaryCandidates';
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
   const LAST_DOCUMENT_KEY = 'roam:lastDocumentId';
@@ -61,7 +62,26 @@
       // localStorage unavailable (private window, blocked storage) --
       // resume just won't be offered, upload still works normally.
     }
+    // /boundary-review links back here with ?doc=<id> so the map shows the
+    // just-confirmed geometry without a manual resume.
+    const docParam = new URLSearchParams(window.location.search).get('doc');
+    if (docParam) {
+      lastDocumentId = docParam;
+      resumeLastDocument();
+    }
   });
+
+  // Manual boundary confirmation (/boundary-review) is a step of the main
+  // flow, offered only for the parcels ROAM's ParcelMap selection picked --
+  // see $lib/boundaryCandidates.
+  $: boundaryCandidates = !usingSample && result ? boundaryRefs(result).filter((r) => !r.excludedReason) : [];
+  $: boundaryConfirmedCount = boundaryCandidates.filter((r) => r.parcel.human_confirmed).length;
+
+  function boundaryReviewHref(parcelKey?: string): string {
+    const q = new URLSearchParams({ doc: documentId ?? '' });
+    if (parcelKey) q.set('parcel', parcelKey);
+    return `/boundary-review?${q.toString()}`;
+  }
 
   function rememberDocumentId(id: string | null) {
     documentId = id;
@@ -1024,6 +1044,15 @@
         {/if}
       </div>
 
+      {#if boundaryCandidates.length > 0 && documentId}
+        <div class="location-banner panel" class:ok={boundaryConfirmedCount === boundaryCandidates.length}>
+          <strong>Boundary confirmation:</strong>
+          {boundaryConfirmedCount} of {boundaryCandidates.length} candidate parcel{boundaryCandidates.length === 1 ? '' : 's'} confirmed
+          <span class="location-source">— ROAM selected these from its ParcelMap regions. Confirm the target parcel's outline on the drawing to calibrate and place it.</span>
+          <a class="btn btn-ghost btn-sm" href={boundaryReviewHref()}>Confirm boundaries →</a>
+        </div>
+      {/if}
+
       <div class="results-grid" class:with-viewer={viewer}>
         {#if viewer}
           <div class="viewer-panel panel">
@@ -1179,6 +1208,9 @@
                     <button class="btn btn-ghost btn-sm" on:click={() => openViewer(entry)}>
                       Open source drawing
                     </button>
+                    <a class="btn btn-ghost btn-sm" href={boundaryReviewHref(`${entry.page}-${entry.i}`)}>
+                      {parcel.human_confirmed ? 'Re-confirm boundary' : 'Confirm boundary'}
+                    </a>
                   </div>
 
                   {#if editingKey === key}
