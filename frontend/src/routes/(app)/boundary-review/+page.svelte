@@ -117,8 +117,8 @@
 
   // Candidates are every parcel on a ParcelMap region except vicinity-inset
   // duplicates, grouped by sheet with the most likely target sheet first (see
-  // $lib/boundaryCandidates). Vision triage only adds a hint -- it never
-  // hides a parcel.
+  // $lib/boundaryCandidates). Vision triage only affects sheet order -- it
+  // never hides a parcel.
   function flattenParcels(res: any): ParcelRef[] {
     const all = boundaryRefs(res);
     excludedParcels = all.filter((r) => r.excludedReason);
@@ -454,8 +454,8 @@
     <p class="hint">
       Parcels on the ParcelMap sheets ROAM found are listed by sheet, most likely target sheet first. Pick the target parcel, drag
       the outline onto its boundary on the drawing (seeded from a previous confirmation, else the
-      vision-extracted calls, else a blank square), then Confirm. Confirming re-runs calibration and
-      placement for that parcel.
+      vision-extracted calls, else a blank square), then Confirm. Confirming saves your outline and places
+      it on the map; verification details are on the map page.
       {#if documentId.trim()}
         <a href={`/workspace?doc=${encodeURIComponent(documentId.trim())}`}>Back to map →</a>
       {/if}
@@ -582,7 +582,6 @@
                 <button class:active={ref.key === selectedKey} on:click={() => selectParcel(ref)}>
                   {ref.label}
                   {#if ref.parcel.human_confirmed}<span class="badge">confirmed</span>{/if}
-                  {#if ref.hint}<span class="hint-tag">{ref.hint}</span>{/if}
                 </button>
               </li>
             {/each}
@@ -636,7 +635,7 @@
             </button>
             {#if saveStatus === 'saving'}<span>saving…</span>{/if}
             {#if saveStatus === 'saved' && georeferenced}
-              <span class="ok">saved ✓ — projected to real-world coordinates.
+              <span class="ok">saved ✓ — placed on the map.
                 <a href={`/workspace?doc=${encodeURIComponent(documentId.trim())}`}>View on map →</a></span
               >
             {:else if saveStatus === 'saved'}
@@ -644,36 +643,6 @@
             {/if}
             {#if saveStatus === 'error'}<span class="error">save failed</span>{/if}
           </div>
-
-          {#if selected.parcel.calibration}
-            <div class="calibration-banner calibration-{selected.parcel.calibration.status}">
-              <strong>
-                {#if selected.parcel.calibration.status === 'cross_validated'}✓ Cross-validated
-                {:else if selected.parcel.calibration.status === 'single_source'}⚠ Single-source
-                {:else}✗ Unverified placement{/if}
-              </strong>
-              {#if selected.parcel.calibration.scale_ft_per_px}
-                — scale {selected.parcel.calibration.scale_ft_per_px.toFixed(4)} ft/px
-                {#if selected.parcel.calibration.rotation_deg !== null}, rotation {selected.parcel.calibration.rotation_deg.toFixed(1)}°{/if}
-                ({selected.parcel.calibration.corroborating_edge_count} corroborating edge(s))
-              {/if}
-              {#if selected.parcel.calibration.notes?.length}
-                <ul class="calibration-notes">
-                  {#each selected.parcel.calibration.notes as note}<li>{note}</li>{/each}
-                </ul>
-              {/if}
-              {#if selected.parcel.calibration.corroborations?.length}
-                <ul class="calibration-notes">
-                  {#each selected.parcel.calibration.corroborations as c}
-                    <li>
-                      edge {c.edge_index}: {c.value}'{#if c.azimuth !== null && c.azimuth !== undefined} @ {c.azimuth.toFixed(1)}°{/if}
-                      ({c.pct_err}% off) — <strong>{c.source === 'gemini_association' ? 'Gemini association' : 'OCR proximity'}</strong>
-                    </li>
-                  {/each}
-                </ul>
-              {/if}
-            </div>
-          {/if}
 
           <div class="stage">
             <img bind:this={cropImgEl} src={cropSrc} alt="source crop" on:load={onCropLoad} />
@@ -760,34 +729,6 @@
   }
   .warn {
     color: #b45f00;
-  }
-  .calibration-banner {
-    margin: 0.3rem 0 0.6rem 0;
-    padding: 0.4rem 0.6rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    border: 1px solid;
-  }
-  .calibration-cross_validated {
-    background: #eaf7ec;
-    border-color: #2e7d32;
-    color: #1b5e20;
-  }
-  .calibration-single_source {
-    background: #fff6e5;
-    border-color: #b45f00;
-    color: #8a4700;
-  }
-  .calibration-unverified {
-    background: #fdecea;
-    border-color: #c0392b;
-    color: #8e2318;
-  }
-  .calibration-notes {
-    margin: 0.3rem 0 0 1rem;
-    padding: 0;
-    font-size: 0.75rem;
-    font-weight: normal;
   }
   .spacer {
     flex: 1;
@@ -921,8 +862,7 @@
     letter-spacing: 0.04em;
     color: #55534b;
   }
-  .ref-badge,
-  .hint-tag {
+  .ref-badge {
     display: inline-block;
     margin-left: 0.4rem;
     padding: 0 0.35rem;

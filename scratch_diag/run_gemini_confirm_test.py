@@ -77,7 +77,7 @@ def confirm(doc_id, base_payload, ring, crop_w, crop_h):
     local_verts = to_local(base_payload["vertices"], t)
     payload = {**base_payload, "local_vertices": local_verts}
     req = urllib.request.Request(
-        f"{API}/documents/{doc_id}/confirm-boundary",
+        f"{API}/documents/{doc_id}/confirm-boundary?wait=true",
         data=json.dumps(payload).encode(),
         headers={"Content-Type": "application/json"},
         method="POST",

@@ -1,12 +1,14 @@
 import asyncio
+import copy
 import json
 import logging
+import threading
 from uuid import uuid4
 from pathlib import Path
 
 import io
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, BackgroundTasks, File, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
 from PIL import Image
 from pydantic import BaseModel
@@ -54,9 +56,12 @@ def _load_result(document_id: str) -> dict:
 
 
 def _save_result(document_id: str, result: dict) -> None:
-    _result_path(document_id).write_text(
-        json.dumps(result, indent=2), encoding="utf-8"
-    )
+    # Write-then-rename: a GET (or the background verification) reading
+    # result.json mid-save must never see a half-written file.
+    path = _result_path(document_id)
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(json.dumps(result, indent=2), encoding="utf-8")
+    tmp.replace(path)
 
 
 @router.post("/upload")
@@ -336,56 +341,49 @@ class ConfirmBoundaryRequest(BaseModel):
     local_vertices: list[list[float]] | None = None
 
 
-@router.post("/{document_id}/confirm-boundary")
-def confirm_boundary(document_id: str, body: ConfirmBoundaryRequest):
-    """
-    Confirm-and-edit boundary review: stores a human-confirmed/
-    corrected polygon (in region-crop pixel space) on the parcel, and,
-    when local_vertices is provided, feeds that SAME shape into the
-    normal geometry pipeline in place of the vision-extracted
-    traverse -- replacing boundary_geojson/boundary_geojson_wgs84/
-    spatial_validation with ones built from the confirmed contour,
-    still walked against this document's own anchor and re-validated
-    the normal way (see validate_traverse), so /workspace renders the
-    confirmed shape exactly like it would any other parcel. The
-    original vision_geometry/resolved_boundary_calls are left alone
-    for comparison -- only the derived geometry is replaced.
-    """
+_RESULT_LOCK = threading.RLock()
 
-    result = _load_result(document_id)
+_DERIVED_PARCEL_KEYS = (
+    "boundary_geojson", "boundary_geojson_wgs84", "spatial_validation",
+    "boundary_source", "calibration", "placement",
+)
 
-    page = next(
-        (p for p in result["pages"] if p["page_number"] == body.page_number), None
-    )
-    if page is None:
-        raise HTTPException(status_code=404, detail=f"No page {body.page_number}")
-    if not (0 <= body.region_index < len(page["regions"])):
-        raise HTTPException(status_code=404, detail="Region index out of range")
+
+def _locate_parcel(result: dict, body) -> tuple[dict, list, dict] | None:
+    page = next((p for p in result["pages"] if p["page_number"] == body.page_number), None)
+    if page is None or not (0 <= body.region_index < len(page["regions"])):
+        return None
     region = page["regions"][body.region_index]
     parcels = region.get("parcels") or []
     if not (0 <= body.parcel_index < len(parcels)):
-        raise HTTPException(status_code=404, detail="Parcel index out of range")
-    parcel = parcels[body.parcel_index]
+        return None
+    return region, parcels, parcels[body.parcel_index]
 
-    if len(body.vertices) < 3:
-        raise HTTPException(status_code=400, detail="A boundary needs at least 3 vertices")
 
-    parcel["confirmed_boundary_pixels"] = {
-        "vertices": body.vertices,
-        "crop_width": body.crop_width,
-        "crop_height": body.crop_height,
-    }
-    parcel["human_confirmed"] = True
+def _anchor_for(result: dict, parcel: dict) -> tuple[float | None, float | None]:
+    override = parcel.get("anchor_override") or {}
+    return override.get("lat", result.get("anchor_lat")), override.get("lon", result.get("anchor_lon"))
 
-    georeferenced_from_confirmation = False
 
-    anchor_override = parcel.get("anchor_override") or {}
-    anchor_lat = anchor_override.get("lat", result.get("anchor_lat"))
-    anchor_lon = anchor_override.get("lon", result.get("anchor_lon"))
+def _derive_confirmed_geometry(
+    document_id: str, body, result: dict, region: dict, parcels: list, parcel: dict,
+    anchor_lat: float, anchor_lon: float, verify: bool,
+) -> None:
+    """
+    Builds the map geometry for a confirmed polygon and stores it on `parcel`.
 
-    if body.local_vertices and len(body.local_vertices) >= 3 and anchor_lat is not None and anchor_lon is not None:
-        old_local_points = [(float(x), float(y)) for x, y in body.local_vertices]
+    verify=False is the fast path used when the user confirms: no OCR, no
+    Gemini, no calibration -- the polygon is placed at the provisional
+    position the original seed implied, and calibration/placement are marked
+    "pending". verify=True (run in the background after the save, see
+    _verify_confirmation) does the calibration and absolute placement.
+    """
 
+    old_local_points = [(float(x), float(y)) for x, y in body.local_vertices]
+    calibration_info = None
+    calibration_ocr_lines = None
+    polygon_page_px = None
+    if verify:
         # --- calibrated reprojection ---
         # Try to independently verify scale AND rotation against this
         # document's own printed evidence (stated acreage + OCR'd
@@ -487,92 +485,217 @@ def confirm_boundary(document_id: str, body: ConfirmBoundaryRequest):
                 corroborating_edge_count=0, notes=[f"calibration attempt failed: {exc}"],
             )
 
-        if calibration_info.status in ("cross_validated", "single_source") and calibration_info.rotation_deg is not None:
-            # Rebuild the local-feet ring using the CALIBRATED scale and
-            # rotation, pivoted at the SAME (page_pivot -> local_pivot)
-            # point the original transform used -- so only scale/
-            # rotation get upgraded, translation stays exactly as
-            # approximate as it already was (still just the document's
-            # geocoded/surveyed anchor, per confirm-boundary's existing
-            # behavior). NOT the shape's own centroid -- see
-            # reproject_page_px_to_local's docstring for why that's wrong.
-            points = calibration_service.reproject_page_px_to_local(
-                polygon_page_px, calibration_info.scale_ft_per_px, calibration_info.rotation_deg,
-                page_pivot, local_pivot,
+    else:
+        calibration_info = calibration_service.CalibrationResult(
+            status="pending", scale_ft_per_px=None, rotation_deg=None,
+            scale_from_area=None, scale_from_edges=None, scale_agreement_pct=None,
+            corroborating_edge_count=0, notes=["verification is running in the background"],
+        )
+
+    if verify and calibration_info.status in ("cross_validated", "single_source") and calibration_info.rotation_deg is not None:
+        # Rebuild the local-feet ring using the CALIBRATED scale and
+        # rotation, pivoted at the SAME (page_pivot -> local_pivot)
+        # point the original transform used -- so only scale/
+        # rotation get upgraded, translation stays exactly as
+        # approximate as it already was (still just the document's
+        # geocoded/surveyed anchor, per confirm-boundary's existing
+        # behavior). NOT the shape's own centroid -- see
+        # reproject_page_px_to_local's docstring for why that's wrong.
+        points = calibration_service.reproject_page_px_to_local(
+            polygon_page_px, calibration_info.scale_ft_per_px, calibration_info.rotation_deg,
+            page_pivot, local_pivot,
+        )
+        boundary_source = "manual_confirmed_calibrated"
+    else:
+        points = old_local_points
+        boundary_source = "manual_confirmed_uncalibrated"
+        if calibration_info.status == "unverified" and not calibration_info.notes:
+            calibration_info.notes.append("no calibration evidence found; using inherited scale/rotation from the original seed.")
+
+    # The confirmed ring is already closed by construction (it's a
+    # human-drawn shape, not a directional walk) -- closure_error_ft
+    # is 0 here, honestly, not because closure was achieved but
+    # because there's no accumulated-error walk to measure.
+    # validate_traverse (shoelace area, perimeter) and traverse_to_geojson expect a
+    # ring whose last point repeats the first, as walk_traverse returns. An open
+    # ring silently drops the closing edge -- a 345x225 ft rectangle measured half
+    # its area and every confirmed parcel showed a false 50% mismatch. `points`
+    # itself stays open: placement wants one point per confirmed vertex.
+    ring_points = points if points[0] == points[-1] else list(points) + [points[0]]
+    traverse = TraverseResult(points=ring_points, closure_error_ft=0.0, unparsed_calls=0)
+
+    parcel["boundary_geojson"] = traverse_to_geojson(traverse)
+    parcel["boundary_geojson_wgs84"] = georeference_traverse_to_geojson(
+        traverse, anchor_lat, anchor_lon
+    )
+    parcel["boundary_geojson_wgs84"]["properties"]["georeferenced"] = "from_confirmed_boundary"
+
+    # --- absolute placement (separate from calibration) ---
+    # The line above puts local (0,0) at the document anchor, which is
+    # never checked to be a point of THIS parcel (on NVZ it is a section-
+    # corner control monument, ~2,600 ft away). Replace it only when a
+    # confirmed vertex can be bound to a printed parcel-corner coordinate
+    # in a CRS the sheet states; otherwise keep it but mark it approximate.
+    # Needs calibrated shape AND orientation, so only when calibration is placeable.
+    placement_info = {"status": placement_service.PLACEMENT_APPROXIMATE,
+                      "notes": ["position comes from the document-level anchor, which is not tied to any vertex of this parcel"]}
+    if boundary_source == "manual_confirmed_calibrated" and calibration_ocr_lines is not None:
+        try:
+            sheet_text = "\n".join(
+                [ln.text for ln in calibration_ocr_lines]
+                + [r.get("ocr_text") or "" for pg in result.get("pages", []) for r in pg.get("regions", [])]
             )
-            boundary_source = "manual_confirmed_calibrated"
+            placed = placement_service.place(polygon_page_px, points, calibration_ocr_lines, sheet_text)
+            placement_info = {"status": placed.status, "notes": placed.notes, "details": placed.details}
+            if placed.geojson is not None:
+                parcel["boundary_geojson_wgs84"] = placed.geojson
+        except Exception as exc:  # noqa: BLE001 -- placement is best-effort; never blocks a save
+            placement_info["notes"].append(f"placement attempt failed: {exc}")
+    elif verify:
+        placement_info["notes"].append("scale/rotation not calibrated, so no vertex can be bound to a surveyed coordinate")
+    if not verify:
+        placement_info = {"status": "pending", "notes": ["placement verification is running in the background"]}
+    parcel["placement"] = placement_info
+
+    # Re-run the normal area-mismatch/self-intersection checks
+    # against the CONFIRMED shape, using whatever calls vision
+    # already resolved for this parcel purely as the source of the
+    # stated-area/OCR-text cross-check -- not to re-walk anything.
+    region_ocr_text = region.get("ocr_text") or "" if len(parcels) == 1 else ""
+    parcel["spatial_validation"] = validate_traverse(
+        traverse,
+        region_ocr_text,
+        stated_area_acres=parcel.get("vision_geometry", {}).get("stated_area_acres"),
+        calls=parcel.get("resolved_boundary_calls"),
+    )
+    parcel["boundary_source"] = boundary_source
+    parcel["calibration"] = {
+        "status": calibration_info.status,
+        "scale_ft_per_px": calibration_info.scale_ft_per_px,
+        "rotation_deg": calibration_info.rotation_deg,
+        "scale_from_area": calibration_info.scale_from_area,
+        "scale_from_edges": calibration_info.scale_from_edges,
+        "scale_agreement_pct": calibration_info.scale_agreement_pct,
+        "corroborating_edge_count": calibration_info.corroborating_edge_count,
+        "notes": calibration_info.notes,
+        "corroborations": calibration_info.corroborations,
+        "independent_bearing_edges": calibration_info.independent_bearing_edges,
+        "quadrant_resolved_edges": calibration_info.quadrant_resolved_edges,
+    }
+    parcel.pop("georeference_error", None)
+
+
+def _verify_confirmation(document_id: str, body, confirmation_id: str) -> None:
+    """
+    Background half of confirm-boundary: runs calibration and absolute
+    placement on a snapshot (slow -- OCR and a Gemini call, no lock held),
+    then writes the result onto the parcel -- unless the user re-confirmed
+    it in the meantime, in which case the newer confirmation's own
+    verification wins.
+    """
+
+    scratch = None
+    failure = None
+    try:
+        snapshot = _load_result(document_id)
+        located = _locate_parcel(snapshot, body)
+        if located is None:
+            return
+        region, parcels, parcel = located
+        if (parcel.get("confirmed_boundary_pixels") or {}).get("id") != confirmation_id:
+            return
+        anchor_lat, anchor_lon = _anchor_for(snapshot, parcel)
+        scratch = copy.deepcopy(parcel)
+        _derive_confirmed_geometry(
+            document_id, body, snapshot, region, parcels, scratch, anchor_lat, anchor_lon, verify=True
+        )
+    except Exception as exc:  # noqa: BLE001 -- never leave a parcel "pending" forever
+        failure = f"{type(exc).__name__}: {exc}"
+        logging.getLogger(__name__).warning("verification failed for %s: %s", document_id, failure)
+
+    with _RESULT_LOCK:
+        try:
+            result = _load_result(document_id)
+        except HTTPException:
+            return
+        located = _locate_parcel(result, body)
+        if located is None:
+            return
+        parcel = located[2]
+        if (parcel.get("confirmed_boundary_pixels") or {}).get("id") != confirmation_id:
+            return
+        if scratch is None:
+            parcel["calibration"] = {
+                "status": "unverified", "scale_ft_per_px": None, "rotation_deg": None,
+                "corroborating_edge_count": 0, "notes": [f"verification failed: {failure}"], "corroborations": [],
+            }
+            parcel["placement"] = {"status": "approximate", "notes": [f"verification failed: {failure}"]}
         else:
-            points = old_local_points
-            boundary_source = "manual_confirmed_uncalibrated"
-            if calibration_info.status == "unverified" and not calibration_info.notes:
-                calibration_info.notes.append("no calibration evidence found; using inherited scale/rotation from the original seed.")
+            for key in _DERIVED_PARCEL_KEYS:
+                if key in scratch:
+                    parcel[key] = scratch[key]
+            parcel.pop("georeference_error", None)
+        _save_result(document_id, result)
 
-        # The confirmed ring is already closed by construction (it's a
-        # human-drawn shape, not a directional walk) -- closure_error_ft
-        # is 0 here, honestly, not because closure was achieved but
-        # because there's no accumulated-error walk to measure.
-        traverse = TraverseResult(points=points, closure_error_ft=0.0, unparsed_calls=0)
 
-        parcel["boundary_geojson"] = traverse_to_geojson(traverse)
-        parcel["boundary_geojson_wgs84"] = georeference_traverse_to_geojson(
-            traverse, anchor_lat, anchor_lon
+@router.post("/{document_id}/confirm-boundary")
+def confirm_boundary(
+    document_id: str, body: ConfirmBoundaryRequest, background_tasks: BackgroundTasks, wait: bool = False
+):
+    """
+    Confirm-and-edit boundary review: stores a human-confirmed/
+    corrected polygon (in region-crop pixel space) on the parcel and,
+    when local_vertices is provided, places it on the map right away at
+    the document anchor -- replacing boundary_geojson/
+    boundary_geojson_wgs84/spatial_validation with ones built from the
+    confirmed contour. Saving never waits on verification: calibration
+    and absolute placement run afterwards in the background and update the
+    parcel when done (calibration.status/placement.status are "pending"
+    until then). `wait=true` runs them inline instead (diagnostics).
+    The original vision_geometry/resolved_boundary_calls are left alone
+    for comparison -- only the derived geometry is replaced.
+    """
+
+    with _RESULT_LOCK:
+        result = _load_result(document_id)
+
+        page = next(
+            (p for p in result["pages"] if p["page_number"] == body.page_number), None
         )
-        parcel["boundary_geojson_wgs84"]["properties"]["georeferenced"] = "from_confirmed_boundary"
+        if page is None:
+            raise HTTPException(status_code=404, detail=f"No page {body.page_number}")
+        if not (0 <= body.region_index < len(page["regions"])):
+            raise HTTPException(status_code=404, detail="Region index out of range")
+        region = page["regions"][body.region_index]
+        parcels = region.get("parcels") or []
+        if not (0 <= body.parcel_index < len(parcels)):
+            raise HTTPException(status_code=404, detail="Parcel index out of range")
+        parcel = parcels[body.parcel_index]
 
-        # --- absolute placement (separate from calibration) ---
-        # The line above puts local (0,0) at the document anchor, which is
-        # never checked to be a point of THIS parcel (on NVZ it is a section-
-        # corner control monument, ~2,600 ft away). Replace it only when a
-        # confirmed vertex can be bound to a printed parcel-corner coordinate
-        # in a CRS the sheet states; otherwise keep it but mark it approximate.
-        # Needs calibrated shape AND orientation, so only when calibration is placeable.
-        placement_info = {"status": placement_service.PLACEMENT_APPROXIMATE,
-                          "notes": ["position comes from the document-level anchor, which is not tied to any vertex of this parcel"]}
-        if boundary_source == "manual_confirmed_calibrated" and calibration_ocr_lines is not None:
-            try:
-                sheet_text = "\n".join(
-                    [ln.text for ln in calibration_ocr_lines]
-                    + [r.get("ocr_text") or "" for pg in result.get("pages", []) for r in pg.get("regions", [])]
-                )
-                placed = placement_service.place(polygon_page_px, points, calibration_ocr_lines, sheet_text)
-                placement_info = {"status": placed.status, "notes": placed.notes, "details": placed.details}
-                if placed.geojson is not None:
-                    parcel["boundary_geojson_wgs84"] = placed.geojson
-            except Exception as exc:  # noqa: BLE001 -- placement is best-effort; never blocks a save
-                placement_info["notes"].append(f"placement attempt failed: {exc}")
-        elif boundary_source != "manual_confirmed_calibrated":
-            placement_info["notes"].append("scale/rotation not calibrated, so no vertex can be bound to a surveyed coordinate")
-        parcel["placement"] = placement_info
+        if len(body.vertices) < 3:
+            raise HTTPException(status_code=400, detail="A boundary needs at least 3 vertices")
 
-        # Re-run the normal area-mismatch/self-intersection checks
-        # against the CONFIRMED shape, using whatever calls vision
-        # already resolved for this parcel purely as the source of the
-        # stated-area/OCR-text cross-check -- not to re-walk anything.
-        region_ocr_text = region.get("ocr_text") or "" if len(parcels) == 1 else ""
-        parcel["spatial_validation"] = validate_traverse(
-            traverse,
-            region_ocr_text,
-            stated_area_acres=parcel.get("vision_geometry", {}).get("stated_area_acres"),
-            calls=parcel.get("resolved_boundary_calls"),
-        )
-        parcel["boundary_source"] = boundary_source
-        parcel["calibration"] = {
-            "status": calibration_info.status,
-            "scale_ft_per_px": calibration_info.scale_ft_per_px,
-            "rotation_deg": calibration_info.rotation_deg,
-            "scale_from_area": calibration_info.scale_from_area,
-            "scale_from_edges": calibration_info.scale_from_edges,
-            "scale_agreement_pct": calibration_info.scale_agreement_pct,
-            "corroborating_edge_count": calibration_info.corroborating_edge_count,
-            "notes": calibration_info.notes,
-            "corroborations": calibration_info.corroborations,
-            "independent_bearing_edges": calibration_info.independent_bearing_edges,
-            "quadrant_resolved_edges": calibration_info.quadrant_resolved_edges,
+        confirmation_id = uuid4().hex
+        parcel["confirmed_boundary_pixels"] = {
+            "vertices": body.vertices,
+            "crop_width": body.crop_width,
+            "crop_height": body.crop_height,
+            "id": confirmation_id,
         }
-        parcel.pop("georeference_error", None)
-        georeferenced_from_confirmation = True
+        parcel["human_confirmed"] = True
 
-    _save_result(document_id, result)
+        georeferenced_from_confirmation = False
+        anchor_lat, anchor_lon = _anchor_for(result, parcel)
+
+        if body.local_vertices and len(body.local_vertices) >= 3 and anchor_lat is not None and anchor_lon is not None:
+            _derive_confirmed_geometry(
+                document_id, body, result, region, parcels, parcel, anchor_lat, anchor_lon, verify=wait
+            )
+            georeferenced_from_confirmation = True
+            if not wait:
+                background_tasks.add_task(_verify_confirmation, document_id, body, confirmation_id)
+
+        _save_result(document_id, result)
 
     return {
         "document_id": document_id,

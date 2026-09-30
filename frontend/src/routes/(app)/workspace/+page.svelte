@@ -71,6 +71,31 @@
     }
   });
 
+  // Verification runs in the background after a boundary is confirmed
+  // (calibration.status === 'pending'); refresh the document until it lands.
+  $: hasPendingVerification = (result?.pages ?? []).some((pg: any) =>
+    (pg.regions ?? []).some((r: any) => (r.parcels ?? []).some((pc: any) => pc.calibration?.status === 'pending'))
+  );
+  let pendingTimer: ReturnType<typeof setInterval> | null = null;
+  $: if (hasPendingVerification && documentId && !usingSample) {
+    if (!pendingTimer) pendingTimer = setInterval(refreshPending, 4000);
+  } else if (pendingTimer) {
+    clearInterval(pendingTimer);
+    pendingTimer = null;
+  }
+  async function refreshPending() {
+    if (!documentId) return;
+    try {
+      const res = await fetch(`${API_BASE}/documents/${documentId}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      result = data.result;
+      queueMicrotask(renderMap);
+    } catch {
+      // transient -- try again on the next tick
+    }
+  }
+
   // Manual boundary confirmation (/boundary-review) is a step of the main
   // flow, offered only for the parcels ROAM's ParcelMap selection picked --
   // see $lib/boundaryCandidates.
@@ -226,7 +251,7 @@
       const shapeOk = parcel.spatial_validation?.valid;
       const locationPrecision = parcelLocationPrecision(parcel);
       const gate = calibrationGate(parcel);
-      const color = gate === 'unconfirmed'
+      const color = gate === 'unconfirmed' || gate === 'pending'
         ? '#6b6a63' // never green/amber for an uncorroborated placement -- see calibrationGate()
         : shapeOk
           ? (parcel.human_confirmed
@@ -463,9 +488,10 @@
   // parcels never run through confirm-boundary at all are unaffected:
   // calibration doesn't apply to them, so they fall through to the
   // pre-existing shape/anchor-precision verdict unchanged.
-  function calibrationGate(parcel: any): 'not_applicable' | 'placeable' | 'unconfirmed' {
+  function calibrationGate(parcel: any): 'not_applicable' | 'placeable' | 'unconfirmed' | 'pending' {
     if (!parcel.human_confirmed) return 'not_applicable';
     const status = parcel.calibration?.status;
+    if (status === 'pending') return 'pending';
     if (status === 'cross_validated' || status === 'single_source') return 'placeable';
     // status === 'unverified', or calibration missing entirely despite
     // human_confirmed (no anchor to calibrate against) -- both mean the
@@ -493,6 +519,7 @@
       : locationPrecision === 'surveyed' || locationPrecision === 'manual';
     if (!parcel.spatial_validation) return { cls: 'high', label: 'No geometry' };
     const gate = calibrationGate(parcel);
+    if (gate === 'pending') return { cls: 'moderate', label: 'Verifying placement…' };
     if (gate === 'unconfirmed') {
       return {
         cls: 'unconfirmed',
@@ -915,6 +942,7 @@
 
   onDestroy(() => {
     stopPolling();
+    if (pendingTimer) clearInterval(pendingTimer);
     map?.remove();
   });
 </script>
@@ -1198,6 +1226,27 @@
                   </p>
                 {/if}
               </button>
+
+              {#if selectedKey === key && parcel.calibration}
+                {@const cal = parcel.calibration}
+                <details class="verify-details">
+                  <summary>Verification details</summary>
+                  <p>
+                    Scale/rotation: <strong>{cal.status === 'cross_validated' ? 'cross-validated' : cal.status === 'single_source' ? 'single source' : cal.status === 'pending' ? 'verifying…' : 'not verified'}</strong>
+                    {#if cal.scale_ft_per_px} · {cal.scale_ft_per_px.toFixed(4)} ft/px{/if}
+                    {#if cal.rotation_deg !== null && cal.rotation_deg !== undefined} · rotation {cal.rotation_deg.toFixed(1)}°{/if}
+                    · {cal.corroborating_edge_count} corroborating edge(s)
+                  </p>
+                  {#if parcel.placement}
+                    <p>Position: <strong>{parcel.placement.status === 'surveyed_corner' ? 'tied to a printed corner coordinate' : 'approximate (document anchor)'}</strong></p>
+                  {/if}
+                  {#if cal.notes?.length || parcel.placement?.notes?.length}
+                    <ul>
+                      {#each [...(cal.notes ?? []), ...(parcel.placement?.notes ?? [])] as note}<li>{note}</li>{/each}
+                    </ul>
+                  {/if}
+                </details>
+              {/if}
 
               {#if selectedKey === key && documentId}
                 <div class="review-tools">
@@ -1694,6 +1743,21 @@ h1 {
   vertical-align: middle;
 }
 
+.verify-details {
+  margin: 0 16px 10px;
+  font-size: 12px;
+  color: var(--ink-2, #55534b);
+}
+.verify-details summary {
+  cursor: pointer;
+}
+.verify-details p,
+.verify-details ul {
+  margin: 6px 0 0;
+}
+.verify-details ul {
+  padding-left: 18px;
+}
 .review-tools {
   padding: 0 16px 14px;
   display: flex;
