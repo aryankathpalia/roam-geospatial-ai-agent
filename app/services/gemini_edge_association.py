@@ -94,6 +94,13 @@ def parse_response(payload: dict, n_edges: int) -> list[dict]:
             continue
         dist = item.get("distance_ft")
         bearing_text = item.get("bearing_text")
+        if isinstance(bearing_text, str):
+            # Live Gemini (JSON mode) intermittently emits U+0000 where the
+            # degree sign belongs (seen 1 call in 18: 'N 61\x0053\'54" E'),
+            # which parse_bearing rejects, silently dropping every bearing in
+            # that response. Map exactly that character, only here -- the
+            # shared parser stays as strict as before.
+            bearing_text = bearing_text.replace("\x00", "\u00b0")
         az = parse_bearing(bearing_text) if bearing_text else None
         if not isinstance(dist, (int, float)) or isinstance(dist, bool) or not math.isfinite(dist) or dist <= 0:
             dist = None

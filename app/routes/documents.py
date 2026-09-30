@@ -537,6 +537,8 @@ def confirm_boundary(document_id: str, body: ConfirmBoundaryRequest):
             "corroborating_edge_count": calibration_info.corroborating_edge_count,
             "notes": calibration_info.notes,
             "corroborations": calibration_info.corroborations,
+            "independent_bearing_edges": calibration_info.independent_bearing_edges,
+            "quadrant_resolved_edges": calibration_info.quadrant_resolved_edges,
         }
         parcel.pop("georeference_error", None)
         georeferenced_from_confirmation = True
