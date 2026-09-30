@@ -657,6 +657,16 @@
                   {#each selected.parcel.calibration.notes as note}<li>{note}</li>{/each}
                 </ul>
               {/if}
+              {#if selected.parcel.calibration.corroborations?.length}
+                <ul class="calibration-notes">
+                  {#each selected.parcel.calibration.corroborations as c}
+                    <li>
+                      edge {c.edge_index}: {c.value}'{#if c.azimuth !== null && c.azimuth !== undefined} @ {c.azimuth.toFixed(1)}°{/if}
+                      ({c.pct_err}% off) — <strong>{c.source === 'gemini_association' ? 'Gemini association' : 'OCR proximity'}</strong>
+                    </li>
+                  {/each}
+                </ul>
+              {/if}
             </div>
           {/if}
 

@@ -57,6 +57,10 @@ class CalibrationResult:
     scale_agreement_pct: float | None
     corroborating_edge_count: int
     notes: list[str] = field(default_factory=list)
+    # Every printed value that matched an edge within tolerance at the
+    # chosen scale, tagged with where it came from ("ocr_proximity" or
+    # "gemini_association") -- never merged indistinguishably.
+    corroborations: list[dict] = field(default_factory=list)
 
 
 def _polygon_area(poly: list[tuple[float, float]]) -> float:
@@ -195,6 +199,7 @@ def calibrate(
     old_local_points: list[tuple[float, float]] | None = None,
     page_pivot: tuple[float, float] | None = None,
     local_pivot: tuple[float, float] | None = None,
+    extra_candidates: list[dict] | None = None,
 ) -> CalibrationResult:
     notes: list[str] = []
     n_edges = len(polygon_page_px)
@@ -228,7 +233,25 @@ def calibrate(
         length_px, angle_px = _edge_geom(polygon_page_px, edge_idx)
         if _text_orientation_diff(cand["line"].bbox, angle_px) > _EDGE_ASSOC_MAX_ORIENT_DIFF_DEG:
             continue
-        by_edge.setdefault(edge_idx, []).append({**cand, "dist_px": dist_px, "length_px": length_px, "angle_px": angle_px})
+        by_edge.setdefault(edge_idx, []).append(
+            {**cand, "source": "ocr_proximity", "dist_px": dist_px, "length_px": length_px, "angle_px": angle_px}
+        )
+
+    # Externally associated candidates (Gemini reading the polygon
+    # overlay). Association is already done (proximity/orientation are
+    # the OCR association step, not corroboration), but everything
+    # downstream -- area-guided prefilter, 3% match, 5% scale agreement,
+    # rotation consensus, 180deg disambiguation -- is the SAME code path.
+    for cand in extra_candidates or []:
+        edge_idx = cand["edge_index"]
+        if not 0 <= edge_idx < n_edges or not cand.get("value"):
+            continue
+        length_px, angle_px = _edge_geom(polygon_page_px, edge_idx)
+        by_edge.setdefault(edge_idx, []).append({
+            "line": None, "value": cand["value"], "azimuth": cand.get("azimuth"),
+            "source": cand.get("source", "gemini_association"),
+            "dist_px": 0.0, "length_px": length_px, "angle_px": angle_px,
+        })
 
     # Independent per-edge scale estimate. Real plats routinely have
     # MORE THAN ONE printed number proximity-matched to the same edge --
@@ -300,6 +323,7 @@ def calibrate(
     # tighter 3% tolerance (the actual predict-and-verify-style check),
     # and among THOSE, the ones with a printed bearing solve rotation.
     corroborating_edges = []
+    corroborations: list[dict] = []
     rotation_candidates = []
     for edge_idx, cands in by_edge.items():
         length_px, angle_px = _edge_geom(polygon_page_px, edge_idx)
@@ -308,6 +332,10 @@ def calibrate(
             pct_err = abs(c["value"] - predicted_ft) / predicted_ft * 100 if predicted_ft else 999
             if pct_err <= _EDGE_MATCH_TOLERANCE_PCT:
                 corroborating_edges.append(edge_idx)
+                corroborations.append({
+                    "edge_index": edge_idx, "value": c["value"], "azimuth": c["azimuth"],
+                    "source": c["source"], "pct_err": round(pct_err, 2),
+                })
                 if c["azimuth"] is not None:
                     rotation_candidates.append((c["azimuth"] - angle_px) % 360)
 
@@ -368,7 +396,7 @@ def calibrate(
             status="unverified", scale_ft_per_px=chosen_scale, rotation_deg=None,
             scale_from_area=scale_from_area, scale_from_edges=scale_from_edges,
             scale_agreement_pct=scale_agreement_pct, corroborating_edge_count=len(corroborating_edges),
-            notes=notes,
+            notes=notes, corroborations=corroborations,
         )
 
     status = "cross_validated" if len(corroborating_edges) >= 2 else "single_source"
@@ -377,5 +405,5 @@ def calibrate(
         status=status, scale_ft_per_px=chosen_scale, rotation_deg=rotation_deg,
         scale_from_area=scale_from_area, scale_from_edges=scale_from_edges,
         scale_agreement_pct=scale_agreement_pct, corroborating_edge_count=len(corroborating_edges),
-        notes=notes,
+        notes=notes, corroborations=corroborations,
     )
