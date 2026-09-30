@@ -205,11 +205,14 @@
 
       const shapeOk = parcel.spatial_validation?.valid;
       const locationPrecision = parcelLocationPrecision(parcel);
-      const color = shapeOk
-        ? locationPrecision === 'surveyed' || locationPrecision === 'manual'
-          ? '#2f7a4f'
-          : '#c98a1a'
-        : '#c53b3b';
+      const gate = calibrationGate(parcel);
+      const color = gate === 'unconfirmed'
+        ? '#6b6a63' // never green/amber for an uncorroborated placement -- see calibrationGate()
+        : shapeOk
+          ? locationPrecision === 'surveyed' || locationPrecision === 'manual'
+            ? '#2f7a4f'
+            : '#c98a1a'
+          : '#c53b3b';
       const key = regionKey(page, i);
 
       const layer = L.geoJSON(parcel.boundary_geojson_wgs84, {
@@ -425,11 +428,43 @@
     return parcel.anchor_override ? 'manual' : anchorPrecision;
   }
 
+  // A confirmed boundary's SHAPE can close and match the stated area
+  // (spatial_validation.valid) while its real-world scale/rotation were
+  // never independently checked against anything the document actually
+  // prints -- that's what parcel.calibration.status tracks (see
+  // app/services/calibration.py), and it is a wholly separate question
+  // from shape validity or anchor precision. A parcel calibration marked
+  // "unverified" -- or one that was human_confirmed but never reached
+  // calibration at all, e.g. because this document has no usable anchor
+  // -- must never present as trusted here just because its outline
+  // happens to close and its anchor happens to be geocoded. Only
+  // parcels never run through confirm-boundary at all are unaffected:
+  // calibration doesn't apply to them, so they fall through to the
+  // pre-existing shape/anchor-precision verdict unchanged.
+  function calibrationGate(parcel: any): 'not_applicable' | 'placeable' | 'unconfirmed' {
+    if (!parcel.human_confirmed) return 'not_applicable';
+    const status = parcel.calibration?.status;
+    if (status === 'cross_validated' || status === 'single_source') return 'placeable';
+    // status === 'unverified', or calibration missing entirely despite
+    // human_confirmed (no anchor to calibrate against) -- both mean the
+    // same thing to a viewer: this placement was never corroborated.
+    return 'unconfirmed';
+  }
+
   function verdict(parcel: any) {
     const shapeOk = !!parcel.spatial_validation?.valid;
     const locationPrecision = parcelLocationPrecision(parcel);
     const locationOk = locationPrecision === 'surveyed' || locationPrecision === 'manual';
     if (!parcel.spatial_validation) return { cls: 'high', label: 'No geometry' };
+    const gate = calibrationGate(parcel);
+    if (gate === 'unconfirmed') {
+      return {
+        cls: 'unconfirmed',
+        label: parcel.calibration?.status === 'unverified'
+          ? 'Unconfirmed placement'
+          : 'Unconfirmed placement · no anchor'
+      };
+    }
     if (shapeOk && locationOk) return { cls: 'low', label: 'Verified' };
     if (shapeOk) return { cls: 'moderate', label: 'Shape OK · location approx.' };
     return { cls: 'high', label: 'Needs review' };

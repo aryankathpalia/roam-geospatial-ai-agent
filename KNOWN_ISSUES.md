@@ -157,6 +157,36 @@ three as one number — see `tests/regression/scoring.py` for why that split mat
   Parcel 2 (550.75' at 0.30%, 220.00' at 0.37%, 903.15' rejected at
   64.5% error) -- both now reach `cross_validated`.
 
+## Fixed and committed this session (2026-09-30)
+
+- **The workspace map could render an uncalibrated parcel as trusted
+  ("Verified", green).** `/workspace`'s `verdict()` and map-coloring logic
+  only checked `spatial_validation.valid` (does the drawn shape close and
+  match the stated area) and anchor precision -- neither has any
+  awareness of `parcel.calibration.status`, the field that actually
+  records whether a confirmed parcel's real-world scale/rotation were
+  ever independently corroborated against the document's own printed
+  evidence (see `app/services/calibration.py`, added earlier this
+  session). A parcel whose calibration is `unverified` -- or one that
+  was human-confirmed but never reached calibration at all, e.g. because
+  its document has no usable anchor -- could still show the green
+  "Verified" label and a green polygon on the real map if its shape
+  happened to close and its anchor happened to be geocoded, since those
+  are properties of the *shape*, not of whether its *placement* was ever
+  checked. Fixed by adding `calibrationGate()`
+  (`frontend/src/routes/(app)/workspace/+page.svelte`), which forces a
+  distinct "Unconfirmed placement" state (new `.pill.unconfirmed` style,
+  `frontend/src/app.css` -- deliberately not a shade of the existing
+  red/amber states, since this is a different concern from shape
+  validity or anchor precision) for any human-confirmed parcel whose
+  calibration is `unverified` or missing, before either the shape or
+  anchor checks run. Confirmed live: MAP 7 LOT 48 and LOT 48-3 (both
+  `calibration.status: "unverified"`) now show gray "Unconfirmed
+  placement" with a gray (`#6b6a63`) polygon, not green; NVZ Parcel 1 and
+  Parcel 2 (both `cross_validated`) are unaffected and still show green
+  "Verified" -- the fix doesn't over-trigger on genuinely placeable
+  parcels.
+
 ## Still open, not fixed this session
 
 - **Pre-calibration confirmed placements used an unvalidated display-fit
