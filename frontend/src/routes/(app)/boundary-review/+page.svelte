@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { boundaryRefs, type BoundaryRef } from '$lib/boundaryCandidates';
+  import { boundaryRefs, groupCandidates, type BoundaryRef } from '$lib/boundaryCandidates';
 
   // Boundary confirmation step of the main flow: /workspace links here
   // (?doc=<id>[&parcel=<page-region-parcel>]) after a document is
@@ -115,16 +115,17 @@
     }
   }
 
-  // Candidates vs. excluded is decided by the shared rule in
-  // $lib/boundaryCandidates (also used by /workspace's confirmation
-  // banner): likely vicinity-inset duplicates and regions vision triage
-  // called non-plat drawings are listed separately with a restore option
-  // -- an automated judgment call, not a silent deletion.
+  // Candidates are every parcel on a ParcelMap region except vicinity-inset
+  // duplicates, grouped by sheet with the most likely target sheet first (see
+  // $lib/boundaryCandidates). Vision triage only adds a hint -- it never
+  // hides a parcel.
   function flattenParcels(res: any): ParcelRef[] {
     const all = boundaryRefs(res);
     excludedParcels = all.filter((r) => r.excludedReason);
-    return all.filter((r) => !r.excludedReason);
+    return groupCandidates(all).flatMap((g) => g.refs);
   }
+
+  $: parcelGroups = groupCandidates(parcelRefs);
 
   let excludedParcels: ParcelRef[] = [];
 
@@ -451,7 +452,7 @@
   <header>
     <h1>Confirm parcel boundary</h1>
     <p class="hint">
-      Only parcels on the ParcelMap regions ROAM selected are listed. Pick the target parcel, drag
+      Parcels on the ParcelMap sheets ROAM found are listed by sheet, most likely target sheet first. Pick the target parcel, drag
       the outline onto its boundary on the drawing (seeded from a previous confirmation, else the
       vision-extracted calls, else a blank square), then Confirm. Confirming re-runs calibration and
       placement for that parcel.
@@ -569,27 +570,35 @@
     <div class="body">
       <aside>
         <h2>Parcels</h2>
-        <ul>
-          {#each parcelRefs as ref}
-            <li>
-              <button class:active={ref.key === selectedKey} on:click={() => selectParcel(ref)}>
-                {ref.label}
-                {#if ref.parcel.human_confirmed}<span class="badge">confirmed</span>{/if}
-              </button>
-            </li>
-          {/each}
-        </ul>
+        {#each parcelGroups as group}
+          <h3 class="sheet-heading">
+            Page {group.pageNumber}
+            {#if group.referencedNote}<span class="ref-badge" title={group.referencedNote}>referenced survey</span>{/if}
+          </h3>
+          {#if group.referencedNote}<p class="hint sheet-note">{group.referencedNote}</p>{/if}
+          <ul>
+            {#each group.refs as ref}
+              <li>
+                <button class:active={ref.key === selectedKey} on:click={() => selectParcel(ref)}>
+                  {ref.label}
+                  {#if ref.parcel.human_confirmed}<span class="badge">confirmed</span>{/if}
+                  {#if ref.hint}<span class="hint-tag">{ref.hint}</span>{/if}
+                </button>
+              </li>
+            {/each}
+          </ul>
+        {/each}
 
         {#if excludedParcels.length > 0}
           <h2 class="excluded-heading">Not offered by default ({excludedParcels.length})</h2>
           <p class="hint excluded-hint">
-            Likely vicinity/locus-map duplicates, or regions that don't look like a dimensioned
-            parcel drawing -- hover for the reason. Restore if this looks wrong.
+            Flagged as likely vicinity/locus-map duplicates of a parcel drawn elsewhere. Restore
+            if this looks wrong.
           </p>
           <ul>
             {#each excludedParcels as ref}
               <li class="excluded-item">
-                <span class="excluded-label" title={ref.excludedReason ?? ''}>{ref.label}</span>
+                <span class="excluded-label" title={ref.excludedReason ?? ''}>Page {ref.pageNumber} · {ref.label}</span>
                 <button class="restore-btn" on:click={() => restoreExcludedParcel(ref)}>Restore</button>
               </li>
             {/each}
@@ -896,6 +905,38 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     cursor: help;
+  }
+  .excluded-label {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  aside .restore-btn {
+    width: auto;
+  }
+  .sheet-heading {
+    margin: 0.9rem 0 0.25rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #55534b;
+  }
+  .ref-badge,
+  .hint-tag {
+    display: inline-block;
+    margin-left: 0.4rem;
+    padding: 0 0.35rem;
+    border-radius: 4px;
+    font-size: 0.68rem;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    background: #ecebe4;
+    color: #6b6a63;
+  }
+  .sheet-note {
+    margin: 0 0 0.3rem;
+    font-size: 0.72rem;
   }
   .restore-btn {
     flex-shrink: 0;
