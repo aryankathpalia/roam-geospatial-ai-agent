@@ -189,6 +189,83 @@ three as one number — see `tests/regression/scoring.py` for why that split mat
 
 ## Still open, not fixed this session
 
+- **A parcel's stored `spatial_validation` can silently go stale relative
+  to its own stored `resolved_boundary_calls`.** Investigated after the
+  Planned Utility Easement showed an apparent contradiction: its
+  `assembly_notes` claimed dropping a call ("`S87°30'20"W 1358.92'`")
+  left the remaining lines "closing and matching the stated acreage,"
+  while its stored `spatial_validation` showed a 72% area mismatch.
+  Direct reproduction (re-running `assemble_traverse` and `walk_traverse`
+  on the exact stored `resolved_boundary_calls`, fresh) shows the
+  assembly step's own claim is actually TRUE under current code -- 13.1%
+  area difference, within the 15% `_AREA_TOLERANCE` gate
+  (`app/services/geometry.py`) -- and does not reproduce the stored 72%
+  figure at all. **The stored `spatial_validation` does not match a
+  fresh recomputation from the document's own stored
+  `resolved_boundary_calls`.** Checked the same way across every
+  vertex-count-mismatched parcel found this session (see the topology
+  entry below) and found the identical symptom in all 4 of 4: MAP 7 LOT
+  48-3 (stored 9,120 sqft vs. fresh 18,451 sqft), Ada County Parcel 1
+  (stored 26,994 sqft vs. fresh 77,218 sqft), Payette Parcel 1 (stored
+  34,612 sqft vs. fresh 124,387 sqft), and the Easement (stored 12,393
+  sqft vs. fresh 50,756 sqft). Every one of these documents currently
+  carries a `spatial_validation` field that disagrees with what its own
+  `resolved_boundary_calls` actually produce today -- not a rare
+  coincidence, but the norm in this small sample. Root cause not
+  pinned down: `assemble_traverse`/`walk_traverse`/`validate_traverse`
+  are called together and store all three derived fields in the same
+  statement in both `document_pipeline.py` call sites checked
+  (`run_vision_stage` and `recompute_parcel_from_calls`), so nothing in
+  the code as it exists today explains how they drifted apart -- this
+  would need per-document processing history (which fields were
+  overwritten, when, by which pipeline version) that isn't currently
+  retained anywhere. **Do not treat a stored `result.json`'s
+  `spatial_validation` as authoritative for a parcel without a live
+  recompute against that same parcel's current `resolved_boundary_calls`
+  first** -- confirmed unreliable in every case checked this session.
+
+- **A human-confirmed boundary's vertex count routinely diverges from the
+  original extracted traverse's -- 4 of 7 parcels checked this session,
+  not a one-off.** Confirmed vertices vs. `resolved_boundary_calls`
+  count: NVZ Parcel 1 (4 vs. 4, match), NVZ Parcel 2 (4 vs. 4, match),
+  MAP 7 LOT 48 (7 vs. 7, match), **MAP 7 LOT 48-3 (6 vs. 5, mismatch),
+  Planned Utility Easement (4 vs. 5, mismatch), Ada County Parcel 1 (4
+  vs. 5, mismatch), Payette Parcel 1 (8 vs. 3, mismatch)**. This matters
+  for calibration specifically: edge-based corroboration assumes a
+  confirmed edge's nearest printed label is meaningful, which requires
+  the confirmed shape's edges to roughly correspond to the original
+  extraction's edges -- an assumption that silently breaks whenever a
+  human redraws a materially different shape.
+  Investigated per-parcel rather than assumed to share one cause, since
+  they don't:
+  - **Payette (8 vs. 3, the largest gap)**: the original extraction only
+    found 3 calls for what must be a much more complex real boundary --
+    a straightforward, already-documented extraction-completeness gap
+    (see "General accuracy beyond the NVZ document" below). The human
+    correctly traced the real, richer shape by hand. Not caused by any
+    assembly decision.
+  - **Ada County Parcel 1 and MAP 7 LOT 48-3**: same signature as
+    Payette -- fresh recomputation of their stored `resolved_boundary_calls`
+    still shows large area mismatches (44% and 75% respectively, see the
+    stale-`spatial_validation` entry above), meaning the original
+    extraction was genuinely incomplete/inaccurate for these too, not a
+    borderline case an assembly tweak could have saved.
+  - **Planned Utility Easement**: the one case traced to an actual
+    assembly decision (dropping `S87°30'20"W 1358.92'`) -- but that
+    decision is independently DEFENSIBLE under today's code (13.1% area
+    agreement, within the 15% tolerance; see the stale-data entry
+    above). The human's 4-vertex redraw doesn't correct a wrong
+    assembly choice so much as suggest the original 6-call extraction
+    had an extraneous or misattributed call in the first place (the
+    easement may simply have 4 real sides, not 5) -- an extraction
+    accuracy question, not an assembly-logic bug.
+  Net: vertex-count mismatch is common and worth tracking as its own
+  signal (e.g. surfaced distinctly from calibration status), but it is
+  NOT one bug with one fix -- three of four cases trace to ordinary
+  extraction incompleteness already tracked elsewhere in this document,
+  and the fourth traces to the stale-`spatial_validation` issue above,
+  not to a flaw in `assemble_traverse`'s own drop logic.
+
 - **Pre-calibration confirmed placements used an unvalidated display-fit
   scale, not a measured one.** Before `app/services/calibration.py` existed,
   `confirm_boundary` reprojected confirmed vertices by inheriting whatever
