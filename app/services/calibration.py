@@ -105,6 +105,71 @@ def _circular_diff(a: float, b: float, period: float = 360) -> float:
     return min(d, period - d)
 
 
+def _folded_consensus(rotations: list[float]) -> tuple[float, float]:
+    """(consensus rotation mod 180, max deviation from it) for rotations compared mod 180."""
+    folded = [r % 180 for r in rotations]
+    vecs = [(math.cos(math.radians(2 * r)), math.sin(math.radians(2 * r))) for r in folded]
+    mean_vec = (sum(v[0] for v in vecs) / len(vecs), sum(v[1] for v in vecs) / len(vecs))
+    consensus = (math.degrees(math.atan2(mean_vec[1], mean_vec[0])) / 2) % 180
+    return consensus, max(_circular_diff(r, consensus, period=180) for r in folded)
+
+
+def _entry_rotation(e: dict, flipped: bool = False) -> float:
+    """Rotation implied by one bearing entry; `flipped` swaps its quadrant (E<->W mirror)."""
+    az = (360 - e["azimuth"]) % 360 if flipped else e["azimuth"]
+    return (az - e["angle_px"]) % 360
+
+
+def _resolve_quadrants(entries: list[dict]) -> tuple[list[dict], list[str]]:
+    """
+    Quadrant-letter disambiguation. Transcription (Gemini and OCR alike)
+    is reliable on a bearing's digits but can get the trailing N/S/E/W
+    letter wrong -- confirmed on MAP 7 LOT 48 edge6 ("S 42 26'48\" E"
+    read, printed W). Mod 180 a bearing theta has exactly ONE alternative
+    reading, its mirror (flipping either letter gives the same folded
+    value), so "both plausible quadrants" is a binary choice.
+
+    Only runs when the as-read bearings DISAGREE (spread > tolerance).
+    Then, for each single entry, test whether mirroring just that one
+    makes ALL entries agree within the normal rotation tolerance. Accept
+    only if exactly one entry qualifies; if none do (would need 2+
+    letters wrong) or several do (ambiguous), change nothing and leave
+    the result to the ordinary agree/disagree check -- never guess.
+    Mutates the chosen entry's azimuth and returns (entries, notes).
+    """
+
+    notes: list[str] = []
+    if len(entries) < 2:
+        return entries, notes
+    _, spread = _folded_consensus([_entry_rotation(e) for e in entries])
+    if spread <= _ROTATION_AGREEMENT_TOLERANCE_DEG:
+        return entries, notes
+
+    fixes = []
+    for i, e in enumerate(entries):
+        rots = [_entry_rotation(x, flipped=(j == i)) for j, x in enumerate(entries)]
+        _, sp = _folded_consensus(rots)
+        if sp <= _ROTATION_AGREEMENT_TOLERANCE_DEG:
+            fixes.append(i)
+    if len(fixes) == 1:
+        e = entries[fixes[0]]
+        e["as_read_azimuth"] = e["azimuth"]
+        e["azimuth"] = (360 - e["azimuth"]) % 360
+        e["quadrant_resolved"] = True
+        notes.append(
+            f"quadrant disambiguation: edge{e['edge']} bearing read as {e['as_read_azimuth']:.2f}deg "
+            f"azimuth disagreed with the other edges; its mirrored-quadrant reading "
+            f"({e['azimuth']:.2f}deg) is the only single-letter change that makes all "
+            f"{len(entries)} bearings agree within {_ROTATION_AGREEMENT_TOLERANCE_DEG}deg -- accepted."
+        )
+    elif len(fixes) > 1:
+        notes.append(
+            f"quadrant disambiguation: bearings disagree and mirroring any one of edges "
+            f"{sorted(entries[i]['edge'] for i in fixes)} would make them agree -- ambiguous, not guessing."
+        )
+    return entries, notes
+
+
 def _text_orientation_diff(bbox, edge_angle_deg: float) -> float:
     x1, y1, x2, y2 = bbox
     w, h = abs(x2 - x1), abs(y2 - y1)
@@ -346,7 +411,7 @@ def calibrate(
     # and among THOSE, the ones with a printed bearing solve rotation.
     corroborating_edges = []
     corroborations: list[dict] = []
-    rotation_candidates = []
+    bearing_entries: list[dict] = []
     for edge_idx, cands in by_edge.items():
         length_px, angle_px = _edge_geom(polygon_page_px, edge_idx)
         predicted_ft = length_px * chosen_scale
@@ -354,12 +419,47 @@ def calibrate(
             pct_err = abs(c["value"] - predicted_ft) / predicted_ft * 100 if predicted_ft else 999
             if pct_err <= _EDGE_MATCH_TOLERANCE_PCT:
                 corroborating_edges.append(edge_idx)
-                corroborations.append({
+                corr = {
                     "edge_index": edge_idx, "value": c["value"], "azimuth": c["azimuth"],
                     "source": c["source"], "pct_err": round(pct_err, 2),
-                })
+                }
+                corroborations.append(corr)
                 if c["azimuth"] is not None:
-                    rotation_candidates.append((c["azimuth"] - angle_px) % 360)
+                    bearing_entries.append({
+                        "edge": edge_idx, "azimuth": c["azimuth"], "angle_px": angle_px, "corr": corr,
+                    })
+
+    # An edge whose own matched candidates imply different line
+    # orientations (two printed values both within tolerance of the same
+    # edge, one belonging to a neighbor -- confirmed on MAP 7 LOT 48
+    # edge1, where LOT 48-3's line intrudes) cannot be trusted either
+    # way: picking whichever candidate agrees with the rest would
+    # manufacture agreement. Exclude the whole edge from rotation
+    # evidence and from the corroborating count, and say so.
+    conflicted_edges = set()
+    for edge_idx in {e["edge"] for e in bearing_entries}:
+        rots = [_entry_rotation(e) % 180 for e in bearing_entries if e["edge"] == edge_idx]
+        if any(_circular_diff(a, b, period=180) > _ROTATION_AGREEMENT_TOLERANCE_DEG for a in rots for b in rots):
+            conflicted_edges.add(edge_idx)
+    for edge_idx in sorted(conflicted_edges):
+        notes.append(
+            f"edge{edge_idx} has multiple printed bearings that disagree on line orientation -- "
+            "excluded from rotation evidence and the corroborating count (not resolved)."
+        )
+        for corr in corroborations:
+            if corr["edge_index"] == edge_idx:
+                corr["conflicted"] = True
+    bearing_entries = [e for e in bearing_entries if e["edge"] not in conflicted_edges]
+    corroborating_edges = [e for e in corroborating_edges if e not in conflicted_edges]
+
+    bearing_entries, quadrant_notes = _resolve_quadrants(bearing_entries)
+    notes.extend(quadrant_notes)
+    for e in bearing_entries:
+        if e.get("quadrant_resolved"):
+            e["corr"]["as_read_azimuth"] = e["as_read_azimuth"]
+            e["corr"]["azimuth"] = e["azimuth"]
+            e["corr"]["quadrant_resolved"] = True
+    rotation_candidates = [_entry_rotation(e) for e in bearing_entries]
 
     corroborating_edges = sorted(set(corroborating_edges))
     rotation_deg = None
@@ -376,11 +476,7 @@ def calibrate(
         # axis, then disambiguate the resulting 180deg-apart pair of
         # absolute candidates using old_local_points as an independent
         # reference below.
-        folded = [r % 180 for r in rotation_candidates]
-        vecs = [(math.cos(math.radians(2 * r)), math.sin(math.radians(2 * r))) for r in folded]
-        mean_vec = (sum(v[0] for v in vecs) / len(vecs), sum(v[1] for v in vecs) / len(vecs))
-        consensus_folded = (math.degrees(math.atan2(mean_vec[1], mean_vec[0])) / 2) % 180
-        spread = max(_circular_diff(r, consensus_folded, period=180) for r in folded)
+        consensus_folded, spread = _folded_consensus(rotation_candidates)
         if spread <= _ROTATION_AGREEMENT_TOLERANCE_DEG:
             candidate_a, candidate_b = consensus_folded, (consensus_folded + 180) % 360
             if (

@@ -444,3 +444,24 @@ Failure (no key/quota) falls back to OCR-only with a note.
 Status: unit-tested with mocks only (tests/test_gemini_edge_association.py).
 The repeated-run evaluation on MAP 7 LOT 48 / LOT 48-3 and NVZ 1/2 still has to
 be run against real documents + a live key; no results exist yet.
+
+## Quadrant-letter disambiguation (implemented, UNCOMMITTED, live validation blocked)
+
+Failure mode: Gemini and PaddleOCR read a bearing's digits reliably but can get
+the trailing N/S/E/W letter wrong (MAP 7 LOT 48 edge6: read `S 42°26'48" E`,
+printed W). Mod 180 a bearing has exactly one alternative reading (its mirror),
+so the choice is binary. `calibration._resolve_quadrants` runs only when as-read
+bearings disagree: it accepts a mirror of ONE entry only if that single change
+makes all bearings agree within the normal 5deg tolerance and exactly one entry
+qualifies; none or several -> unchanged/flagged. Edges whose own matched
+candidates disagree on orientation (LOT 48 edge1) are excluded entirely from
+rotation evidence and the corroborating count (tagged `conflicted`), never
+resolved by picking the agreeing candidate.
+
+Status: unit-tested offline on real LOT 48 geometry/readings (edge6 -> W,
+334.73 vs edge3 335.44; edge1 excluded; unrelated bearings and symmetric
+ambiguity stay unverified). Live confirm cycles (LOT 48, LOT 48-3, Easement,
+NVZ) NOT run: PaddleOCR could not download models (aistudio.baidu.com,
+paddle-model-ecology.bj.bcebos.com, modelscope.cn, huggingface.co denied by the
+environment network policy). Known cost: with only 2 bearings, a random pair
+gets reconciled ~10% of the time by chance (scale match at 3% already gates it).
