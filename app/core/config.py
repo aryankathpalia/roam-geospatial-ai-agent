@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     # poor fallback (20 req/day free-tier cap, see above), and
     # gemini-2.5-flash-lite returns 404 for new users.
     GEMINI_FALLBACK_MODELS: str = "gemini-3.1-flash-lite"
+    # confirm-boundary calibration: one extra Gemini call per confirm
+    # (single polygon overlay) to read per-edge printed values OCR
+    # proximity misses. Candidates still pass calibration's normal checks.
+    CALIBRATION_GEMINI_ASSOCIATION: bool = True
 
 
 settings = Settings()

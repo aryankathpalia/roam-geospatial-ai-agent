@@ -427,3 +427,20 @@ three as one number — see `tests/regression/scoring.py` for why that split mat
 
 No further extraction fixes were made after this point in either session; the above
 reflects a deliberate stopping point for re-scoping, not an exhaustive fix pass.
+
+## Gemini edge association for calibration (built, NOT yet validated on real documents)
+
+`confirm_boundary` makes one extra Gemini call per confirm
+(`app/services/gemini_edge_association.py`, gated by
+`CALIBRATION_GEMINI_ASSOCIATION` + `GEMINI_API_KEY`): one padded crop, ONE
+polygon drawn with numbered edges, one target parcel. Do not broaden to
+multiple polygons / whole-sheet reads (tested worse twice). Candidates enter
+`calibrate(extra_candidates=...)` and go through the same prefilter, 3% match,
+5% scale agreement, rotation consensus and 180deg disambiguation as OCR ones.
+Each corroboration is stored in `parcel.calibration.corroborations` with
+`source` = `ocr_proximity` | `gemini_association` and shown in /boundary-review.
+Failure (no key/quota) falls back to OCR-only with a note.
+
+Status: unit-tested with mocks only (tests/test_gemini_edge_association.py).
+The repeated-run evaluation on MAP 7 LOT 48 / LOT 48-3 and NVZ 1/2 still has to
+be run against real documents + a live key; no results exist yet.

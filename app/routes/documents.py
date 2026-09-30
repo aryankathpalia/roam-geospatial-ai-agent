@@ -11,6 +11,7 @@ from fastapi.responses import StreamingResponse
 from PIL import Image
 from pydantic import BaseModel
 
+from app.core.config import settings
 from app.pipeline.document_pipeline import (
     process_document,
     recompute_parcel_from_calls,
@@ -21,6 +22,7 @@ from app.services.geometry import TraverseResult, traverse_to_geojson, walk_trav
 from app.services.region_cropper import PARCELMAP_CROP_MARGIN_FRAC, PARCELMAP_CROP_MARGIN_MIN_PX
 from app.services.ocr import run_parcelmap_ocr
 from app.services import calibration as calibration_service
+from app.services import gemini_edge_association
 from app.services.georeference import georeference_traverse_to_geojson
 from app.services.spatial_validation import validate_traverse
 
@@ -406,6 +408,23 @@ def confirm_boundary(document_id: str, body: ConfirmBoundaryRequest):
                 polygon_page_px = [(origin_x + x, origin_y + y) for x, y in body.vertices]
                 ocr_lines, _ = run_parcelmap_ocr(page_img)
 
+                # One Gemini call, one polygon, one crop (see
+                # gemini_edge_association). Best-effort: failure (no key,
+                # quota) leaves OCR-only calibration exactly as before.
+                gemini_candidates: list[dict] = []
+                gemini_note = None
+                if settings.CALIBRATION_GEMINI_ASSOCIATION and settings.GEMINI_API_KEY:
+                    try:
+                        crop_box = (
+                            int(origin_x), int(origin_y),
+                            int(min(page_w, bx + bw + mx)), int(min(page_h, by + bh + my)),
+                        )
+                        gemini_candidates = gemini_edge_association.associate_edges(
+                            page_img, crop_box, [tuple(v) for v in body.vertices],
+                        )
+                    except Exception as exc:  # noqa: BLE001
+                        gemini_note = f"gemini edge association failed ({type(exc).__name__}: {exc}); OCR-only."
+
                 # The pivot the ORIGINAL (uncalibrated) seed transform
                 # used: crop center in pixels <-> the true vision-
                 # extracted ring's own bounding-box center in local
@@ -451,7 +470,12 @@ def confirm_boundary(document_id: str, body: ConfirmBoundaryRequest):
             calibration_info = calibration_service.calibrate(
                 polygon_page_px, ocr_lines, stated_sqft,
                 old_local_points=old_local_points, page_pivot=page_pivot, local_pivot=local_pivot,
+                extra_candidates=gemini_candidates,
             )
+            if gemini_note:
+                calibration_info.notes.append(gemini_note)
+            if not gemini_note:
+                calibration_info.notes.append(f"gemini association returned {len(gemini_candidates)} edge reading(s)")
         except Exception as exc:  # noqa: BLE001 -- calibration is best-effort; never blocks a save
             calibration_info = calibration_service.CalibrationResult(
                 status="unverified", scale_ft_per_px=None, rotation_deg=None,
@@ -512,6 +536,7 @@ def confirm_boundary(document_id: str, body: ConfirmBoundaryRequest):
             "scale_agreement_pct": calibration_info.scale_agreement_pct,
             "corroborating_edge_count": calibration_info.corroborating_edge_count,
             "notes": calibration_info.notes,
+            "corroborations": calibration_info.corroborations,
         }
         parcel.pop("georeference_error", None)
         georeferenced_from_confirmation = True
