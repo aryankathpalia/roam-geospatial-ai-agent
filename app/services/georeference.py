@@ -126,8 +126,12 @@ def find_explicit_coordinates(pages_result: list[dict]) -> tuple[float, float] |
 # on a real document put unrelated text between them (the two labels
 # read out of visual order), so requiring them adjacent found nothing.
 # Matched by position (1st N pairs with 1st E, etc.) instead.
-_N_COORD_RE = re.compile(r"\bN[:：]\s*([\d.,]+)")
-_E_COORD_RE = re.compile(r"\bE[:：]\s*([\d.,]+)")
+# Colon optional: real sheets also print "N 14926910.28" / "E2251599.70"
+# (confirmed on NVZ page 9, whose parcel-corner coordinates were missed).
+# Without the colon a bearing ("N 22 51'56\" W") would otherwise match, so
+# the number must be coordinate-sized: 6+ digits before any decimal.
+_N_COORD_RE = re.compile(r"\bN[:：]?\s*(\d[\d,]{5,}(?:\.\d+)?)")
+_E_COORD_RE = re.compile(r"\bE[:：]?\s*(\d[\d,]{5,}(?:\.\d+)?)")
 _STATE_PLANE_VALIDATION_MILES = 60.0
 
 
@@ -422,25 +426,32 @@ _CORNER_SCORES = {
 
 def georeference_traverse_from_ground_corner(
     traverse: TraverseResult,
-    corner: str,
+    corner: str | int,
     ground_northing_ft: float,
     ground_easting_ft: float,
     epsg: int,
     grid_to_ground_factor: float,
 ) -> dict:
     """
-    Places a walked traverse so its `corner` ("NW"/"NE"/"SW"/"SE" --
-    the vertex extreme in that direction) sits at a surveyed ground
-    coordinate, then converts every vertex to WGS84. Ground coordinates
-    (and the traverse's ground distances) are scaled to grid by dividing
-    by grid_to_ground_factor before projecting. See the scope note above.
+    Places a walked traverse so its `corner` sits at a surveyed ground
+    coordinate, then converts every vertex to WGS84. `corner` is either
+    "NW"/"NE"/"SW"/"SE" (the vertex extreme in that direction) or an
+    int vertex index -- the index form is what a caller that has
+    identified WHICH vertex the coordinate labels should use (see
+    placement.py), since a direction extreme can be a different vertex
+    on a rotated or irregular shape. Ground coordinates (and the
+    traverse's ground distances) are scaled to grid by dividing by
+    grid_to_ground_factor before projecting. See the scope note above.
     """
 
     from pyproj import Transformer
 
     corners = traverse.points[:-1] if len(traverse.points) > 1 else traverse.points
-    score = _CORNER_SCORES[corner.upper()]
-    ax, ay = max(corners, key=lambda p: score(p[0], p[1]))
+    if isinstance(corner, int):
+        ax, ay = corners[corner]
+    else:
+        score = _CORNER_SCORES[corner.upper()]
+        ax, ay = max(corners, key=lambda p: score(p[0], p[1]))
 
     to_wgs84 = Transformer.from_crs(epsg, 4326, always_xy=True)
     ring_lonlat = []
@@ -458,7 +469,7 @@ def georeference_traverse_from_ground_corner(
             "closure_error_ft": traverse.closure_error_ft,
             "unparsed_calls": traverse.unparsed_calls,
             "georeferenced": "surveyed_ground_coordinate",
-            "anchor_corner": corner.upper(),
+            "anchor_corner": corner if isinstance(corner, int) else corner.upper(),
             "anchor_ground_ne_ft": [ground_northing_ft, ground_easting_ft],
             "epsg": epsg,
             "grid_to_ground_factor": grid_to_ground_factor,

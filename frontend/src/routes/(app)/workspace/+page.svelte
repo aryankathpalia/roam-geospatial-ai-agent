@@ -209,7 +209,9 @@
       const color = gate === 'unconfirmed'
         ? '#6b6a63' // never green/amber for an uncorroborated placement -- see calibrationGate()
         : shapeOk
-          ? locationPrecision === 'surveyed' || locationPrecision === 'manual'
+          ? (parcel.human_confirmed
+              ? confirmedPlacementOk(parcel)
+              : locationPrecision === 'surveyed' || locationPrecision === 'manual')
             ? '#2f7a4f'
             : '#c98a1a'
           : '#c53b3b';
@@ -451,10 +453,24 @@
     return 'unconfirmed';
   }
 
+  // Calibration only verifies scale/rotation. WHERE a confirmed polygon
+  // sits is parcel.placement.status (app/services/placement.py):
+  // "surveyed_corner" means one of its own vertices was bound to a printed
+  // parcel-corner coordinate in a CRS the sheet states. The document-level
+  // anchorPrecision can say "surveyed" merely because the sheet prints a
+  // control monument somewhere -- confirmed on NVZ, where that put Parcel 1
+  // ~2,600 ft off -- so it must not stand in for a confirmed parcel's own
+  // placement.
+  function confirmedPlacementOk(parcel: any): boolean {
+    return !!parcel.anchor_override || parcel.placement?.status === 'surveyed_corner';
+  }
+
   function verdict(parcel: any) {
     const shapeOk = !!parcel.spatial_validation?.valid;
     const locationPrecision = parcelLocationPrecision(parcel);
-    const locationOk = locationPrecision === 'surveyed' || locationPrecision === 'manual';
+    const locationOk = parcel.human_confirmed
+      ? confirmedPlacementOk(parcel)
+      : locationPrecision === 'surveyed' || locationPrecision === 'manual';
     if (!parcel.spatial_validation) return { cls: 'high', label: 'No geometry' };
     const gate = calibrationGate(parcel);
     if (gate === 'unconfirmed') {
