@@ -40,6 +40,11 @@ _EDGE_ASSOC_MAX_ORIENT_DIFF_DEG = 15
 _EDGE_MATCH_TOLERANCE_PCT = 3.0
 _SCALE_AGREEMENT_TOLERANCE_PCT = 5.0
 _ROTATION_AGREEMENT_TOLERANCE_DEG = 5.0
+# Tolerance for the quadrant-letter disambiguation fallback. Tighter than
+# the plain 5deg check on purpose: trying both quadrant options for every
+# bearing roughly doubles the chance that two UNRELATED bearings agree by
+# accident, so the extra freedom is paid for with a stricter agreement.
+_QUADRANT_RESOLUTION_TOLERANCE_DEG = 1.5
 # Loose sanity prefilter used only to pick, among several candidates
 # proximity-matched to the same edge, which one is even plausibly that
 # edge's own dimension -- not itself a pass/fail tolerance (that's
@@ -142,6 +147,61 @@ def _collect_candidate_numbers(lines: list[OCRLine]) -> list[dict]:
         if dist is not None:
             out.append({"line": line, "value": dist, "azimuth": None})
     return out
+
+
+def _resolve_quadrant_ambiguity(items: list[dict]) -> tuple[list[dict] | None, str]:
+    """
+    Fallback for when the as-read rotation candidates disagree.
+
+    A printed bearing's numeric core (e.g. 42 26'48") can be read
+    reliably while its quadrant letters are not (confirmed: Gemini read
+    S..E for S..W; PaddleOCR dropped the letters). Rotation is folded
+    mod 180, and flipping either letter maps the folded rotation to the
+    same single alternative, so each bearing has exactly TWO options:
+    as read, or (-az - angle_px) mod 180.
+
+    Each item is {"edge": int, "read": folded_rot, "alt": folded_rot}.
+    Choose the one rotation that is supported (read OR alt, within the
+    tight resolution tolerance) by the most DISTINCT edges. Accept only if:
+      - at least 2 distinct edges support it,
+      - it is the unique best (no rival cluster with equal support and
+        equal flips), and
+      - EVERY item lands in it -- one stray unresolved bearing means the
+        parcel's evidence is conflicting, so nothing is accepted.
+    Returns (resolved items with "chosen"/"flipped", note). Resolved is
+    None whenever it cannot be done unambiguously.
+    """
+
+    tol = _QUADRANT_RESOLUTION_TOLERANCE_DEG
+    best = None
+    ambiguous = False
+    for center in [v for it in items for v in (it["read"], it["alt"])]:
+        supp, flips, unresolved = set(), 0, 0
+        for it in items:
+            if _circular_diff(it["read"], center, period=180) <= tol:
+                supp.add(it["edge"])
+            elif _circular_diff(it["alt"], center, period=180) <= tol:
+                supp.add(it["edge"])
+                flips += 1
+            else:
+                unresolved += 1
+        score = (len(supp), -flips)
+        if best is None or score > best[0]:
+            best, ambiguous = (score, center, unresolved), False
+        elif score == best[0] and _circular_diff(center, best[1], period=180) > 2 * tol:
+            ambiguous = True
+    if best is None or best[0][0] < 2:
+        return None, "no rotation is supported by 2+ distinct edges under either quadrant option"
+    if ambiguous:
+        return None, "more than one rotation is equally supported under the quadrant options -- not guessing"
+    if best[2]:
+        return None, f"{best[2]} bearing(s) match no quadrant option of the best-supported rotation -- conflicting evidence, not resolving"
+    center = best[1]
+    out = []
+    for it in items:
+        as_read = _circular_diff(it["read"], center, period=180) <= tol
+        out.append({**it, "chosen": it["read"] if as_read else it["alt"], "flipped": not as_read})
+    return out, ""
 
 
 def reproject_page_px_to_local(
@@ -347,6 +407,7 @@ def calibrate(
     corroborating_edges = []
     corroborations: list[dict] = []
     rotation_candidates = []
+    rotation_items: list[dict] = []
     for edge_idx, cands in by_edge.items():
         length_px, angle_px = _edge_geom(polygon_page_px, edge_idx)
         predicted_ft = length_px * chosen_scale
@@ -360,6 +421,11 @@ def calibrate(
                 })
                 if c["azimuth"] is not None:
                     rotation_candidates.append((c["azimuth"] - angle_px) % 360)
+                    rotation_items.append({
+                        "edge": edge_idx, "corr": corroborations[-1],
+                        "read": (c["azimuth"] - angle_px) % 180,
+                        "alt": (-c["azimuth"] - angle_px) % 180,
+                    })
 
     corroborating_edges = sorted(set(corroborating_edges))
     rotation_deg = None
@@ -381,6 +447,30 @@ def calibrate(
         mean_vec = (sum(v[0] for v in vecs) / len(vecs), sum(v[1] for v in vecs) / len(vecs))
         consensus_folded = (math.degrees(math.atan2(mean_vec[1], mean_vec[0])) / 2) % 180
         spread = max(_circular_diff(r, consensus_folded, period=180) for r in folded)
+        quadrant_note = None
+        if spread > _ROTATION_AGREEMENT_TOLERANCE_DEG:
+            resolved, why = _resolve_quadrant_ambiguity(rotation_items)
+            if resolved is None:
+                quadrant_note = f"quadrant-letter disambiguation not applied: {why}."
+            else:
+                folded = [it["chosen"] for it in resolved]
+                vecs = [(math.cos(math.radians(2 * r)), math.sin(math.radians(2 * r))) for r in folded]
+                mean_vec = (sum(v[0] for v in vecs) / len(vecs), sum(v[1] for v in vecs) / len(vecs))
+                consensus_folded = (math.degrees(math.atan2(mean_vec[1], mean_vec[0])) / 2) % 180
+                spread = max(_circular_diff(r, consensus_folded, period=180) for r in folded)
+                for it in resolved:
+                    if it["flipped"]:
+                        corr = it["corr"]
+                        corr["quadrant_resolved"] = True
+                        corr["azimuth_as_read"] = corr["azimuth"]
+                        corr["azimuth"] = (360 - corr["azimuth"]) % 360
+                        notes.append(
+                            f"edge {it['edge']}: quadrant letter unconfirmed as read; the opposite quadrant "
+                            f"agrees with the other corroborating edge(s) on rotation, as-read does not -- "
+                            f"used the agreeing quadrant."
+                        )
+        if quadrant_note:
+            notes.append(quadrant_note)
         if spread <= _ROTATION_AGREEMENT_TOLERANCE_DEG:
             candidate_a, candidate_b = consensus_folded, (consensus_folded + 180) % 360
             if (

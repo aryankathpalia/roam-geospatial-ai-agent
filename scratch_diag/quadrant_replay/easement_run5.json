@@ -1,0 +1,14 @@
+{
+  "status": "unverified",
+  "scale_ft_per_px": 0.5545878822056473,
+  "rotation_deg": null,
+  "scale_from_area": 0.5545878822056473,
+  "scale_from_edges": null,
+  "scale_agreement_pct": null,
+  "corroborating_edge_count": 0,
+  "notes": [
+    "no corroborating edge has a printed bearing that agrees closely enough -- rotation unverified.",
+    "gemini association returned 0 edge reading(s)"
+  ],
+  "corroborations": []
+}
