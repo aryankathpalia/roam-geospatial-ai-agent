@@ -1,5 +1,12 @@
 <script lang="ts">
-  // Prototype screen: confirm-and-edit boundary review.
+  import { onMount } from 'svelte';
+  import { boundaryRefs, type BoundaryRef } from '$lib/boundaryCandidates';
+
+  // Boundary confirmation step of the main flow: /workspace links here
+  // (?doc=<id>[&parcel=<page-region-parcel>]) after a document is
+  // processed, and "Back to map" returns to /workspace?doc=<id>.
+  //
+  // Originally a prototype screen: confirm-and-edit boundary review.
   //
   // Separate from the main workspace page on purpose (see scoping
   // discussion) -- this isolates the vertex-drag interaction so it can
@@ -24,14 +31,7 @@
   let loading = false;
   let result: any = null;
 
-  type ParcelRef = {
-    key: string;
-    pageNumber: number;
-    regionIndex: number;
-    parcelIndex: number;
-    label: string;
-    parcel: any;
-  };
+  type ParcelRef = BoundaryRef;
 
   let parcelRefs: ParcelRef[] = [];
   let selectedKey: string | null = null;
@@ -64,17 +64,23 @@
   let localTransform: { scale: number; cx: number; cy: number; midX: number; midY: number } | null =
     null;
 
-  onMountLoadLast();
-  function onMountLoadLast() {
+  onMount(() => {
+    const params = new URLSearchParams(window.location.search);
+    const docParam = params.get('doc');
+    if (docParam) {
+      documentId = docParam;
+      loadDocument(params.get('parcel'));
+      return;
+    }
     try {
       const last = localStorage.getItem(LAST_DOCUMENT_KEY);
       if (last) documentId = last;
     } catch {
       // ignore -- localStorage unavailable, not fatal
     }
-  }
+  });
 
-  async function loadDocument() {
+  async function loadDocument(preferredKey: string | null = null) {
     if (!documentId.trim()) return;
     loading = true;
     loadError = '';
@@ -87,7 +93,19 @@
       const data = await res.json();
       result = data.result;
       parcelRefs = flattenParcels(result);
-      if (parcelRefs.length > 0) {
+      try {
+        localStorage.setItem(LAST_DOCUMENT_KEY, documentId.trim());
+      } catch {
+        // best-effort only
+      }
+      // A parcel asked for by key is brought into the list even if it was
+      // excluded by default -- the user chose it explicitly.
+      const excludedMatch = preferredKey ? excludedParcels.find((r) => r.key === preferredKey) : null;
+      if (excludedMatch) restoreExcludedParcel(excludedMatch);
+      const preferred = preferredKey ? parcelRefs.find((r) => r.key === preferredKey) : null;
+      if (preferred) {
+        selectParcel(preferred);
+      } else if (parcelRefs.length > 0) {
         selectParcel(parcelRefs[0]);
       }
     } catch (err: any) {
@@ -97,41 +115,15 @@
     }
   }
 
+  // Candidates vs. excluded is decided by the shared rule in
+  // $lib/boundaryCandidates (also used by /workspace's confirmation
+  // banner): likely vicinity-inset duplicates and regions vision triage
+  // called non-plat drawings are listed separately with a restore option
+  // -- an automated judgment call, not a silent deletion.
   function flattenParcels(res: any): ParcelRef[] {
-    const out: ParcelRef[] = [];
-    excludedParcels = [];
-    for (const page of res?.pages ?? []) {
-      (page.regions ?? []).forEach((region: any, regionIndex: number) => {
-        (region.parcels ?? []).forEach((parcel: any, parcelIndex: number) => {
-          const label =
-            parcel?.vision_geometry?.parcel_label ||
-            `Page ${page.page_number} · Region ${regionIndex} · Parcel ${parcelIndex + 1}`;
-          const ref: ParcelRef = {
-            key: `${page.page_number}-${regionIndex}-${parcelIndex}`,
-            pageNumber: page.page_number,
-            regionIndex,
-            parcelIndex,
-            label,
-            parcel
-          };
-          // Flagged by the pipeline as a probable vicinity/locus-map
-          // inset misclassified as a real ParcelMap region, duplicating
-          // a parcel already present from the actual drawing elsewhere
-          // in the document -- see flag_spurious_duplicate_parcelmap_regions
-          // in app/pipeline/document_pipeline.py. Kept out of the main
-          // list (nothing to confirm on a vicinity-map thumbnail) but
-          // still visible in its own section with a restore option --
-          // an automated judgment call, not a silent deletion; a
-          // reviewer who disagrees can bring it back into the main list.
-          if (parcel?.likely_duplicate_region) {
-            excludedParcels.push(ref);
-          } else {
-            out.push(ref);
-          }
-        });
-      });
-    }
-    return out;
+    const all = boundaryRefs(res);
+    excludedParcels = all.filter((r) => r.excludedReason);
+    return all.filter((r) => !r.excludedReason);
   }
 
   let excludedParcels: ParcelRef[] = [];
@@ -457,11 +449,15 @@
 
 <div class="page">
   <header>
-    <h1>Boundary confirm/edit — prototype</h1>
+    <h1>Confirm parcel boundary</h1>
     <p class="hint">
-      Standalone test screen. Loads an already-processed document, seeds a starting boundary shape
-      (confirmed &gt; traverse-derived &gt; blank), and lets you drag/add/delete vertices in absolute
-      pixel space before saving. Not wired into the main workspace review flow yet.
+      Only parcels on the ParcelMap regions ROAM selected are listed. Pick the target parcel, drag
+      the outline onto its boundary on the drawing (seeded from a previous confirmation, else the
+      vision-extracted calls, else a blank square), then Confirm. Confirming re-runs calibration and
+      placement for that parcel.
+      {#if documentId.trim()}
+        <a href={`/workspace?doc=${encodeURIComponent(documentId.trim())}`}>Back to map →</a>
+      {/if}
     </p>
   </header>
 
@@ -472,7 +468,7 @@
       bind:value={documentId}
       on:keydown={(e) => e.key === 'Enter' && loadDocument()}
     />
-    <button on:click={loadDocument} disabled={loading}>{loading ? 'Loading…' : 'Load'}</button>
+    <button on:click={() => loadDocument()} disabled={loading}>{loading ? 'Loading…' : 'Load'}</button>
     {#if loadError}<span class="error">{loadError}</span>{/if}
     {#if parcelRefs.length > 0}
       <span class="spacer" />
@@ -585,15 +581,15 @@
         </ul>
 
         {#if excludedParcels.length > 0}
-          <h2 class="excluded-heading">Excluded ({excludedParcels.length})</h2>
+          <h2 class="excluded-heading">Not offered by default ({excludedParcels.length})</h2>
           <p class="hint excluded-hint">
-            Flagged as likely vicinity/locus-map duplicates, not real parcel drawings -- see
-            each one's note. Restore if this looks wrong.
+            Likely vicinity/locus-map duplicates, or regions that don't look like a dimensioned
+            parcel drawing -- hover for the reason. Restore if this looks wrong.
           </p>
           <ul>
             {#each excludedParcels as ref}
               <li class="excluded-item">
-                <span class="excluded-label" title={ref.parcel.duplicate_note}>{ref.label}</span>
+                <span class="excluded-label" title={ref.excludedReason ?? ''}>{ref.label}</span>
                 <button class="restore-btn" on:click={() => restoreExcludedParcel(ref)}>Restore</button>
               </li>
             {/each}
@@ -631,8 +627,8 @@
             </button>
             {#if saveStatus === 'saving'}<span>saving…</span>{/if}
             {#if saveStatus === 'saved' && georeferenced}
-              <span class="ok">saved ✓ — projected to real-world coordinates, /workspace will show
-                this shape</span
+              <span class="ok">saved ✓ — projected to real-world coordinates.
+                <a href={`/workspace?doc=${encodeURIComponent(documentId.trim())}`}>View on map →</a></span
               >
             {:else if saveStatus === 'saved'}
               <span class="ok">saved ✓ (pixel shape only — not projected)</span>
