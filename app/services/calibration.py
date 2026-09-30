@@ -66,6 +66,14 @@ class CalibrationResult:
     # chosen scale, tagged with where it came from ("ocr_proximity" or
     # "gemini_association") -- never merged indistinguishably.
     corroborations: list[dict] = field(default_factory=list)
+    # Distinct edges whose bearing, AS READ, agrees with the accepted
+    # rotation. Only these can independently establish rotation, so only
+    # these count toward "cross_validated". A quadrant_resolved bearing was
+    # chosen BECAUSE it agrees, and a distance-only edge has no bearing at
+    # all -- both still support scale, neither independently confirms
+    # rotation.
+    independent_bearing_edges: list[int] = field(default_factory=list)
+    quadrant_resolved_edges: list[int] = field(default_factory=list)
 
 
 def _polygon_area(poly: list[tuple[float, float]]) -> float:
@@ -511,11 +519,28 @@ def calibrate(
             notes=notes, corroborations=corroborations,
         )
 
-    status = "cross_validated" if len(corroborating_edges) >= 2 else "single_source"
+    # Rotation is cross-validated only when 2+ DISTINCT edges independently
+    # read bearings that agree on it. corroborating_edges (distance matches)
+    # validates scale, not rotation: counting it here let one bearing plus a
+    # distance-only edge, or one bearing plus a quadrant-resolved bearing
+    # whose letter was picked to agree with it, read as cross_validated.
+    independent_bearing_edges = sorted({it["edge"] for it in rotation_items if not it["corr"].get("quadrant_resolved")})
+    quadrant_resolved_edges = sorted({it["edge"] for it in rotation_items if it["corr"].get("quadrant_resolved")})
+    status = "cross_validated" if len(independent_bearing_edges) >= 2 else "single_source"
     notes.append(f"{len(corroborating_edges)} corroborating edge(s): {corroborating_edges}")
+    notes.append(
+        f"{len(independent_bearing_edges)} edge(s) with an independently read agreeing bearing: {independent_bearing_edges}"
+        + (f"; quadrant-resolved (supporting only, not independent): {quadrant_resolved_edges}" if quadrant_resolved_edges else "")
+    )
+    if status == "single_source" and len(corroborating_edges) >= 2:
+        notes.append(
+            "scale is corroborated by 2+ edges, but rotation rests on fewer than 2 independently read "
+            "bearings -- single_source, not cross_validated."
+        )
     return CalibrationResult(
         status=status, scale_ft_per_px=chosen_scale, rotation_deg=rotation_deg,
         scale_from_area=scale_from_area, scale_from_edges=scale_from_edges,
         scale_agreement_pct=scale_agreement_pct, corroborating_edge_count=len(corroborating_edges),
         notes=notes, corroborations=corroborations,
+        independent_bearing_edges=independent_bearing_edges, quadrant_resolved_edges=quadrant_resolved_edges,
     )
