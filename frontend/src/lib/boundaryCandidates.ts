@@ -8,7 +8,7 @@
 // comment (document_pipeline.py, classify_regions) records that triage drops
 // 9 of 23 real plats when used as a gate, and confirmed on a real
 // application packet (WTDLP22-0003) that it hid the packet's own map. The
-// category is only a hint and a sort key. The only exclusion is the
+// category is only a sort key (never shown as a warning). The only exclusion is the
 // pre-existing vicinity-inset duplicate flag (likely_duplicate_region).
 //
 // Application packets attach older recorded surveys they cite as references.
@@ -31,8 +31,6 @@ export type BoundaryRef = {
   excludedReason: string | null;
   // Set when this parcel's sheet is a survey cited by another sheet.
   referencedNote: string | null;
-  // Soft hint shown next to the label.
-  hint: string | null;
 };
 
 export type BoundaryGroup = { pageNumber: number; referencedNote: string | null; refs: BoundaryRef[] };
@@ -96,13 +94,7 @@ export function boundaryRefs(result: any): BoundaryRef[] {
           excludedReason: parcel?.likely_duplicate_region
             ? (parcel.duplicate_note ?? 'Likely a vicinity/locus-map duplicate of a parcel drawn elsewhere.')
             : null,
-          referencedNote: referenced.get(page.page_number) ?? null,
-          hint:
-            region.category === 'undimensioned_drawing'
-              ? 'few/no bearing-distance labels'
-              : region.category === 'not_a_parcel_drawing'
-                ? 'may not be a parcel drawing'
-                : null
+          referencedNote: referenced.get(page.page_number) ?? null
         });
       });
     });

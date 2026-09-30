@@ -565,3 +565,20 @@ Easement document) have been live-tested; Ada County and Payette have not.
   669.6 x ~70 ft easement; nothing passes the distance gate, so it is untestable as-is.
 - Same-sheet scale inconsistency: NVZ Parcel 1 and 2 calibrate to 0.594 vs 0.655 ft/px on
   one page (each from its own stated area); not investigated.
+
+## Confirming a boundary no longer waits on, or shows, verification (2026-09-30)
+
+`/confirm-boundary` used to run OCR, a Gemini call and calibration before returning, and the
+review screen then printed the calibration notes (corroborating edges, bearing disagreements)
+in a red panel. It now saves the polygon and places it on the map at the document anchor
+immediately (`calibration.status` / `placement.status` = `pending`), then verifies in a
+background task and updates the parcel; the workspace shows "Verifying placement..." and
+refreshes itself, with the details in a collapsed "Verification details" section on the parcel
+card. `?wait=true` runs verification inline (the scratch_diag harness uses it). A re-confirm
+while a verification is running wins: the stale verification is discarded. Not covered: other
+endpoints (`/recompute`) still read-modify-write `result.json` without the new lock.
+
+Fixed at the same time: confirmed parcels passed `validate_traverse` an OPEN ring, which drops
+the closing edge, so a 345x225 ft rectangle measured half its area and every confirmed parcel
+showed a false ~50% area mismatch ("Needs review"). Parcels confirmed before this fix keep
+the wrong stored `spatial_validation` until they are confirmed again.
