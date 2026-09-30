@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
-  import { boundaryRefs } from '$lib/boundaryCandidates';
+  import { boundaryRefs, primaryCandidates } from '$lib/boundaryCandidates';
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
   const LAST_DOCUMENT_KEY = 'roam:lastDocumentId';
@@ -74,7 +74,7 @@
   // Manual boundary confirmation (/boundary-review) is a step of the main
   // flow, offered only for the parcels ROAM's ParcelMap selection picked --
   // see $lib/boundaryCandidates.
-  $: boundaryCandidates = !usingSample && result ? boundaryRefs(result).filter((r) => !r.excludedReason) : [];
+  $: boundaryCandidates = !usingSample && result ? primaryCandidates(boundaryRefs(result)) : [];
   $: boundaryConfirmedCount = boundaryCandidates.filter((r) => r.parcel.human_confirmed).length;
 
   function boundaryReviewHref(parcelKey?: string): string {
@@ -1048,7 +1048,7 @@
         <div class="location-banner panel" class:ok={boundaryConfirmedCount === boundaryCandidates.length}>
           <strong>Boundary confirmation:</strong>
           {boundaryConfirmedCount} of {boundaryCandidates.length} candidate parcel{boundaryCandidates.length === 1 ? '' : 's'} confirmed
-          <span class="location-source">— ROAM selected these from its ParcelMap regions. Confirm the target parcel's outline on the drawing to calibrate and place it.</span>
+          <span class="location-source">— parcels on ROAM's ParcelMap sheets, leaving out surveys cited only as references. Confirm the target parcel's outline on the drawing to calibrate and place it.</span>
           <a class="btn btn-ghost btn-sm" href={boundaryReviewHref()}>Confirm boundaries →</a>
         </div>
       {/if}
