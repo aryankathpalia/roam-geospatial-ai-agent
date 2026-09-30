@@ -1,0 +1,88 @@
+INFO:     Started server process [14860]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:58168 - "GET /documents/390d4d58-6a88-4e5d-8c21-41d90cafcdd8 HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 422, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\fastapi\applications.py", line 1163, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\starlette\applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\starlette\middleware\cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\starlette\routing.py", line 670, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\fastapi\routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\fastapi\routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\fastapi\routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\fastapi\routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\fastapi\routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\fastapi\routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\fastapi\routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\fastapi\routing.py", line 747, in app
+    response = actual_response_class(content, **response_args)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\starlette\responses.py", line 192, in __init__
+    super().__init__(content, status_code, headers, media_type, background)
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\starlette\responses.py", line 45, in __init__
+    self.body = self.render(content)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\starlette\responses.py", line 195, in render
+    return json.dumps(
+           ^^^^^^^^^^^
+  File "C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\json\encoder.py", line 200, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\json\encoder.py", line 258, in iterencode
+    return _iterencode(o, 0)
+           ^^^^^^^^^^^^^^^^^
+ValueError: Out of range float values are not JSON compliant: nan
+INFO:     127.0.0.1:58172 - "GET /documents/3ccb39f7-4a9f-4bad-b38a-c39d26fc57bc HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58194 - "GET /documents/3ccb39f7-4a9f-4bad-b38a-c39d26fc57bc HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56402 - "GET /documents/3ccb39f7-4a9f-4bad-b38a-c39d26fc57bc/pages/7/regions/3/crop.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59963 - "GET /documents/6ddcedc5-6247-454f-ba5d-293fe3b3bb07 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52608 - "GET /documents/6ddcedc5-6247-454f-ba5d-293fe3b3bb07 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59961 - "GET /documents/6ddcedc5-6247-454f-ba5d-293fe3b3bb07/pages/6/regions/0/crop.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54595 - "GET /documents/6ddcedc5-6247-454f-ba5d-293fe3b3bb07/pages/7/regions/3/crop.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58916 - "GET /documents/8d10744d-5a14-435f-bbd4-356930b94996 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64577 - "GET /documents/8d10744d-5a14-435f-bbd4-356930b94996/pages/13/regions/1/crop.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51569 - "GET /documents/8d10744d-5a14-435f-bbd4-356930b94996/pages/15/regions/0/crop.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63979 - "GET /documents/bec76ab0-f70c-482c-a2e2-71a18cec7ef9 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49379 - "GET /documents/bec76ab0-f70c-482c-a2e2-71a18cec7ef9/pages/11/regions/0/crop.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59790 - "GET /documents/6ddcedc5-6247-454f-ba5d-293fe3b3bb07 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54403 - "GET /documents/6cbca296-7d7e-4457-a66b-37f04a7c2628 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53846 - "GET /documents/6cbca296-7d7e-4457-a66b-37f04a7c2628/pages/28/regions/3/crop.png HTTP/1.1" 200 OK

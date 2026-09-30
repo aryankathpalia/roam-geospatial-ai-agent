@@ -1,0 +1,24 @@
+Here is the extracted information from the provided pieces of Region 5, based on your instructions:
+
+### Region 5, Piece 1:
+- **Parcel/Lot Label or Acreage:** 
+  - PARCEL A
+  - PARCEL B
+  - PARCEL C
+
+### Region 5, Piece 2:
+- **Boundary Bearing and Distance Call / Road Frontage:** 
+  - `N 01°51'34" E 1139.00'` (Appears to be along the road or a section/quarter line rather than an interior parcel boundary call in this view).
+  - `S 89°11'45" E 386.05'`
+
+### Region 5, Piece 3:
+- **Boundary Bearing and Distance Call:**
+  - `N 89°11'10" W 389.26'`
+  - `N 01°51'34" E 527.32'`
+
+### Region 5, Piece 4:
+- **Boundary Bearing and Distance Call / Road Frontage:**
+  - `N 89°11'45" W` (Distance obstructed/partially shown)
+  - `N 87°31'02" W`
+- **Basis-of-Bearings / Datum Statement:**
+  - `NORTH-SOUTH CENTERLINE OF SECTION, BEING NORTH 01°07'34" EAST AS SHOWN ON RECORD OF SURVEY RECORDED IN BOOK 15 OF SURVEYS AT PAGE 16, RECORDS OF SKAGIT COUNTY, WASHINGTON.`

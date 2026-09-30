@@ -1,0 +1,70 @@
+Region 1, Piece 1:
+
+- LOT 12A (parcel/lot label)
+- LOT 16 (parcel/lot label, within "LOT 16")
+- LOTS 15, 16, & 17 (parcel/lot label)
+- LOT 16B2 (parcel/lot label)
+- 16,235 SQUARE FEET (acreage/area statement)
+Region 1, Piece 1:
+
+- `LOT 15D` (parcel/lot label)
+- `RESUBDIVISION OF LOTS 15, 16 AND 17` (subdivision / reference label)
+- `IN STAGGS INDUSTRIAL DEVELOPMENT` (subdivision reference label)
+- `PLAT BOOK H-2, PAGE 51` (subdivision reference label)
+- `LOT 16B OF THE RESUBDIVISION OF` (subdivision / reference label)
+- `BETWEEN LOT 12 OF` (reference label)
+Region 1, Piece 1:
+
+- `20' WATERWAY` (label associated with the dashed-line waterway corridor)
+- `NTHWESTERLY* OF LOT 12` (partial parcel/lot label text visible)
+- `100.00'` (dimension/distance label)
+- `N52*` (partial bearing label along the property line)
+- *STAGGS INDUSTRIAL DEVELOPMENT PLAT* (plat title text in the upper right)
+- *STAGGS INDUSTRIAL DEVELOPMENT* / *OF LOTS 15, 16, & 17 IN STAGGS INDUS* (partial title text at the top)
+Region 1, Piece 1:
+- `* LOT 11 *` (parcel/lot label)
+- `GS INDUSTRIAL DEVELOPMENT * PLAT BOOK Z, PAGE 25` (plat reference / parcel label context)
+Region 1, Piece 1:
+
+- **LOT 16B2** (parcel/lot label under "LEGAL DESCRIPTION LOT 16B2:")
+- **CONTAINING AN AREA OF 20,008 SQUARE FEET OF LAND, MORE OR LESS.** (acreage / area statement)
+- **THE NORTHWESTERLY 8.30 FEET OF THE SOUTHEASTERLY 148.83 FEET OF LOT 16B** (parcel/lot label and dimensions under "PROPERTY TO EXCHANGE:")
+- **CONTAINING AN AREA OF 1,235 SQUARE FEET OF LAND, MORE OR LESS.** (acreage / area statement for the property to exchange)
+Region 1, Piece 1:
+- LOT 16A
+- `36'49"W 170.29'` (partial view of a boundary bearing and distance call, with the degrees portion cut off: `°36'49"W 170.29'`)
+Region 1, Piece 1:
+
+- **S37°08'00"W 100.00'** (boundary bearing and distance call)
+- **N52°52'00"W 50.00'** (boundary bearing and distance call)
+- **51.17'** (a measurement associated with the boundary line, possibly a record or alternative dimension next to the 50.00' call)
+- **S37°08'00"W 8.30'** (boundary bearing and distance call)
+- **S52°52'00"E 148.** (partial boundary bearing and distance call visible at the bottom)
+- **LOT 12A** (parcel/lot label)
+- **16,235 SF** (acreage/area label)
+- **NORTHWESTERN 50' OF LOT 12** (text describing a portion of a lot / parcel label context)
+Region 1, Piece 1:
+
+- N52°52'00"W 150.00' (boundary bearing and distance call)
+- S37°08'00"E 108.30' (boundary bearing and distance call, with text "STREET" and "R.O.W." nearby)
+- 12A / SF (appears to be a parcel/lot area or label fragment)
+Region 1, Piece 1:
+- CONTAINING AN AREA OF 1,235 SQUARE FEET OF LAND, MORE OR LESS. (Parcel area statement)
+
+*(Note: The remaining text consists of a legal description certification statement, surveyor details, and a licensed professional land surveyor stamp for John L. Bailey, Colorado P.L.S. No. 19586, which do not contain boundary calls, coordinates, basis of bearings, or parcel/lot labels outside of the area statement listed above.)*
+Region 1, Piece 1:
+- * LOT 17A * (parcel/lot label)
+- S76... (partial boundary bearing/distance call visible on the right edge)
+- S10°36'49" (partial bearing along the waterway)
+Region 1, Piece 1:
+
+- **LOT 16B2** (parcel/lot label)
+- **20,008 SF** (acreage/area label)
+- **S76°58'30"E 135.81'** (boundary bearing and distance call)
+- **N37°08'00"E 88.60'** (boundary bearing and distance call)
+- **0°E 148.83'** (partial boundary bearing and distance call, truncated by the edge of the piece)
+Region 1, Piece 1:
+
+- N37°08'00" [bearing fragment visible]
+- 88.60' [distance associated with the property boundary/line]
+- 29TH STREET (60' R.O.W.) [road right-of-way label]

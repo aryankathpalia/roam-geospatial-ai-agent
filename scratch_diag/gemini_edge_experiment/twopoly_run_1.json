@@ -1,0 +1,12 @@
+{
+  "shared_edge_calls": [
+    {
+      "distance_value": "322.74'",
+      "bearing": "S 59°41'15\" E",
+      "assigned_to": "blue (Lot 48)",
+      "evidence_location": "Central-right portion of the map, along the long diagonal boundary line between the main house parcel and Lot 48-3 transfer area.",
+      "confidence": 0.95,
+      "reasoning": "The text '322.74'' is placed directly along the long continuous line segment that forms the northeastern boundary of the blue polygon (Lot 48). It runs right on top of the blue line segment, making it part of Lot 48's perimeter definition."
+    }
+  ]
+}

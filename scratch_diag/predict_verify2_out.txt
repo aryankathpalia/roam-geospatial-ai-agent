@@ -1,0 +1,148 @@
+INFO: Could not find files for the given pattern(s).
+C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:718: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mCreating model: ('PP-LCNet_x1_0_doc_ori', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-LCNet_x1_0_doc_ori`.[0m
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I0928 19:31:31.707744 12636 onednn_context.cc:81] oneDNN v3.6.2
+[32mCreating model: ('PP-LCNet_x1_0_textline_ori', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-LCNet_x1_0_textline_ori`.[0m
+[32mCreating model: ('PP-OCRv5_mobile_det', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-OCRv5_mobile_det`.[0m
+[32mCreating model: ('PP-OCRv5_mobile_rec', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-OCRv5_mobile_rec`.[0m
+
+========================================================================
+nvz_parcel1  (6d8534f5 / 'PARCEL 1')
+========================================================================
+page=9  vertices=4  pixel_area=180092px^2  stated_sqft=77537  scale=0.6562 ft/px
+  tol=2%: 3 matches, 3/4 edges covered
+  tol=3%: 3 matches, 3/4 edges covered
+    edge0 (pred=353.0ft): '352.40' dist_px=7 err=0.2%
+    edge1 (pred=220.0ft): 'S0°48\'45"W220.00°' dist_px=5 err=0.0%
+    edge2 (pred=352.3ft): '352.40' dist_px=6 err=0.0%
+  tol=5%: 3 matches, 3/4 edges covered
+  SANITY CHECK: 1/4 edges have NO matching printed label at any tolerance up to 5% -> partially unverified (edges [3] uncorroborated)
+  large-value check: '2107.74' value=2107.74 -> REJECTED (correct) (err=858.3%, dist=172px)
+  large-value check: '1077.91' value=1077.91 -> REJECTED (correct) (err=390.1%, dist=59px)
+  large-value check: '550.75' value=550.75 -> REJECTED (correct) (err=150.6%, dist=466px)
+  large-value check: 'N89*11\'15"W 903.15"' value=903.15 -> REJECTED (correct) (err=155.8%, dist=155px)
+  large-value check: '29629' value=29629.0 -> REJECTED (correct) (err=8293.2%, dist=160px)
+  large-value check: '0032168' value=32168.0 -> REJECTED (correct) (err=9012.5%, dist=39px)
+  large-value check: '420524' value=420524.0 -> REJECTED (correct) (err=119025.0%, dist=687px)
+
+========================================================================
+nvz_parcel2  (6d8534f5 / 'PARCEL 2')
+========================================================================
+page=9  vertices=4  pixel_area=282433px^2  stated_sqft=121097  scale=0.6548 ft/px
+  tol=2%: 2 matches, 2/4 edges covered
+  tol=3%: 2 matches, 2/4 edges covered
+    edge0 (pred=219.2ft): 'N0°48\'45"E 220.00*' dist_px=7 err=0.4%
+    edge3 (pred=549.1ft): '550.75' dist_px=6 err=0.3%
+  tol=5%: 2 matches, 2/4 edges covered
+  SANITY CHECK: 2/4 edges have NO matching printed label at any tolerance up to 5% -> partially unverified (edges [1, 2] uncorroborated)
+  large-value check: '2107.74' value=2107.74 -> REJECTED (correct) (err=281.3%, dist=700px)
+  large-value check: '1077.91' value=1077.91 -> REJECTED (correct) (err=389.0%, dist=595px)
+  large-value check: '550.75' value=550.75 -> MATCHED (unexpected) (err=0.3%, dist=6px)
+  large-value check: 'N89*11\'15"W 903.15"' value=903.15 -> REJECTED (correct) (err=64.5%, dist=7px)
+  large-value check: '29629' value=29629.0 -> REJECTED (correct) (err=13341.1%, dist=702px)
+  large-value check: '0032168' value=32168.0 -> REJECTED (correct) (err=14492.9%, dist=423px)
+  large-value check: '420524' value=420524.0 -> REJECTED (correct) (err=190668.9%, dist=1029px)
+
+========================================================================
+map7lot48  (3ea4cc01 / 'MAP 7 LOT 48')
+========================================================================
+page=13  vertices=7  pixel_area=431616px^2  stated_sqft=41382  scale=0.3096 ft/px
+  tol=2%: 0 matches, 0/7 edges covered
+  tol=3%: 0 matches, 0/7 edges covered
+  tol=5%: 0 matches, 0/7 edges covered
+  SANITY CHECK: 7/7 edges have NO matching printed label at any tolerance up to 5% -> shape or placement UNVERIFIED (zero corroboration at all)
+  large-value check: '81072' value=81072.0 -> REJECTED (correct) (err=38414.6%, dist=425px)
+  large-value check: '.26602' value=26602.0 -> REJECTED (correct) (err=12537.7%, dist=431px)
+  large-value check: '03038' value=3038.0 -> REJECTED (correct) (err=1343.3%, dist=639px)
+  large-value check: '03038' value=3038.0 -> REJECTED (correct) (err=4450.2%, dist=73px)
+  large-value check: '36607' value=36607.0 -> REJECTED (correct) (err=15958.5%, dist=1205px)
+  large-value check: '89960' value=89960.0 -> REJECTED (correct) (err=39363.1%, dist=1627px)
+  large-value check: '3013' value=3013.0 -> REJECTED (correct) (err=8725.6%, dist=734px)
+  large-value check: 'N225156W 9991' value=9991.0 -> REJECTED (correct) (err=4646.4%, dist=175px)
+
+========================================================================
+map7lot48-3  (3ea4cc01 / 'MAP 7 LOT 48-3')
+========================================================================
+page=13  vertices=6  pixel_area=786133px^2  stated_sqft=74923  scale=0.3087 ft/px
+  tol=2%: 0 matches, 0/6 edges covered
+  tol=3%: 0 matches, 0/6 edges covered
+  tol=5%: 0 matches, 0/6 edges covered
+  SANITY CHECK: 6/6 edges have NO matching printed label at any tolerance up to 5% -> shape or placement UNVERIFIED (zero corroboration at all)
+  large-value check: '81072' value=81072.0 -> REJECTED (correct) (err=48893.1%, dist=798px)
+  large-value check: '.26602' value=26602.0 -> REJECTED (correct) (err=15976.0%, dist=558px)
+  large-value check: '03038' value=3038.0 -> REJECTED (correct) (err=1735.9%, dist=650px)
+  large-value check: '03038' value=3038.0 -> REJECTED (correct) (err=4421.5%, dist=72px)
+  large-value check: '36607' value=36607.0 -> REJECTED (correct) (err=11891.2%, dist=924px)
+  large-value check: '89960' value=89960.0 -> REJECTED (correct) (err=29367.8%, dist=1008px)
+  large-value check: '3013' value=3013.0 -> REJECTED (correct) (err=887.0%, dist=136px)
+  large-value check: 'N225156W 9991' value=9991.0 -> REJECTED (correct) (err=5937.7%, dist=371px)
+
+========================================================================
+ada_parcel1  (bec76ab0 / 'PARCEL 1')
+========================================================================
+page=11  vertices=4  pixel_area=462308px^2  stated_sqft=53579  scale=0.3404 ft/px
+  tol=2%: 1 matches, 1/4 edges covered
+  tol=3%: 1 matches, 1/4 edges covered
+    edge0 (pred=316.4ft): "S8941'50E 314.20" dist_px=16 err=0.7%
+  tol=5%: 1 matches, 1/4 edges covered
+  SANITY CHECK: 3/4 edges have NO matching printed label at any tolerance up to 5% -> partially unverified (edges [1, 2, 3] uncorroborated)
+  large-value check: '918' value=918.0 -> REJECTED (correct) (err=442.2%, dist=68px)
+  large-value check: '08036' value=8036.0 -> REJECTED (correct) (err=4612.4%, dist=740px)
+
+========================================================================
+payette_parcel1  (6cbca296 / 'PARCEL 1')
+========================================================================
+page=28  vertices=8  pixel_area=189582px^2  stated_sqft=278305  scale=1.2116 ft/px
+  tol=2%: 1 matches, 1/8 edges covered
+  tol=3%: 1 matches, 1/8 edges covered
+    edge2 (pred=700.5ft): 'S692904E695.55' dist_px=12 err=0.7%
+  tol=5%: 2 matches, 2/8 edges covered
+  SANITY CHECK: 6/8 edges have NO matching printed label at any tolerance up to 5% -> partially unverified (edges [0, 1, 3, 5, 6, 7] uncorroborated)
+  large-value check: '2019' value=2019.0 -> REJECTED (correct) (err=188.2%, dist=231px)
+  large-value check: 'S692904E695.55' value=695.55 -> MATCHED (unexpected) (err=0.7%, dist=12px)
+  large-value check: '2342' value=2342.0 -> REJECTED (correct) (err=234.3%, dist=9px)
+  large-value check: '55021' value=55021.0 -> REJECTED (correct) (err=7754.9%, dist=6px)
+  large-value check: '1002' value=1002.0 -> REJECTED (correct) (err=43.0%, dist=7px)
+  large-value check: '61671' value=61671.0 -> REJECTED (correct) (err=47563.2%, dist=8px)
+  large-value check: '2442' value=2442.0 -> REJECTED (correct) (err=3992.8%, dist=194px)
+  large-value check: '165970' value=165970.0 -> REJECTED (correct) (err=23594.1%, dist=169px)
+  large-value check: '662' value=662.0 -> REJECTED (correct) (err=147.5%, dist=9px)
+  large-value check: '1074.6' value=1074.6 -> REJECTED (correct) (err=117.7%, dist=26px)
+  large-value check: '5557005' value=5557005.0 -> REJECTED (correct) (err=1125655.9%, dist=238px)
+  large-value check: '352316' value=352316.0 -> REJECTED (correct) (err=71273.3%, dist=309px)
+  large-value check: '10561' value=10561.0 -> REJECTED (correct) (err=17600.3%, dist=855px)
+  large-value check: '19042' value=19042.0 -> REJECTED (correct) (err=3757.6%, dist=1131px)
+
+========================================================================
+planned_utility_easement  (1600dbf6 / 'Planned Utility Easement')
+========================================================================
+page=6  vertices=4  pixel_area=145876px^2  stated_sqft=44867  scale=0.5546 ft/px
+  tol=2%: 0 matches, 0/4 edges covered
+  tol=3%: 0 matches, 0/4 edges covered
+  tol=5%: 0 matches, 0/4 edges covered
+  SANITY CHECK: 4/4 edges have NO matching printed label at any tolerance up to 5% -> shape or placement UNVERIFIED (zero corroboration at all)
+  large-value check: '1289.30' value=1289.3 -> REJECTED (correct) (err=327.3%, dist=333px)
+  large-value check: '09699' value=9699.0 -> REJECTED (correct) (err=3114.4%, dist=632px)
+  large-value check: "667.16'" value=667.16 -> REJECTED (correct) (err=121.1%, dist=89px)
+  large-value check: '1278.52' value=1278.52 -> REJECTED (correct) (err=323.7%, dist=320px)
+  large-value check: '2018' value=2018.0 -> REJECTED (correct) (err=569.9%, dist=739px)
+  large-value check: 'S87°30\'20"W 268501' value=268501.0 -> REJECTED (correct) (err=88884.8%, dist=358px)
+  large-value check: 'S00°37\'56"W 669.60' value=669.6 -> REJECTED (correct) (err=121.9%, dist=598px)
+  large-value check: 'N00°26\'29"E 667.16\'' value=667.16 -> REJECTED (correct) (err=121.1%, dist=81px)
+
+========================================================================
+SUMMARY
+========================================================================
+  nvz_parcel1: 4 edges, 1 fully unverified
+  nvz_parcel2: 4 edges, 2 fully unverified
+  map7lot48: 7 edges, 7 fully unverified
+  map7lot48-3: 6 edges, 6 fully unverified
+  ada_parcel1: 4 edges, 3 fully unverified
+  payette_parcel1: 8 edges, 6 fully unverified
+  planned_utility_easement: 4 edges, 4 fully unverified

@@ -1,0 +1,59 @@
+Here are the extracted boundary calls, tie lines, coordinate/datum statements, parcel/lot labels, and acreage measurements for each of the six pieces from Region 1, exactly as written:
+
+---
+
+### Region 1, Piece 1
+* **13719.0 SQ. FT.** (Parcel/lot area)
+* **0.31 ACRES** (Parcel/lot area)
+* **N 89°41'50" W** (Bearing/distance call near the western edge: **70.00'** is nearby, though broken across text/lines)
+* **S 89°41'50" E** (Bearing/distance call: **46.45'**)
+* **N 89°41'50" W** (Bearing/distance call: **48.16'**)
+* **N 34°41'50" W** (Bearing/distance call: **50.41'**)
+* **N 00°01'40" W** (Tie/offset line measurement: **88.05'** — appears to be a local offset/tie along the western property line referencing the highway right-of-way)
+* **S 89°41'50" E** (Top horizontal boundary call: spans the upper extent of this piece)
+* Additional vertical dimension calls: **39.00'**, **31.95'**, **170.00'**, **50.00'**, **2650.40'** (Section/quarter-section tie or subdivision bounding dimensions)
+
+---
+
+### Region 1, Piece 2
+* **53404.3 SQ. FT.** (Parcel/lot area)
+* **1.23 ACRES** (Parcel/lot area)
+* **NEW INGRESS-EGRESS EASEMENT** (Easement label)
+* **S 34°41'50" E** (Bearing/distance call: **50.41'**)
+* **S 89°41'50" E** (Bearing/distance call: **81.91'**)
+* **N 89°41'50" W** (Bearing/distance call: **92.11'**)
+* **N 89°41'50" W** (Bearing/distance call: **475.40'**)
+* **S 00°04'17" W** (Tie/dimension calls: **170.00'**, **20.00'**, **30.00'**)
+
+---
+
+### Region 1, Piece 3
+* **PARCEL 1 ROS No. 226** (Parcel/lot label)
+* **SCALE 1 INCH = 30 FT** (Scale statement, no other relevant boundary/coordinate/acreage data)
+
+---
+
+### Region 1, Piece 4
+* **S 00°01'40" E BASIS OF BEARINGS** (Basis of bearings / datum statement)
+* **N 89°41'50" W** (Bearing/distance call: **144.55'**)
+* **PLATTED E. RODEO LANE (PRIVATE)** (Road/right-of-way label)
+* **LOT 1 BLOCK 2 RODEO SUBDIVISION** (Parcel/lot label)
+* **227.84'** (Dimension associated with the platted subdivision boundary)
+* Vertical dimension call: **30.00'**
+
+---
+
+### Region 1, Piece 5
+* **PARCEL 1 ROS No. 7118** (Parcel/lot label)
+* **S 89°41'50" E** (Bearing/distance call: **189.46'** with a concurrent **14.00'** segment)
+
+---
+
+### Region 1, Piece 6
+* **LOT 1, BLOCK 1 RODEO SUBDIVISION** (Parcel/lot label)
+* **CURVE TABLE** entries:
+  * **C1**: RADIUS **115.00'**, ARC LENGTH **110.39'**, CHORD LENGTH **106.20'**, CHORD BEARING **S 62°11'50" E**, DELTA ANGLE **55°00'00"**
+  * **C2**: RADIUS **85.00'**, ARC LENGTH **62.40'**, CHORD LENGTH **61.03'**, CHORD BEARING **S 62°11'50" E**, DELTA ANGLE **42°00'00"**
+  * **C3**: RADIUS **115.00'**, ARC LENGTH **84.99'**, CHORD LENGTH **83.07'**, CHORD BEARING **S 88°31'33" E**, DELTA ANGLE **42°25'33"**
+  * **C4**: RADIUS **115.00'**, ARC LENGTH **25.41'**, CHORD LENGTH **25.35'**, CHORD BEARING **N 41°01'33" W**, DELTA ANGLE **12°39'27"**
+  * **C5**: RADIUS **85.00'**, ARC LENGTH **62.40'**, CHORD LENGTH **61.03'**, CHORD BEARING **N 62°11'50" W**, DELTA ANGLE **42°00'00"**

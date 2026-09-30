@@ -1,0 +1,3493 @@
+{
+  "document_id": "6d8534f5-f07a-460d-970f-4ccf5c40a3e4",
+  "inspection": {
+    "filename": "original.pdf",
+    "page_count": 11,
+    "metadata": {
+      "format": "PDF 1.6",
+      "title": "parcelmap_app_2026.pdf",
+      "author": "gsannazzaro",
+      "subject": "",
+      "keywords": "",
+      "creator": "Acrobat PDFMaker 15 for Word",
+      "producer": "Acrobat Distiller 26.0 (Windows)",
+      "creationDate": "D:20260415075130-07'00'",
+      "modDate": "D:20260415075310-07'00'",
+      "trapped": "",
+      "encryption": null
+    },
+    "pages": [
+      {
+        "page_number": 1,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": true,
+        "text_length": 255,
+        "image_count": 1
+      },
+      {
+        "page_number": 2,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": true,
+        "text_length": 3501,
+        "image_count": 0
+      },
+      {
+        "page_number": 3,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": true,
+        "text_length": 3303,
+        "image_count": 0
+      },
+      {
+        "page_number": 4,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": true,
+        "text_length": 1686,
+        "image_count": 0
+      },
+      {
+        "page_number": 5,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": true,
+        "text_length": 1726,
+        "image_count": 0
+      },
+      {
+        "page_number": 6,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": true,
+        "text_length": 1849,
+        "image_count": 0
+      },
+      {
+        "page_number": 7,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": true,
+        "text_length": 2796,
+        "image_count": 0
+      },
+      {
+        "page_number": 8,
+        "width": 792.0,
+        "height": 612.0,
+        "has_text": true,
+        "text_length": 3298,
+        "image_count": 1
+      },
+      {
+        "page_number": 9,
+        "width": 792.0,
+        "height": 612.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 0
+      },
+      {
+        "page_number": 10,
+        "width": 792.0,
+        "height": 612.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 0
+      },
+      {
+        "page_number": 11,
+        "width": 792.0,
+        "height": 612.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 0
+      }
+    ]
+  },
+  "pages": [
+    {
+      "page_number": 1,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.976,
+          "bbox": [
+            1046.7,
+            1565.7,
+            456.6,
+            147.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Community Services Department\nPlanning and Building\n1001 E. Ninth St., BIdg. A\nReno, NV 89512-2845",
+          "ocr_confidence": 0.976
+        },
+        {
+          "class": "Text",
+          "confidence": 0.962,
+          "bbox": [
+            1138.5,
+            1736.1,
+            368.8,
+            47.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Telephone: 775.328.6100",
+          "ocr_confidence": 0.99
+        },
+        {
+          "class": "Picture",
+          "confidence": 0.863,
+          "bbox": [
+            591.3,
+            902.6,
+            518.9,
+            527.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "skipped"
+        },
+        {
+          "class": "Text",
+          "confidence": 0.776,
+          "bbox": [
+            609.7,
+            798.2,
+            473.0,
+            88.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "APPLICATION",
+          "ocr_confidence": 0.999
+        },
+        {
+          "class": "Text",
+          "confidence": 0.493,
+          "bbox": [
+            333.3,
+            242.1,
+            1012.5,
+            688.2
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_001_04_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Community Services Department\nPlanning and Building\nTENTATIVE PARCEL MAP\n(see page 6)\nPARCEL MAP WAIVER\n(see page 11)",
+          "ocr_confidence": 0.978
+        }
+      ]
+    },
+    {
+      "page_number": 2,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.982,
+          "bbox": [
+            178.1,
+            2062.5,
+            757.8,
+            68.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Washoe County Planning and Building\nTENTATIVE PARCEL MAP APPLICATION SUBMITTAL REQUIREMENT",
+          "ocr_confidence": 0.976
+        },
+        {
+          "class": "Text",
+          "confidence": 0.974,
+          "bbox": [
+            198.6,
+            170.8,
+            1311.9,
+            197.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Washoe County Code (WCC) Chapter 110, Article 606, Tentative Parcel Map\uff0c prescribes the\nrequirements for and waiver of, parcel maps. A parcel map shall be required for all subdivisions,\nmerger, and re-subdivision of existing lots, and common-interest communities consisting of four (4) or\nfewer units. The Parcel Map Review Committee shall approve, conditionally approve, or deny the\ntentative parcel map within sixty (6o) days of the date that the application is determined to be\ncomplete. See WCC 110.606, for further information.",
+          "ocr_confidence": 0.981
+        },
+        {
+          "class": "Text",
+          "confidence": 0.971,
+          "bbox": [
+            257.8,
+            1898.8,
+            1265.5,
+            82.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "\u010d\ne.\nThe width and approximate location of all existing or proposed easements, whether public or\nprivate, for roads, drainage, sewers, irrigation, or public utility purposes.",
+          "ocr_confidence": 0.815
+        },
+        {
+          "class": "Text",
+          "confidence": 0.963,
+          "bbox": [
+            174.4,
+            709.0,
+            1361.4,
+            146.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "N4octorEoo\nSobodo\nportal. If you would like to pay by check, please make the check payable to Washoe County and\nbring your application and payment to the Community Services Department (CSD). There may also\nbe a fee due to Engineering and Capital Projects for Technical Plan Check.",
+          "ocr_confidence": 0.847
+        },
+        {
+          "class": "Text",
+          "confidence": 0.958,
+          "bbox": [
+            191.4,
+            992.7,
+            1309.1,
+            110.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "4.\nProof of Property Tax Payment: The applicant must provide a written statement from the Washoe\nCounty Treasurer's Office indicating all property taxes for the current quarter of the fiscal year on the\nland have been paid.",
+          "ocr_confidence": 0.988
+        },
+        {
+          "class": "Text",
+          "confidence": 0.952,
+          "bbox": [
+            238.1,
+            1356.4,
+            547.1,
+            49.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Description of all liens against property.",
+          "ocr_confidence": 0.987
+        },
+        {
+          "class": "Text",
+          "confidence": 0.946,
+          "bbox": [
+            242.3,
+            1275.7,
+            424.7,
+            45.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Legal description of property.",
+          "ocr_confidence": 0.993
+        },
+        {
+          "class": "Text",
+          "confidence": 0.945,
+          "bbox": [
+            257.5,
+            1783.4,
+            1260.3,
+            111.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "\u25a1d.\nThe cross sections of all right-of-ways, streets, alleys or private access ways within the\nproposed development, proposed name and approximate grade of each, and approximate\nradius of all curves and diameter of each cul-de-sac.",
+          "ocr_confidence": 0.954
+        },
+        {
+          "class": "Text",
+          "confidence": 0.944,
+          "bbox": [
+            650.2,
+            110.7,
+            402.2,
+            54.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Tentative Parcel Map",
+          "ocr_confidence": 0.983
+        },
+        {
+          "class": "Text",
+          "confidence": 0.94,
+          "bbox": [
+            1360.3,
+            2066.6,
+            157.5,
+            36.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "February 2024",
+          "ocr_confidence": 0.985
+        },
+        {
+          "class": "Text",
+          "confidence": 0.934,
+          "bbox": [
+            250.1,
+            1399.3,
+            857.4,
+            47.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Any covenants, conditions and restrictions (CC&Rs) that apply.",
+          "ocr_confidence": 0.993
+        },
+        {
+          "class": "Text",
+          "confidence": 0.93,
+          "bbox": [
+            289.9,
+            567.6,
+            1082.9,
+            48.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "If you are submitting your application online, you may do so at OneNV.us",
+          "ocr_confidence": 0.987
+        },
+        {
+          "class": "Text",
+          "confidence": 0.929,
+          "bbox": [
+            207.4,
+            1450.6,
+            1320.2,
+            83.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Development Plan Specifications: (If the requirement is \"Not Applicable,\" please check the box\npreceding the requirement.)",
+          "ocr_confidence": 0.978
+        },
+        {
+          "class": "Text",
+          "confidence": 0.926,
+          "bbox": [
+            211.9,
+            1159.7,
+            1279.2,
+            77.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "6.\nTitle Report: A preliminary title report, with an effective date of no more than one hundred twenty\n(120) days of the submittal date, by a title company which provides the following information:",
+          "ocr_confidence": 0.987
+        },
+        {
+          "class": "Text",
+          "confidence": 0.921,
+          "bbox": [
+            195.4,
+            905.6,
+            1336.4,
+            83.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "3.\nOwner Affidavit: The Owner Affidavit must be signed and notarized by all owners of the property\nsubject to the application request.",
+          "ocr_confidence": 0.986
+        },
+        {
+          "class": "Text",
+          "confidence": 0.918,
+          "bbox": [
+            246.1,
+            1650.0,
+            726.1,
+            45.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "\u0111\nb.\nProperty boundary lines, distances and bearings.",
+          "ocr_confidence": 0.694
+        },
+        {
+          "class": "Text",
+          "confidence": 0.913,
+          "bbox": [
+            239.1,
+            1315.3,
+            729.5,
+            46.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Description of all easements and/or deed restrictions.",
+          "ocr_confidence": 0.99
+        },
+        {
+          "class": "Text",
+          "confidence": 0.905,
+          "bbox": [
+            288.0,
+            857.5,
+            1092.4,
+            47.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Development Application: A completed Washoe County Development Application form.",
+          "ocr_confidence": 0.986
+        },
+        {
+          "class": "Text",
+          "confidence": 0.895,
+          "bbox": [
+            373.9,
+            406.1,
+            973.6,
+            59.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Development Application Submittal Requirements",
+          "ocr_confidence": 0.998
+        },
+        {
+          "class": "Text",
+          "confidence": 0.841,
+          "bbox": [
+            235.8,
+            1235.2,
+            552.5,
+            45.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Name and address of property owners.",
+          "ocr_confidence": 0.993
+        },
+        {
+          "class": "Text",
+          "confidence": 0.693,
+          "bbox": [
+            254.8,
+            1696.7,
+            1224.8,
+            84.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "\u25a1\nC.\nContours at five (5) foot intervals or two (2) foot intervals where, in the opinion of the County\nEngineer, topography is a major factor in the development.",
+          "ocr_confidence": 0.857
+        },
+        {
+          "class": "Text",
+          "confidence": 0.631,
+          "bbox": [
+            233.9,
+            1533.1,
+            1279.5,
+            111.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "\u010d\na.\nMap to be drawn using engineering scales (e.g. scale 1\" = 100', 1\" = 200', or 1\" = 500' unless\na prior approval is granted by the County Surveyor) showing all streets and ingress/egress to\nthe property and must meet NRS standards as specified in NRS 278.466.",
+          "ocr_confidence": 0.848
+        },
+        {
+          "class": "Text",
+          "confidence": 0.543,
+          "bbox": [
+            183.1,
+            466.6,
+            1334.1,
+            79.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Applications are accepted on the 8th of each month. If the 8th falls on a non-business day, applications will\nbe accepted on the next business day.",
+          "ocr_confidence": 0.982
+        },
+        {
+          "class": "Text",
+          "confidence": 0.424,
+          "bbox": [
+            317.2,
+            639.3,
+            1161.7,
+            49.9
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_002_23_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "This sheet must accompany the original application and be signed by the Professional Land Surveyor.",
+          "ocr_confidence": 0.988
+        }
+      ]
+    },
+    {
+      "page_number": 3,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.976,
+          "bbox": [
+            176.8,
+            2062.9,
+            758.8,
+            67.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Washoe County Planning and Building\nTENTATIVE PARCEL MAP APPLICATION SUBMITTAL REQUIREMENT",
+          "ocr_confidence": 0.972
+        },
+        {
+          "class": "Text",
+          "confidence": 0.974,
+          "bbox": [
+            248.8,
+            96.8,
+            1268.3,
+            174.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": " f. If any portion of the land within the boundary of the development is subject to inundation or\nstorm water overflow, as shown on the adopted Federal Emergency Management Agency's\nFlood Boundary and Floodway Maps, that fact and the land so affected shall be clearly\nshown on the map by a prominent note on each sheet, as well as width and direction of flow\nof each water course within the boundaries of the development.",
+          "ocr_confidence": 0.975
+        },
+        {
+          "class": "Text",
+          "confidence": 0.966,
+          "bbox": [
+            190.2,
+            848.1,
+            1294.5,
+            199.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "9.\nSubmission Packets: One (1) packet and a flash drive. Any digital documents need to have a\nresolution of 300 dpi. If materials are unreadable, you will be asked to provide a higher quality copy.\nThe packet shall include one (1) 8.5\"x 11\"reduction of any applicable site plan, development plan,\nand/or application map. Labeling on these reproductions should be no smaller than 8 point on the\n8.5\"x 11\"display. Large format sheets should be included in a slide pocket(s). Any specialized\nreports identified above shall be included as attachments or appendices and be annotated as such.",
+          "ocr_confidence": 0.975
+        },
+        {
+          "class": "Text",
+          "confidence": 0.95,
+          "bbox": [
+            291.3,
+            1568.8,
+            948.7,
+            49.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "The Title Report should only be included in the one (1) original packet.",
+          "ocr_confidence": 0.971
+        },
+        {
+          "class": "Text",
+          "confidence": 0.944,
+          "bbox": [
+            1360.7,
+            2066.9,
+            155.3,
+            36.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "February 2024",
+          "ocr_confidence": 0.989
+        },
+        {
+          "class": "Text",
+          "confidence": 0.929,
+          "bbox": [
+            201.9,
+            1716.7,
+            1289.9,
+            81.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "I hereby certify, to the best of my knowledge, all information contained in this application is correct\nand meets all Washoe County Development Code requirements.",
+          "ocr_confidence": 0.986
+        },
+        {
+          "class": "Text",
+          "confidence": 0.912,
+          "bbox": [
+            263.7,
+            1135.5,
+            1257.7,
+            78.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Application and map submittals must comply with all specific criteria as established in the\nWashoe County Development Code and/or the Nevada Revised Statutes.",
+          "ocr_confidence": 0.974
+        },
+        {
+          "class": "Text",
+          "confidence": 0.903,
+          "bbox": [
+            311.7,
+            460.2,
+            1072.6,
+            47.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Date, north arrow, scale, and number of each sheet in relation to the total number of sheets.",
+          "ocr_confidence": 0.988
+        },
+        {
+          "class": "Text",
+          "confidence": 0.896,
+          "bbox": [
+            245.3,
+            410.8,
+            1151.4,
+            44.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "\u0103\ni.\nVicinity map showing the proposed development in relation to the surrounding area.",
+          "ocr_confidence": 0.713
+        },
+        {
+          "class": "Text",
+          "confidence": 0.889,
+          "bbox": [
+            195.1,
+            713.3,
+            1307.2,
+            111.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "O.\nStreet Names. A Corpieted Request to Reserve New Street Nahe(s) Torml (icluded hi appllcatior\npacket). Please print all street names on the Tentative Map. Note whether they are existing or\nproposed.",
+          "ocr_confidence": 0.912
+        },
+        {
+          "class": "Text",
+          "confidence": 0.83,
+          "bbox": [
+            297.4,
+            363.0,
+            1118.6,
+            44.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "h.\nExisting roads, trails or rights-of-way within the development shall be designated on the map.",
+          "ocr_confidence": 0.984
+        },
+        {
+          "class": "Text",
+          "confidence": 0.817,
+          "bbox": [
+            278.1,
+            1354.3,
+            1221.6,
+            212.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Based on the specific nature of the development request, Washoe County reserves the right\nto specify additional submittal packets, additional information and/or specialized studies that\nclarify the potential impacts and potential conditions of development in order to minimize or\nmitigate impacts resulting from the project. No application shall be processed until the\ninformation necessary to review and evaluate the proposed project is deemed complete by\nthe Director of Planning and Building.",
+          "ocr_confidence": 0.982
+        },
+        {
+          "class": "Text",
+          "confidence": 0.816,
+          "bbox": [
+            247.0,
+            597.0,
+            1261.4,
+            109.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "\u25a11.\nAll known areas of potential hazard including, but not limited to, earth slide areas, avalanche\nareas or otherwise hazardous slopes, shall be clearly designated on the map. Additionally,\nactive fault lines (post-Holocene) shall be delineated on the map.",
+          "ocr_confidence": 0.902
+        },
+        {
+          "class": "Text",
+          "confidence": 0.803,
+          "bbox": [
+            254.4,
+            278.7,
+            1269.8,
+            82.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "\u010d\ng.\nThe location and outline to scale of each existing building or structure that is not to be moved\nin the development.",
+          "ocr_confidence": 0.727
+        },
+        {
+          "class": "Text",
+          "confidence": 0.762,
+          "bbox": [
+            958.0,
+            1902.9,
+            351.2,
+            43.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Professional Land Surveyor",
+          "ocr_confidence": 0.995
+        },
+        {
+          "class": "Text",
+          "confidence": 0.755,
+          "bbox": [
+            282.7,
+            1301.1,
+            868.7,
+            51.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "All oversized maps and plans must be folded to a 9\"x 12\"size.",
+          "ocr_confidence": 0.967
+        },
+        {
+          "class": "Text",
+          "confidence": 0.641,
+          "bbox": [
+            195.0,
+            1088.3,
+            99.1,
+            43.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Notes:",
+          "ocr_confidence": 0.991
+        },
+        {
+          "class": "Text",
+          "confidence": 0.554,
+          "bbox": [
+            267.2,
+            1220.8,
+            1239.7,
+            77.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Appropriate map engineering and building architectural scales are subject to the approval of\nthe Planning and Building and/or Engineering and Capital Projects.",
+          "ocr_confidence": 0.986
+        }
+      ]
+    },
+    {
+      "page_number": 4,
+      "regions": [
+        {
+          "class": "Table",
+          "confidence": 0.95,
+          "bbox": [
+            183.2,
+            236.4,
+            1336.5,
+            1672.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Project Information\nStaff Assigned Case No.:\nProject Name:\nParcel Map for NVZ LLC\nProject\nA division of that certain parcel as described in the Deed Document No. 5589341,\nDescription: recorded December 17, 2025, Official Records of Washoe County, Nevada\nProject Address: 10235 Placerville Road\nProject Area (acres or square feet): 198,691 square feet or 4.56 acres\nProject Location (with point of reference to major cross streets AND area locator):\nApproximately 2,700 feet northeasterly of the intersection of Red Rock Road and Placerville Road\nAssessor's Parcel No.(s):\nParcel Acreage:\nAssessor's Parcel No.(s):\nParcel Acreage:\n086-250-65\n4.56\nIndicate any previous Washoe County approvals associated with this application:\nCase No.(s).\nApplicant Information (attach additional sheets if necessary)\nProperty Owner:\nProfessional Consultant:\nName: NVZ LLC\nName: Bowman Consulting Group Ltd.\nAddress:\nAddress:\nZip:\nZip:\nPhone:\nFax:\nPhone:\nFax:\nEmail:\nEmail:\nCell:\nOther:\nCell:\nOther:\nContact Person: Jeff Veasley\nContact Person: Eric V. Snyder, P.L.S.\nApplicant/Developer:\nOther Persons to be Contacted:\nName:\nName:\nAddress:\nAddress:\nZip:\nZip:\nPhone:\nFax:\nPhone:\nFax:\nEmail:\nEmail:\nCell:\nOther:\nCell!\nOther:\nContact Person:Jeff Veasley\nContact Person:\nFor Office Use Only\nDate Received:\nInitial:\nPlanning Area:\nCounty Commission District:\nMaster Plan Designation(s):",
+          "ocr_confidence": 0.983
+        },
+        {
+          "class": "Text",
+          "confidence": 0.947,
+          "bbox": [
+            429.4,
+            136.2,
+            828.4,
+            58.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Washoe County Development Application",
+          "ocr_confidence": 0.996
+        },
+        {
+          "class": "Text",
+          "confidence": 0.936,
+          "bbox": [
+            171.2,
+            191.6,
+            1345.1,
+            87.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Your entire application is a public record. If you have a concern about releasing\npersonal information, please contact Planning and Building staff at 775.328.6100.",
+          "ocr_confidence": 0.984
+        },
+        {
+          "class": "Text",
+          "confidence": 0.679,
+          "bbox": [
+            1360.8,
+            2063.4,
+            155.8,
+            35.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "February 2024",
+          "ocr_confidence": 0.996
+        }
+      ]
+    },
+    {
+      "page_number": 5,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.953,
+          "bbox": [
+            192.3,
+            1423.5,
+            161.2,
+            43.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "6.Utilities:",
+          "ocr_confidence": 0.985
+        },
+        {
+          "class": "Table",
+          "confidence": 0.945,
+          "bbox": [
+            278.2,
+            1769.4,
+            1222.1,
+            148.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Individual wells\nThere is an existing well on Parcel 1 and none that was visible within Parcel 2\n\u25a1\nPrivate water\nProvider:\n\u25a1 Public water\nProvider:",
+          "ocr_confidence": 0.973
+        },
+        {
+          "class": "Text",
+          "confidence": 0.944,
+          "bbox": [
+            208.5,
+            1638.0,
+            1291.4,
+            85.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "7. Please describe the source of the water facilities necessary to serve the proposed tentative parcel\nmap:",
+          "ocr_confidence": 0.988
+        },
+        {
+          "class": "Text",
+          "confidence": 0.937,
+          "bbox": [
+            230.6,
+            678.5,
+            1043.0,
+            46.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "2. Please describe the existing conditions, structures, and uses located at the site:",
+          "ocr_confidence": 0.98
+        },
+        {
+          "class": "Text",
+          "confidence": 0.936,
+          "bbox": [
+            524.5,
+            236.1,
+            668.1,
+            43.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "(All required information may be separately attached)",
+          "ocr_confidence": 0.98
+        },
+        {
+          "class": "Text",
+          "confidence": 0.931,
+          "bbox": [
+            1360.6,
+            2067.4,
+            155.5,
+            35.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "February 2024",
+          "ocr_confidence": 0.996
+        },
+        {
+          "class": "Text",
+          "confidence": 0.922,
+          "bbox": [
+            532.8,
+            148.1,
+            634.7,
+            96.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Tentative Parcel Map Application\nSupplemental Information",
+          "ocr_confidence": 0.994
+        },
+        {
+          "class": "Table",
+          "confidence": 0.909,
+          "bbox": [
+            218.3,
+            1469.5,
+            1307.0,
+            149.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "a. Sewer Service\nSeptic System\nb. Electrical Service/Generator\nOverhead electric\nC. Water Service\nWell",
+          "ocr_confidence": 0.963
+        },
+        {
+          "class": "Text",
+          "confidence": 0.9,
+          "bbox": [
+            184.9,
+            1224.5,
+            1328.0,
+            161.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "5.\nWas the parcel or lot that is proposed for division created (recorded) within the last 5 years? (If yes,\npublic review of the parcel map will be required. See Planning and Building staff for additional\nmaterials that are required to be submitted.)\n\u25a1 Yes\n\u25a0 No",
+          "ocr_confidence": 0.933
+        },
+        {
+          "class": "Table",
+          "confidence": 0.881,
+          "bbox": [
+            247.9,
+            490.2,
+            1274.2,
+            167.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "a. Please list the following:\nAPN of Parcel\nLand Use Designation\nExisting Acres\n086-250-65\n200\n4.56",
+          "ocr_confidence": 0.991
+        },
+        {
+          "class": "Table",
+          "confidence": 0.856,
+          "bbox": [
+            230.3,
+            872.2,
+            1294.9,
+            135.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Parcel 1\nParcel 2\nParcel 3\nParcel 4\nProposed Minimum Lot Area\n1.78 acres\n2.78 acres\nProposed Minimum Lot Width\n352.40 feet\n550.75feet",
+          "ocr_confidence": 0.977
+        },
+        {
+          "class": "Text",
+          "confidence": 0.771,
+          "bbox": [
+            317.8,
+            746.3,
+            1136.3,
+            55.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "There is an existing residence, garage and out buildings to remain on Parcel 1",
+          "ocr_confidence": 0.988
+        },
+        {
+          "class": "Text",
+          "confidence": 0.736,
+          "bbox": [
+            189.9,
+            834.3,
+            541.0,
+            41.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "3. What are the proposed lot standards?",
+          "ocr_confidence": 0.985
+        },
+        {
+          "class": "Text",
+          "confidence": 0.713,
+          "bbox": [
+            193.8,
+            2064.2,
+            819.9,
+            94.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Washoe County Planning and Building\nTENTATIVE PARCEL MAP APPLICATION SUPPLEMENTAL INFORMATION\n6",
+          "ocr_confidence": 0.989
+        },
+        {
+          "class": "Text",
+          "confidence": 0.679,
+          "bbox": [
+            282.7,
+            400.4,
+            1215.3,
+            48.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "10235 Placerville Road, Approximately 2,700 feet northeasterly of the intersection of Red Rock Road and Placerville Road",
+          "ocr_confidence": 0.98
+        },
+        {
+          "class": "Text",
+          "confidence": 0.639,
+          "bbox": [
+            213.0,
+            334.5,
+            1091.5,
+            46.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "1. What is the location (address or distance and direction from nearest intersection)?",
+          "ocr_confidence": 0.985
+        },
+        {
+          "class": "Text",
+          "confidence": 0.526,
+          "bbox": [
+            247.6,
+            1724.3,
+            310.1,
+            44.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "a. Water System Type:",
+          "ocr_confidence": 0.963
+        }
+      ]
+    },
+    {
+      "page_number": 6,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.962,
+          "bbox": [
+            204.4,
+            919.8,
+            1316.7,
+            143.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "9. For most uses, the Washoe County Code, Chapter 110, Article 422, Water and Sewer Resource\nRequirements, requires the dedication of water rights to Washoe County when creating new parcels.\nPlease indicate the type and quantity of water rights you have available should dedication be\nrequired:",
+          "ocr_confidence": 0.983
+        },
+        {
+          "class": "Text",
+          "confidence": 0.924,
+          "bbox": [
+            1361.1,
+            2067.1,
+            155.2,
+            35.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "February 2024",
+          "ocr_confidence": 0.999
+        },
+        {
+          "class": "Text",
+          "confidence": 0.903,
+          "bbox": [
+            246.2,
+            1377.5,
+            340.0,
+            57.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "None at this time",
+          "ocr_confidence": 0.971
+        },
+        {
+          "class": "Table",
+          "confidence": 0.898,
+          "bbox": [
+            241.7,
+            160.1,
+            1249.0,
+            124.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "\u25a1 Now\n\u25a11-3 years\n\u25a1 3-5 years\n\u25a0\n5+years",
+          "ocr_confidence": 0.89
+        },
+        {
+          "class": "Text",
+          "confidence": 0.8,
+          "bbox": [
+            220.9,
+            437.8,
+            1119.6,
+            44.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "8. What sewer services are necessary to accommodate the proposed tentative parcel map?",
+          "ocr_confidence": 0.989
+        },
+        {
+          "class": "Text",
+          "confidence": 0.756,
+          "bbox": [
+            200.6,
+            1664.2,
+            1294.6,
+            107.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "11. Does property contain slopes or hillsides in excess of 15 percent and/or significant ridgelines? (If\nyes, and this is the second parcel map dividing this property, Article 424, Hillside Development of the\nWashoe County Development Code will apply.)",
+          "ocr_confidence": 0.975
+        },
+        {
+          "class": "Table",
+          "confidence": 0.723,
+          "bbox": [
+            236.3,
+            1066.0,
+            1277.1,
+            190.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "a. Permit #\nNone at this time\nacre-feet per year\nb. Certificate #\nNone at this time\nacre-feet per year\nC.\nSurface Claim #\nNone at this time\nacre-feet per year\nd. Other,#\nNone at this time\nacre-feet per year",
+          "ocr_confidence": 0.965
+        },
+        {
+          "class": "Text",
+          "confidence": 0.685,
+          "bbox": [
+            241.4,
+            658.6,
+            190.6,
+            45.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "b. Available:",
+          "ocr_confidence": 0.968
+        },
+        {
+          "class": "Text",
+          "confidence": 0.653,
+          "bbox": [
+            233.0,
+            1276.4,
+            1270.4,
+            81.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "a. Title of those rights (as filed with the State Engineer in the Division of Water Resources of the\nDepartment of Conservation and Natural Resources):",
+          "ocr_confidence": 0.984
+        },
+        {
+          "class": "Text",
+          "confidence": 0.634,
+          "bbox": [
+            242.3,
+            177.5,
+            189.6,
+            46.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "b. Available:",
+          "ocr_confidence": 0.967
+        },
+        {
+          "class": "Text",
+          "confidence": 0.542,
+          "bbox": [
+            312.0,
+            1780.3,
+            1000.3,
+            56.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": " Yes\nNo\nIf yes, include a separate set of attachments and maps.",
+          "ocr_confidence": 0.913
+        },
+        {
+          "class": "Table",
+          "confidence": 0.537,
+          "bbox": [
+            299.2,
+            531.3,
+            1225.5,
+            109.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "\u25a1 Individual septic\nIndividual Septic Systems\n\u25a1 Public system\nProvider:",
+          "ocr_confidence": 0.97
+        },
+        {
+          "class": "Table",
+          "confidence": 0.532,
+          "bbox": [
+            263.6,
+            702.7,
+            1260.4,
+            64.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Now\n\u25a11-3years\n\u25a13-5 years\n5+ years",
+          "ocr_confidence": 0.958
+        },
+        {
+          "class": "Text",
+          "confidence": 0.493,
+          "bbox": [
+            310.7,
+            1585.2,
+            1004.0,
+            56.2
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_006_13_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "\u25a1 Yes\nNo\nIf yes, include a separate set of attachments and maps.",
+          "ocr_confidence": 0.911
+        },
+        {
+          "class": "Text",
+          "confidence": 0.408,
+          "bbox": [
+            232.9,
+            1466.4,
+            1252.3,
+            113.4
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_006_14_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "10. Does the property contain wetlands? (If yes, please attach a preliminary delineation map and\ndescribe the impact the proposal will have on the wetlands. Impacts to the wetlands may require a\npermit issued from the U.S. Army Corps of Engineers.)",
+          "ocr_confidence": 0.974
+        },
+        {
+          "class": "Text",
+          "confidence": 0.297,
+          "bbox": [
+            189.0,
+            2060.7,
+            810.6,
+            83.2
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_006_15_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Washoe County Planning and Building\nTENTATIVE PARCEL MAP APPLICATION SUPPLEMENTAL INFORMATION\n7",
+          "ocr_confidence": 0.988
+        }
+      ]
+    },
+    {
+      "page_number": 7,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.981,
+          "bbox": [
+            175.4,
+            1332.0,
+            1367.9,
+            376.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Please complete the following additional questions if the project anticipates grading that involves:\n(1) Disturbed area exceeding twenty-five thousand (25,o0o) square feet not covered by streets,\nbuildings and landscaping; (2) More than one thousand (1,ooo) cubic yards of earth to be\nimported and placed as fill in a special flood hazard area; (3) More than five thousand (5,ooo)\ncubic yards of earth to be imported and placed as fill; (4) More than one thousand (1,0oo) cubic\nyards to be excavated, whether or not the earth will be exported from the property; or (5) If a\npermanent earthen structure will be established over four and one-half (4.5) feet high. If your\nproject exceeds any of the above criteria, you shall either provide a preliminary grading and\nroadway design plan for review OR if these criteria are exceeded with the final construction\ndrawings and not disclosed at the Tentative Parcel Map Application, you shall be required to apply\nfor a special use permit for grading and you will be delayed up to three months, if approved.",
+          "ocr_confidence": 0.976
+        },
+        {
+          "class": "Text",
+          "confidence": 0.964,
+          "bbox": [
+            180.5,
+            180.4,
+            1344.4,
+            142.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "12. Does property contain geologic hazards such as active faults; hillside or mountainous areas; is it\nsubject to avalanches, landslides, or flash floods; is it near a water body, stream, Significant\nHydrologic Resource as defined in Article 418, or riparian area such as the Truckee River, and/or an\narea of groundwater recharge",
+          "ocr_confidence": 0.972
+        },
+        {
+          "class": "Text",
+          "confidence": 0.948,
+          "bbox": [
+            264.0,
+            1799.4,
+            797.4,
+            66.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "No grading anticipated at this time.",
+          "ocr_confidence": 0.975
+        },
+        {
+          "class": "Text",
+          "confidence": 0.92,
+          "bbox": [
+            770.0,
+            1275.1,
+            161.1,
+            50.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Grading",
+          "ocr_confidence": 1.0
+        },
+        {
+          "class": "Text",
+          "confidence": 0.91,
+          "bbox": [
+            1360.6,
+            2066.7,
+            156.1,
+            36.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "February 2024",
+          "ocr_confidence": 0.998
+        },
+        {
+          "class": "Text",
+          "confidence": 0.886,
+          "bbox": [
+            182.0,
+            601.3,
+            1354.7,
+            81.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "14. If private roads are proposed, will the community be gated? If so, is a public trail system easement\nprovided through the subdivision?",
+          "ocr_confidence": 0.99
+        },
+        {
+          "class": "Text",
+          "confidence": 0.883,
+          "bbox": [
+            168.2,
+            1727.6,
+            1037.8,
+            47.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "18. How many cubic yards of material are you proposing to excavate on site?",
+          "ocr_confidence": 0.977
+        },
+        {
+          "class": "Text",
+          "confidence": 0.868,
+          "bbox": [
+            242.7,
+            331.5,
+            1071.1,
+            51.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "\u25a1 Yes\n\u53e3\nNo\nIf yes, include a separate set of attachments and maps.",
+          "ocr_confidence": 0.828
+        },
+        {
+          "class": "Text",
+          "confidence": 0.839,
+          "bbox": [
+            202.2,
+            2061.5,
+            792.0,
+            99.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Washoe County Planning and Building\nTENTATIVE PARCEL MAP APPLICATION SUPPLEMENTAL INFORMATION\n8",
+          "ocr_confidence": 0.984
+        },
+        {
+          "class": "Text",
+          "confidence": 0.803,
+          "bbox": [
+            192.5,
+            405.3,
+            1338.7,
+            110.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "13. Does the tentative parcel map involve common open space as defined in Article 408 of the Washoe\nCounty Development Code? (If so, please identify all proposed non-residential uses and all the open\nspace parcels.)?",
+          "ocr_confidence": 0.99
+        },
+        {
+          "class": "Text",
+          "confidence": 0.65,
+          "bbox": [
+            173.7,
+            763.7,
+            1339.1,
+            155.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "15. Are there any applicable policies of the adopted area plan in which the project is located that require\ncompliance? If so, which policies and how does the project comply.\n\u25a1Yes\n\u65e5No\nIf yes, include a separate set of attachments and maps.",
+          "ocr_confidence": 0.908
+        },
+        {
+          "class": "Text",
+          "confidence": 0.561,
+          "bbox": [
+            185.7,
+            928.3,
+            1315.8,
+            85.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "16. Are there any applicable area plan modifiers in the Development Code in which the project is located\nthat require compliance? If so, which modifiers and how does the project comply?",
+          "ocr_confidence": 0.975
+        },
+        {
+          "class": "Text",
+          "confidence": 0.384,
+          "bbox": [
+            179.6,
+            1095.7,
+            1323.8,
+            99.4
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_007_12_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "17. Is the project subject to Article 418, Significant Hydrologic Resources? If yes, please address Special\nReview Considerations within Section 110.418.30 in a separate attachment.",
+          "ocr_confidence": 0.982
+        },
+        {
+          "class": "Text",
+          "confidence": 0.359,
+          "bbox": [
+            339.1,
+            527.8,
+            936.3,
+            51.3
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_007_13_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "\u56deNo\nIf yes, include a separate set of attachments and maps.",
+          "ocr_confidence": 0.869
+        },
+        {
+          "class": "Text",
+          "confidence": 0.274,
+          "bbox": [
+            361.9,
+            1187.3,
+            919.6,
+            52.4
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_007_14_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "\u25a0\nNo\nIf yes, include a separate set of attachments and maps.",
+          "ocr_confidence": 0.781
+        }
+      ]
+    },
+    {
+      "page_number": 8,
+      "regions": [
+        {
+          "class": "ParcelMap",
+          "confidence": 0.714,
+          "bbox": [
+            0,
+            38.4,
+            2145.0,
+            1525.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Assessor's Map Number\n086-25\nPORTION OF SEC.13\nT21N-R18E\nSTATE OF NEVADA\nWASHOE COUNTY\nASSESSOR'S OFFICE\nR18E\nR19E\n1001 East Ninth Street, Building D\nReno, Nevada 89512\n(775)328-2231\n1230.28\n720.75\n903.15\n423.38\n655.12\n0\n086-250-65\n02\n086-250-77\n0000\n22\n086-250-78\n22\n086-250-04\n4.56 ac.\n2.14ac.\n10.0 ac.\n3.24 ac.\n375.18\n903.15\n423.38\n557.14\n36.9g\n259.18\n1409.72\n086-250-69\n734.19\n327.39\n9.43 ac.\n335.02\n212.06\n336.41\n302.61\n329.80\n325.30\n208.36\n208.38\n208.38\nO\n22\n880\n086-250-73\n8\n086-250-74\nY\n2\n086-250-75\n086-250-70\n086-250-76\n1.16086-250-72\n086-250-71\n9612\n1.19 ac.\n66\n0\n062\n1.79 ac.\n1.80 ac.\n\n5.188 ac.\n2.18 ac.\nac.\n16\n1.18ac.\n-31.42\n\n329.82\n293.64\n325.33\n208.36\n208.38\n208.38\n31.42\n548.52\n327.39\nPLACERVILLE\n374.83\n212.06\n\n086-250-66\n80902\nROAD\n086-250-67\n323.52\n5.46 ac.\n5.46 ac.\n349.37\n901.37\n36.02\n223.17\nE60\n086-250-64\n262\n086-250-63\n168\n7.13 ac.\nFeet\n086-250-68\n299.55\n\u25a1\u25a1\n5.415 ac.\n6.53 ac.\n0\n100\n200\n300\n400\n208.89\n87499\n970\n1 inch = 400 feet\n3.139.04\n580\n335.0\n335.0\nAun m\n684.05\n-39.74\n086-250-05\n087-05\n60ROAESWAS EMENT\n\no\nPAR.A\n-42.88\n30.00 ac.\nRS 6008\n-67.77\n-68.79\n30'ROADWAY &\n/\nUTILITIES EASEMENT\n086-250-79\nE\nSparks\n10.00 ac.\n-97.46\nPAR.B2\n/\n-49.00\nPM5649\n=\n-101.98\n\u221a\n086-250-81\nPAR.D2\n-96.56\nPM 5649\n/\n1070.15\n89.91 ac.\n086-250-82+\n157.54\n$PAR3{$\n158\n/\nPAM.3481.10ac.\nPAR.A341.14\n51984 sf\nA\n086-250-44\n\n/\nLEELZL\n086-250-46\n220\n4\n1.19ac.\nBAR8\n8\n\n086-250-45\n29680\n50'STRIP OFFERED\n8\n1:48-ac.\nWHITE OWL DRIVE\n087-02\n089-10\nFOR DEDICATION TO\nWASHOE COUNTY\n158.05\n158\n641.57\n341.14\n322.23\nPR3PARA\nDEDICATED PER\nPAR.387\n4\n8\n087-06\nDOC.#'S.2400029\n086-26\n4\n40'STRIP OFFERED\nFOR DEDICATION TO\n086-250-59\n086-250-43\n-1.00 ac.\n2400030\nWASHOE COUNTY\n304.96\n3.24 ac.\nPOR.PAR.B\n2400032\n29\u2220Ev\n60\n80\nP.M.387\n2400033\n-92.71\nEOTROASEASEMENT\n1.00ac.\n2400034\n086-25\n086-85\n3766.48\nP.M.387\n-1.00ac.\n322.92\n086-250-61\n1\n304.96\n086-250-35\n157.38\nPAR_\n157\nPOR.PAR.A 313.50\n25.02 ac.\nPAR.C\nP.M.377\n-1.00 ac.\n087-39\n0610S\n086-23\nP.M.377\nP.M.377\n086-250-568\n8E0\n086-22\n086-250-58\n1.01ac.\n086-250-38\nPOR,PAR.B313.50\n1.00 ac.\n+\nP.M.377\n1.22 ac.\n086-250-57\n298.32\n\nDEDICATED PER\nDOC.#2400031\n*157.90\n157\nCOYOTERUNCT\n086-250-01\n22988\nPAR.D\nPAR.C\nP.M.384\nP.M.384\nP.M.3841.10 ac.\nPAR.A\n82192\n80.00 ac.\n822\n086\n-250-50\n086-250-48\n\n086\n-250-51\n1.00 ac.\nPOR.PAR.B\nDEDICATED PER\n1.01ac.\nPM.384\nDOC.#2400035\ncreated by:\nEMG 11/18/2014\n158.33\n157\n086-250-62\n315.50\n1.00 ac.\n60\nupdated: SR 10/30/18 SR 02/06/23\n628.83\n14\n13\n009\nDEDICATED PER\n086-250-54\n0059\nDOC.#2400028\n23\n\u25b2\n24\n2625.27\n3.81ac.\narea previously shown on map(s):\n1318.45\n13\n18\n-\n080-04\n\n24\n19\nNOTE: This map was prepared for the use of the\nGREYHAWK CT\nWashoe County Assessor for assessment and\nillustrative purposes only. It does not represent\na survey of the premises. No liability is assumed\nas to the sufficiency or accuracy of the data\ndelineated hereon.",
+          "ocr_confidence": 0.854,
+          "needs_vision": true,
+          "category": "undimensioned_drawing",
+          "parcels": [],
+          "vision_escalated": true
+        },
+        {
+          "class": "Picture",
+          "confidence": 0.276,
+          "bbox": [
+            1951.0,
+            730.4,
+            208.6,
+            236.4
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_008_01_Picture.png",
+          "extraction_status": "skipped"
+        }
+      ]
+    },
+    {
+      "page_number": 9,
+      "regions": [
+        {
+          "class": "ParcelMap",
+          "confidence": 0.958,
+          "bbox": [
+            186.9,
+            71.9,
+            2013.1,
+            1495.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "12\nWASHOE COUNTY CONTROL POINT\nN22SM01029 USGLO 2* BRASS CAP\nS12/7/13/18 1942\n13\n18\nGROUND COORDINATES (MEASURED)\nN:14928989.71\nE:2253610.44\nGROUND COORDINATES (RECORD)\nN: 14928989.62\nROBERTL. CARSEY JR.\nE:2253610.74\nPARCEL 1B RS 623I (R3)\nAPN: 086-260-21\nSTEVEND& CORINA B.POKRAJAC\nPARCEL2BRS 6231 (R3)\nAPN: 086-260-22\n2201\n(S89\u00b009/41\"E) (R3)\n(N89*5729\u00b0E) (R4)\nS89\u00b01115\"E903.15\n550.75\nN89\u00b011\"1:\nGROUND COORDINATES\n5.00 P.U.E GRANTED\n+\n352.40\n28.5\n1077.91\nN 14926910.28\nE2251599.70\nPER THIS MAP\n41.0\n5.00/ P.U.E GRANTED\nPER THIS MAP\n5.00 P.U.E GRANTED\nEXISTING\nEXISTING\n0.77' EAST OF SECTION LINE\nFD 5/8\" REBAR - PLS 5506\nSHED\n74.7\nSHEDS\nGROUND COORDINATES\nPER THIS MAP\nN14926897.47\nEXISTING\nE2252502.76\n62680)\n()\nEXISTING\nSHEDS\nEXISTING\n028\nISILAT SNAO\n00023.9.80N\n\u2014() (.00\u00b009 M.1S.20,0N)-\nWELL.\nGARAGE\n\n69-052-980-Nd\n52.g\n2\n(a) (00\u00b009Z 3.18.20.0s)\n.000ZM..S.8.0S\nEXISTING\n920 0330\n02-980N\nM.S.8,0S\nGARAGE\nPARCEL2\n-.00022\n2.78 ACRES\nPARCEL1\nEXISTING\n1.78 ACRES\nRESIDENCE\n5.00\n91.3\n10 P.U.E. GRANTED\nPER THIS MAP\n5.00 P.U.E GRANTED\nPER THIS MAP\nFD 5/8* REBAR - NO CAP OR TAG\n10.00 P.U.E GRANTED\n-5.00\n68.0\n0.32EAST\nPER THIS MAP\n10.00 P.U.E GRANTED\nPER THIS MAP\nFD 5/8* REBAR - NO CAP OR TAG\n550.75\n0.36 SOUTH\nN89*11'15\"W 903.15\"\n352.40\n29629\n-S1\u00b039/59\u00b0W 30.00\u00b0(TIE)\n30\n(N89\u00b05729\u00b0E)(R4)\nD\nS89\u00b01117\u00b0E336.41\n(N89\u00b057'29\u00b0E) (R2)\nI\nS89*11'17*E329.80\n\u2193\n(N89\u00b057\"29\u00b0E)(R2)\n2\nS89*1117*E325.30\n-30QUITCLAIMAREA (R6)\n30\u00b0\nPLACERVILLE ROAD\n(N89\u00b057'29\u00b0E) (R2)\n(60r WIDE PUBLIC ROW AS SHOWN ON RS 5122)\n30QUITCLAIM AREA (R5)\n30QUITCLAIMAREA (R5)-\n13\n18\nJAMES KRANTZ & LINDA HOUGHTON TRUST\nDEED 4286292\nORLANDO G. & REGINA M. JASSO\nWASHOE COUNTY CONTROL POINT\nAPN: 086-250-67\nORLANDO G. & REGINA M. JASSO\nDEED 5217588\nN22SM01113 USGLO BRASS CAP\nDEED 5217588\nAPN: 086-250-76\n1/4 CORNER 13/18 1942\nAPN: 086-250-75\nGROUND COORDINATES (MEASURED)\nN:14926352.62\nE:2253573.04\nGROUND COORDINATES (RECORD)\nN:14926352.55\nE:2253573.13\nLEGEND\n\u25a0\nFOUND 5/8* REBAR WITH CAP PLS 5506\n?\nFOUND 5/8* REBAR - NO CAP OR TAG\nO\nSET 5/8\" REBAR WITH PLASTIC CAP 'PLS 11194*\n2\nTIED SECTION CORNER AS NOTED\n.3\n18\n13\u301018\nTIED QUARTER SECTION CORNER AS NOTED\n0\nRECORD INFORMATION\n(R1)\nREFERENCE NUMBER\nGRAPHIC SCALE\nTM\nTRACT MAP\n40\n20\n40\n80\nPM\nPARCEL MAP\nAPN\nASSESSOR PARCEL NUMBER\n1inch = 40 ft.\nPUE\nPUBLIC UTILITY EASEMENT\nROW\nRIGHT-OF-WAY\nSQ. FT.\nSQUARE FOOT\nADJOINER LOT LINES\nEASEMENT LINE\nNVZ LLC\nBASIS OF BEARINGS\nPROPERTY LINES\nLOCATED WITHIN THE NORTHEAST QUARTER (NE1/4) OF SECTION 13,\nBEING A DIVISION QF DEED DOC NO, 5589341\nSECTION LINE\nTHE BASIS OF BEARINGS FOR THIS SURVEY IS NEVADA STATE PLANE, WEST ZONE\nWASHOE COUNTY\nTOWNSHIP 21 NORTH, RANGE 18 EAST, M.D.M.\nGRAPHIC BORDER\nNEVADA\nCORRECTIONS FROM THE NORTHERN NEVADA COOPERATIVE REAL TIME NETWORK.\nNAD83(94) BASED ON REAL TIME KINEMATIC (RTK) GPS OBSERVATIONS UTILIZING\nJOB NO.\n420524\nCOORDINATES AND DISTANCES HEREON ARE AT GROUND LEVEL BASED ON A\nBowman\nDRAWN BY\nAJV\nCOMBINED GRID TO GROUND FACTOR OF 1.000197939.\nCHECKED BY\nEVS\n1150 CORPO8ATE BLVD. IRENO. NV 89502\nDATE\n03/11/2026\n775-856-1150 MAIN |BOWMAN,COM\nSHEET\nV: \\420524 \u2013 10235 PLACERMLLE DR, RENO, NV\\420524\u201301\u2013001 (SUR) \u2212 VEASLEY\u2013PM PREP\u2013P0ST SUBMITTAL\\SURVEY\\DWG\\V\u2013PMAP\u2013PLACERMLLE\u2013RD.DWG <ESNYDER> 3/19/2026 9: 38 AM",
+          "ocr_confidence": 0.897,
+          "needs_vision": true,
+          "category": "boundary_plat",
+          "parcels": [
+            {
+              "vision_geometry": {
+                "boundary_calls": [
+                  {
+                    "bearing": "N0\u00b048'45\"E",
+                    "distance": "220.00'"
+                  },
+                  {
+                    "bearing": "S89\u00b011'15\"E",
+                    "distance": "903.15'"
+                  },
+                  {
+                    "bearing": "S0\u00b048'45\"W",
+                    "distance": "220.00'"
+                  },
+                  {
+                    "bearing": "N89\u00b011'15\"W",
+                    "distance": "903.15'"
+                  }
+                ],
+                "tie_point": {
+                  "northing": "14926910.28",
+                  "easting": "2251599.70",
+                  "anchors_corner": "northwestern corner of Parcel 2"
+                },
+                "basis_of_bearings": "NEVADA STATE PLANE, WEST ZONE NAD83(94)",
+                "parcel_label": "PARCEL 2",
+                "role": "target",
+                "stated_area_acres": "2.78",
+                "ambiguous_alternates": [
+                  {
+                    "bearing": "S89\u00b011'15\"E",
+                    "distance": "550.75'"
+                  },
+                  {
+                    "bearing": "N89\u00b011'15\"W",
+                    "distance": "550.75'"
+                  }
+                ],
+                "curve_calls": []
+              },
+              "resolved_boundary_calls": [
+                {
+                  "bearing": "N0\u00b048'45\"E",
+                  "distance": "220.00'"
+                },
+                {
+                  "bearing": "S89\u00b011'15\"E",
+                  "distance": "550.75'"
+                },
+                {
+                  "bearing": "S0\u00b048'45\"W",
+                  "distance": "220.00'"
+                },
+                {
+                  "bearing": "N89\u00b011'15\"W",
+                  "distance": "550.75'"
+                }
+              ],
+              "boundary_geojson": {
+                "type": "Feature",
+                "properties": {
+                  "closure_error_ft": 0.0,
+                  "unparsed_calls": 0,
+                  "curve_diagnostics": []
+                },
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [
+                        -142.64,
+                        150.46
+                      ],
+                      [
+                        -141.34,
+                        369.65
+                      ],
+                      [
+                        411.37,
+                        363.47
+                      ],
+                      [
+                        406.41,
+                        143.09
+                      ],
+                      [
+                        -142.64,
+                        150.46
+                      ]
+                    ]
+                  ]
+                }
+              },
+              "spatial_validation": {
+                "valid": false,
+                "issues": [
+                  "Walked area (60,578 sqft) differs from the document's stated area (121,097 sqft) by 50% -- beyond the 15% tolerance."
+                ],
+                "perimeter_ft": 992.38,
+                "precision_ratio": null,
+                "self_intersects": false,
+                "area_sqft": 60578.47,
+                "area_acres": 1.391,
+                "stated_area_sqft": 121096.79999999999,
+                "area_matches_stated": false,
+                "area_diff_pct": 49.98,
+                "curve_diagnostics": []
+              },
+              "confirmed_boundary_pixels": {
+                "vertices": [
+                  [
+                    446.46490813726314,
+                    774.6566650845099
+                  ],
+                  [
+                    448.98128806727266,
+                    439.91626532888733
+                  ],
+                  [
+                    1293.0569518746324,
+                    450.72906549531274
+                  ],
+                  [
+                    1284.9471194086898,
+                    787.2783128151112
+                  ]
+                ],
+                "crop_width": 2174.0,
+                "crop_height": 1687.0
+              },
+              "human_confirmed": true,
+              "boundary_geojson_wgs84": {
+                "type": "Feature",
+                "properties": {
+                  "closure_error_ft": 0.0,
+                  "unparsed_calls": 0,
+                  "anchor_lat": 39.70204799348275,
+                  "anchor_lon": -119.90215963414798,
+                  "georeferenced": "from_confirmed_boundary"
+                },
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [
+                        -119.9026666,
+                        39.702461
+                      ],
+                      [
+                        -119.902662,
+                        39.7030628
+                      ],
+                      [
+                        -119.9006976,
+                        39.7030458
+                      ],
+                      [
+                        -119.9007153,
+                        39.7024408
+                      ],
+                      [
+                        -119.9026666,
+                        39.702461
+                      ]
+                    ]
+                  ]
+                }
+              },
+              "boundary_source": "manual_confirmed_calibrated",
+              "calibration": {
+                "status": "cross_validated",
+                "scale_ft_per_px": 0.6547997110431316,
+                "rotation_deg": 359.9069511242111,
+                "scale_from_area": 0.6547997110431316,
+                "scale_from_edges": 0.6567671984590464,
+                "scale_agreement_pct": 0.30047163777462244,
+                "corroborating_edge_count": 3,
+                "notes": [
+                  "resolved 180deg direction ambiguity using the previous (uncalibrated) placement as a reference (candidate A err=1115229, candidate B err=154364)",
+                  "3 corroborating edge(s): [0, 2, 3]",
+                  "gemini association returned 3 edge reading(s)"
+                ],
+                "corroborations": [
+                  {
+                    "edge_index": 0,
+                    "value": 220.0,
+                    "azimuth": 0.8125,
+                    "source": "ocr_proximity",
+                    "pct_err": 0.37
+                  },
+                  {
+                    "edge_index": 2,
+                    "value": 220.0,
+                    "azimuth": 180.8125,
+                    "source": "gemini_association",
+                    "pct_err": 0.2
+                  },
+                  {
+                    "edge_index": 3,
+                    "value": 550.75,
+                    "azimuth": null,
+                    "source": "ocr_proximity",
+                    "pct_err": 0.3
+                  }
+                ]
+              }
+            },
+            {
+              "vision_geometry": {
+                "boundary_calls": [
+                  {
+                    "bearing": "S0\u00b048'45\"W",
+                    "distance": "220.00'"
+                  },
+                  {
+                    "bearing": "N89\u00b011'15\"W",
+                    "distance": "903.15'"
+                  },
+                  {
+                    "bearing": "N0\u00b048'45\"E",
+                    "distance": "220.00'"
+                  },
+                  {
+                    "bearing": "S89\u00b011'15\"E",
+                    "distance": "903.15'"
+                  }
+                ],
+                "tie_point": null,
+                "basis_of_bearings": "NEVADA STATE PLANE, WEST ZONE NAD83(94)",
+                "parcel_label": "PARCEL 1",
+                "role": "target",
+                "stated_area_acres": "1.78",
+                "ambiguous_alternates": [
+                  {
+                    "bearing": "S89\u00b011'15\"E",
+                    "distance": "352.40'"
+                  },
+                  {
+                    "bearing": "N89\u00b011'15\"W",
+                    "distance": "352.40'"
+                  }
+                ],
+                "curve_calls": []
+              },
+              "resolved_boundary_calls": [
+                {
+                  "bearing": "S0\u00b048'45\"W",
+                  "distance": "220.00'"
+                },
+                {
+                  "bearing": "N89\u00b011'15\"W",
+                  "distance": "352.40'"
+                },
+                {
+                  "bearing": "N0\u00b048'45\"E",
+                  "distance": "220.00'"
+                },
+                {
+                  "bearing": "S89\u00b011'15\"E",
+                  "distance": "352.40'"
+                }
+              ],
+              "boundary_geojson": {
+                "type": "Feature",
+                "properties": {
+                  "closure_error_ft": 0.0,
+                  "unparsed_calls": 0,
+                  "curve_diagnostics": []
+                },
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [
+                        -100.2,
+                        -86.16
+                      ],
+                      [
+                        245.09,
+                        -92.49
+                      ],
+                      [
+                        247.84,
+                        132.33
+                      ],
+                      [
+                        -96.8,
+                        138.44
+                      ],
+                      [
+                        -100.2,
+                        -86.16
+                      ]
+                    ]
+                  ]
+                }
+              },
+              "spatial_validation": {
+                "valid": false,
+                "issues": [
+                  "Walked area (38,822 sqft) differs from the document's stated area (77,537 sqft) by 50% -- beyond the 15% tolerance."
+                ],
+                "perimeter_ft": 914.87,
+                "precision_ratio": null,
+                "self_intersects": false,
+                "area_sqft": 38822.36,
+                "area_acres": 0.891,
+                "stated_area_sqft": 77536.8,
+                "area_matches_stated": false,
+                "area_diff_pct": 49.93,
+                "curve_diagnostics": []
+              },
+              "confirmed_boundary_pixels": {
+                "vertices": [
+                  [
+                    1217.4379746140316,
+                    807.2529857652794
+                  ],
+                  [
+                    1798.400042101398,
+                    816.4040475868369
+                  ],
+                  [
+                    1802.0493005731087,
+                    438.15770241957784
+                  ],
+                  [
+                    1222.200641974328,
+                    429.3487392613849
+                  ]
+                ],
+                "crop_width": 2174.0,
+                "crop_height": 1687.0
+              },
+              "human_confirmed": true,
+              "boundary_geojson_wgs84": {
+                "type": "Feature",
+                "properties": {
+                  "closure_error_ft": 0.0,
+                  "unparsed_calls": 0,
+                  "anchor_lat": 39.70204799348275,
+                  "anchor_lon": -119.90215963414798,
+                  "georeferenced": "from_confirmed_boundary"
+                },
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [
+                        -119.9025157,
+                        39.7018115
+                      ],
+                      [
+                        -119.9012886,
+                        39.7017941
+                      ],
+                      [
+                        -119.9012788,
+                        39.7024113
+                      ],
+                      [
+                        -119.9025036,
+                        39.7024281
+                      ],
+                      [
+                        -119.9025157,
+                        39.7018115
+                      ]
+                    ]
+                  ]
+                }
+              },
+              "boundary_source": "manual_confirmed_calibrated",
+              "calibration": {
+                "status": "cross_validated",
+                "scale_ft_per_px": 0.594376603229447,
+                "rotation_deg": 0.14687795597903636,
+                "scale_from_area": 0.594376603229447,
+                "scale_from_edges": 0.594308319624289,
+                "scale_agreement_pct": 0.011488272719177357,
+                "corroborating_edge_count": 4,
+                "notes": [
+                  "resolved 180deg direction ambiguity using the previous (uncalibrated) placement as a reference (candidate A err=224650, candidate B err=860569)",
+                  "4 corroborating edge(s): [0, 1, 2, 3]",
+                  "gemini association returned 4 edge reading(s)"
+                ],
+                "corroborations": [
+                  {
+                    "edge_index": 3,
+                    "value": 220.0,
+                    "azimuth": 0.8125,
+                    "source": "gemini_association",
+                    "pct_err": 2.06
+                  },
+                  {
+                    "edge_index": 3,
+                    "value": 220.0,
+                    "azimuth": 180.8125,
+                    "source": "gemini_association",
+                    "pct_err": 2.06
+                  },
+                  {
+                    "edge_index": 2,
+                    "value": 352.4,
+                    "azimuth": null,
+                    "source": "ocr_proximity",
+                    "pct_err": 2.24
+                  },
+                  {
+                    "edge_index": 1,
+                    "value": 220.0,
+                    "azimuth": 180.8125,
+                    "source": "ocr_proximity",
+                    "pct_err": 2.15
+                  },
+                  {
+                    "edge_index": 0,
+                    "value": 352.4,
+                    "azimuth": null,
+                    "source": "ocr_proximity",
+                    "pct_err": 2.04
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "class": "Seal",
+          "confidence": 0.922,
+          "bbox": [
+            1418.1,
+            1352.6,
+            126.0,
+            124.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "C\nERIC\nV\nE\nSNYDER\nOF\nEXP:06-30-26",
+          "ocr_confidence": 0.843
+        },
+        {
+          "class": "Table",
+          "confidence": 0.568,
+          "bbox": [
+            1622.3,
+            1184.8,
+            256.0,
+            75.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "RESULTANT PARCEL AREAS\nAREA NAME\nSQ.FT\nACRES\nPARCEL1\n77,526\n121,165\n2.78\n1.78\nPARCEL 2\nTOTAL\n198,691\n4.56",
+          "ocr_confidence": 0.985
+        },
+        {
+          "class": "Text",
+          "confidence": 0.425,
+          "bbox": [
+            1883.0,
+            1327.2,
+            127.6,
+            34.0
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_009_03_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "PARCEL MAP EXHIBIT\nFOR",
+          "ocr_confidence": 0.99
+        },
+        {
+          "class": "Picture",
+          "confidence": 0.336,
+          "bbox": [
+            1807.9,
+            1438.3,
+            190.1,
+            64.2
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_009_04_Picture.png",
+          "extraction_status": "skipped"
+        }
+      ]
+    },
+    {
+      "page_number": 10,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.975,
+          "bbox": [
+            1550.3,
+            590.6,
+            532.1,
+            52.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "3.\nPURPOSE OF INSTALLING AND MAINTAINING UTILTY AND CABLE TV FACILTIES TO THAT PARCEL AND THE RIGHT TO\nAGREED UPON BY THE OWNER OF RECORD, AT THAT TIME, AND THE UTILITY AND CABLE TV COMPANIES.",
+          "ocr_confidence": 0.978
+        },
+        {
+          "class": "Text",
+          "confidence": 0.973,
+          "bbox": [
+            1000.9,
+            1375.1,
+            526.7,
+            34.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "5\nQUITCLAIM DEED DOCUMENT NO, 3676616, RECORDED AUGUST 6. 2008, OFFICIAL RECORDS OF WASHOE COUNTY.\nNEVADA.",
+          "ocr_confidence": 0.974
+        },
+        {
+          "class": "Text",
+          "confidence": 0.97,
+          "bbox": [
+            1546.6,
+            846.5,
+            542.8,
+            43.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "10.\nESTABLISHED. IF STRUCTURE PLACEMENT DQES NOT REFLECT THE STREeT ON WHICH THE PRE-ASSIGNED ADDRESS\nWASHOE COINTY WILL PRE-ASSIGN ADDRESSES TO RE RELEASED ONCE AN ASSESSOR'S PARCEL NUMBER HAS BEEN\nIS ISSUED. THE DEVELOPER WILL REOUEST A NEW ADDRESS PRIOR TO ISSUANCE OF A BUILDING PERMIT.",
+          "ocr_confidence": 0.944
+        },
+        {
+          "class": "Text",
+          "confidence": 0.97,
+          "bbox": [
+            1546.0,
+            764.9,
+            532.7,
+            41.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "8\nEACH PARCEL CREATED BY THIS MAP IS REQUIRED TO HAVE A SEPARATE WATER METER AND WATER SERVICE LNE\nTHE WATER PURVEYOR SHALL HAVE THE RIGHT TO INSTALL A WATER METER IN A PUBLIC UTILITY EASEMENT\nADJACENT TO THE STREET TO SERVEEACH PARCEL RESPECTIVELY.",
+          "ocr_confidence": 0.953
+        },
+        {
+          "class": "Text",
+          "confidence": 0.967,
+          "bbox": [
+            1001.8,
+            1344.2,
+            515.9,
+            33.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "4.\nGRANT, BARGAIN_ SALE DEED, DOCUMENT NO. 5589341, RECORDED DECEMBER 17, 2025, OFFICIAL RECORDS OF\nWASHOE COUNTY, NEVADA.",
+          "ocr_confidence": 0.933
+        },
+        {
+          "class": "Text",
+          "confidence": 0.965,
+          "bbox": [
+            1549.9,
+            1021.5,
+            531.4,
+            51.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "15.\nTHE OWNER, BUYERS, ASSIGNS, OR ANY INTEREST HOLDER OF ANY LOTS OR PARCELS SHOWN HEREON, HEREBY\nRIGHTS TO WATER FROM THESE DITCHES SHALL BE HONORED AND THE RIGHT OF ACCESS FOR MAINTENANCE AND\nAGREE THAT ALL EXISTING IRRIGATION FLOWS CROSSING THESE PARCELS SHALL BE PERPETUATED. ANY LEGAL\nOPERATION WILL NOT BE DENIED TO VALID HOLDERS OF THOSE RIGHTS.",
+          "ocr_confidence": 0.968
+        },
+        {
+          "class": "Text",
+          "confidence": 0.964,
+          "bbox": [
+            1551.7,
+            887.9,
+            543.2,
+            53.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "11. ALL PROPERTIES, REGARDLESS IF THEY ARE LOCATED WITHIN OR OUTSIDE OF A FEMA DESIGNATED FLOOD ZONE, MAY\nBE SUBJECT TO FLOODING. THE PROPERTY OWNER IS REQUIRED TO MAINTAIN ALL DRAINAGE EASEMENTS AND\nNATURAL DRAINAGES AND NOT PERFORM OR ALLOW UNPERMITTED AND UNAPPROVED MODIFICATIONS TO THE\nPROPERTY THAT MAY HAVE DETRIMENTAL IMPACTS TO SURROUNDING PROPERTIES.",
+          "ocr_confidence": 0.976
+        },
+        {
+          "class": "Text",
+          "confidence": 0.959,
+          "bbox": [
+            1549.0,
+            672.4,
+            545.2,
+            42.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "5.\nWITH THE DEVELOPMENT OF EACH PARCEL AND PRIOR TO THE ISSUANCE OF ANY BUILDING PERMIT FOR SAD PARCEL\nTHE OWNER SHALL DEDICATE WATER RIGHTS TO THE SERVICING UTILITY SUFFICIENT TO SERVE THE DEVELOPMENT,\nAND SHALL PROVIDE WASHOE COUNTY WITH A WILL-SERVE LETTER.",
+          "ocr_confidence": 0.969
+        },
+        {
+          "class": "Seal",
+          "confidence": 0.95,
+          "bbox": [
+            1137.5,
+            753.9,
+            131.1,
+            122.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "ERIC\nSNYDER\nXP:06-30-\n4\n111",
+          "ocr_confidence": 0.784
+        },
+        {
+          "class": "Text",
+          "confidence": 0.947,
+          "bbox": [
+            1545.7,
+            559.0,
+            526.8,
+            33.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "2.\nA PUBLIC UTILTY EASEMENT TEN FEET (1Q') IN WIDTH CENTERED ON ALL EXISTING UTILITY FACILITIES IS HEREBY\nGRANTED",
+          "ocr_confidence": 0.874
+        },
+        {
+          "class": "Text",
+          "confidence": 0.945,
+          "bbox": [
+            998.3,
+            1436.7,
+            540.3,
+            32.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "7\nCOMMITMENT FOR TITLE INSURANCE ISSUED BY FIRST AMERICAN TITLE INSURANCE COMPANY OF NEVADA, ORDER",
+          "ocr_confidence": 0.96
+        },
+        {
+          "class": "Text",
+          "confidence": 0.944,
+          "bbox": [
+            998.8,
+            1222.5,
+            121.1,
+            28.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "REFERENCES",
+          "ocr_confidence": 0.999
+        },
+        {
+          "class": "Text",
+          "confidence": 0.944,
+          "bbox": [
+            1551.4,
+            732.5,
+            526.2,
+            34.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "7.\nFIRE HYDRANTS SHALL BE INSTALLED AS PER FIRE DEPARTMENT REQUIREMENTS WITH THE ISSUANCE OF BUILDING\nPERMITS.",
+          "ocr_confidence": 0.979
+        },
+        {
+          "class": "Text",
+          "confidence": 0.941,
+          "bbox": [
+            417.5,
+            764.7,
+            517.7,
+            79.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "MANAGEMENT, LLC OWNS OF RECORD AN INTEREST IN THE LANDS DELINEATED HEREON AND THAT HE IS THE ONLY\nTHE LANDS DELINEATED HEREON FOR DELINQUENT STATE, COUNTY, MUNICIPAL FEDERAL OR LOCAL TAXES OR\nDIMIDED: EXCEPT PER DEEDS)OE TRUSTDOC NO. 5588342. AND THAT THERE ARE NOIIENS OE RECORD AGAINST\nASSESSMENTS COLLECTED AS TAXES OR SPECIAL ASSESSMENTS, AS OF\n20",
+          "ocr_confidence": 0.956
+        },
+        {
+          "class": "Text",
+          "confidence": 0.94,
+          "bbox": [
+            994.9,
+            1304.4,
+            524.8,
+            41.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "3.\nRECORD OF SURVEY SUPPORTING A BOUNDARY LINE ADJUSTMENT FOR THE LARRY WELCH TRUST DATED\nSEPTEMBER 16, 2010, AND THE SUSAN S. THOMPSON ESTATE, RECORD OF SuRVEY NO. 6231, FILE NO. 5138104.\nRECORDED FEBRUARY 4, 2021, OFFICIAL RECORDS OF WASHOE COUNTY, NEVADA,",
+          "ocr_confidence": 0.97
+        },
+        {
+          "class": "Text",
+          "confidence": 0.934,
+          "bbox": [
+            1002.3,
+            964.4,
+            512.4,
+            41.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "THIS FINAL MAP IS APPROVED AND ACCEPTED THIS\nDAY OF\n2026. BY THE DIRECTOR OF PLANNING\nAND BUILDING DIVISION OF WASHOE COUNTY, NEVADA, IN ACCORDANCE WITH NEVADA REVISED STATUTES 278.461\nTHROUGH 278,469.",
+          "ocr_confidence": 0.962
+        },
+        {
+          "class": "Text",
+          "confidence": 0.929,
+          "bbox": [
+            988.6,
+            664.7,
+            517.5,
+            31.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "1.\nTHE LANDS SURVEYED LIE WITHIN A PORTION OF THE NE 1/4 OF SECTION 13, TOWNSHIP 21 NORTH, RANGE 18 EAST,\nM.D.M.. AND THE SURVEY WAS COMPLETED ON FEBRUARY 02. 2026.",
+          "ocr_confidence": 0.965
+        },
+        {
+          "class": "Text",
+          "confidence": 0.928,
+          "bbox": [
+            1551.5,
+            989.2,
+            529.9,
+            32.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "14. NO HABITABLE STRUCTURES SHALL BE LOCATED QN A FAULT THAT WAS ACTIVE DURING THE HOLOCENE EPOCH OF\nGEOLOGICAL TIME.",
+          "ocr_confidence": 0.982
+        },
+        {
+          "class": "Text",
+          "confidence": 0.915,
+          "bbox": [
+            1010.1,
+            1241.5,
+            520.9,
+            33.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "RECORD OF SURVEY FOR JOAN BAILLIE, RECORD OF SURVEY NO. 3823, FILE NO. 2463986, RECORDED JULY 14, 2000\nOFFICIAL RECORDS OF WASHOE COUNTY, NEVADA.",
+          "ocr_confidence": 0.974
+        },
+        {
+          "class": "Text",
+          "confidence": 0.914,
+          "bbox": [
+            1012.4,
+            1406.2,
+            531.2,
+            33.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "QUITCLAM DEED DQCUMENT NO. 2400040, RECQRDED NQVEMBER 22. 1999. QFFICIAL RECQRDS OF WASHQE COUNTY\nNEVADA.",
+          "ocr_confidence": 0.921
+        },
+        {
+          "class": "Text",
+          "confidence": 0.907,
+          "bbox": [
+            979.6,
+            723.3,
+            499.9,
+            30.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "3.\nTHE MONUMENTS DEPICTED ON THIS PLAT ARE OE THE CHARACTER SHOWN AND OCCUPY THE POSITIONS\nINDICATED AND ARE OF SUFFICIENT NUMBER AND DURABILITY.",
+          "ocr_confidence": 0.968
+        },
+        {
+          "class": "Text",
+          "confidence": 0.905,
+          "bbox": [
+            418.6,
+            386.6,
+            251.0,
+            28.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "OWNER ACKNOWLEDGEMENT",
+          "ocr_confidence": 0.978
+        },
+        {
+          "class": "Text",
+          "confidence": 0.903,
+          "bbox": [
+            413.5,
+            975.4,
+            522.0,
+            53.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "THIS IS TO CERTIEY THAT THE FOLLOWNG HAVE CONSENTED TO THE PREPARATION AND RECORDATION OF THIS\nEASEMENTS SHOWN HEREON, AND HEREBY RELINQUISHES AND SUBORDINATES ANY LIENS HELD BY THE\nUNDERSIGNED IN FAVOR OE SUCH UTILTY EASEMENTS CREATED BY THIS MAP",
+          "ocr_confidence": 0.949
+        },
+        {
+          "class": "Text",
+          "confidence": 0.903,
+          "bbox": [
+            1551.7,
+            519.2,
+            536.4,
+            42.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "1.\nPUBLIC UTILITY EASEMENTS ARE HEREBY GRANTED TEN FEET (1O) COINCIDENT WITH ANY PUBLIC RIGHT-OF-WAY, FIVE\nFEET (5') IN WIDTH COINCIDENT WITH ALL OTHER EXTERIOR BOUNDARIES AND 10 FEET CENTERED ON ALL INTERIOR\nLOT LINES.",
+          "ocr_confidence": 0.969
+        },
+        {
+          "class": "Text",
+          "confidence": 0.898,
+          "bbox": [
+            994.4,
+            635.6,
+            507.8,
+            30.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "THIS PLAT REPRESENTS THE RESULTS OF A SURVEY CONDUCTED UNDER MY DIRECT SUPERVISION AT THE INSTANCE OF\nJEFFREYVEASLEY.",
+          "ocr_confidence": 0.962
+        },
+        {
+          "class": "Text",
+          "confidence": 0.895,
+          "bbox": [
+            1547.2,
+            641.2,
+            540.4,
+            32.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "4\nTHE PUBLIC UTILTY EASEMENTS SHON AND/OR NOTED ON THIS PLAT SHALL INCLUDE USE FOR THE INSTALLATION\nAND MAINTENANCE OF CABLE TELEVISION AND TRUCKEE MEADOWS WATER AUTHORITY.",
+          "ocr_confidence": 0.979
+        },
+        {
+          "class": "Text",
+          "confidence": 0.892,
+          "bbox": [
+            416.2,
+            1118.1,
+            343.1,
+            28.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "SECURITY INTEREST ACKNOWLEDGEMENT",
+          "ocr_confidence": 0.985
+        },
+        {
+          "class": "Text",
+          "confidence": 0.88,
+          "bbox": [
+            1546.4,
+            497.3,
+            73.1,
+            29.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "NOTES",
+          "ocr_confidence": 0.999
+        },
+        {
+          "class": "Text",
+          "confidence": 0.874,
+          "bbox": [
+            416.4,
+            948.2,
+            354.8,
+            27.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "SECURITY INTEREST HOLDER CERTIFICATE",
+          "ocr_confidence": 0.966
+        },
+        {
+          "class": "Text",
+          "confidence": 0.868,
+          "bbox": [
+            418.6,
+            1326.5,
+            504.2,
+            61.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "COUNTY SURVEYOR'S CERTIFICATE\nI HEREBY CERTIFY THAT I HAVE EXAMINED THIS PLAT AND PERFORMED A TECHNICAL MAP CHECK OF THE\nRECORDS OF WASHOE COUNTY, NEVADA, AS DOCUMENT NO. 2233806, AND I AM SATISFIED SAID GEOMETRIC DATA IS\nTECHNICALLY CORRECT.",
+          "ocr_confidence": 0.97
+        },
+        {
+          "class": "Text",
+          "confidence": 0.866,
+          "bbox": [
+            1553.9,
+            968.9,
+            383.5,
+            22.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "13. OWNERS OF EACH PARCEL SHALL PERPETUATE ALL NATURAL DRAINAGE.",
+          "ocr_confidence": 0.974
+        },
+        {
+          "class": "Text",
+          "confidence": 0.862,
+          "bbox": [
+            1544.9,
+            712.1,
+            431.9,
+            23.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "SEWAGE DISPOSAL SHALL BE BY CONNECTION TO A PUBLIC SEWER SYSTEM,",
+          "ocr_confidence": 0.968
+        },
+        {
+          "class": "Text",
+          "confidence": 0.859,
+          "bbox": [
+            421.0,
+            455.0,
+            504.2,
+            31.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "THIS INSTRUMENT WAS ACKNOWLEDGED BEFORE ME ON\n20_BY\nJEFFREY VEASLEY, MANAGING MEMBER.",
+          "ocr_confidence": 0.971
+        },
+        {
+          "class": "Text",
+          "confidence": 0.828,
+          "bbox": [
+            416.3,
+            848.6,
+            163.5,
+            22.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "FIRST CENTENNIAL TITLE COMPANY",
+          "ocr_confidence": 0.982
+        },
+        {
+          "class": "Text",
+          "confidence": 0.797,
+          "bbox": [
+            422.4,
+            622.9,
+            502.8,
+            50.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "DISPOSAL, WATER POLLUTION, WATER QUALITY, AND WATER SUPPLY FACILITIES. THIS MAP HAS BEEN FOUND TO MEeT\nALL APPLICABLE REQUIREMENTS AND PROVISIONS OF THE ENVIRONMENTAL HEALTH SERVICES DIVISION OF THE\nWASHOE COUNTY HEALTH DISTRICT.",
+          "ocr_confidence": 0.974
+        },
+        {
+          "class": "Text",
+          "confidence": 0.796,
+          "bbox": [
+            1552.2,
+            805.4,
+            500.2,
+            42.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "FOR EACH PARCEL CREATED BY THIS PARCEL MAP, ACCESS AND DRAINAGE IMPROVEMENTS MEETING THE\nREQUIREMENTS OF WASHOE COUNTY DEVELOPMENT CODE ARE REQUIRED WITH SAID IMPROVEMENTS TO BE\nINCLUDED WITHIN AN APPROVED RESIDENTIAL BUILDING PERMIT.",
+          "ocr_confidence": 0.961
+        },
+        {
+          "class": "Text",
+          "confidence": 0.745,
+          "bbox": [
+            996.2,
+            1273.1,
+            542.2,
+            32.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "2.\nRECORD OF SURVEY FOR WASHOE COUNTY, RECORD OF SURVEY NO. 5122, FILE NO. 3707161, RECORDED NOVEMBER\n20, 2008, OFFICIAL RECORDS OF WASHOE COUNTY, NEVADA",
+          "ocr_confidence": 0.964
+        },
+        {
+          "class": "Text",
+          "confidence": 0.742,
+          "bbox": [
+            415.3,
+            700.3,
+            222.0,
+            23.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "FOR THE OISTRICT BOARD OF HEALTH\nDATE",
+          "ocr_confidence": 0.972
+        },
+        {
+          "class": "Text",
+          "confidence": 0.734,
+          "bbox": [
+            1221.5,
+            1194.4,
+            91.7,
+            21.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "PRINT NAME/TITLE",
+          "ocr_confidence": 0.994
+        },
+        {
+          "class": "Text",
+          "confidence": 0.707,
+          "bbox": [
+            419.4,
+            229.3,
+            515.2,
+            84.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "THIS IS TO CERTIFY THAT THE UNDERSIGNED, JEFF VEASLY MANAGEMENT, LLC IS THE OWNER OF THE TRACT OF\nLAND REPRESENTED ON THIS PLAT AND HAS CONSENTED TO THE PREPARATION AND RECORDATION OF THIS PLAT.\nAND THAT THE SAME IS EXECUTED IN COMPLIANCE WITH AND SUBJECT TO THE PROVISIONS OF N.R.S. CHAPTER 278.\nTHE PUBLIC UTILITY EASEMENTS AS SHOWN HEREON ARE HEREBY GRANTED TOGETHER WITH THE RIGHT OF\nAGREE TO THE USE OF RESIDENTIAL WATER METERS. THE 20-FOOT ACCESS EASEMENT AND DRAINAGE EASEMENT\nACCESS TO ALL PUBLIC UTILmY COMPANIES, THEIR SUCCESSORS AND ASSIGNS, THE OWNER AND ITS ASSIGNS\n(DE), SANITARY SEWER EASEMENT (SS) AS SHOWN HEREON ARE HEREBY GRANTED.",
+          "ocr_confidence": 0.964
+        },
+        {
+          "class": "Text",
+          "confidence": 0.702,
+          "bbox": [
+            407.0,
+            1416.2,
+            151.3,
+            31.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "WAYNE HANDROCK, P.L.S. 20464\nWASHOE COUNTY SURVEYOR",
+          "ocr_confidence": 0.986
+        },
+        {
+          "class": "Text",
+          "confidence": 0.701,
+          "bbox": [
+            996.1,
+            1193.4,
+            64.2,
+            23.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "SIGNATURE",
+          "ocr_confidence": 0.999
+        },
+        {
+          "class": "Text",
+          "confidence": 0.693,
+          "bbox": [
+            1002.2,
+            615.0,
+            455.3,
+            22.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "L ERICV. SNYDER. A PROFESSIONAI IAND SIIRVEYORIICENSED IN THE STATE OE NEVADA. CERTIEY THAT",
+          "ocr_confidence": 0.88
+        },
+        {
+          "class": "Text",
+          "confidence": 0.682,
+          "bbox": [
+            990.8,
+            885.5,
+            512.8,
+            81.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "DIRECTOR OF PLANNING AND DEVELOPMENT CERTIFICATE\nTHE FINaL PARCEL MAP CASe NO, WTPM24-00Q9 MEetS ALL APPLICABLE STatUTES, ORDINaNCeS, AND CODE\nPROVISIONS; IS IN SUBSTANTIAL CONFORMANCE WITH THE TENTATIVE MAP AND ITS CONDITIONS, WHICH ARE\nINCORPORATED HEREIN BY THIS REFERENCE, AND THOSE CONDITIONS HAVE BEEN SATISFIED FOR RECORDATION\nOF THIS MAP. THE OFFER(S) OF DEDICATION IS (ARE) REJECTED AT THIS TIME, BUT WILL REMAIN OPEN IN\nACCORDANCE WITH NEVADA REVISED STATUTES CHAPTER 278.",
+          "ocr_confidence": 0.95
+        },
+        {
+          "class": "Text",
+          "confidence": 0.673,
+          "bbox": [
+            416.8,
+            879.6,
+            79.2,
+            24.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "TITLE OFFICER",
+          "ocr_confidence": 0.991
+        },
+        {
+          "class": "Text",
+          "confidence": 0.668,
+          "bbox": [
+            419.6,
+            510.0,
+            82.2,
+            23.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "NOTARY PUBLIC",
+          "ocr_confidence": 0.964
+        },
+        {
+          "class": "Text",
+          "confidence": 0.601,
+          "bbox": [
+            445.2,
+            1186.1,
+            456.2,
+            25.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": " 202_BY\nTHIS INSTRUMENT WAS ACKNOWLEDGED BEFORE ME ON",
+          "ocr_confidence": 0.923
+        },
+        {
+          "class": "Text",
+          "confidence": 0.587,
+          "bbox": [
+            997.1,
+            1087.0,
+            254.0,
+            24.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "TAXATION CERTIFICATE (APN: 086-250-65)",
+          "ocr_confidence": 0.988
+        },
+        {
+          "class": "Picture",
+          "confidence": 0.569,
+          "bbox": [
+            1807.9,
+            1439.3,
+            188.0,
+            62.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "skipped"
+        },
+        {
+          "class": "Text",
+          "confidence": 0.544,
+          "bbox": [
+            993.0,
+            801.0,
+            132.4,
+            25.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "ERIC V. SNYDER \u2212 PLS 11194",
+          "ocr_confidence": 0.934
+        },
+        {
+          "class": "Text",
+          "confidence": 0.534,
+          "bbox": [
+            995.3,
+            598.6,
+            204.5,
+            25.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "SURVEYOR'S CERTIFICATE",
+          "ocr_confidence": 0.988
+        },
+        {
+          "class": "Text",
+          "confidence": 0.504,
+          "bbox": [
+            995.4,
+            1026.5,
+            320.6,
+            22.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "KELLY MULLIN, DIRECTOR, PLANNING AND BUILDING DIVISION\nDATE",
+          "ocr_confidence": 0.992
+        },
+        {
+          "class": "Text",
+          "confidence": 0.497,
+          "bbox": [
+            421.4,
+            214.4,
+            182.5,
+            25.5
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_010_52_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "OWNERS CERTIFICATE",
+          "ocr_confidence": 0.993
+        },
+        {
+          "class": "Text",
+          "confidence": 0.497,
+          "bbox": [
+            992.3,
+            694.1,
+            498.7,
+            31.6
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_010_53_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "2.\nTHIS PLAT COMPLIES WITH THE APPLICABLE STATE STATUTES AND ANY LOCAL ORDINANCES IN AEFECT ON THE\nDATE THAT THE GOVERNING BODY GAVE IT'S FINAL APPROVAL",
+          "ocr_confidence": 0.871
+        },
+        {
+          "class": "Picture",
+          "confidence": 0.475,
+          "bbox": [
+            1026.8,
+            204.7,
+            397.5,
+            377.0
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_010_54_Picture.png",
+          "extraction_status": "skipped"
+        },
+        {
+          "class": "ParcelMap",
+          "confidence": 0.461,
+          "bbox": [
+            992.8,
+            170.7,
+            465.5,
+            445.0
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_010_55_ParcelMap.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "LAUREN DR\nPROJECT LOCATION\nOSAGE RD\nCPLACERVILLE RD\nRD\nVICINITYMAP\nNOT TO SCALE",
+          "ocr_confidence": 0.97,
+          "needs_vision": true,
+          "category": "not_a_parcel_drawing",
+          "parcels": [],
+          "vision_escalated": true
+        },
+        {
+          "class": "Text",
+          "confidence": 0.453,
+          "bbox": [
+            416.1,
+            528.3,
+            140.1,
+            25.0
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_010_56_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "MY COMMISSION EXPIRES",
+          "ocr_confidence": 0.994
+        },
+        {
+          "class": "Text",
+          "confidence": 0.449,
+          "bbox": [
+            412.8,
+            606.2,
+            338.6,
+            25.4
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_010_57_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "DISTRICT BOARD OF HEALTH CERTIFICATE\nTHIS MAP IS APPROVED BY THE WASHOE COUNTY DISTRICT BOARD OF HEALTH. THIS APPROVAL CONCERNS SEWAGE",
+          "ocr_confidence": 0.957
+        },
+        {
+          "class": "Text",
+          "confidence": 0.376,
+          "bbox": [
+            1552.0,
+            1241.9,
+            279.8,
+            24.0
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_010_58_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "WASHOE COUNTY COMMUNITY SERVICES DEPARTMENT DATE",
+          "ocr_confidence": 0.976
+        },
+        {
+          "class": "Text",
+          "confidence": 0.35,
+          "bbox": [
+            996.2,
+            1100.9,
+            519.5,
+            45.1
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_010_59_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "THE UNDERSIGNED HEREBY CERTIFIES THAT ALL THE PROPERTY TAXES ON THE LAND FOR THE FISCAL YEAR HAVE\nBEEN PAID AND THAT THE FULL AMOUNT OF ANY DEFERRED PROPERTY TAXES FOR THE CONVERSION OF THE\nPROPERTY FROM AGRICULTURE USE HAS BEEN PAID PURSUANT TO NRS 361A.265.",
+          "ocr_confidence": 0.973
+        },
+        {
+          "class": "Text",
+          "confidence": 0.346,
+          "bbox": [
+            418.6,
+            750.5,
+            248.1,
+            25.5
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_010_60_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "TITLE COMPANY CERTIFICATE\nTHE UNDeRSIGNED HEReBY CeRTIFIES THAT THIS PLAT HaS BEEN EXAMINED AND THAT JEFF VEASLEY",
+          "ocr_confidence": 0.919
+        },
+        {
+          "class": "Text",
+          "confidence": 0.277,
+          "bbox": [
+            409.2,
+            344.4,
+            385.8,
+            21.6
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_010_61_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "OWNER\nDATE\nBY:JEFF VEASLEY MANAGEMENT, LLC",
+          "ocr_confidence": 0.991
+        },
+        {
+          "class": "Text",
+          "confidence": 0.269,
+          "bbox": [
+            1549.4,
+            1179.0,
+            512.4,
+            45.9
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_010_62_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "WATER & SEWER RESOURCE REQUIREMENTS\nTHE PROJECT/DEVELOPMENT DEPICTED ON THIS MAP IS IN CONFORMANCE WITH THE PROVISIONS OF ARTICLE 422 OF\nWASHOE COUNTY CHAPTER 110 (DEVELOPMENT CODE).",
+          "ocr_confidence": 0.973
+        }
+      ]
+    },
+    {
+      "page_number": 11,
+      "regions": [
+        {
+          "class": "ParcelMap",
+          "confidence": 0.962,
+          "bbox": [
+            184.4,
+            72.6,
+            2015.6,
+            1490.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "12\nWASHOE COUNTY CONTROL POINT\nN22SM01029 USGLO 2\" BRASS CAP\nS12/7/13/18 1942\n13\n1\nGROUND COORDINATES (MEASURED)\nN: 14928989.71\nE: 2253610.44\nGROUND COORDINATES (RECORD)\nN:14928989.62\nROBERTL. CARSEY JR.\nE:2253610.74\nPARCEL 1B RS 6231 (R.3)\nAPN: 086-260-21\nSTEVEND& CORINA B.POKRAJIAC\nPARCEL2BRS 6231 (R3)\nAPN: 086-260-22\n21\n(S89\u00b009/41\"E) (R3)\n(N89*5729\"E) (R4)\nS89\u00b01115\"E903.15\n550.75\nN89\u00b011\"15\"W\nGROUND COORDINATES\n5.00 P.U.E GRANTED\n352.40\n1077.90*\nN 14926910.28\nE2251599.70\nPER THIS MAP\n5.00/ P.U.E GRANTED\nPER THIS MAP\n5.00 P.U.E GRANTED\nFD 5/8*REBAR - PLS 5506\nGROUND COORDINATES\n0.77' EAST OF SECTION LINE\nPER THIS MAP\nN14926897.47\nE2252502.76\n9\n\uff0862680)\n(0)\nISILAT SNAO\n00023.9.80N\n\u2014() (.00\u00b009 M.1S.20,0N)-\n\n69-052-980-N\n(a) (00\u00b009Z 3.18.20.0S)\n.000ZM..S.8.0S\n910 0330\n02-980N\nPARCEL2\n-.00022\nM.S.8,0S\n2.78 ACRES\nPARCEL1\n1.78 ACRES\n5.00\n10 P.U.E. GRANTED\nPER THIS MAP\n5.00 P.U.E GRANTED\nPER THIS MAP\nFD 5/8* REBAR - NO CAP OR TAG\n10.00 P.U.E GRANTED\n0.32EAST\nPER THIS MAP\n5.00\n10.00 P.U.E GRANTED\nPER THIS MAP\nFD 5/8* REBAR - NO CAP OR TAG\n550.75\n0.36' SOUTH\nN89*11'15\"W 903.15\"\n352.40\n3962\n-S1\u00b039/59\u00b0W 30.00\u00b0(TIE)\n(N89\u00b05729\u00b0E)(R4)\nQ\nS89\u00b01117\u00b0E336.41\n(N89\u00b057'29\u00b0E) (R2)\n4\nS89*11'17*E329.80\n(N89\u00b057\"29\u00b0E)(R2)\n2\nS89*11'17*E325.30\n-30QUITCLAIMAREA (R6)\nPLACERVILLE ROAD\n(N89\u00b057'29\u00b0E) (R2)\n(60r WIDE PUBLIC ROW AS SHOWN ON RS 5122)\n30QUITCLAIM AREA (R5)\n-30 QUITCLAIM AREA (R5)\n18\nJAMES KRANTZ & LINDA HOUGHTON TRUST\nDEED 4286292\nORLANDO G. & REGINA M. JASSO\nWASHOE COUNTY CONTROL POINT\nAPN: 086-250-67\nORLANDO G. & REGINA M. JASSO\nDEED 5217588\nN22SM01113 USGLO BRASS CAP\nDEED 5217588\nAPN: 086-250-76\n1/4 CORNER 13/18 1942\nAPN: 086-250-75\nGROUND COORDINATES (MEASURED)\nN:14926352.62\nE:2253573.04\nGROUND COORDINATES (RECORD)\nN:14926352.55\nE:2253573.13\nLEGEND\n\u25a0\nFOUND 5/8* REBAR WITH CAP PLS 5506\n?\nFOUND 5/8* REBAR - NO CAP OR TAG\nO\nSET 5/8\" REBAR WITH PLASTIC CAP \"PLS 11194*\n/2\nTIED SECTION CORNER AS NOTED\n18\n13 18\nTIED QUARTER SECTION CORNER AS NOTED\n0\nRECORD INFORMATION\n(R1)\nREFERENCE NUMBER\nGRAPHIC SCALE\nTM\nTRACT MAP\n40\n20\n40\n80\nPM\nPARCEL MAP\nAPN\nASSESSOR PARCEL NUMBER\n1 inch = 40 ft.\nPUE\nPUBLIC UTILITY EASEMENT\nROW\nRIGHT-OF-WAY\nSQ. FT.\nSQUARE FOOT\nPARCEL MAP\nADJOINER LOT LINES\nFOR\nEASEMENT LINE\nNVZ LLC\nPROPERTY LINES\nLOCATED WITHIN THE NORTHEAST QUARTER (NE1/4) OF SECTION 13,\nBEING A DIVISION OF DEED DOC NO. 5589341\nBASIS OF BEARINGS\nTHE BASIS OF BEARINGS FOR THIS SURVEY IS NEVADA STATE PLANE, WEST ZONE\nSECTION LINE\nWASHOE COUNTY\nTOWNSHIP 21 NORTH, RANGE 18 EAST, M.D.M.\nGRAPHIC BORDER\nNEVADA\nCORRECTIONS FROM THE NORTHERN NEVADA COOPERATIVE REAL TIME NETWORK.\nNAD83(94) BASED ON REAL TIME KINEMATIC (RTK) GPS OBSERVATIONS UTILIZING\nJOB NO.\n420524\nCOORDINATES AND DISTANCES HEREON ARE AT GROUND LEVEL BASED ON A\nBowman\nDRAWN BY\nAJV\nCOMBINED GRID TO GROUND FACTOR OF 1.000197939.\nCHECKED BY\nEVS\n1150 CORPO8ATE BLVD. IRENO. NV 89502\nDATE\n03/11/2026\n775-856-1150 MAIN |BOWMAN,COM\nSHEET\n2\n2\nV: \\420524 \u2013 10235 PLACERMLLE DR, RENO, NV\\420524\u201301\u2013001 (SUR) \u2212 VEASLEY\u2013PM PREP\u2013P0ST SUBMITTAL\\SURVEY\\DWG\\V\u2013PMAP\u2013PLACERMLLE\u2013RD.DWG <ESNYDER> 3/19/2026 9: 36 AM",
+          "ocr_confidence": 0.899,
+          "needs_vision": true,
+          "category": "boundary_plat",
+          "parcels": [
+            {
+              "vision_geometry": {
+                "boundary_calls": [
+                  {
+                    "bearing": "N0\u00b048'45\"E",
+                    "distance": "220.00'"
+                  },
+                  {
+                    "bearing": "S89\u00b011'15\"E",
+                    "distance": "903.15'"
+                  },
+                  {
+                    "bearing": "S0\u00b048'45\"W",
+                    "distance": "220.00'"
+                  },
+                  {
+                    "bearing": "N89\u00b011'15\"W",
+                    "distance": "903.15'"
+                  }
+                ],
+                "tie_point": {
+                  "northing": "14926910.28",
+                  "easting": "2251599.70",
+                  "anchors_corner": "northwestern corner of Parcel 2"
+                },
+                "basis_of_bearings": "NEVADA STATE PLANE, WEST ZONE NAD83(94)",
+                "parcel_label": "PARCEL 2",
+                "role": "target",
+                "stated_area_acres": "2.78",
+                "ambiguous_alternates": [
+                  {
+                    "bearing": "S89\u00b011'15\"E",
+                    "distance": "550.75'"
+                  },
+                  {
+                    "bearing": "N89\u00b011'15\"W",
+                    "distance": "550.75'"
+                  }
+                ],
+                "curve_calls": []
+              },
+              "resolved_boundary_calls": [
+                {
+                  "bearing": "N0\u00b048'45\"E",
+                  "distance": "220.00'"
+                },
+                {
+                  "bearing": "S89\u00b011'15\"E",
+                  "distance": "550.75'"
+                },
+                {
+                  "bearing": "S0\u00b048'45\"W",
+                  "distance": "220.00'"
+                },
+                {
+                  "bearing": "N89\u00b011'15\"W",
+                  "distance": "550.75'"
+                }
+              ],
+              "boundary_geojson": {
+                "type": "Feature",
+                "properties": {
+                  "closure_error_ft": 0.0,
+                  "unparsed_calls": 0,
+                  "curve_diagnostics": []
+                },
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [
+                        0.0,
+                        0.0
+                      ],
+                      [
+                        3.12,
+                        219.98
+                      ],
+                      [
+                        553.81,
+                        212.17
+                      ],
+                      [
+                        550.69,
+                        -7.81
+                      ],
+                      [
+                        0.0,
+                        0.0
+                      ],
+                      [
+                        0.0,
+                        0.0
+                      ]
+                    ]
+                  ]
+                }
+              },
+              "spatial_validation": {
+                "valid": true,
+                "issues": [],
+                "perimeter_ft": 1541.5,
+                "precision_ratio": null,
+                "self_intersects": false,
+                "area_sqft": 121165.0,
+                "area_acres": 2.782,
+                "stated_area_sqft": 121096.79999999999,
+                "area_matches_stated": true,
+                "area_diff_pct": 0.06,
+                "curve_diagnostics": []
+              },
+              "boundary_geojson_wgs84": {
+                "type": "Feature",
+                "properties": {
+                  "closure_error_ft": 0.0,
+                  "unparsed_calls": 0,
+                  "anchor_lat": 39.70204799348275,
+                  "anchor_lon": -119.90215963414798,
+                  "georeferenced": "approximate"
+                },
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [
+                        -119.9021596,
+                        39.702048
+                      ],
+                      [
+                        -119.9021485,
+                        39.7026519
+                      ],
+                      [
+                        -119.9001914,
+                        39.7026304
+                      ],
+                      [
+                        -119.9002025,
+                        39.7020265
+                      ],
+                      [
+                        -119.9021596,
+                        39.702048
+                      ]
+                    ]
+                  ]
+                }
+              }
+            },
+            {
+              "vision_geometry": {
+                "boundary_calls": [
+                  {
+                    "bearing": "S0\u00b048'45\"W",
+                    "distance": "220.00'"
+                  },
+                  {
+                    "bearing": "N89\u00b011'15\"W",
+                    "distance": "903.15'"
+                  },
+                  {
+                    "bearing": "N0\u00b048'45\"E",
+                    "distance": "220.00'"
+                  },
+                  {
+                    "bearing": "S89\u00b011'15\"E",
+                    "distance": "903.15'"
+                  }
+                ],
+                "tie_point": null,
+                "basis_of_bearings": "NEVADA STATE PLANE, WEST ZONE NAD83(94)",
+                "parcel_label": "PARCEL 1",
+                "role": "target",
+                "stated_area_acres": "1.78",
+                "ambiguous_alternates": [
+                  {
+                    "bearing": "S89\u00b011'15\"E",
+                    "distance": "352.40'"
+                  },
+                  {
+                    "bearing": "N89\u00b011'15\"W",
+                    "distance": "352.40'"
+                  }
+                ],
+                "curve_calls": []
+              },
+              "resolved_boundary_calls": [
+                {
+                  "bearing": "S0\u00b048'45\"W",
+                  "distance": "220.00'"
+                },
+                {
+                  "bearing": "N89\u00b011'15\"W",
+                  "distance": "352.40'"
+                },
+                {
+                  "bearing": "N0\u00b048'45\"E",
+                  "distance": "220.00'"
+                },
+                {
+                  "bearing": "S89\u00b011'15\"E",
+                  "distance": "352.40'"
+                }
+              ],
+              "boundary_geojson": {
+                "type": "Feature",
+                "properties": {
+                  "closure_error_ft": 0.0,
+                  "unparsed_calls": 0,
+                  "curve_diagnostics": []
+                },
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [
+                        0.0,
+                        0.0
+                      ],
+                      [
+                        -3.12,
+                        -219.98
+                      ],
+                      [
+                        -355.48,
+                        -214.98
+                      ],
+                      [
+                        -352.36,
+                        5.0
+                      ],
+                      [
+                        -0.0,
+                        0.0
+                      ],
+                      [
+                        0.0,
+                        0.0
+                      ]
+                    ]
+                  ]
+                }
+              },
+              "spatial_validation": {
+                "valid": true,
+                "issues": [],
+                "perimeter_ft": 1144.8,
+                "precision_ratio": null,
+                "self_intersects": false,
+                "area_sqft": 77528.0,
+                "area_acres": 1.78,
+                "stated_area_sqft": 77536.8,
+                "area_matches_stated": true,
+                "area_diff_pct": 0.01,
+                "curve_diagnostics": []
+              },
+              "boundary_geojson_wgs84": {
+                "type": "Feature",
+                "properties": {
+                  "closure_error_ft": 0.0,
+                  "unparsed_calls": 0,
+                  "anchor_lat": 39.70204799348275,
+                  "anchor_lon": -119.90215963414798,
+                  "georeferenced": "approximate"
+                },
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [
+                        -119.9021596,
+                        39.702048
+                      ],
+                      [
+                        -119.9021707,
+                        39.7014441
+                      ],
+                      [
+                        -119.903423,
+                        39.7014578
+                      ],
+                      [
+                        -119.9034119,
+                        39.7020617
+                      ],
+                      [
+                        -119.9021596,
+                        39.702048
+                      ]
+                    ]
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "class": "Seal",
+          "confidence": 0.893,
+          "bbox": [
+            1427.7,
+            1357.6,
+            124.2,
+            123.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "ERIC\nSNYDER\n2",
+          "ocr_confidence": 0.715
+        },
+        {
+          "class": "Table",
+          "confidence": 0.483,
+          "bbox": [
+            1622.3,
+            1184.8,
+            255.8,
+            75.0
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_011_02_Table.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "RESULTANT PARCEL AREAS\nAREA NAME\nSQ.FT\nACRES\nPARCEL1\n77,526\n121,165\n2.78\n1.78\nPARCEL 2\nTOTAL\n198,691\n4.56",
+          "ocr_confidence": 0.984
+        },
+        {
+          "class": "Picture",
+          "confidence": 0.381,
+          "bbox": [
+            1807.4,
+            1438.2,
+            190.4,
+            64.5
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\6d8534f5-f07a-460d-970f-4ccf5c40a3e4\\review_crops\\page_011_03_Picture.png",
+          "extraction_status": "skipped"
+        }
+      ]
+    }
+  ],
+  "pages_needing_review": 8,
+  "anchor_lat": 39.70204799348275,
+  "anchor_lon": -119.90215963414798,
+  "anchor": {
+    "precision": "surveyed",
+    "source": "state-plane coordinate printed on the document"
+  }
+}

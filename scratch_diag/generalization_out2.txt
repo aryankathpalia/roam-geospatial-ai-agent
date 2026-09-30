@@ -1,0 +1,150 @@
+C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py:197: UserWarning: Specified provider 'CUDAExecutionProvider' is not in available provider names.Available providers: 'AzureExecutionProvider, CPUExecutionProvider'
+  warnings.warn(
+
+======================================================================
+27211ae5-0099-4b0d-8176-f1483897b766 (13 pages): 4 ParcelMap region(s)
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+  p2 R1 MAP 7 LOT 48: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+  p2 R1 MAP 7 LOT 48-3: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+  p13 R3 MAP 7 LOT 48: raw_calls=5 used=5 alts=[] closure=458.12 prec=1:1.9 area=1.067 stated=0.95 valid=False
+      calls: ['N 24°11\'47" W 209.92\'', 'N 66°04\'20" E 11.63\'', 'N 61°53\'54" E 105.55\'', 'S 55°14\'15" E 322.74\'', 'S 54°45\'01" E 209.93\'']
+      - Weak closure: precision ratio 1:2 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.
+  p13 R3 MAP 7 LOT 48-3: raw_calls=4 used=4 alts=[] closure=270.13 prec=1:1.6 area=0.493 stated=1.72 valid=False
+      calls: ['N 22°51\'56" W 164.66\'', 'S 77°39\'32" W 164.41\'', 'S 42°26\'48" W 66.91\'', 'S 03°23\'08" E 32.24\'']
+      - Weak closure: precision ratio 1:2 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.
+      - Walked area (21,485 sqft) differs from the document's stated area (74,923 sqft) by 71% -- beyond the 15% tolerance.
+  p13 R4 MAP 7 LOT 48: raw_calls=5 used=5 alts=[] closure=458.12 prec=1:1.9 area=1.067 stated=0.95 valid=False
+      calls: ['N 24°11\'47" W 209.92\'', 'N 66°04\'20" E 11.63\'', 'N 61°53\'54" E 105.55\'', 'S 55°14\'15" E 322.74\'', 'S 54°45\'01" E 209.93\'']
+      - Weak closure: precision ratio 1:2 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.
+  p13 R4 MAP 7 LOT 48-3: raw_calls=4 used=4 alts=[] closure=270.13 prec=1:1.6 area=0.493 stated=1.72 valid=False
+      calls: ['N 22°51\'56" W 164.66\'', 'S 77°39\'32" W 164.41\'', 'S 42°26\'48" W 66.91\'', 'S 03°23\'08" E 32.24\'']
+      - Weak closure: precision ratio 1:2 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.
+      - Walked area (21,485 sqft) differs from the document's stated area (74,923 sqft) by 71% -- beyond the 15% tolerance.
+
+======================================================================
+3affa529-5b4f-42d7-b336-596315433572 (15 pages): 4 ParcelMap region(s)
+  p6 R1 PARCEL 1035: raw_calls=7 used=7 alts=["1278.52'"] closure=1411.5 prec=1:2.4 area=0.003 stated=1.03 valid=False
+      calls: ['S87°30\'20"W 1278.52\'', 'S00°37\'56"W 669.60\'', 'N87°36\'12"E 67.27\'', 'S87°42\'05"W 75.70\'', 'N03°08\'59"E 281.53\'', 'N00°03\'07"E 388.68\'', 'N00°26\'29"E 667.16\'']
+      - Weak closure: precision ratio 1:2 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.
+      - Traverse self-intersects -- the walked boundary crosses itself, which isn't a valid parcel shape regardless of closure error.
+      - Walked area (141 sqft) differs from the document's stated area (44,867 sqft) by 100% -- beyond the 15% tolerance.
+  p7 R2 44-021-06: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+  p7 R2 44-021-07: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+  p7 R2 43-006-11: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+  p7 R3 44-021-06: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+  p7 R3 43-006-11: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+  p7 R3 44-021-07: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+
+======================================================================
+db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b (15 pages): 3 ParcelMap region(s)
+  p15 R3 PARCEL 1: raw_calls=3 used=3 alts=[] closure=996.78 prec=1:1.2 area=1.28 stated=1.96 valid=False
+      calls: ['N 56°02\'43" E 434.26\'', 'S 41°27\'17" E 258.94\'', 'N 70°29\'46" E 470.71\'']
+      - Weak closure: precision ratio 1:1 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.
+      - Walked area (55,743 sqft) differs from the document's stated area (85,378 sqft) by 35% -- beyond the 15% tolerance.
+  p15 R3 PARCEL 2: raw_calls=2 used=2 alts=["158.00'"] closure=434.04 prec=1:1.5 area=None stated=1.39 valid=False
+      calls: ['S 41°27\'17" E 158.00\'', 'S 75°16\'17" W 481.51\'']
+      - Weak closure: precision ratio 1:2 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.
+      - Only 2 boundary call(s) parsed -- too few to form a closed shape (need at least 3).
+
+======================================================================
+42f617a1-1d02-4f26-bf05-2a17b23f8fda (2 pages): 2 ParcelMap region(s)
+  p1 R2 LOT 12A: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+  p1 R2 LOT 16B2: raw_calls=3 used=3 alts=[] closure=308.5 prec=1:1.2 area=0.151 stated=None valid=False
+      calls: ['S52°52\'00"E 148.83\'', 'N37°08\'00"E 88.60\'', 'S76°58\'30"E 135.81\'']
+      - Weak closure: precision ratio 1:1 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.
+  p1 R2 LOT 15D: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+  p1 R2 LOT 16A: raw_calls=1 used=1 alts=[] closure=170.29 prec=1:1.0 area=None stated=None valid=False
+      calls: ['S10°36\'49"W 170.29\'']
+      - Weak closure: precision ratio 1:1 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.
+      - Only 1 boundary call(s) parsed -- too few to form a closed shape (need at least 3).
+  p1 R2 LOT 11: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+  p1 R2 LOT 17A: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+
+======================================================================
+a1136318-03ef-438d-9f02-8fcdcb5dca30 (5 pages): 2 ParcelMap region(s)
+  p5 R2 Lot 1: raw_calls=10 used=9 alts=[] closure=85.19 prec=1:6.8 area=0.043 stated=0.73 valid=False
+      calls: ['N21° 13\' 27"W 159.18\'', 'S21° 13\' 27"E 193.20\'', 'N65° 22\' 13"E 5.32\'', 'S62° 00\' 09"E 11.31\'', 'N63° 37\' 29"E 6.89\'', 'S27° 04\' 12"E 32.43\'', 'N68° 38\' 43"E 24.60\'', 'N06° 53\' 43"E 22.70\'', 'S69° 05\' 58"W 124.76\'']
+      - Weak closure: precision ratio 1:7 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.
+      - Walked area (1,874 sqft) differs from the document's stated area (31,799 sqft) by 94% -- beyond the 15% tolerance.
+  p5 R2 Lot 2: raw_calls=8 used=6 alts=[] closure=167.97 prec=1:2.1 area=0.158 stated=0.32 valid=False
+      calls: ['N68° 38\' 43"E 26.96\'', 'S21° 13\' 27"E 20.00\'', 'N68° 38\' 43"E 68.53\'', 'S20° 54\' 02"E 83.98\'', 'S17° 37\' 02"E 64.85\'', 'S69° 05\' 58"W 91.89\'']
+      - Weak closure: precision ratio 1:2 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.
+      - Walked area (6,885 sqft) differs from the document's stated area (13,939 sqft) by 51% -- beyond the 15% tolerance.
+
+======================================================================
+2f896c95-b0f3-4a49-a447-4b3ca6129c27 (8 pages): 4 ParcelMap region(s)
+  p6 R1 PARCEL 1: raw_calls=4 used=4 alts=[] closure=0.0 prec=1:None area=None stated=40.00 valid=False
+      calls: ['S89° 33’ 38”W 3950.22’', 'N0° 57’ 09”E 1333.30’', 'S89° 33’ 00”E 1318.27’', 'S0° 48’ 45”W 1320.11’']
+      - Only 1 boundary call(s) parsed -- too few to form a closed shape (need at least 3).
+  p6 R1 REMAINDER PARCEL: raw_calls=1 used=1 alts=[] closure=0.0 prec=1:None area=None stated=120.4 valid=False
+      calls: ['S89° 25’ 02”W 3946.91’']
+      - Only 1 boundary call(s) parsed -- too few to form a closed shape (need at least 3).
+  p7 R3 PARCEL 1: raw_calls=5 used=5 alts=[] closure=0.0 prec=1:None area=None stated=40.00 valid=False
+      calls: ['S89° 24’ 39”E 1318.25’', 'S0° 48’ 45”W 1320.11’', 'S89° 33’ 00”E 1318.27’', 'N89° 33’ 38”W 3950.22’', 'N0° 57’ 09”E 1333.30’']
+      - Only 1 boundary call(s) parsed -- too few to form a closed shape (need at least 3).
+  p7 R3 REMAINDER PARCEL: raw_calls=2 used=2 alts=[] closure=0.0 prec=1:None area=None stated=120.4 valid=False
+      calls: ['N89° 25’ 02”W 3946.91’', 'S89° 33’ 38”W 3950.22’']
+      - Only 1 boundary call(s) parsed -- too few to form a closed shape (need at least 3).
+
+======================================================================
+65be453d-f014-4024-84d6-60a2d0052aeb (8 pages): 5 ParcelMap region(s)
+  p6 R3 PARCEL A: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+  p6 R3 PARCEL B: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+  p6 R3 PARCEL C: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+  p7 R4 PARCEL A: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+  p7 R4 PARCEL B: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+  p7 R4 PARCEL C: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+  p8 R5 PARCEL A: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+  p8 R5 PARCEL B: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+  p8 R5 PARCEL C: raw_calls=0 used=0 alts=[] closure=None prec=1:None area=None stated=None valid=None
+      calls: []
+      - no attributable boundary calls (extraction_note)
+
+======================================================================
+83ab22d0-b950-4f5d-ad33-5f0fd6105dbe (12 pages): 1 ParcelMap region(s)
+  p11 R1 LOT 1 BLOCK 2 RODEO SUBDIVISION: raw_calls=2 used=2 alts=[] closure=372.39 prec=1:1.0 area=None stated=None valid=False
+      calls: ['N 89°41\'50" W 144.55\'', 'N 89°41\'50" W 227.84\'']
+      - Weak closure: precision ratio 1:1 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.
+      - Only 2 boundary call(s) parsed -- too few to form a closed shape (need at least 3).
+
+TOTAL parcels=37 valid=0 needs_review=16 no_calls=21

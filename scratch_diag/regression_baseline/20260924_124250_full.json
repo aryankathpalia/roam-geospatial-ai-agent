@@ -1,0 +1,2445 @@
+{
+  "83ab22d0-b950-4f5d-ad33-5f0fd6105dbe": {
+    "full_runs": [
+      {
+        "run": 0,
+        "elapsed_s": 184.7,
+        "result": {
+          "document_id": "83ab22d0-b950-4f5d-ad33-5f0fd6105dbe",
+          "inspection": {
+            "filename": "original.pdf",
+            "page_count": 12,
+            "metadata": {
+              "format": "PDF 1.6",
+              "title": "",
+              "author": "",
+              "subject": "",
+              "keywords": "",
+              "creator": "RICOH MP C4504ex",
+              "producer": "Adobe Acrobat Standard 2017 17 Paper Capture Plug-in",
+              "creationDate": "D:20190904112201-06'00'",
+              "modDate": "D:20190905090620-06'00'",
+              "trapped": "",
+              "encryption": null
+            },
+            "pages": [
+              {
+                "page_number": 1,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": true,
+                "text_length": 2170,
+                "image_count": 1
+              },
+              {
+                "page_number": 2,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": true,
+                "text_length": 1608,
+                "image_count": 1
+              },
+              {
+                "page_number": 3,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": true,
+                "text_length": 1594,
+                "image_count": 1
+              },
+              {
+                "page_number": 4,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": true,
+                "text_length": 1773,
+                "image_count": 1
+              },
+              {
+                "page_number": 5,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": true,
+                "text_length": 1828,
+                "image_count": 1
+              },
+              {
+                "page_number": 6,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": true,
+                "text_length": 1672,
+                "image_count": 1
+              },
+              {
+                "page_number": 7,
+                "width": 612.0000610351562,
+                "height": 792.0,
+                "has_text": true,
+                "text_length": 832,
+                "image_count": 1
+              },
+              {
+                "page_number": 8,
+                "width": 612.0,
+                "height": 792.0000610351562,
+                "has_text": true,
+                "text_length": 1785,
+                "image_count": 1
+              },
+              {
+                "page_number": 9,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": true,
+                "text_length": 1098,
+                "image_count": 1
+              },
+              {
+                "page_number": 10,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": true,
+                "text_length": 893,
+                "image_count": 1
+              },
+              {
+                "page_number": 11,
+                "width": 792.0,
+                "height": 612.0,
+                "has_text": true,
+                "text_length": 3794,
+                "image_count": 1
+              },
+              {
+                "page_number": 12,
+                "width": 612.0,
+                "height": 792.0000610351562,
+                "has_text": false,
+                "text_length": 0,
+                "image_count": 1
+              }
+            ]
+          },
+          "pages": [
+            {
+              "page_number": 1,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.949,
+                  "bbox": [
+                    134.9,
+                    87.6,
+                    156.4,
+                    31.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "OFFICIALS",
+                  "ocr_confidence": 0.998
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.949,
+                  "bbox": [
+                    310.5,
+                    1747.9,
+                    1177.0,
+                    184.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "All items listed under the Consent Agenda are considered to be routine and are acted on\nwith one motion by the City Council. There will be no separate discussion on these items\nunless the Mayor, Council Member, or City Staff requests an item to be removed from the\nConsent Agenda for discussion. Items removed from the Consent Agenda will be placed\non the Regular Agenda under Business or as instructed by the City Council.",
+                  "ocr_confidence": 0.975
+                },
+                {
+                  "class": "Seal",
+                  "confidence": 0.936,
+                  "bbox": [
+                    1334.5,
+                    90.9,
+                    232.7,
+                    234.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "KUNA",
+                  "ocr_confidence": 0.886
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.898,
+                  "bbox": [
+                    107.5,
+                    147.7,
+                    525.2,
+                    158.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Joe Stear, Mayor\nBriana Buban-Vonder Haar, Council President\nRichard Cardoza, Council Member\nWarren Christensen, Council Member\nGreg McPherson, Council Member",
+                  "ocr_confidence": 0.97
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.862,
+                  "bbox": [
+                    309.6,
+                    1017.2,
+                    656.2,
+                    419.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Bob Bachman, Public Works Director\nJared Empey, City Treasurer\nChris Engels, City Clerk\nBill Punkoney,City Attorney\nLisa Holland, Economic Development Director\nWendy Howell, Planning& Zoning Director\nNancy Stauffer, Human Resources Director\nBobbyWithrow, Parks Director\nJace Hellman, Planner II\nSam Weiger, Planner I",
+                  "ocr_confidence": 0.971
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.75,
+                  "bbox": [
+                    555.0,
+                    589.9,
+                    583.1,
+                    39.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "6:00 P.M. REGULAR CITY COUNCIL",
+                  "ocr_confidence": 0.958
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.737,
+                  "bbox": [
+                    251.4,
+                    669.8,
+                    441.3,
+                    34.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "1. Call to Order and Roll Call",
+                  "ocr_confidence": 0.965
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.712,
+                  "bbox": [
+                    266.1,
+                    1628.6,
+                    1234.0,
+                    75.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "4. Consent Agenda:\nALL OF THE LISTED CONSENT AGENDA ITEMS ARE ACTION ITEMS\n(Timestamp 00:01:44)",
+                  "ocr_confidence": 0.976
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.706,
+                  "bbox": [
+                    311.2,
+                    742.7,
+                    687.9,
+                    231.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "COUNCIL MEMBERS PRESENT:\nMayor Joe Stear\nCouncil President Briana Buban-Vonder Haar\nCouncil Member Richard Cardoza\nCouncil Member Warren Christensen\nCouncil Member Greg McPherson",
+                  "ocr_confidence": 0.975
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.701,
+                  "bbox": [
+                    252.7,
+                    1551.8,
+                    542.3,
+                    38.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "3. Pledge of Allegiance: Mayor Stear",
+                  "ocr_confidence": 0.977
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.541,
+                  "bbox": [
+                    321.3,
+                    327.1,
+                    1087.7,
+                    70.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "CITY OF KUNA\nKuna City Hall Council Cham ber, 751 W 4th Street, Kuna, Idaho 83634",
+                  "ocr_confidence": 0.964
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.532,
+                  "bbox": [
+                    325.4,
+                    1015.2,
+                    354.1,
+                    34.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "CITYSTAFFPRESENT:",
+                  "ocr_confidence": 0.995
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.53,
+                  "bbox": [
+                    650.0,
+                    440.2,
+                    398.6,
+                    114.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "City Council Meeting\nMINUTES\nTuesday, August 20, 2019",
+                  "ocr_confidence": 0.991
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.501,
+                  "bbox": [
+                    246.1,
+                    1475.9,
+                    903.4,
+                    36.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "2. Invocation: D. Scott Allen, Kuna United Methodist Church",
+                  "ocr_confidence": 0.987
+                }
+              ]
+            },
+            {
+              "page_number": 2,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.972,
+                  "bbox": [
+                    414.6,
+                    594.2,
+                    1088.9,
+                    183.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "A RESOLUTION OF THE CITY COUNCIL FOR KUNA, IDAHO\nAPPROVING A PERFORMANCE BOND BY TOLL ID I, LLC FOR THE\nWINFIELD SPRINGS SUBDIVISION NO. 4 FOR UNCOMPLETED WORK\nINCLUDING LANDSCAPING. STREET LIGHTING AND FENCING\nPURSUANT TO THE TERMS OF THIS RESOLUTION.",
+                  "ocr_confidence": 0.965
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.969,
+                  "bbox": [
+                    415.6,
+                    902.0,
+                    1087.9,
+                    221.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "A RESOLUTION OF THE CITY COUNCIL OF KUNA, IDAHO APPROVING\nA NEW FEE SCHEDULE FOR TRASH COLLECTION SERVICES THAT\nREFLECTS A RATE INCREASE OF 2.90% FOR EACH SERVICE RELATED\nTO THE CITY'S COLLECTION, HAULING AND REMOVAL OF SOLID\nWASTE\n\nWITH ITS CONTRACTOR J&M SANITATION, WITH AN\nEFFECTIVE DATE OF OCTOBER 1, 2019.",
+                  "ocr_confidence": 0.847
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.968,
+                  "bbox": [
+                    412.9,
+                    1245.0,
+                    1094.3,
+                    187.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "A]\nRESOLUTIONOF\nTHE\nCITY\nCOUNCIL FOR KUNA\uff0c IDAHO\nAUTHORIZING THE MAYOR TO EXECUTE THE CONTRACT WITH THE\nADA\nCOUNTY\nPROSECUTING\nATTORNEY\n\nTO\nPROVIDE\nPROSECUTORIAL SERVICES FOR CITY MISDEMEANORS FOR THE\nFISCAL YEAR 2019-2020.",
+                  "ocr_confidence": 0.912
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.959,
+                  "bbox": [
+                    367.4,
+                    1549.9,
+                    1089.4,
+                    76.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "1. Consideration to approve Case No. 19-01-FP (Final Plat) for Lugarno Terra\nSubdivision.",
+                  "ocr_confidence": 0.988
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.952,
+                  "bbox": [
+                    365.5,
+                    282.8,
+                    700.0,
+                    38.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "1. Regular City Council Minutes, August 6, 2019",
+                  "ocr_confidence": 0.972
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.951,
+                  "bbox": [
+                    375.2,
+                    1857.8,
+                    1140.1,
+                    77.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "2. Consideration to approve Findings of Fact and Conclusions of Law for Case No.'s\n19-02-AN, 19-01-ZC and 19-01-S for Greyhawk West Subdivision.",
+                  "ocr_confidence": 0.983
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.944,
+                  "bbox": [
+                    310.4,
+                    206.6,
+                    465.3,
+                    39.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "A. City Council Meeting Minutes",
+                  "ocr_confidence": 0.99
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.939,
+                  "bbox": [
+                    369.9,
+                    1740.9,
+                    1131.2,
+                    79.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "1. Consideration to approve Findings of Fact and Conclusions of Law for Case No.\n19-04-AN for Washburn Annexation.",
+                  "ocr_confidence": 0.972
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.936,
+                  "bbox": [
+                    311.0,
+                    1473.5,
+                    199.2,
+                    38.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "D. Final Plats",
+                  "ocr_confidence": 0.959
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.93,
+                  "bbox": [
+                    310.4,
+                    1666.3,
+                    610.1,
+                    38.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "E. Findings of Fact and Conclusions of Law",
+                  "ocr_confidence": 0.965
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.865,
+                  "bbox": [
+                    996.0,
+                    2057.8,
+                    514.3,
+                    62.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Page 2 of 7\nKuna City Council Minutes August 20, 2019",
+                  "ocr_confidence": 0.948
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.834,
+                  "bbox": [
+                    312.9,
+                    437.2,
+                    212.6,
+                    37.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.814,
+                  "bbox": [
+                    398.9,
+                    357.5,
+                    934.8,
+                    42.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "B. Accounts Payable Dated August 15, 2019 in the Amount $15,502,107.92",
+                  "ocr_confidence": 0.982
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.771,
+                  "bbox": [
+                    375.8,
+                    823.2,
+                    746.5,
+                    35.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "2. Consideration to approve Resolution No. R58-2019",
+                  "ocr_confidence": 0.981
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.754,
+                  "bbox": [
+                    372.6,
+                    516.8,
+                    747.6,
+                    34.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "1. Consideration to approve Resolution No. R57-2019",
+                  "ocr_confidence": 0.984
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.72,
+                  "bbox": [
+                    373.9,
+                    1168.3,
+                    746.8,
+                    36.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "3. Consideration to approve Resolution No. R59-2019",
+                  "ocr_confidence": 0.989
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.718,
+                  "bbox": [
+                    310.7,
+                    438.0,
+                    208.5,
+                    36.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "C.Resolutions",
+                  "ocr_confidence": 0.998
+                }
+              ]
+            },
+            {
+              "page_number": 3,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.965,
+                  "bbox": [
+                    351.8,
+                    938.9,
+                    1131.5,
+                    147.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Larry Hansen seeks approval of an annexation of approximately 125 acres into Kuna\nCity Limits with C-1 (Neighborhood Commercial) and R-4 (Medium Density\nResidential) zoning districts. The subject properties are located around the\nintersection of North Meridian Road and East Rodeo Lane, Kuna, Idaho 83634.",
+                  "ocr_confidence": 0.984
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.962,
+                  "bbox": [
+                    304.0,
+                    745.1,
+                    1193.2,
+                    147.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "A. Public Hearing and Consideration to approve 19-05-AN (Annexation) for Go For IT,\nLLC, Select Development and Contracting, LLC, Jane Golden and Sandstone Farms,\nLLC \u2014Sam Weiger, Planner IACTION ITEM\n(Timestamp 00:02:22)",
+                  "ocr_confidence": 0.978
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.949,
+                  "bbox": [
+                    263.7,
+                    514.2,
+                    508.2,
+                    35.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "5. Community Reports or Requests:",
+                  "ocr_confidence": 0.966
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.928,
+                  "bbox": [
+                    310.5,
+                    591.4,
+                    75.9,
+                    32.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "None",
+                  "ocr_confidence": 0.999
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.924,
+                  "bbox": [
+                    361.4,
+                    1550.0,
+                    191.9,
+                    38.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Neutral: None",
+                  "ocr_confidence": 0.985
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.907,
+                  "bbox": [
+                    355.6,
+                    1128.5,
+                    1091.1,
+                    70.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Planner I Sam Weiger reviewed the application and asked Council to disregard\nnumber 8.",
+                  "ocr_confidence": 0.974
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.893,
+                  "bbox": [
+                    354.0,
+                    1321.7,
+                    545.2,
+                    34.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Mayor Stear opened the public hearing.",
+                  "ocr_confidence": 0.986
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.879,
+                  "bbox": [
+                    994.1,
+                    2056.2,
+                    515.7,
+                    63.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Page 3 of 7\nKuna City Council Minutes August 20, 2019",
+                  "ocr_confidence": 0.953
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.73,
+                  "bbox": [
+                    362.1,
+                    1473.6,
+                    198.0,
+                    40.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Against: None",
+                  "ocr_confidence": 0.97
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.719,
+                  "bbox": [
+                    313.5,
+                    399.3,
+                    207.2,
+                    32.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Absent: None",
+                  "ocr_confidence": 0.993
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.711,
+                  "bbox": [
+                    313.3,
+                    436.3,
+                    279.0,
+                    35.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Motion carried 4-0.",
+                  "ocr_confidence": 0.974
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.697,
+                  "bbox": [
+                    306.6,
+                    212.1,
+                    1209.6,
+                    199.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Council President Buban-Vonder Haar moved to approve the consent agenda.\nSeconded by Council Member McPherson. Approved by the following roll call vote:\nVoting Aye: Council Members Cardoza, Christensen, Buban-Vonder Haar, and\nMcPherson\nVoting No: None",
+                  "ocr_confidence": 0.982
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.65,
+                  "bbox": [
+                    361.1,
+                    1627.4,
+                    208.8,
+                    36.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Rebuttal: None",
+                  "ocr_confidence": 0.965
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.646,
+                  "bbox": [
+                    359.3,
+                    1708.4,
+                    1125.3,
+                    181.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Richard Hersey, 2202 Meridian Road, Kuna, Idaho 83634, lived at the end of lane\nand was concerned with the amount of property he would lose when the road was\ndeveloped. He indicated he had a copy of an agreement to give the property for road\nway but neither he nor his wife signed it. He didn't know where their signatures\ncame from.",
+                  "ocr_confidence": 0.981
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.641,
+                  "bbox": [
+                    358.0,
+                    1395.9,
+                    199.9,
+                    42.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.627,
+                  "bbox": [
+                    293.1,
+                    670.6,
+                    1089.3,
+                    32.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "6. Public Hearings: (6:00 p.m. or as soon thereafter as matters may be heard.)",
+                  "ocr_confidence": 0.977
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.35,
+                  "bbox": [
+                    359.5,
+                    1708.0,
+                    1133.4,
+                    187.2
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_003_16_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.325,
+                  "bbox": [
+                    364.8,
+                    1245.3,
+                    890.7,
+                    34.7
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_003_17_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Applicant Larry Hansen thanked Council and asked for approval.",
+                  "ocr_confidence": 0.984
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.296,
+                  "bbox": [
+                    361.3,
+                    1396.0,
+                    200.3,
+                    40.9
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_003_18_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Support: None",
+                  "ocr_confidence": 0.963
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.265,
+                  "bbox": [
+                    303.0,
+                    207.1,
+                    1216.9,
+                    243.8
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_003_19_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                }
+              ]
+            },
+            {
+              "page_number": 4,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.973,
+                  "bbox": [
+                    357.9,
+                    1399.8,
+                    1121.3,
+                    147.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Council President Buban-Vonder Haar stated the application complied with the\nComprehensive Plan and other relevant authorities. She asked if Council had any\nthoughts on it. She had read through the Findings of Fact and Conclusions of Law\nand endorsed those as written.",
+                  "ocr_confidence": 0.99
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.971,
+                  "bbox": [
+                    356.1,
+                    515.5,
+                    1124.4,
+                    112.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Mr. Weiger indicated the applicant would maintain the road as private and this\napplication was only for annexation. The road would be part of future development\napplications",
+                  "ocr_confidence": 0.988
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.964,
+                  "bbox": [
+                    348.7,
+                    205.2,
+                    1119.4,
+                    76.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Mayor Stear asked Mr. Hersey if Ada County had a copy of the document he said\ndid not have his signature on it.",
+                  "ocr_confidence": 0.979
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.96,
+                  "bbox": [
+                    356.3,
+                    1089.2,
+                    1090.2,
+                    76.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Mayor Stear asked Mr. Weiger if they would still be noticed on that and when it\nwould happen.",
+                  "ocr_confidence": 0.985
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.956,
+                  "bbox": [
+                    360.4,
+                    1206.5,
+                    306.5,
+                    33.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Mr. Weiger stated yes.",
+                  "ocr_confidence": 0.985
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.949,
+                  "bbox": [
+                    363.8,
+                    1594.7,
+                    1152.5,
+                    181.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Council President Buban-Vonder Haar moved approve 19-05-AN (Annexation)\nwith conditions as listed except item number 8 removed and close the Public\nHearing and approve Findings of Fact, Conclusions of Law and Order of\nDecision as included in the packet. Seconded by Council Member McPherson.\nMotion carried 4-0.",
+                  "ocr_confidence": 0.981
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.946,
+                  "bbox": [
+                    353.9,
+                    667.4,
+                    1104.5,
+                    76.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Mayor Stear asked Mr. Weiger if it would actually come back when they went to\nPlat the property.",
+                  "ocr_confidence": 0.989
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.913,
+                  "bbox": [
+                    363.8,
+                    321.4,
+                    620.9,
+                    35.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Mr. Hersey replied he had a copy of the paper.",
+                  "ocr_confidence": 0.952
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.881,
+                  "bbox": [
+                    354.2,
+                    1282.8,
+                    1128.6,
+                    74.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Mayor Stear clarified to Mr. Hersey that he would be noticed again before the next\nprocess began and nothing could happen to the road at this point.",
+                  "ocr_confidence": 0.978
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.854,
+                  "bbox": [
+                    366.8,
+                    783.8,
+                    528.0,
+                    34.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.85,
+                  "bbox": [
+                    359.3,
+                    860.7,
+                    1144.8,
+                    110.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Mayor Stear thanked Mr. Weiger and asked what the opinion of the Council was. He\nclarified the road issue would not be an issue until the platting occurred. He asked if\nthere would be issues with that road that would have to be taken care of later.",
+                  "ocr_confidence": 0.987
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.811,
+                  "bbox": [
+                    1005.2,
+                    2054.1,
+                    502.3,
+                    62.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Page 4 of 7\nKuna City Council Minutes August 20, 2019",
+                  "ocr_confidence": 0.95
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.75,
+                  "bbox": [
+                    359.7,
+                    399.8,
+                    1105.2,
+                    73.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Mayor Stear asked Mr. Weiger to provide information regarding what Mr. Hersey\ndiscussed.",
+                  "ocr_confidence": 0.994
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.553,
+                  "bbox": [
+                    367.9,
+                    783.9,
+                    529.1,
+                    33.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Mr. Weiger confirmed that was correct.",
+                  "ocr_confidence": 0.985
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.48,
+                  "bbox": [
+                    359.6,
+                    1013.6,
+                    491.3,
+                    34.9
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_004_14_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Mr. Weiger replied that was correct.",
+                  "ocr_confidence": 0.989
+                }
+              ]
+            },
+            {
+              "page_number": 5,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.964,
+                  "bbox": [
+                    343.8,
+                    860.0,
+                    1158.2,
+                    113.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Mayor Stear agreed it was a good idea and gave the direction to allow approval of\nFindings of Fact and Conclusions of Law with the packet instead of putting them off\nto the following City Council Meeting.",
+                  "ocr_confidence": 0.985
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.961,
+                  "bbox": [
+                    353.1,
+                    472.2,
+                    1145.5,
+                    114.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "City Clerk Chris Engels reviewed the conversation from the August 6, 2019 Council\nMeeting and asked Council for direction regarding the final approval format of\nFindings of Fact and Conclusions of Law. She stood for questions.",
+                  "ocr_confidence": 0.987
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.961,
+                  "bbox": [
+                    337.1,
+                    1551.7,
+                    1126.0,
+                    71.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Council President Buban-Vonder Haar moved approve 19-01-LS (Lot Split).\nSeconded by Council Mem ber McPherson. Motion carried 4-0.",
+                  "ocr_confidence": 0.991
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.956,
+                  "bbox": [
+                    348.5,
+                    628.1,
+                    1157.9,
+                    75.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Council President Briana Buban-Vonder Harr clarified she was not making a request\nat the last meeting but just asking a question.",
+                  "ocr_confidence": 0.984
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.952,
+                  "bbox": [
+                    363.8,
+                    743.1,
+                    1047.3,
+                    73.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Ms. Engels stated it was being brought back for discussion so the necessary\ndocuments could be prepped accordingly.",
+                  "ocr_confidence": 0.992
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.923,
+                  "bbox": [
+                    345.4,
+                    1780.4,
+                    996.5,
+                    36.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "City Treasurer Jared Empey presented the report and stood for questions.",
+                  "ocr_confidence": 0.992
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.903,
+                  "bbox": [
+                    351.2,
+                    1165.9,
+                    1141.9,
+                    111.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "On behalf of Jefferson Washburn (owner), Dave Washburn (applicant) is requesting\nto split approximately 0.44-acres off a 19.06-acre parcel. The property is located at\n7015 S. Ten Mile Road, Meridian, ID 83642 (APN: S1303141900).",
+                  "ocr_confidence": 0.985
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.898,
+                  "bbox": [
+                    261.0,
+                    204.6,
+                    272.9,
+                    36.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "7.Business Items:",
+                  "ocr_confidence": 0.989
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.882,
+                  "bbox": [
+                    404.4,
+                    1394.3,
+                    1101.0,
+                    38.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Mayor Stear stated it looked straight forward and asked if Council had any questions.",
+                  "ocr_confidence": 0.986
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.87,
+                  "bbox": [
+                    308.8,
+                    1011.3,
+                    1133.5,
+                    115.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "B. Consideration to approve 19-01-LS (Lot Split) for Washburn- Jace Hellman,\nPlannerIIACTIONITEM\n(Timestamp 00:19:11)",
+                  "ocr_confidence": 0.987
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.8,
+                  "bbox": [
+                    361.8,
+                    1856.2,
+                    282.5,
+                    36.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "No action was taken.",
+                  "ocr_confidence": 0.976
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.769,
+                  "bbox": [
+                    374.0,
+                    1319.8,
+                    994.0,
+                    33.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Planner II Jace Hellman presented the staff report and stood for questions.",
+                  "ocr_confidence": 0.982
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.764,
+                  "bbox": [
+                    326.6,
+                    1664.5,
+                    1093.6,
+                    74.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "C. Quarterly Financial Report \u2013 Jared Empey, City Treasurer ACTION ITEM\n(Timestamp 00:21:21)",
+                  "ocr_confidence": 0.978
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.673,
+                  "bbox": [
+                    1001.6,
+                    2054.9,
+                    503.4,
+                    61.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.572,
+                  "bbox": [
+                    1004.1,
+                    2055.3,
+                    502.7,
+                    61.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Page 5 of7\nKuna City Council Minutes August 20, 2019",
+                  "ocr_confidence": 0.958
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.538,
+                  "bbox": [
+                    367.2,
+                    1475.1,
+                    214.6,
+                    31.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "There were none.",
+                  "ocr_confidence": 0.979
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.371,
+                  "bbox": [
+                    307.3,
+                    280.0,
+                    1198.7,
+                    154.7
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_005_16_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.314,
+                  "bbox": [
+                    300.9,
+                    280.6,
+                    1203.0,
+                    146.7
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_005_17_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "A. Direction for final approval format of Findings of Fact and Conclusions of Law from\nthe previous discussion at the August 6, 2019 City Council Meeting \u2014 Chris Engels,\nCity Clerk\n(Timestamp 00:17:00)",
+                  "ocr_confidence": 0.988
+                }
+              ]
+            },
+            {
+              "page_number": 6,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.969,
+                  "bbox": [
+                    353.3,
+                    438.4,
+                    1155.5,
+                    183.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "AMENDING SECTIONS 1, 2, 3 and 4 OF CHAPTER 3 OF TITLE 3 KUNA\nCITY CODE MAKING TECHNICAL CHANGES TO PURPOSE, LICENSE\nREQUIREMENTS, LICENSE APPLICATIONS AND ADDING TERMS TO\nDEFINITIONS TO SOLICITORS AND PEDDLERS LICENSURE\nREQUIREMENT;AND",
+                  "ocr_confidence": 0.974
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.965,
+                  "bbox": [
+                    361.2,
+                    630.4,
+                    1154.5,
+                    112.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "AMENDING CHAPTER 3 OF TITLE 3 KUNA CITY CODE BY THE\nADDITION OF A NEW SECTION 11 PROVIDING FOR A LICENSE\nEXEMPTION:AND",
+                  "ocr_confidence": 0.973
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.961,
+                  "bbox": [
+                    346.2,
+                    981.4,
+                    1146.4,
+                    73.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Council President Briana Buban-Vonder Haar preferred the slow track on the item as\nit would afford time for feedback.",
+                  "ocr_confidence": 0.976
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.949,
+                  "bbox": [
+                    357.6,
+                    1559.3,
+                    1152.7,
+                    115.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "DIRECTING THE CITY ENGINEER TO PROVIDE NOTICE OF THIS\nORDINANCE TO THE NEW YORK IRRIGATION DISTRICT, THE OWNERS\nAND UPDATE THE IRRIGATION SYSTEM MAP; and",
+                  "ocr_confidence": 0.963
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.938,
+                  "bbox": [
+                    327.4,
+                    1093.1,
+                    959.9,
+                    77.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "B. Consideration to approve Ordinance No. 2019-28 ACTION ITEM\n(Timestamp 00:24:44)",
+                  "ocr_confidence": 0.987
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.921,
+                  "bbox": [
+                    372.1,
+                    746.1,
+                    590.1,
+                    38.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "DIRECTING THE CITY CLERK; AND",
+                  "ocr_confidence": 0.974
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.91,
+                  "bbox": [
+                    362.9,
+                    786.6,
+                    589.5,
+                    38.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.9,
+                  "bbox": [
+                    262.0,
+                    203.7,
+                    215.9,
+                    36.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "8. Ordinances:",
+                  "ocr_confidence": 0.976
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.884,
+                  "bbox": [
+                    350.2,
+                    1754.4,
+                    1186.2,
+                    108.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Council President Buban-Vonder Haar moved to waive three readings of\nOrdinance No. 2019-28. Seconded by Council Member McPherson. Motion\ncarried 4-0.",
+                  "ocr_confidence": 0.98
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.842,
+                  "bbox": [
+                    330.6,
+                    1211.7,
+                    1164.9,
+                    149.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "AN ORDINANCE OF THE CITY COUNCIL OF THE CITY OF KUNA:\nMAKING CERTAINFINDINGS; and\n\u2022\nENLARGING THE BOUNDARIES OF THE KUNA MUNICIPAL\nIRRIGATION SYSTEM BY THE INCLUSION OF ADA COUNTY",
+                  "ocr_confidence": 0.921
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.807,
+                  "bbox": [
+                    364.2,
+                    1672.7,
+                    570.9,
+                    38.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "PROVIDING AN EFFECTIVE DATE",
+                  "ocr_confidence": 0.964
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.701,
+                  "bbox": [
+                    321.5,
+                    279.2,
+                    612.1,
+                    75.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "A. Second reading of Ordinance No. 2019-22\n(Timestamp 00:23:30)",
+                  "ocr_confidence": 0.983
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.624,
+                  "bbox": [
+                    342.2,
+                    868.3,
+                    1186.0,
+                    75.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.564,
+                  "bbox": [
+                    352.0,
+                    1393.4,
+                    1138.4,
+                    84.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "DECLARING WATER RIGHTS APPURTENANT THERETO ARE POOLED\nFOR DELIVERY PIIRPOSES: and",
+                  "ocr_confidence": 0.943
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.556,
+                  "bbox": [
+                    1002.1,
+                    2054.3,
+                    505.2,
+                    62.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Page 6 of 7\nKuna City Council Minutes August 20, 2019",
+                  "ocr_confidence": 0.953
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.504,
+                  "bbox": [
+                    360.5,
+                    787.3,
+                    587.7,
+                    38.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "PROVIDING AN EFFECTIVE DATE.",
+                  "ocr_confidence": 0.968
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.481,
+                  "bbox": [
+                    376.0,
+                    394.1,
+                    911.5,
+                    42.2
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_006_16_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "AN ORDINANCE OF THE CITY COUNCIL OF KUNA, IDAHO:",
+                  "ocr_confidence": 0.944
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.315,
+                  "bbox": [
+                    343.0,
+                    869.7,
+                    1172.9,
+                    74.6
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_006_17_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Mayor Stear read the ordinance and stated the item would come back for a third\nreading.",
+                  "ocr_confidence": 0.982
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.29,
+                  "bbox": [
+                    260.1,
+                    203.9,
+                    225.8,
+                    36.2
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_006_18_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                }
+              ]
+            },
+            {
+              "page_number": 7,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.919,
+                  "bbox": [
+                    262.3,
+                    553.6,
+                    508.2,
+                    35.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "9. Mayor/Council Announcements:",
+                  "ocr_confidence": 0.987
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.903,
+                  "bbox": [
+                    368.6,
+                    211.3,
+                    1133.0,
+                    105.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Council President Buban-Vonder Haar moved to approve Ordinance No. 2019-\n28. Seconded by Council Member McPherson. Approved by the following roll\ncallvote:",
+                  "ocr_confidence": 0.975
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.871,
+                  "bbox": [
+                    1003.2,
+                    2058.3,
+                    509.3,
+                    62.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Page 7 of 7\nKuna City Council Minutes August 20, 2019",
+                  "ocr_confidence": 0.938
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.691,
+                  "bbox": [
+                    257.6,
+                    1189.1,
+                    330.5,
+                    35.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Chris Engels, City Clerk",
+                  "ocr_confidence": 0.958
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.593,
+                  "bbox": [
+                    357.7,
+                    324.7,
+                    1145.6,
+                    81.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Voting Aye: Council Members Cardoza, Christensen, Buban-Vonder Haar, and\nMcPherson",
+                  "ocr_confidence": 0.987
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.581,
+                  "bbox": [
+                    256.5,
+                    709.2,
+                    327.1,
+                    32.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "10. Executive Session:",
+                  "ocr_confidence": 0.99
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.435,
+                  "bbox": [
+                    252.0,
+                    855.3,
+                    431.1,
+                    46.3
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_007_06_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "11. Adjournment: 6:25 PM",
+                  "ocr_confidence": 0.957
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.266,
+                  "bbox": [
+                    359.1,
+                    476.1,
+                    289.1,
+                    36.1
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_007_07_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Motion carried 4-0.",
+                  "ocr_confidence": 0.987
+                }
+              ]
+            },
+            {
+              "page_number": 8,
+              "regions": [
+                {
+                  "class": "Seal",
+                  "confidence": 0.966,
+                  "bbox": [
+                    108.8,
+                    55.2,
+                    248.5,
+                    253.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.846,
+                  "bbox": [
+                    101.2,
+                    606.2,
+                    1508.9,
+                    67.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Please print your name below if you would like to present oral testimony or written exhibits about this item to the\nCommission or City Council.",
+                  "ocr_confidence": 0.973
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.719,
+                  "bbox": [
+                    307.6,
+                    1979.7,
+                    138.1,
+                    30.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "State, Zip",
+                  "ocr_confidence": 0.978
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.718,
+                  "bbox": [
+                    138.0,
+                    361.1,
+                    1443.2,
+                    202.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "CaseName: 19-05-AN(Annexation)-Hansen Annexation\nCase Type: Larry Hansen requests to annex six parcels comprising of approximately 125 acres at\n1863 East Rodeo Lane and 2400 North Meridian Road into Kuna City Limits with C-1 and R-4zoning\ndistricts; Approximately 77 acres are proposed to annex into the City with a C-1 zoning, and\napproximately 48 acres are proposed to annex into the City with an R-4 zoning(APNs S141823400,\nS1418233650,R7534260155,R7534260400,R7534260218,&R7534260350).",
+                  "ocr_confidence": 0.969
+                },
+                {
+                  "class": "Table",
+                  "confidence": 0.686,
+                  "bbox": [
+                    577.3,
+                    701.1,
+                    994.0,
+                    1390.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "NEUTRAL\nIN OPPOSITION\nTestify\nNot Testify\n Testify\nNot Testify\nPrintName\nPrint Name\nPrint Address\nPrint Address\nCity\nState, Zip\nCity\nState, Zip\nTestiry\nNot Testiry\nTestiry\nNot Testiry\nPrint Name\nPrintName\nPrint Address\nPrint Address\nCity\nState, Zip\nCity\nState, Zip\n Testify\n Not Testify\n Testify\n Not Testify\nPrint Name\nPrint Name\nPrint Address\nPrint Address\nCity\nState, Zip\nCity\nState, Zip\n Testify\n Not Testify\n Testify\nNot Testify\nPrint Name\nPrint Name\nPrint Address\nPrint Address\nCity\nState, Zip\nCity",
+                  "ocr_confidence": 0.957
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.676,
+                  "bbox": [
+                    1374.6,
+                    1941.4,
+                    136.1,
+                    29.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "State, Zip",
+                  "ocr_confidence": 0.976
+                },
+                {
+                  "class": "Table",
+                  "confidence": 0.423,
+                  "bbox": [
+                    85.9,
+                    671.4,
+                    1324.3,
+                    1524.7
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_008_06_Table.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "INFAVOR\n Testify\n Not Testify\nRuhael\nHersey\nPrint Name\nmenriditahl\n\u30b9\u3053AZ\nPrintAddress\nTl g3y\nUNA\nCity\nState, Zip\n Testify\n Not Testify\nPrint Name\nPrint Address\nCity\nState, Zip\n Testify\nNot Testify\nPrint Name\nPrint Address\nCity\nState,\nZip\n Testify\nNot Testify\nPrint Name\nPrint Address\nCity",
+                  "ocr_confidence": 0.9
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.279,
+                  "bbox": [
+                    450.7,
+                    65.9,
+                    1047.5,
+                    259.4
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_008_07_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "CITYOF KUNA\n751 W.4th Street\u2022Kuna, Idaho\u202283634\u25cfPhone(208) 922-5274\nFax:(208) 922-5989\u2022www.Kunacity.ld.gov\nSIGN-UP SHEET\nAugust 20, 2019-City Council Public Hearing",
+                  "ocr_confidence": 0.957
+                }
+              ]
+            },
+            {
+              "page_number": 9,
+              "regions": [
+                {
+                  "class": "Table",
+                  "confidence": 0.735,
+                  "bbox": [
+                    76.9,
+                    182.6,
+                    1360.0,
+                    1714.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "IN OPPOSITION",
+                  "ocr_confidence": 0.961
+                },
+                {
+                  "class": "Table",
+                  "confidence": 0.344,
+                  "bbox": [
+                    77.6,
+                    177.1,
+                    1262.3,
+                    1722.4
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_009_01_Table.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "IN FAVOR\nNEUTRAL\n\u25a1 Testify\nNot Testify\n\u25a1Testify\nNot Testify\n\u25a1Testify\nPrint Name\nPrint Name\nPrint Name\nPrint Address\nPrint Address\nPrint Address\nCity\nState, Zip\nCity\nState, Zip\nCity\n\u25a1Testify\nNot Testify\n\u25a1Testify\nNot Testify\n\u25a1 Testify\nPrint Name\nPrint Name\nPrint Name\nPrint Address\nPrint Address\nPrint Address\nCity\nState, Zip\nCity\nState, Zip.\nCity\n\u25a1 Testify\nNot Testify\n\u25a1 Testify\nNot Testify\n Testify\nPrint Name\nPrint Name\nPrint Name\nPrint Address\nPrint Address\nPrint Address\nCity\nState, Zip\nCity\nState, Zip\nCity\n\u25a1Testify\n Not Testify\n\u25a1 Testify\n Not Testify\n\u25a1Testify\nPrint Name\nPrint Name\nPrint Name\nPrint Address\nPrint Address\nPrint Address\nCity\nState, Zip\nCity\nState, Zip\nCity\n\u25a1Testify\nNot Testify\n\u25a1 Testify\nNot Testify\n Testify\nPrint Name\nPrint Name\nPrint Name\nPrint Address\nPrint Address\nPrint Address\nCity\nState, Zip\nCity\nState, Zip\nCity",
+                  "ocr_confidence": 0.968
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.308,
+                  "bbox": [
+                    1376.2,
+                    1828.5,
+                    142.0,
+                    30.5
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_009_02_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "State, Zip",
+                  "ocr_confidence": 0.978
+                }
+              ]
+            },
+            {
+              "page_number": 10,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.932,
+                  "bbox": [
+                    91.9,
+                    808.8,
+                    1464.5,
+                    165.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "we just forwarded an emaiI that George received from Ada County.\nApparently the road has been moved and registered but the old' road needs\nthe easement taken off the lot. since you are the registered owners onty\nyou can vacate the easement. please contact Kuna city to file the proper\npaperwork.",
+                  "ocr_confidence": 0.967
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.912,
+                  "bbox": [
+                    100.1,
+                    291.2,
+                    120.2,
+                    35.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Subject:",
+                  "ocr_confidence": 0.998
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.909,
+                  "bbox": [
+                    97.7,
+                    739.2,
+                    505.8,
+                    37.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Good day Louise and Dick;",
+                  "ocr_confidence": 0.946
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.891,
+                  "bbox": [
+                    95.9,
+                    196.3,
+                    93.1,
+                    32.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "From:",
+                  "ocr_confidence": 0.963
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.885,
+                  "bbox": [
+                    437.7,
+                    352.9,
+                    132.1,
+                    32.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Follow up",
+                  "ocr_confidence": 0.988
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.809,
+                  "bbox": [
+                    97.4,
+                    230.2,
+                    84.0,
+                    29.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Sent:",
+                  "ocr_confidence": 0.994
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.795,
+                  "bbox": [
+                    447.5,
+                    263.0,
+                    157.1,
+                    28.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Dick Hersey",
+                  "ocr_confidence": 0.954
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.731,
+                  "bbox": [
+                    88.5,
+                    572.5,
+                    703.1,
+                    134.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "From: Lomie Famis [mailto:lfwestminster@yahoo.com]\nSent: Friday, August 23, 2013 10:54 AM\nTo:louise@theherseys.com",
+                  "ocr_confidence": 0.966
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.72,
+                  "bbox": [
+                    101.0,
+                    1173.6,
+                    541.9,
+                    36.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Thanks and have a good day!",
+                  "ocr_confidence": 0.964
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.704,
+                  "bbox": [
+                    96.7,
+                    1240.2,
+                    386.3,
+                    102.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.67,
+                  "bbox": [
+                    100.2,
+                    122.1,
+                    192.8,
+                    41.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Dick Hersey",
+                  "ocr_confidence": 0.993
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.633,
+                  "bbox": [
+                    96.1,
+                    1108.3,
+                    923.8,
+                    37.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "If you have any questions please contact us.",
+                  "ocr_confidence": 0.984
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.627,
+                  "bbox": [
+                    440.1,
+                    387.7,
+                    119.4,
+                    32.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Flagged",
+                  "ocr_confidence": 0.996
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.602,
+                  "bbox": [
+                    446.6,
+                    193.5,
+                    512.0,
+                    130.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Louise Hersey [Louise@TheHerseys.com]\nFriday, August 23, 2013 12:40 PM",
+                  "ocr_confidence": 0.982
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.481,
+                  "bbox": [
+                    66.3,
+                    1006.0,
+                    1485.7,
+                    72.0
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_010_14_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "resolved.",
+                  "ocr_confidence": 0.993
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.471,
+                  "bbox": [
+                    95.4,
+                    355.2,
+                    232.3,
+                    31.1
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_010_15_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Follow Up Flag:",
+                  "ocr_confidence": 0.966
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.464,
+                  "bbox": [
+                    187.0,
+                    1006.7,
+                    1277.7,
+                    38.5
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_010_16_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Ada County cannot issue a building permit until the easement issue is",
+                  "ocr_confidence": 0.973
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.422,
+                  "bbox": [
+                    465.6,
+                    294.3,
+                    433.5,
+                    28.6
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_010_17_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "FW: vacate easement on property",
+                  "ocr_confidence": 0.977
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.313,
+                  "bbox": [
+                    91.7,
+                    675.2,
+                    499.5,
+                    28.2
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_010_18_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Subject: vacate easement on property",
+                  "ocr_confidence": 0.983
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.253,
+                  "bbox": [
+                    99.6,
+                    1242.0,
+                    383.0,
+                    99.9
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_010_19_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Lorrie Ferris\nwestminster II, LLC\n939-1221",
+                  "ocr_confidence": 0.967
+                }
+              ]
+            },
+            {
+              "page_number": 11,
+              "regions": [
+                {
+                  "class": "ParcelMap",
+                  "confidence": 0.887,
+                  "bbox": [
+                    93.9,
+                    -12.8,
+                    1953.3,
+                    1398.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "CUUDUR.UVYLI\nWITHIN THE NW1/4SW1/4, SECTION 18,\n0\n1/4CORNER\n2\nTOWNSHIP 2 NORTH, RANGE 1 EAST, BOISE MERIDIAN\nFND.ALUMINUM CAP\nAS PER COR.REC.\nADA COUNTY, IDAHO\nINST. No,103052674\nRYTOA\natyttnoen\n74.\n.\n2\n00160\n\n\nL\nC$5.0\n1nst.no.o(s4D\nSEARGHED\n70.00\nS8941'50E\n314.20\nNOTHINO FOUND\nN894150W\n\n\nS018\nPOINT FALLS ON\nCONC. SLAB AT\n(-2)()2\uff09(2)0\nFENCE INTERSECTION\nI\nS8941'50\u00b0E\nSCRIBEDXINCONC.\n.00021\nK\nSET MTNESS CORNER\n46.45\nS0D417W6.00'\n\n.0009\nNEW INGRESS-EGRESS\nPARCEL1\n9\nROSNo. 226\nEASEMENT\n13719.0 S0.FT.\n0.31 ACRES\n53404.3 S0.FT.\n1.23 ACRES\ni\n\n\n48.16'\n(69\nN8941'50\"W\n5\n50.41\nG\nSCALE\nn\n30\n15\n30\n40\n0.10.09\n,9098\nN\nA\n(FEET)\n\u65e5\n50\nn\n1NOH-3OFT\n2\n(2))(1\n4\n.B94150E81.91\nM\nFENCE COR.15\nSEARGHED\n144.55\n1.2WESTOF\nNOTHNG FOUND\n189.48\n\nLINEATENO\nEPx\nN8941'50W\n00\n.0000\nPLATTED E. RODEO LANE\n.000E\nm.\u00a31.0.0os\n0\n(PRIVATE)\nLOT1 BLOCK2RODE6 SUBDIVSION\n227.84\nC\nRO:\n92.11\n161.45\nN894150W475.40\n\n\nFND.5/8REBAR\nPARCEL1\nFND.5/8REBAR\nPLS 4993\nS062222W,0.20\nROS No. 7118\nPLS6111\nS0346'47W,0.20\nLOT1,BLOCK1\nRODEOSUBDIVSION\nLEGEND\nREFERENCES\n22\nPLAT OF RODEO SUBDIVSION, BOOK 72, FAGE 7413\nLNE SURVEYED\nRECORD OF SURVEY NO.133\nCURVE TABLE\nRECORD OF SURVEY NO. 226\nOTHER DEEDLN\nRECORD OF SURVEY NO. 7118\nCURVE\nRADIUS\nARC LENGTH\nCHOAD LUT CHORD BEAANG\nSECTIONALLINE\nQUITCLAIM DEED INST.NO.99098728\nG\n14.00\n110.30\n20\nS829150E\nC2\n8.00\n0240\n0.0\nSB211'50\nEROPDSED.EASENENTS..\nC3\n113:00\nB409\nP1\nS083133E\nC\n11.00\n23.41\nEXISTING EDGE GRAVEL\nN4103W\n\nS\n35.00\n02.40\nN621150W\n\nEP\nEXISTNG EDCE PAVEMENY\nSURVEYOR'S CERTIFICATE:\n0\nFOUND ALUIMINUM CAP\n1,ROBERT G. HINCKLEY, OO HEREBYGERTIFY THATI AM A\n\u5fc3\nFOUND0/8\u00b0REBAR\nREGISTERED PROFESSIONAL LANO SURVEYOR, THAT THIS PLAT\n?\nSET0/8X3OREPARW/ORANGE\nREPRESENTS A SURVEY MADE BY ME, OR UNDER MY OIRECT\nFLASTC CAP PL 1076X\nSUPERVSION.IS AN ACCURATE REPRESENTATION QF THAT\nSURVEY, AND COMPLES WTH IDAHO CODETTLE 55,CHAPTER\n\nSET1/2X24RE0NRW/DRANGE\n13\n19,REGARDING SURVEYS,AND CHAPTER 16.REGARDING\n18\nPLASTC CAP PLS 10782\nCORNER PERPETUATON.\nGHINC\n\u4e2d\nSURVEYINDEXNO211-18-3-4-0-00-00\n6-28-06\n24\nA\nCALCULATEO POINY\n19\nRECORD-INFORMATON\nTHTLE-RECORDOFSURVEYFOR\nTCISUBEYAUIRY IHGINESAS.NC\n1204 BTE STETNORTH\nLARRY HANSEN",
+                  "ocr_confidence": 0.696,
+                  "needs_vision": true,
+                  "parcels": [
+                    {
+                      "vision_geometry": {
+                        "boundary_calls": [
+                          {
+                            "bearing": "N 89\u00b041'50\" W",
+                            "distance": "144.55'"
+                          }
+                        ],
+                        "tie_point": null,
+                        "basis_of_bearings": "S 00\u00b001'40\" E",
+                        "parcel_label": "LOT 1 BLOCK 2 RODEO SUBDIVISION",
+                        "stated_area_acres": null,
+                        "ambiguous_alternates": []
+                      },
+                      "resolved_boundary_calls": [
+                        {
+                          "bearing": "N 89\u00b041'50\" W",
+                          "distance": "144.55'"
+                        }
+                      ],
+                      "boundary_geojson": {
+                        "type": "Feature",
+                        "properties": {
+                          "closure_error_ft": 144.55,
+                          "unparsed_calls": 0
+                        },
+                        "geometry": {
+                          "type": "Polygon",
+                          "coordinates": [
+                            [
+                              [
+                                0.0,
+                                0.0
+                              ],
+                              [
+                                -144.55,
+                                0.76
+                              ],
+                              [
+                                0.0,
+                                0.0
+                              ]
+                            ]
+                          ]
+                        }
+                      },
+                      "spatial_validation": {
+                        "valid": false,
+                        "issues": [
+                          "Weak closure: precision ratio 1:1 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.",
+                          "Only 1 boundary call(s) parsed -- too few to form a closed shape (need at least 3)."
+                        ],
+                        "perimeter_ft": 144.55,
+                        "precision_ratio": 1.0,
+                        "self_intersects": false,
+                        "area_sqft": null,
+                        "area_acres": null,
+                        "stated_area_sqft": 13503.6,
+                        "area_matches_stated": null
+                      },
+                      "georeference_error": "no geocodable address found in this document's OCR text"
+                    },
+                    {
+                      "vision_geometry": {
+                        "boundary_calls": [],
+                        "tie_point": null,
+                        "basis_of_bearings": null,
+                        "parcel_label": "LOT 1, BLOCK 1 RODEO SUBDIVISION",
+                        "stated_area_acres": null,
+                        "ambiguous_alternates": []
+                      },
+                      "extraction_note": "This parcel was identified in the document (it has its own label/description) but no boundary dimensions could be confidently attributed to it specifically -- needs manual review against the source document."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "page_number": 12,
+              "regions": [
+                {
+                  "class": "ScannedPrintout",
+                  "confidence": 0.569,
+                  "bbox": [
+                    276.5,
+                    176.1,
+                    1167.5,
+                    1950.8
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\83ab22d0-b950-4f5d-ad33-5f0fd6105dbe\\review_crops\\page_012_00_ScannedPrintout.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "\"\uff1a\n+\n\n\n5\n?\ni\n'\n-\n3\n\n+\n\u221a\n?\n\n2\nBAPOT\n\u4eba\n\n\n\n\n\n\n\n4\n2\n\n-\nXo\n\nctomie E droy",
+                  "ocr_confidence": 0.133
+                }
+              ]
+            }
+          ],
+          "pages_needing_review": 9
+        }
+      }
+    ],
+    "summaries": [
+      {
+        "n_regions": 1,
+        "n_parcels": 2,
+        "n_parcels_with_geometry": 1,
+        "n_valid": 0,
+        "valid_rate": 0.0,
+        "mean_precision_ratio": 1.0,
+        "area_match_rate": null,
+        "issue_buckets": {
+          "weak_closure": 1,
+          "too_few_calls": 1
+        },
+        "pages_needing_review": 9,
+        "run": 0,
+        "elapsed_s": 184.7
+      }
+    ]
+  }
+}

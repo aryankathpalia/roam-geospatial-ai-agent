@@ -1,0 +1,23 @@
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+  (retry: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}})
+
+=== run 1 ===
+  PARCEL 2 stated=2.78 alts=[] final=["903.15'", "220.00'", "903.15'", "220.00'"] area=4.826 closure=25.61
+  PARCEL 1 stated=1.78 alts=[] final=["1077.91'", "220.00'", "1077.91'", "220.00'"] area=5.442 closure=0.0
+
+=== run 2 ===
+  PARCEL 2 stated=2.78 alts=[] final=["220.00'"] area=0.0 closure=220.0
+  PARCEL 1 stated=1.78 alts=[] final=["903.15'", "220.00'"] area=0.0 closure=929.56
+
+=== run 3 ===
+  PARCEL 2 stated=2.78 alts=[] final=["220.00'", "903.15'", "220.00'", "903.15'"] area=4.561 closure=0.0
+  PARCEL 1 stated=1.78 alts=[] final=["903.15'", "220.00'", "903.15'", "220.00'"] area=4.561 closure=6.24
+  (retry: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}})
+
+=== run 4 ===
+  PARCEL 2 stated=2.78 alts=[] final=["220.00'", "336.41'", "220.00'"] area=0.85 closure=336.41
+  PARCEL 1 stated=1.78 alts=[] final=["220.00'", "325.30'", "220.00'"] area=0.821 closure=325.3
+
+=== run 5 ===
+  PARCEL 2 stated=2.78 alts=[] final=["220.00'"] area=0.0 closure=220.0
+  PARCEL 1 stated=1.78 alts=[] final=["903.15'", "903.15'"] area=0.0 closure=25.61

@@ -1,0 +1,33 @@
+Based on the provided piece of the survey drawing, here are the requested items listed exactly as written, categorized with local context:
+
+**Region 1, Piece 1:**
+
+*   **Basis-of-bearings / datum / coordinate-zone statements and Control Point data:**
+    *   `WASHOE COUNTY CONTROL POINT`
+        `N22SM01029 USGLO 2" BRASS CAP`
+        `S12/7/13/18 1942`
+    *   `GROUND COORDINATES (MEASURED)`
+        `N: 14928989.71`
+        `E: 2253610.44`
+    *   `GROUND COORDINATES (RECORD)`
+        `N: 14928989.62`
+        `E: 2253610.74`
+
+*   **Parcel/lot labels and acreage:**
+    *   `PARCEL 1`
+    *   `1.78 ACRES`
+
+*   **Boundary bearing and distance calls:**
+    *   `S0°48'45"W 220.00'`
+    *   `(S0°02'31"E 250.00' - R4)` *(in parentheses, representing a prior-record citation)*
+    *   `N89°11'15"E 1077.90'` *(located near the top right section line)*
+
+*   **Tie lines / reference measurements:**
+    *   `N0°48'45"E 2637.36'` *(appears to be a tie line / section-line distance along the eastern boundary connecting to the reference section/control area, not a parcel boundary call)*
+    *   `(N0°48'59"E 2637.29' - R1)` *(in parentheses, representing a prior-record record/tie citation next to the eastern section line)*
+    *   `(N0°49'02"E 2637.35' - R3)` *(in parentheses, representing a prior-record record/tie citation next to the eastern section line)*
+
+*   **Ground / state-plane coordinates at parcel corners:**
+    *   `GROUND COORDINATES`
+        `N 14926897.47`
+        `E 2252502.76`

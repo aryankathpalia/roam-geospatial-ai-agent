@@ -1,0 +1,24 @@
+[
+ {
+  "boundary_calls": [
+   {
+    "bearing": "S00°37'56\"W",
+    "distance": "669.60'"
+   },
+   {
+    "bearing": "N87°36'12\"E",
+    "distance": "67.27'"
+   },
+   {
+    "bearing": "S87°42'05\"W",
+    "distance": "75.70'"
+   }
+  ],
+  "tie_point": null,
+  "basis_of_bearings": null,
+  "parcel_label": "PARENT PARCEL",
+  "stated_area_acres": "20.77",
+  "ambiguous_alternates": [],
+  "curve_calls": []
+ }
+]

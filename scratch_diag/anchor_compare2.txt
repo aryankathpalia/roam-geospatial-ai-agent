@@ -1,0 +1,30 @@
+2f896c95 CHANGED
+  old: '0 Ironwood Road'
+  new: '17, TOWNSHIP 22 NORTH， RANGE 21 EAST， M.D.M，PALOMINOVALLEY， WASHOE COUNTY,'
+27211ae5 CHANGED
+  old: ''
+  new: 'DERRY, NH 03038'
+3affa529 CHANGED
+  old: 'Springfield, IL 62711'
+  new: 'Pike County, IL'
+65be453d CHANGED
+  old: '1:37435'
+  new: 'Skagit County Auditor'
+a1136318 CHANGED
+  old: 'Porbian af Pacel 160.35-1-22200 Aree 0.25± acn'
+  new: 'Cedar Koook, Lc'
+db54d473 CHANGED
+  old: '65 WATER BUCK WAY'
+  new: 'Washoe County Parcel Information'
+798850fc CHANGED
+  old: 'City of Payette ~ 700 Center Avefue ~ Payette, ID 83661 ~ 208-642-6024'
+  new: 'PAYETTE,PAYETTE COUNTY,IDAHO'
+83ab22d0 CHANGED
+  old: '7015 S. Ten Mile Road, Meridian, ID 83642 (APN: S1303141900).'
+  new: 'ADA COUNTY, IDAHO'
+8d75d3ed CHANGED
+  old: 'St. George, UT 84770'
+  new: '8,451 Sq, Ft.'
+510ea60f CHANGED
+  old: 'Des Moines, IA 50319-0034'
+  new: 'recorded in Book 10846, Page 771, of Polk County Iowa records.'

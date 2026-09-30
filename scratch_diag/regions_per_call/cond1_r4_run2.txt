@@ -1,0 +1,22 @@
+Region 4, Piece 1:
+- PARCEL A
+- PARCEL B
+- PARCEL C
+
+Region 4, Piece 2:
+- Parcel B
+
+Region 4, Piece 3:
+- N 89°11'10" W (bearing)
+- 389.26' (distance)
+- 527.32' (distance)
+- N 01°51'34" E (bearing)
+
+Region 4, Piece 4:
+- P19769
+- P19772
+- N 89°11'45" W (bearing)
+- 30.00' (distance)
+- N 87°31'02" W (bearing)
+- 690.00' (distance) - appears to be road frontage / right-of-way measurement along Padilla Heights Road
+- BASIS OF BEARING: NORTH-SOUTH CENTERLINE OF SECTION, BEING NORTH 2°07'34" EAST AS SHOWN ON RECORD OF SURVEY RECORDED IN BOOK 15 OF SURVEYS AT PAGE 16, RECORDS OF SKAGIT COUNTY, WASHINGTON.

@@ -1,0 +1,265 @@
+INFO: Could not find files for the given pattern(s).
+C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:718: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-LCNet_x1_0_doc_ori`.[0m
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I0925 11:29:42.941768 24876 onednn_context.cc:81] oneDNN v3.6.2
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+n_tiles 36
+=== NOTES ===
+Region 1, Piece 1:
+- NORTHWEST CORNER SECTION 14, T43S, R16 W SLB & M (1971 BLM CAP)
+- COUNTY REF. No. C-14-43-16
+- HCN No. 164
+
+Region 1, Piece 2:
+- NORTHWEST CORNER SECTION 14, T43S, R16 W SLB & M (1971 BLM CAP)
+- COUNTY REF. No. C-14-43-16
+- HCN No. 164
+
+Region 1, Piece 3:
+- nothing relevant
+
+Region 1, Piece 4:
+- nothing relevant
+
+Region 1, Piece 5:
+- nothing relevant
+
+Region 1, Piece 6:
+- S47°23'19"E 39.50'
+- 22.50' (appears to be a utility/easement offset distance)
+- 22.50' (appears to be a utility/easement offset distance)
+
+Region 1, Piece 7:
+- LOT 26
+
+Region 1, Piece 8:
+- nothing relevant
+
+Region 1, Piece 9:
+- LOT 25
+
+Region 1, Piece 10:
+- WEST 1/4 CORNER SECTION 14, T43S, R16 W SLB & M (1971 BLM CAP)
+- COUNTY REF. No. D-14-43-16
+- HCN No. 165
+- SECTION MEASUREMENTS PER INST. No. 201500044178 S 1°16'24" W 2638.70' FEET (HCN GROUND), 2638.85' FEET (MEAS.), 2638.49' FEET (GRID)
+
+Region 1, Piece 11:
+- WEST 1/4 CORNER SECTION 14, T43S, R16 W SLB & M (1971 BLM CAP)
+- COUNTY REF. No. D-14-43-16
+- HCN No. 165
+- SECTION MEASUREMENTS PER INST. No. 201500044178 S 1°16'24" W 2638.70' FEET (HCN GROUND), 2638.85' FEET (MEAS.), 2638.49' FEET (GRID)
+
+Region 1, Piece 12:
+- S88°44'00"E 2374.54' (appears to be a section line measurement / tie)
+- 2318.98' (prior-record or alternative measurement)
+
+Region 1, Piece 13:
+- GATE HOUSE LANE (road name)
+- S88°44'00"E 2374.54'
+- 2318.98'
+
+Region 1, Piece 14:
+- GATE HOUSE LANE (road name)
+- LOT 1
+- BRUCE NELSON SR.
+- INSTRUMENT No. 20170007362
+- PARCEL No.: SG-HYDE-1
+
+Region 1, Piece 15:
+- 22.50' (offset/easement distance)
+- S47°23'19"E
+- L=68.57', R=222.50', Δ=17°39'28" (curve on parcel boundary)
+- 55.57' (bare distance along boundary line near LOT 1)
+
+Region 1, Piece 16:
+- MARIGOLD WAY (road name)
+- S47°23'19"E 75.38'
+- L=144.18', R=200.00', Δ=41°18'14" (curve for road centerline or right-of-way)
+- L=62.99', R=222.50', Δ=16°13'15" (curve on parcel boundary)
+- S88°41'33"E 75.38'
+
+Region 1, Piece 17:
+- MARIGOLD WAY (road name)
+- 22.50' (offset/easement distance)
+- 11.16'
+- 42.50'
+- L=28.82', R=20.00', Δ=82°34'29" (curve on parcel boundary)
+- 40.47'
+
+Region 1, Piece 18:
+- SCALE: 1"=20'
+
+Region 1, Piece 19:
+- SURVEYOR'S CERTIFICATE
+- Michael R. Draper
+- License No. 7706445-2201
+
+Region 1, Piece 20:
+- SURVEYOR'S CERTIFICATE
+- Michael R. Draper
+- License No. 7706445-2201
+
+Region 1, Piece 21:
+- SURVEYOR'S CERTIFICATE
+- Michael R. Draper
+- License No. 7706445-2201
+- Date: 01-29-2019
+
+Region 1, Piece 22:
+- LOT 7
+
+Region 1, Piece 23:
+- SOUTH 81.71' (TIE)
+- LOT 2 (POST L.L.A.)
+- N47°21'38"E 53.68' (approximate boundary call near L4)
+
+Region 1, Piece 24:
+- 55.57' (bare distance along boundary)
+- SOUTH 74.25' (TIE)
+- N47°21'38"E 93.31'
+- S42°38'22"E 50.69'
+
+Region 1, Piece 25:
+- LOT 2
+- ALEX P. & KENSEY D. NELSON
+- INSTRUMENT No. 20170048574
+- PARCEL No.: SG-HYDE-2
+- 12,228 SQ. FT. or 0.28 ACRES (PRE L.L.A.)
+- 10,895 SQ. FT. or 0.25 ACRES (POST L.L.A.)
+- N88°41'33"W 100.00'
+
+Region 1, Piece 26:
+- 22.50' (utility offset)
+- L=28.82', R=20.00', Δ=82°34'29" (curve on parcel boundary)
+- S1°18'27"W 64.60'
+
+Region 1, Piece 27:
+- LOT 12
+
+Region 1, Piece 28:
+- NARRATIVE:
+- Michael R. Draper
+- License No. 7706445-2201
+
+Region 1, Piece 29:
+- LOT 2 - PRE LOT LINE ADJUSTMENT
+- PARCEL DESCRIPTION
+- Instrument No. 20170048574
+- "LOT 2, HYDE-BERRY PARK, ACCORDING TO THE OFFICIAL PLAT THEREOF ON FILE AND OF RECORD IN THE WASHINGTON COUNTY RECORDER'S OFFICE."
+- LOT 3 - PRE LOT LINE ADJUSTMENT
+
+Region 1, Piece 30:
+- 7.5 FOOT PUBLIC UTILITY EASEMENTS TO BE VACATED:
+- Commencing at the Northwest corner of Section 14...
+
+Region 1, Piece 31:
+- 7.5 FOOT PUBLIC UTILITY EASEMENTS TO BE VACATED...
+
+Region 1, Piece 32:
+- P.O.B. LOT 3 (POST L.L.A.)
+- N35°59'37"W
+
+Region 1, Piece 33:
+- P.O.B. 7.5' P.U.E. TO BE VACATED & NEW 7.5' P.U.E. TO BE DEDICATED
+- N35°59'37"W 100.57'
+
+Region 1, Piece 34:
+- N88°41'33"W 109.90'
+- LOT 3
+- ALEX P. & KENSEY D. NELSON
+- INSTRUMENT No. 20170034313
+- PARCEL No.: SG-HYDE-3
+- 12,198 SQ. FT. or 0.28 ACRES (PRE L.L.A.)
+- 13,531 SQ. FT. or 0.31 ACRES (POST L.L.A.)
+
+Region 1, Piece 35:
+- HYDEBERRY COVE
+- BASIS OF BEARING: N1°18'27"E 363.50' (PLAT) 363.50' (MEASURED)
+- S1°18'27"W 80.00'
+
+Region 1, Piece 36:
+- LOT 11
+
+=== STRUCTURE STEP ===
+{
+  "parcel_labels_found": [
+    {
+      "region_index": 1,
+      "label": "LOT 1"
+    },
+    {
+      "region_index": 1,
+      "label": "LOT 2"
+    },
+    {
+      "region_index": 1,
+      "label": "LOT 3"
+    }
+  ],
+  "parcels": [
+    {
+      "region_index": 1,
+      "boundary_calls": [
+        {
+          "bearing": "S47°23'19\"E",
+          "distance": "39.50'"
+        }
+      ],
+      "tie_point": null,
+      "basis_of_bearings": null,
+      "parcel_label": "LOT 1",
+      "stated_area_acres": null,
+      "ambiguous_alternates": [],
+      "curve_calls": []
+    },
+    {
+      "region_index": 1,
+      "boundary_calls": [
+        {
+          "bearing": "N88°41'33\"W",
+          "distance": "100.00'"
+        },
+        {
+          "bearing": "S1°18'27\"W",
+          "distance": "64.60'"
+        }
+      ],
+      "tie_point": null,
+      "basis_of_bearings": null,
+      "parcel_label": "LOT 2",
+      "stated_area_acres": "0.25",
+      "ambiguous_alternates": [],
+      "curve_calls": [
+        {
+          "delta": "17°39'28\"",
+          "radius": "222.50'",
+          "arc_length": "68.57'",
+          "turn": null,
+          "after_call_index": 0
+        }
+      ]
+    },
+    {
+      "region_index": 1,
+      "boundary_calls": [
+        {
+          "bearing": "N88°41'33\"W",
+          "distance": "109.90'"
+        },
+        {
+          "bearing": "S1°18'27\"W",
+          "distance": "80.00'"
+        }
+      ],
+      "tie_point": null,
+      "basis_of_bearings": "N1°18'27\"E 363.50'",
+      "parcel_label": "LOT 3",
+      "stated_area_acres": "0.31",
+      "ambiguous_alternates": [],
+      "curve_calls": []
+    }
+  ]
+}

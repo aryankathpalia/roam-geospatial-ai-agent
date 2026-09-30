@@ -1,0 +1,41 @@
+2f896c95: 4 regions classified
+27211ae5: 4 regions classified
+3affa529: 4 regions classified
+65be453d: 5 regions classified
+a1136318: 2 regions classified
+db54d473: 3 regions classified
+798850fc: 1 regions classified
+83ab22d0: 1 regions classified
+INFO: Could not find files for the given pattern(s).
+C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:718: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-LCNet_x1_0_doc_ori`.[0m
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I0924 22:10:37.246052 21028 onednn_context.cc:81] oneDNN v3.6.2
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+Gemini gemini-3.5-flash-lite returned 503 (round 1)
+Gemini gemini-3.1-flash-lite returned 503 (round 1)
+All Gemini models returned 503; retrying in 20s
+Gemini gemini-3.5-flash-lite returned 503 (round 2)
+Gemini gemini-3.1-flash-lite returned 503 (round 2)
+All Gemini models returned 503; retrying in 60s
+Gemini gemini-3.5-flash-lite returned 503 (round 3)
+8d75d3ed: attempt 1 failed (503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This mo); waiting 120s
+Gemini gemini-3.5-flash-lite returned 503 (round 1)
+Gemini gemini-3.1-flash-lite returned 503 (round 1)
+All Gemini models returned 503; retrying in 20s
+8d75d3ed: 81 regions classified
+510ea60f: 27 regions classified
+
+label -> predicted counts:
+  not_a_plat     -> boundary_plat          2  <-- mismatch
+  not_a_plat     -> not_a_parcel_drawing   66
+  not_a_plat     -> undimensioned_drawing  4  <-- mismatch
+  plat           -> boundary_plat          21
+  plat           -> undimensioned_drawing  2  <-- mismatch
+  undimensioned  -> boundary_plat          10  <-- mismatch
+  undimensioned  -> not_a_parcel_drawing   2  <-- mismatch
+  undimensioned  -> undimensioned_drawing  25
+
+plats_dropped: 2/23  [('510ea60f', 57, 'undimensioned_drawing'), ('510ea60f', 57, 'undimensioned_drawing')]
+nonplats still sent to extraction: 12/109

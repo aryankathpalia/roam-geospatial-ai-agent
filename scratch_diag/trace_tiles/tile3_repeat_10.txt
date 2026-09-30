@@ -1,0 +1,23 @@
+Region 1, Piece 1:
+
+**Boundary Bearing and Distance Calls (and associated record citations):**
+* `S0°48'45"W 220.00'`
+* `(S0°02'31"E 250.00' (R4))` (in parentheses, prior-record citation)
+
+**Ties, Monument Connections, and Section/Reference Lines:**
+* `N89°11'15"E 1077.91'` (appears to be a tie line/distance connecting the property corner to the section line / control point area)
+* `N0°48'45"E 2637.36'` (appears to be a tie / section line distance connecting to the Washoe County Control Point monument, not a parcel boundary call)
+* `(N0°48'59"E 2637.29' - R1)` (record citation associated with the tie/section line)
+* `(N0°49'02"E 2637.35' - R3)` (record citation associated with the tie/section line)
+
+**Ground / State-Plane Coordinates:**
+* `N: 14928989.71` / `E: 2253610.44` (Ground Coordinates - Measured,Washoe County Control Point)
+* `N: 14928989.62` / `E: 2253610.74` (Ground Coordinates - Record, Washoe County Control Point)
+* `N 14926897.47` / `E 2252502.76` (Ground Coordinates at parcel corner)
+
+**Basis of Bearings / Datum / Coordinate-Zone Statements:**
+* `WASHOE COUNTY CONTROL POINT N22SM01029 USGLO 2" BRASS CAP S12/7/13/18 1942`
+
+**Parcel / Lot Labels and Acreage:**
+* `PARCEL 1`
+* `1.78 ACRES`

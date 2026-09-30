@@ -1,0 +1,54 @@
+[
+  {
+    "region_index": 2,
+    "boundary_calls": [
+      {
+        "bearing": "N52*52'00\"W",
+        "distance": "148.83'"
+      },
+      {
+        "bearing": "S37*08'00\"W",
+        "distance": "100.00'"
+      },
+      {
+        "bearing": "S52*52'00\"E",
+        "distance": "148.83'"
+      },
+      {
+        "bearing": "N37*08'00\"E",
+        "distance": "100.00'"
+      }
+    ],
+    "tie_point": null,
+    "basis_of_bearings": null,
+    "parcel_label": "LOT 12A",
+    "stated_area_acres": "0.37",
+    "ambiguous_alternates": []
+  },
+  {
+    "region_index": 2,
+    "boundary_calls": [
+      {
+        "bearing": "N52*52'00\"W",
+        "distance": "148.83'"
+      },
+      {
+        "bearing": "N37*08'00\"E",
+        "distance": "88.60'"
+      },
+      {
+        "bearing": "S76*58'30\"E",
+        "distance": "135.81'"
+      },
+      {
+        "bearing": "S37*08'00\"W",
+        "distance": "108.30'"
+      }
+    ],
+    "tie_point": null,
+    "basis_of_bearings": null,
+    "parcel_label": "LOT 16B2",
+    "stated_area_acres": "0.46",
+    "ambiguous_alternates": []
+  }
+]

@@ -1,0 +1,22 @@
+C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py:197: UserWarning: Specified provider 'CUDAExecutionProvider' is not in available provider names.Available providers: 'AzureExecutionProvider, CPUExecutionProvider'
+  warnings.warn(
+========================================================================
+1. CROP PADDING REGRESSION
+========================================================================
+pages checked: 136
+ParcelMap crops checked: 33
+failures: 0
+
+========================================================================
+2. DUPLICATE-REGION FLAG REGRESSION (all processed documents)
+========================================================================
+documents checked: 34
+documents with a flagged duplicate: 3
+  - 1cdd7b85-b3cb-4c78-9da8-3c25e68736f8: ['MAP 7 LOT 48-3']
+  - 6a816467-07b0-4edb-bb97-157787d19c94: ['MAP 7 LOT 48', 'MAP 7 LOT 48-3']
+  - 8fdcbca1-e6a2-4e9e-b447-f68ba704bee2: ['MAP 7 LOT 48-3']
+errors: 0
+
+========================================================================
+RESULT: crop padding PASS, duplicate flag PASS
+========================================================================

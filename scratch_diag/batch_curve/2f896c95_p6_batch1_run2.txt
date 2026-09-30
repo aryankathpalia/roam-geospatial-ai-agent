@@ -1,0 +1,38 @@
+Region 1, Piece 1:
+- `N89° 25'` (bearing shown along the top boundary line)
+- `S7' 09"E 1333.30'` (bearing and distance shown along the left vertical boundary line)
+- `REMAINDE` (parcel/lot label, partially visible)
+- `17-2` (parcel number/identifier)
+- `[120.4` (acreage or partial text value, partially visible)
+Region 1, Piece 1:
+- `1200'` (graphic scale bar value)
+- `N89° 25' 02”W 3946.91'`
+- `17-2-1-4` (parcel label / number)
+- `120.4 AC.±` (acreage label)
+Region 1, Piece 1:
+
+- S89° 24' 39"E 1318.25' (boundary bearing and distance call)
+- S0° 48' 45"W 1323.32' (boundary bearing and distance call, located along the left vertical border)
+- S0° 48' 45"W 1320.11' (boundary bearing and distance call, located along the right vertical border)
+- PARCEL 1 [40.00 AC +] (parcel label and acreage, partially visible at the bottom)
+Region 1, Piece 1:
+- `N0° 57' 09" E` (bearing call along the vertical boundary line on the left)
+- `N89° 33'` (partial bearing call along the horizontal boundary line; the trailing seconds/text extend off to the right or into another region)
+- `REMAINDER 17-2 [120.4` (parcel label and partial acreage/text at the top right)
+- `DISPLAY MAP FOR APN 077-210-11` (parcel/display map label at the bottom)
+- `PATNAUDE` (name label at the bottom)
+Region 1, Piece 1:
+
+- **Parcel/Lot label and acreage:**
+  - `REMAINDER PARCEL`
+  - `17-2-1-4`
+  - `120.4 AC.±`
+
+- **Boundary bearing and distance call:**
+  - `N89° 33' 38" W 3950.22'`
+Region 1, Piece 1:
+
+- **PARCEL 1 [40.00 AC.±]** (Parcel/lot label and acreage)
+- **S89° 33' 00"E 1318.27'** (Boundary bearing and distance call)
+- **S0° 48' 45" W** (Bearing call along the left property boundary)
+- **S0° 48' 45" W** (Bearing call along the right property boundary)

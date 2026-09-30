@@ -1,0 +1,43 @@
+Region 1, Piece 1:
+- N0°48'45"E 220.00' (boundary bearing and distance call)
+- (N0°02'31"W 250.00) (R4) (prior-record citation in parentheses)
+- 550.75' (distance along the top boundary line)
+- 550.75' (distance along the bottom boundary line)
+- PARCEL 2 / 2.78 ACRES (parcel/lot label and acreage)
+
+Region 1, Piece 2:
+- S89°11'15"E 903.15' (boundary bearing and distance call along the top boundary)
+- (S89°09'41"E) (R3) (prior-record citation in parentheses)
+- (N89°57'29"E) (R4) (prior-record citation in parentheses)
+- N89°11'15"W 903.15' (boundary bearing and distance call along the bottom boundary)
+- (N89°57'29"E) (R4) (prior-record citation in parentheses)
+- PARCEL 1 / 1.78 ACRES (parcel/lot label and acreage)
+
+Region 1, Piece 3:
+- N 14926897.47 / E 2252502.76 (ground coordinate for a corner point)
+- N 14928989.71 / E 2253610.44 (GROUND COORDINATES (MEASURED))
+- N 14928989.62 / E 2253610.74 (GROUND COORDINATES (RECORD))
+- N0°48'45"E 220.00' (boundary bearing and distance call)
+- (S0°02'31"E 250.00) (R4) (prior-record citation in parentheses)
+- N0°48'45"E 2637.36' (N0°48'59"E 2637.29' - R1) (N0°49'02"E 2637.35' - R3) -- appears to be a TIE/section line distance adjacent to the WASHOE COUNTY CONTROL POINT, not a parcel boundary call
+- N89°11'11"E 1077.91' -- appears to be a tie/reference line distance to the outside monument/section line, not a parcel boundary call
+
+Region 1, Piece 4:
+- S1°39'59"W 30.00' (TIE) -- tie line distance
+- S89°11'17"E 336.41' (N89°57'29"E) (R2) -- road frontage / adjoiner line distance (30' QUITCLAIM AREA)
+- (Notes referencing "30' QUITCLAIM AREA (R6)" and adjacent trust deeds)
+
+Region 1, Piece 5:
+- N89°11'15"W 903.15' (N89°57'29"E) (R4) -- road frontage / right-of-way line distance (PLACERVILLE ROAD)
+- S89°11'17"E 329.80' (N89°57'29"E) (R2) -- road frontage / adjoiner line distance (30' QUITCLAIM AREA (R5))
+
+Region 1, Piece 6:
+- S89°11'17"E 325.30' (N89°57'29"E) (R2) -- road frontage / adjoiner line distance (30' QUITCLAIM AREA (R5))
+- N 14926352.62 / E 2253573.04 (GROUND COORDINATES (MEASURED) for the 1/4 corner monument)
+- N 14926352.55 / E 2253573.13 (GROUND COORDINATES (RECORD) for the 1/4 corner monument)
+- BASIS OF BEARINGS statement:
+  "THE BASIS OF BEARINGS FOR THIS SURVEY IS NEVADA STATE PLANE, WEST ZONE NAD83(94) BASED ON REAL TIME KINEMATIC (RTK) GPS OBSERVATIONS UTILIZING CORRECTIONS FROM THE NORTHERN NEVADA COOPERATIVE REAL TIME NETWORK. COORDINATES AND DISTANCES HEREON ARE AT GROUND LEVEL BASED ON A COMBINED GRID TO GROUND FACTOR OF 1.000197939."
+- RESULTANT PARCEL AREAS table:
+  - PARCEL 1: 77,526 SQ. FT. / 1.78 ACRES
+  - PARCEL 2: 121,165 SQ. FT. / 2.78 ACRES
+  - TOTAL: 198,691 SQ. FT. / 4.56 ACRES

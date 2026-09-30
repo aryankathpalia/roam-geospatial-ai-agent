@@ -1,0 +1,199 @@
+**Region 1, Piece 1:**
+- 086-250-70
+- 5.188 ac.
+- 086-250-63
+- 5.415 ac.
+- PAR.A
+- RS 6008
+
+**Region 1, Piece 2:**
+- PORTION OF SEC. 13
+- T21N - R18E
+- 086-250-04
+- 10.0 ac.
+- 086-250-69
+- 9.43 ac.
+- 086-250-71
+- 2.18 ac.
+- 086-250-66
+- 5.46 ac.
+- 086-250-64
+- 7.13 ac.
+- 086-250-68
+- 6.53 ac.
+
+**Region 1, Piece 3:**
+- 086-250-77
+- 2.14 ac.
+- 086-250-78
+- 3.24 ac.
+- 086-250-75
+- 1.79 ac.
+- 086-250-76
+- 1.80 ac.
+- 086-250-73
+- 1.16 ac.
+- 086-250-74
+- 1.19 ac.
+- 086-250-72
+- 1.18 ac.
+- 086-250-05
+- 30.00 ac.
+
+**Region 1, Piece 4:**
+- 086-250-79
+- 10.00 ac.
+
+**Region 1, Piece 5:**
+- 086-250-81
+- 89.91 ac.
+- 086-250-01
+- 80.00 ac.
+
+**Region 1, Piece 6:**
+- 086-250-46
+- 1.19 ac.
+- 086-250-44
+- 1.10 ac.
+- 086-250-45
+- 1.48 ac.
+- 086-250-43
+- 3.24 ac.
+- 086-250-59
+- 1.00 ac.
+- 086-250-60
+- 1.00 ac.
+- 086-250-61
+- 1.00 ac.
+- 086-250-58
+- 1.00 ac.
+- 086-250-38
+- 1.22 ac.
+- 086-250-56
+- 1.00 ac.
+- 086-250-57
+- 1.00 ac.
+- 086-250-50
+- 1.00 ac.
+- 086-250-48
+- 1.10 ac.
+- 086-250-51
+- 1.01 ac.
+- 086-250-62
+- 1.00 ac.
+- 086-250-54
+- 3.81 ac.
+- 086-250-35
+- 25.02 ac.
+
+---
+
+**Region 2, Piece 1:**
+- PARCEL 1
+- PARCEL 2
+- APN: 086-260-21
+- APN: 086-250-69
+- N0°48'45"E 220.00'
+- (N0°02'31"W 250.00') (R4)
+- GROUND COORDINATES
+- N 14926910.28
+- E 2251599.70
+
+**Region 2, Piece 2:**
+- APN: 086-260-22
+- S89°11'15"E 903.15'
+- (S89°09'41"E) (R3)
+- (N89°57'29"E) (R4)
+- S0°48'45"W 220.00'
+
+**Region 2, Piece 3:**
+- APN: 086-250-77
+- N89°11'15"W 1077.90'
+- N0°48'45"E 2637.36'
+- (N0°48'59"E 2637.29' - R1)
+- (N0°49'02"E 2637.35' - R3)
+- GROUND COORDINATES (MEASURED)
+- N: 14926989.71
+- E: 2253610.44
+- GROUND COORDINATES (RECORD)
+- N: 14926989.62
+- E: 2253610.74
+- GROUND COORDINATES
+- N 14926897.47
+- E 2252502.76
+- S0°48'45"W 220.00'
+- (S0°02'31"E 250.00') (R4)
+
+**Region 2, Piece 4:**
+- APN: 086-250-67
+- S89°11'17"E 336.41'
+- (N89°57'29"E) (R2)
+
+**Region 2, Piece 5:**
+- APN: 086-250-75
+- S89°11'17"E 329.80'
+- (N89°57'29"E) (R2)
+
+**Region 2, Piece 6:**
+- BASIS OF BEARINGS
+- THE BASIS OF BEARINGS FOR THIS SURVEY IS NEVADA STATE PLANE, WEST ZONE NAD83(94) BASED ON REAL TIME KINEMATIC (RTK) GPS OBSERVATIONS UTILIZING CORRECTIONS FROM THE NORTHERN NEVADA COOPERATIVE REAL TIME NETWORK. COORDINATES AND DISTANCES HEREON ARE AT GROUND LEVEL BASED ON A COMBINED GRID TO GROUND FACTOR OF 1.000197939.
+
+---
+
+**Region 3, Piece 1:**
+- S89°11'17"E 329.80'
+- (N89°57'29"E) (R2)
+
+---
+
+**Region 4, Piece 1:**
+- S89°11'17"E 325.30'
+- (N89°57'29"E) (R2)
+- GROUND COORDINATES (MEASURED)
+- N: 14926352.62
+- E: 2253573.04
+- GROUND COORDINATES (RECORD)
+- N: 14926352.55
+- E: 2253573.13
+- RESULTANT PARCEL AREAS
+- PARCEL 1
+- 77,526 SQ. FT.
+- 1.78 ACRES
+- PARCEL 2
+- 121,165 SQ. FT.
+- 2.78 ACRES
+- TOTAL
+- 198,691 SQ. FT.
+- 4.56 ACRES
+
+**Region 4, Piece 2:**
+- nothing relevant
+
+**Region 4, Piece 3:**
+- APN: 086-250-21
+- PARCEL 2
+- 2.78 ACRES
+
+**Region 4, Piece 4:**
+- APN: 086-260-22
+- S89°11'15"E 903.15'
+- PARCEL 1
+- 1.78 ACRES
+
+**Region 4, Piece 5:**
+- N89°11'15"W 1077.90'
+- GROUND COORDINATES (MEASURED)
+- N: 14926989.71
+- E: 2253610.44
+- GROUND COORDINATES (RECORD)
+- N: 14926989.62
+- E: 2253610.74
+- GROUND COORDINATES
+- N 14926897.47
+- E 2252502.76
+- S0°48'45"W 220.00'
+
+**Region 4, Piece 6:**
+- APN: 086-250-67
+- S89°11'17"E 336.41'
+- (N89°57'29"E) (R2)

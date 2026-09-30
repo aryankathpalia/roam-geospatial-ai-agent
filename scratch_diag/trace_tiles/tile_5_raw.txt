@@ -1,0 +1,8 @@
+Region 1, Piece 1:
+
+- **S89°11'17"E 329.80'** -- Boundary/road frontage bearing and distance call for Placerville Road (along the northern right-of-way).
+- **(N89°57'29"E) (R2)** -- Record information (prior-record citation) corresponding to the Placerville Road frontage bearing, shown in parentheses.
+- **30' QUITCLAIM AREA (R5)** -- Label indicating a 30' quitclaim/dedication area along Placerville Road.
+- **ORLANDO G. & REGINA M. JASSO** -- Parcel owner label.
+- **DEED 5217588** -- Deed reference number for the parcel.
+- **APN: 086-250-75** -- Assessor Parcel Number (APN) for the parcel.

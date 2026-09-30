@@ -1,0 +1,37 @@
+Region 1, Piece 1:
+- PARCEL A
+- PARCEL B
+- PARCEL C
+
+Region 1, Piece 2:
+- N 01°31'34" E 139.00'
+- S 89°11'45" E 690.15'
+
+Region 1, Piece 3:
+- N 89°11'10" W 389.26'
+- S 89°11'10" E 657.32' (referenced in the small overview grid/map at the bottom)
+- S 89°11'45" E 1310.32' (referenced in the small overview grid/map at the bottom)
+Region 1, Piece 1:
+
+Boundary bearings, distances, and calls:
+- `N 01'51'34"` (part of a bearing label on the left edge)
+- `S 01'56'24" E`
+- `S 89'11'45" W` (along the northern portion of the property)
+- `N 89'11'45" W`
+- `N 87'31'02" W`
+- `6.3` (dimension call near the northeast corner area)
+- `30.00` (dimension call)
+- `-100.21` (dimension call)
+- `1310.32'` (distance)
+- `2631.41'` (distance)
+- `1340.19'` (distance)
+- `S 2704'03" W` (bearing and distance call near top-left area: `S 2704'03" W 1340.19'`)
+- `S 1517'34" W` (bearing and distance call: `S 1517'34" W 1317.03'`)
+- `N 207'34" E` (bearing and distance call: `N 207'34" E 1300.30'`)
+- `S 89'11'45" E` (bearing and distance call: `S 89'11'45" E 1310.32'`)
+- `N 88'25'45" W 1326.93'` (bearing and distance call)
+- `N 88'13'24" W 1305.23'` (bearing and distance call)
+
+Basis of Bearing / Datum statements:
+- `BASIS OF BEARING`
+- `NORTH-SOUTH CENTERLINE OF SECTION, BEING NORTH 2'07'34" EAST AS SHOWN ON RECORD OF SURVEY RECORDED IN BOOK 15 OF SURVEYS AT PAGE 16, RECORDS OF SKAGIT COUNTY, WASHINGTON.`

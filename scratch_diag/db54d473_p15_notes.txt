@@ -1,0 +1,126 @@
+Region 1, Piece 1:
+- nothing relevant
+
+Region 1, Piece 2:
+- nothing relevant
+
+Region 1, Piece 3:
+- S 41° 27' 17" E (bearing call along boundary/road)
+- 258.94' (distance call along boundary/road)
+
+Region 1, Piece 4:
+- 416.94' (distance call along boundary)
+- 158.00' (distance call along boundary)
+
+Region 1, Piece 5:
+- GROUND COORDINATE: N 14869222.39, E 2229634.73
+
+Region 1, Piece 6:
+- S 48° 08' 14" E 4926.29' -- appears to be a TIE to the adjacent WASHOU COUNTY GPS POINT V72SM01037 monument, not a parcel boundary call
+- WASHOU COUNTY GPS POINT V72SM01037 GROUND COORDINATE: N 14865934.85, E 2233303.57
+- BASIS OF BEARING: WASHOE COUNTY GPS SYSTEM BETWEEN POINTS V72SM01034 AND V72SM01037 COMPUTED AS N 44° 54' 37" E 2721.05' (NAD83/94)
+- TOTAL AREA = 3.35 AC.
+- TOTAL AREA = 145,741 SQ. FT.
+
+Region 1, Piece 7:
+- 38-710-14 PODEWILS LOT 8, BLK B, T. M. # 2754 (parcel/lot label)
+
+Region 1, Piece 8:
+- N 56° 02' 43" E 434.26' (boundary bearing and distance call)
+- PARCEL 1 85,396 SQ. FT. (parcel label and area)
+
+Region 1, Piece 9:
+- N 70° 29' 46" E 470.71' (boundary bearing and distance call)
+
+Region 1, Piece 10:
+- S 75° 16' 17" W 481.51' (boundary bearing and distance call)
+- PARCEL 2 60,345 SQ. FT. (parcel label and area)
+- 38-710-10 VAN WAAY LOT 11, BLK B, T. M. # 2754 (adjoining lot label)
+
+Region 1, Piece 11:
+- nothing relevant
+
+Region 1, Piece 12:
+- nothing relevant
+
+Region 1, Piece 13:
+- nothing relevant
+
+Region 1, Piece 14:
+- nothing relevant
+
+Region 1, Piece 15:
+- nothing relevant
+
+Region 1, Piece 16:
+- GROUND COORDINATE: N 14869099.98, E 2229169.05
+
+Region 1, Piece 17:
+- nothing relevant
+
+Region 1, Piece 18:
+- N 42° 28' 53" E (radial bearing)
+- 1470.10' (distance)
+
+Region 1, Piece 19:
+- WATER BUCK WAY PER T. M. # 2754 (road name/label)
+
+Region 1, Piece 20:
+- R=385.00' (Radius for curve C2)
+- 324.40' (distance call)
+- C1 arc=115.63', delta=15° 13' 50", radius=435.00'
+- C2 arc=120.24', delta=17° 53' 39", radius=385.00'
+- C3 arc=22.44', delta=03° 20' 25", radius=385.00'
+
+Region 1, Piece 21:
+- R=410.00' (Radius call)
+- S 23° 29' 37" E 5552.48' -- appears to be a TIE or distant control line, not an immediate parcel boundary call
+- WASHOE COUNTY GPS POINT V72SM01034 GROUND COORDINATE: N 14864007.77, E 2231382.51
+
+Region 1, Piece 22:
+- Curve Table:
+  - C1: ARC = 115.63', DELTA = 15° 13' 50", RADIUS = 435.00'
+  - C2: ARC = 120.24', DELTA = 17° 53' 39", RADIUS = 385.00'
+  - C3: ARC = 22.44', DELTA = 03° 20' 25", RADIUS = 385.00'
+
+Region 1, Piece 23:
+- nothing relevant
+
+Region 1, Piece 24:
+- S 62° 54' (bearing/direction call)
+- WEST 1/4 CORNER SECTION 8
+
+Region 1, Piece 25:
+- SILVER LYNX WAY PER T. M. # 2754 (road label)
+
+Region 1, Piece 26:
+- nothing relevant
+
+Region 1, Piece 27:
+- nothing relevant
+
+Region 1, Piece 28:
+- SIERRA PACIFIC POWER COMPANY DBA NV ENERGY (utility company label)
+- NEVADA BELL TELEPHONE COMPANY DBA AT&T NEVADA (utility company label)
+- CHARTER COMMUNICATIONS (utility company label)
+
+Region 1, Piece 29:
+- nothing relevant
+
+Region 1, Piece 30:
+- nothing relevant
+
+Region 1, Piece 31:
+- nothing relevant
+
+Region 1, Piece 32:
+- nothing relevant
+
+Region 1, Piece 33:
+- nothing relevant
+
+Region 1, Piece 34:
+- nothing relevant
+
+Region 1, Piece 35:
+- nothing relevant

@@ -1,0 +1,23 @@
+Based on the provided image, here are the extracted details listed according to your instructions:
+
+**Region 1, Piece 1:**
+
+*   **Boundary bearing and distance calls / Record citations:**
+    *   `S0*48'45"W 220.00'` (Boundary bearing and distance call)
+    *   `(S0*02'31"E 250.00' - R4)` (Bearing and distance in parentheses - prior record citation)
+*   **Tie lines / Reference lines:**
+    *   `N89*11'1! 1077.9!'` (Tie line to the found 5/8" rebar / section line)
+    *   `N0*48'45"E 2637.36'` (Tie line / section line distance connecting to control/section monument)
+    *   `(N0*48'59"E 2637.29' - R1)` (Prior record citation tie line)
+    *   `(N0*49'02"E 2637.35' - R3)` (Prior record citation tie line)
+*   **Ground / State-plane coordinates:**
+    *   `N: 14928989.71` / `E: 2253610.44` (Ground coordinates - Measured, Washoe County Control Point)
+    *   `N: 14928989.62` / `E: 2253610.74` (Ground coordinates - Record, Washoe County Control Point)
+    *   `N 14926897.47` / `E 2252502.76` (Ground coordinates at parcel corner)
+*   **Basis-of-bearings / Datum / Coordinate-zone statements:**
+    *   `WASHOE COUNTY CONTROL POINT N22SM01029 USGLO 2" BRASS CAP S12/7/13/18 1942`
+    *   `GROUND COORDINATES (MEASURED)`
+    *   `GROUND COORDINATES (RECORD)`
+*   **Parcel / Lot labels and acreages:**
+    *   `PARCEL 1`
+    *   `1.78 ACRES`

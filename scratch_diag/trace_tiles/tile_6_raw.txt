@@ -1,0 +1,26 @@
+Region 1, Piece 1:
+
+**Boundary bearing and distance calls:**
+- S89°11'17"E 325.30'
+- (N89°57'29"E) (R2) — *prior-record citation in parentheses, located near the top boundary line.*
+
+**Tie-line measurements / control point calls:**
+- The top-center call `S89°11'17"E 325.30'` / `(N89°57'29"E) (R2)` with a curved leader pointing to the dashed line near `30' QUITCLAIM AREA (R5)` appears to relate to the right-of-way/quitclaim area rather than a standard parcel boundary line.
+
+**Ground/state-plane coordinates:**
+- GROUND COORDINATES (MEASURED):
+  N: 14926352.62
+  E: 2253573.04
+- GROUND COORDINATES (RECORD):
+  N: 14926352.55
+  E: 2253573.13
+
+**Basis-of-bearings / datum / coordinate-zone statement:**
+- WASHOE COUNTY CONTROL POINT
+  N22SM01113 USGLO BRASS CAP
+  1/4 CORNER 13/18 1942
+
+**Parcel/lot labels or acreage:**
+- PARCEL 1 | 77,526 SQ. FT. | 1.78 ACRES
+- PARCEL 2 | 121,165 SQ. FT. | 2.78 ACRES
+- TOTAL | 198,691 SQ. FT. | 4.56 ACRES

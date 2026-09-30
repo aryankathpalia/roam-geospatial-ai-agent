@@ -1,0 +1,22 @@
+INFO:     Started server process [5444]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:51486 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51491 - "GET /documents/3ea4cc01-4d39-472b-9465-a105306d63dc/pages/13/regions/3/crop.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60767 - "GET /documents/3ea4cc01-4d39-472b-9465-a105306d63dc HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52453 - "GET /documents/3ea4cc01-4d39-472b-9465-a105306d63dc/pages/13/regions/3/crop.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59601 - "GET /documents/3ea4cc01-4d39-472b-9465-a105306d63dc HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65344 - "GET /documents/3ea4cc01-4d39-472b-9465-a105306d63dc HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65344 - "GET /documents/3ea4cc01-4d39-472b-9465-a105306d63dc HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65344 - "GET /documents/3ea4cc01-4d39-472b-9465-a105306d63dc HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65344 - "GET /documents/3ea4cc01-4d39-472b-9465-a105306d63dc HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65344 - "GET /documents/3ea4cc01-4d39-472b-9465-a105306d63dc HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65344 - "GET /documents/3ea4cc01-4d39-472b-9465-a105306d63dc HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65344 - "GET /documents/3ea4cc01-4d39-472b-9465-a105306d63dc HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65344 - "GET /documents/3ea4cc01-4d39-472b-9465-a105306d63dc HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65344 - "GET /documents/3ea4cc01-4d39-472b-9465-a105306d63dc HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65344 - "GET /documents/3ea4cc01-4d39-472b-9465-a105306d63dc HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65344 - "GET /documents/3ea4cc01-4d39-472b-9465-a105306d63dc HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63913 - "GET /documents/1cdd7b85-b3cb-4c78-9da8-3c25e68736f8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54329 - "GET /documents/1cdd7b85-b3cb-4c78-9da8-3c25e68736f8/pages/2/regions/5/crop.png HTTP/1.1" 200 OK

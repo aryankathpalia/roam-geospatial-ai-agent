@@ -1,0 +1,64 @@
+Region 1, Piece 1:
+- nothing relevant
+
+Region 2, Piece 1:
+- `Parcel - 160.35-1-26.000`
+- `Proposed Access Easement For Parcel 160.35-1-25.000`
+- `Area = 456.2 ± sq. ft.`
+- `N69° 51' 34"E 27.06'` (bearing and distance)
+- `S21° 13' 27"E 18.00'` (bearing and distance)
+- `S69° 51' 34"W 27.02'` (bearing and distance)
+- `N21° 21' 17"W 18.00'` (bearing and distance)
+- `Lot 1`
+- `Parcel 160.35-1-25.000 Area = 0.42 ± acres`
+- `Portion of Parcel 160.35-1-26.000 Area = 0.06 ± acres`
+- `Portion of Parcel 160.35-1-22.200 Area = 0.25 ± acres`
+- `Total Area = 0.73 ± acres`
+- `Lot 2`
+- `Portion of Parcel 160.35-1-22.200 Area = 0.15 ± acres`
+- `Portion of Parcel 160.35-1-26.000 Area = 0.17 ± acres`
+- `Total Area = 0.32 ± acres`
+- `N21° 13' 27"W 159.18'` (bearing and distance)
+
+Region 2, Piece 2:
+- `Lot 1`
+- `Parcel 160.35-1-25.000`
+- `Area = 0.42 ± acres to Low Water Mark`
+- `Total Proposed Area = 0.73 ± acres`
+- `S21° 13' 27"E 4.2 ±` (bearing and distance)
+- `N56° 40' 56"E 51.12' Tie Line` (Note: labeled as "Tie Line")
+- `S21° 13' 59"E 60.03'` (bearing and distance)
+- `N65° 22' 13"E 5.32'` (bearing and distance)
+- `N63° 37' 29"E 6.89'` (bearing and distance)
+- `S27° 04' 12"E 32.43'` (bearing and distance)
+- `S62° 00' 09"E 11.31'` (bearing and distance)
+- `Lot 2 Remaining Portion of Parcel - 160.35-1-26.000 Area = 0.17 ± acres (To Low Water Mark)`
+- `S21° 13' 27"E 193.20'` (bearing and distance)
+- `160.35-1-27`
+- `Parcel 160.35-1-26.000`
+- `S21° 13' 27"E Total 182.69'` (bearing and distance)
+
+Region 2, Piece 3:
+- `Portion of Parcel 160.35-1-26.000 Area = 0.17 ± acres`
+- `Total Area = 0.32 ± acres`
+- `Portion of Parcel 160.35-1-26.000 to be Combined With Parcel 160.35-1-25.000 Area = 0.06 ± acres`
+- `N68° 38' 43"E 24.60'` (bearing and distance)
+- `N06° 53' 43"E 22.70'` (bearing and distance)
+- `S68° 38' 43"W 32.40'` (bearing and distance)
+- `S68° 38' 43"W 100.00'` (bearing and distance)
+- `N21° 52' 17"W 62.99'` (bearing and distance)
+- `160.35-1-83.200`
+- `Lot 1 Portion Of Parcel 160.35-1-22.200 to be Combined With Parcel 160.35-1-25.000 Area = 0.25 ± acres (Total Proposed Area = 0.73 ± acres)`
+- `S69° 05' 58"W 124.76'` (bearing and distance)
+- `160.35-1-22.100`
+
+Region 2, Piece 4:
+- `160.35-1-83.120`
+- `Lot 2 Portion Of Parcel 160.35-1-22.200 to be Combined With Parcel 160.35-1-26.000 Area = 0.15 ± acres (Total Proposed Area = 0.32 ± acres)`
+- `S20° 54' 02"E 83.98'` (bearing and distance)
+- `S17° 37' 02"E 64.85'` (bearing and distance)
+- `S69° 05' 58"W 91.89'` (bearing and distance)
+- `N68° 38' 43"E 23.04'` (bearing and distance)
+- `N68° 38' 43"E 26.96'` (bearing and distance)
+- `S21° 13' 27"E 20.00'` (bearing and distance)
+- `N68° 38' 43"E 68.53'` (bearing and distance)

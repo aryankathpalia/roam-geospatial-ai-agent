@@ -1,0 +1,91 @@
+Here are the extracted items for each piece, categorized according to your instructions:
+
+### Region 1, Piece 1 (Top-Left)
+* **Ground/State-Plane Coordinates:**
+  * `N 14926910.28`
+  * `E 2251599.70`
+* **Boundary Bearing and Distance Call:**
+  * `N0°48'45"E 220.00'`
+* **Prior-Record Citation (in parentheses):**
+  * `(N0°02'31"W 250.00') (R4)`
+* **Parcel/Lot Label or Acreage:**
+  * `PARCEL 2`
+  * `2.78 ACRES`
+
+---
+
+### Region 1, Piece 2 (Top-Middle)
+* **Boundary Bearing and Distance Call:**
+  * `S89°11'15"E 903.15'`
+  * `S0°48'45"W 220.00'`
+  * `N89°11'15"W 903.15'`
+* **Prior-Record Citations (in parentheses):**
+  * `(S89°09'41"E) (R3)`
+  * `(N89°57'29"E) (R4)`
+  * `(N89°57'29"E) (R4)`
+
+---
+
+### Region 1, Piece 3 (Top-Right)
+* **Ground/State-Plane Coordinates:**
+  * `GROUND COORDINATES (MEASURED)`
+    * `N: 14928989.71`
+    * `E: 2253610.44`
+  * `GROUND COORDINATES (RECORD)`
+    * `N: 14928989.62`
+    * `E: 2253610.74`
+  * `GROUND COORDINATES`
+    * `N 14926897.47`
+    * `E 2252502.76`
+* **Boundary Bearing and Distance Call:**
+  * `S0°48'45"W 220.00'`
+* **Prior-Record Citation (in parentheses):**
+  * `(S0°02'31"E 250.00') (R4)`
+  * `(N0°48'59"E 2637.29' - R1)`
+  * `(N0°49'02"E 2637.35' - R3)`
+* **Tie Line / Reference Call:**
+  * `N0°48'45"E 2637.36'` — Appears to be a TIE/section line distance next to the section corner and Washoe County Control Point monument, not a parcel boundary call.
+  * `2107.74'` — Distance shown with break lines pointing toward section control.
+* **Parcel/Lot Label or Acreage:**
+  * `PARCEL 1`
+  * `1.78 ACRES`
+
+---
+
+### Region 1, Piece 4 (Bottom-Left)
+* **Prior-Record Citation (in parentheses):**
+  * `(N89°57'29"E) (R2)`
+* **Road Frontage / Right-of-Way / Quitclaim Area Call:**
+  * `S89°11'17"E 336.41'` — Associated with "30' QUITCLAIM AREA (R6)" (describes a quitclaim area, not a parcel boundary).
+
+---
+
+### Region 1, Piece 5 (Bottom-Middle)
+* **Basis-of-Bearings / Datum / Coordinate-Zone Statement:**
+  * `BASIS OF BEARINGS`
+  * `THE BASIS OF BEARINGS FOR THIS SURVEY IS NEVADA STATE PLANE, WEST ZONE`
+  * `NAD83(94) BASED ON REAL TIME KINEMATIC (RTK) GPS OBSERVATIONS UTILIZING`
+  * `CORRECTIONS FROM THE NORTHERN NEVADA COOPERATIVE REAL TIME NETWORK.`
+  * `COORDINATES AND DISTANCES HEREON ARE AT GROUND LEVEL BASED ON A`
+  * `COMBINED GRID TO GROUND FACTOR OF 1.000197939.`
+* **Road Frontage / Right-of-Way / Quitclaim Area Call:**
+  * `S89°11'17"E 329.80'` — Associated with "30' QUITCLAIM AREA (R5)" and Placerville Road right-of-way.
+* **Other Legends/Labels (Non-boundary):**
+  * A full "LEGEND" block is present defining line types, abbreviations, and monument symbols.
+
+---
+
+### Region 1, Piece 6 (Bottom-Right)
+* **Ground/State-Plane Coordinates:**
+  * `GROUND COORDINATES (MEASURED)`
+    * `N: 14926352.62`
+    * `E: 2253573.04`
+  * `GROUND COORDINATES (RECORD)`
+    * `N: 14926352.55`
+    * `E: 2253573.13`
+* **Road Frontage / Right-of-Way / Quitclaim Area Call:**
+  * `S89°11'17"E 325.30'` — Associated with "30' QUITCLAIM AREA (R5)" along the road frontage.
+* **Parcel/Lot Label or Acreage (Resultant Parcel Areas Table):**
+  * `PARCEL 1` — `77,526` SQ. FT. / `1.78` ACRES
+  * `PARCEL 2` — `121,165` SQ. FT. / `2.78` ACRES
+  * `TOTAL` — `198,691` SQ. FT. / `4.56` ACRES

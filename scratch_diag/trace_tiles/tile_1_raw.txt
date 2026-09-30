@@ -1,0 +1,16 @@
+Region 1, Piece 1:
+
+- **Ground Coordinates:** 
+  - N 14926910.28
+  - E 2251599.70
+
+- **Boundary Bearing and Distance Calls (and associated record calls):**
+  - $\text{N}0^\circ48'45''\text{E } 220.00'$ (as-surveyed boundary call)
+  - $(\text{N}0^\circ02'31''\text{W } 250.00')\text{ (R4)}$ (prior-record citation in parentheses)
+
+- **Tie Lines:**
+  - $\text{S}1^\circ39'59''\text{W } 30.00'\text{ (TIE)}$ (tie line connected to the monument/reference point)
+
+- **Parcel / Lot Labels and Acreage:**
+  - `PARCEL 2`
+  - `2.78 ACRES`

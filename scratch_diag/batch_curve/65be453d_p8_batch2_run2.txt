@@ -1,0 +1,18 @@
+Region 1, Piece 1:
+- PARCEL A:
+- PARCEL B:
+- PARCEL C:
+*(Note: This piece contains the legal descriptions (text) for Parcels A, B, and C, but no boundary bearing/distance calls, ground coordinates, basis-of-bearings statements, or acreage values).*
+
+Region 1, Piece 2:
+- Parcel 'B'
+*(Note: This piece shows a drawing of "Parcel B" containing various line segments, dimensions, and fence/road details, but contains no explicitly written boundary bearing and distance calls, ground/state-plane coordinates, basis-of-bearings statements, or parcel acreage values).*
+Region 1, Piece 1:
+- `N 89°11'10" W  389.26'` (boundary bearing and distance call)
+
+Region 1, Piece 2:
+- `N 89°11'45" W` (boundary bearing and distance call)
+- `N 87°31'02" W` (boundary bearing and distance call)
+- `S 89°41'45" E` (boundary bearing and distance call)
+- `BASIS OF BEARING: NORTH-SOUTH CENTERLINE OF SECTION, BEING NORTH 2°07'34" EAST AS SHOWN ON RECORD OF SURVEY RECORDED IN BOOK 15 OF SURVEYS AT PAGE 16, RECORDS OF SKAGIT COUNTY, WASHINGTON.` (basis-of-bearings / datum / coordinate-zone statement)
+- `Asare unit. Parcel "C"` (parcel/lot label)

@@ -1,0 +1,41 @@
+Region 1, Piece 1:
+- PARCEL 2
+- 2.78 ACRES
+
+Region 1, Piece 2:
+- S89°11'15"E 903.15' (Boundary bearing and distance call)
+- (S89°09'41"E) (R3) (Prior-record citation in parentheses)
+- (N89°57'29"E) (R4) (Prior-record citation in parentheses)
+- PARCEL 1
+- 1.78 ACRES
+
+Region 1, Piece 3:
+- WASHOE COUNTY CONTROL POINT N22SM01029 USGLO 2" BRASS CAP S12/7/13/18 1942
+- GROUND COORDINATES (MEASURED) N: 14929899.71 E: 2253610.44
+- GROUND COORDINATES (RECORD) N: 14929899.62 E: 2253610.74
+- N89°11'15"E 1077.91' -- appears to be a TIE to the adjacent control point / section line, not a parcel boundary call
+- N0°48'45"E 2637.36' (N0°48'59"E 2637.29' - R1) (N0°49'02"E 2637.35' - R3) -- appears to be a TIE/section line distance, not a parcel boundary call
+- PARCEL 1
+- 1.78 ACRES
+
+Region 1, Piece 4:
+- S1°39'59"W 30.00' (TIE) -- appears to be a tie line, not a parcel boundary call
+- S89°11'17"E 336.41' (N89°57'29"E) (R2) -- road frontage / quitclaim area measurement, not a parcel boundary call
+- 30' QUITCLAIM AREA (R6)
+
+Region 1, Piece 5:
+- N89°11'15"W 903.15' (N89°57'29"E) (R4) -- road frontage / right-of-way boundary call
+- S89°11'17"E 329.80' (N89°57'29"E) (R2) -- road frontage / quitclaim area measurement, not a parcel boundary call
+- 30' QUITCLAIM AREA (R5)
+- PLACERVILLE ROAD (60' WIDE PUBLIC ROW)
+
+Region 1, Piece 6:
+- S89°11'17"E 325.30' (N89°57'29"E) (R2) -- road frontage / quitclaim area measurement, not a parcel boundary call
+- 30' QUITCLAIM AREA (R5)
+- WASHOE COUNTY CONTROL POINT N22SM01113 USGLO BRASS CAP 1/4 CORNER 13/18 1942
+- GROUND COORDINATES (MEASURED) N: 14926352.62 E: 2253573.04
+- GROUND COORDINATES (RECORD) N: 14926352.55 E: 2253573.13
+- RESULTANT PARCEL AREAS:
+  - PARCEL 1: 77,526 SQ. FT. / 1.78 ACRES
+  - PARCEL 2: 121,165 SQ. FT. / 2.78 ACRES
+  - TOTAL: 198,691 SQ. FT. / 4.56 ACRES

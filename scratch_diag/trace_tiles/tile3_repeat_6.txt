@@ -1,0 +1,23 @@
+Region 1, Piece 1:
+
+**Washoe County Control Point / Coordinate Data:**
+- WASHOE COUNTY CONTROL POINT N22SM01029 USGLO 2" BRASS CAP S12/7/13/18 1942
+- GROUND COORDINATES (MEASURED) N: 14928989.71 E: 2253610.44
+- GROUND COORDINATES (RECORD) N: 14928962.62 E: 2253610.74
+- GROUND COORDINATES N 14926897.47 E 2252502.76
+
+**Parcel / Lot Label & Acreage:**
+- PARCEL 1
+- 1.78 ACRES
+
+**Boundary Bearing and Distance Calls:**
+- S0°48'45"W 220.00' (Boundary call)
+- *(S0°02'31"E 250.00' (R4))* — in parentheses (prior-record citation)
+
+**Ties, Off-Parcel Measurements, & Reference Lines:**
+- 2107.74' — vertical dimension line connecting the control point area to the section line / monument intersection (appears to be a tie/reference distance)
+- N89°11'15"E 1077.90' — horizontal tie/reference call near the found 5/8" rebar east of section line (appears to be a tie/reference to the section line/control network)
+- N0°48'45"E 2637.36' — vertical reference distance between sections/control points along the section line
+- *(N0°48'59"E 2637.29' - R1)* — in parentheses, along the section line / tie reference
+- *(N0°49'02"E 2637.35' - R3)* — in parentheses, along the section line / tie reference
+- 529.62' — vertical distance along the right/eastern reference line (appears to be a tie/reference distance)

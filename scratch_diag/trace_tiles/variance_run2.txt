@@ -1,0 +1,77 @@
+Here is the extracted information for each piece of Region 1, categorized by the requested criteria and taking local context into account:
+
+### Region 1, Piece 1
+* **Boundary bearing and distance call:**
+  * `N0°48'45"E 220.00'`
+* **Prior-record citation bearing/distance call (in parentheses):**
+  * `(N0°02'31"W 250.00' (R4))`
+* **Ground/state-plane coordinate:**
+  * `N 14926910.28 E 2251599.70` (labeled as `GROUND COORDINATES`)
+* **Parcel/lot label or acreage:**
+  * `PARCEL 2`, `2.78 ACRES`
+
+---
+
+### Region 1, Piece 2
+* **Boundary bearing and distance call:**
+  * `S89°11'15"E 903.15'` (top boundary)
+  * `N89°11'15"W 903.15'` (bottom boundary)
+* **Prior-record citation bearing/distance call (in parentheses):**
+  * `(S89°09'41"E) (R3)` (near top boundary)
+  * `(N89°57'29"E) (R4)` (near top boundary)
+  * `(N89°57'29"E) (R4)` (near bottom boundary)
+* **Parcel/lot label or acreage:**
+  * None (shows adjacent owner information `STEVEN D & CORINA B. POKRAJAC`, APN, and existing structures)
+
+---
+
+### Region 1, Piece 3
+* **Boundary bearing and distance call / Tie lines:**
+  * `N0°48'45"E 2637.36'` — **Appears to be a TIE** (section/subdivision line extending up to the control point/monument, sitting adjacent to a dashed vertical section line and running near the monument callouts).
+  * `S0°48'45"W 220.00'` — Boundary call on the right side of Parcel 1.
+* **Prior-record citation bearing/distance call (in parentheses):**
+  * `(S0°02'31"E 250.00' (R4))`
+  * `(N0°48'59"E 2637.29' - R1)`
+  * `(N0°49'02"E 2637.35' - R3)`
+* **Ground/state-plane coordinate:**
+  * `N: 14928989.71 E: 2253610.44` (labeled as `GROUND COORDINATES (MEASURED)` for the Washoe County Control Point)
+  * `N: 14928989.62 E: 2253610.74` (labeled as `GROUND COORDINATES (RECORD)` for the Washoe County Control Point)
+  * `N 14926897.47 E 2252502.76` (labeled as `GROUND COORDINATES` at a parcel corner)
+* **Parcel/lot label or acreage:**
+  * `PARCEL 1`, `1.78 ACRES`
+
+---
+
+### Region 1, Piece 4
+* **Road frontage / Right-of-way / Quitclaim area call:**
+  * `S89°11'17"E 336.41'` (Road/Quitclaim area measurement along Placerville Road / adjoiner line)
+* **Prior-record citation bearing/distance call (in parentheses):**
+  * `(N89°57'29"E) (R2)`
+
+---
+
+### Region 1, Piece 5
+* **Road frontage / Right-of-way / Quitclaim area call:**
+  * `S89°11'17"E 329.80'` (labeled with `30' QUITCLAIM AREA (R5)` along `PLACERVILLE ROAD (60' WIDE PUBLIC ROW AS SHOWN ON RS 5122)`)
+* **Prior-record citation bearing/distance call (in parentheses):**
+  * `(N89°57'29"E) (R2)`
+* **Basis-of-bearings / Datum / Coordinate-zone statement:**
+  * None (contains standard Legend and Surveyor's seal / certificate block)
+
+---
+
+### Region 1, Piece 6
+* **Road frontage / Right-of-way / Quitclaim area call:**
+  * `S89°11'17"E 325.30'` (labeled with `30' QUITCLAIM AREA (R5)` along Placerville Road corridor)
+* **Prior-record citation bearing/distance call (in parentheses):**
+  * `(N89°57'29"E) (R2)`
+* **Ground/state-plane coordinate:**
+  * `N: 14926352.62 E: 2253573.04` (labeled as `GROUND COORDINATES (MEASURED)` near the quarter corner monument)
+  * `N: 14926352.55 E: 2253573.13` (labeled as `GROUND COORDINATES (RECORD)`)
+* **Basis-of-bearings / Datum / Coordinate-zone statement:**
+  * Appears in full text elsewhere on the sheet, but specifically for this area, ties back to `WASHOE COUNTY CONTROL POINT N22SM01113 USGLO BRASS CAP 1/4 CORNER 13/18 1942`.
+* **Parcel/lot label or acreage:**
+  * Resultant Parcel Areas summary table:
+    * `PARCEL 1: SQ. FT.: 77,526 | ACRES: 1.78`
+    * `PARCEL 2: SQ. FT.: 121,165 | ACRES: 2.78`
+    * `TOTAL: SQ. FT.: 198,691 | ACRES: 4.56`

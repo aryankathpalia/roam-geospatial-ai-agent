@@ -1,0 +1,31 @@
+Region 1, Piece 1:
+
+- **WASHOE COUNTY CONTROL POINT / Monument Label:**
+  - `WASHOE COUNTY CONTROL POINT`
+  - `N22SM01029 USGLO 2" BRASS CAP`
+  - `S12/7/13/18 1942`
+
+- **Ground / State-Plane Coordinates:**
+  - `GROUND COORDINATES (MEASURED)`
+    `N: 14928989.71`
+    `E: 2253610.44`
+  - `GROUND COORDINATES (RECORD)`
+    `N: 14928989.62`
+    `E: 2253610.74`
+  - `GROUND COORDINATES`
+    `N 14926897.47`
+    `E 2252502.76`
+
+- **Boundary Bearing and Distance Calls & Ties:**
+  - `N89°11'15" 1077.90'` — appears to be a section line / tie distance (connects to the section line / control point area, labeled with "0.77' EAST OF SECTION LINE"), not an ordinary parcel perimeter boundary call.
+  - `S0°48'45"W 220.00'` — boundary bearing and distance call.
+  - `(S0°02'31"E 250.00' - R4)` — prior-record citation in parentheses.
+  - `N0°48'45"E 2637.36'` — appears to be a section line / TIE distance (connecting along the section line between monument points), not a parcel boundary call.
+  - `(N0°48'59"E 2637.29' - R1)` — prior-record citation in parentheses, associated with the section line / tie distance.
+  - `(N0°49'02"E 2637.35' - R3)` — prior-record citation in parentheses, associated with the section line / tie distance.
+  - `352.40'` — dimension line for the north property boundary length.
+  - `352.40'` — dimension line for the south property boundary length.
+
+- **Parcel / Lot Label and Acreage:**
+  - `PARCEL 1`
+  - `1.78 ACRES`

@@ -1,0 +1,163 @@
+Region 1, Piece 1:
+- P19684
+- P19763
+
+Region 1, Piece 2:
+- P19764
+- QUANTUM BUSINESS PARK CONDOMINIUM
+- AF 20008070065
+- UNIT 2
+- P13081
+- UNIT 4
+- P130387
+- UNIT 6
+- P130309
+- UNIT 8
+- P159386
+- UNIT 10
+- P130308
+- UNIT 12
+- P159385
+- UNIT 14
+- P130307
+- UNIT 16
+- P150381
+- UNIT 18
+- P130311
+- UNIT 19
+- P130389
+- UNIT 20
+- P130390
+- UNIT 22
+- P130312
+- UNIT 24
+- P130391
+- UNIT 26
+- P130313
+- UNIT 28
+- P130392
+- UNIT 30
+- P130314
+- UNIT 32
+- P130393
+- COMMON AREA
+- P19698
+- P19785
+- P19693
+- SURVEY AF 20040115 P113
+
+Region 1, Piece 3:
+- P19770
+- P19771
+- P19702
+- Survey AF 9712230024 V20 P30
+- Survey AF 9712230026 V20 P32
+
+Region 1, Piece 4:
+- P19697
+- P131234
+- P19773
+- GREAT HEIGHTS SHORT PLAT PL 12-0284 AF 201210230054
+- SURVEY AF #826580
+
+Region 2, Piece 1:
+- P19688
+- P19690
+- P19681
+- ABANDONED P.S. & B.R.R.
+- P19724
+- P19721
+- LOT - 2
+- P19687
+- P19712
+- P19677
+- P19689
+- SURVEY AF #9509070049
+
+Region 2, Piece 2:
+- P19713
+- P19676
+- 2nd CLASS TIDELANDS
+- P19707
+- P19675
+
+Region 2, Piece 3:
+- P19720
+- P19721
+- P19728
+- P19678
+- P197305
+- P99590
+- P103360
+- P19729
+- P19770
+- P19685
+- Survey AF 9712230024 V20 P30
+
+Region 2, Piece 4:
+- P104357
+- LOT - 1
+- P19765
+- SURVEY AF #826580 "A"
+- P19684
+- P19761
+- P19763
+- SURVEY AF 9712230026
+
+Region 2, Piece 5:
+- P19737
+- P19736
+- P19756
+- P19757
+- P19767
+- P19768
+- P19774
+- P19702
+- P19773
+- SURVEY AF #826580
+- P19697
+- P19772
+- P19701
+- P19779
+
+Region 2, Piece 6:
+- P19764
+- SURVEY AF #826580 "B"
+- P19766
+- P19785
+- P19772
+- P19703
+- P19784
+- P19783
+- P19698
+- P19706
+- P19693
+- P19694
+- P19787
+- P19777
+- P19695
+- P19783
+
+Region 3, Piece 1:
+- PARCEL A
+- PARCEL B
+- PARCEL C
+
+Region 3, Piece 2:
+- N 01°51'34" E 139.00' (note: sits next to road and storm pipe/manhole/asphalt details, appears to be a road frontage/right-of-way call)
+- S 89°11'45" E 690.15'
+
+Region 3, Piece 3:
+- N 89°11'10" W 389.26'
+- N 01°51'34" E 527.32'
+- S 89°11'10" E 657.32'
+- S 89°11'10" E 657.53'
+- S 01°37'34" W 1312.03' (note: part of vicinity map/section diagram)
+- S 89°25'45" W 1326.93' (note: part of vicinity map/section diagram)
+- N 88°53'24" W 1305.23' (note: part of vicinity map/section diagram)
+- S 20°04'03" W 1340.19' (note: part of vicinity map/section diagram)
+
+Region 3, Piece 4:
+- S 89°11'45" E 1310.32' (note: part of vicinity map/section diagram)
+- N 89°11'45" W
+- N 87°31'02" W (note: along PADILLA HEIGHTS ROAD)

@@ -1,0 +1,64 @@
+Region 1, Piece 1:
+- LEGAL DESCRIPTION LOT 12A:
+- LOT 12A AS PLATTED IN STAGGS INDUSTRIAL DEVELOPMENT RECORDED SEPTEMBER 27, 1957 IN PLAT BOOK Z AT PAGE 25 OF THE OFFICIAL RECORDS OF THE EL PASO COUNTY, COLORADO CLERK AND RECORDERS, TOGETHER WITH THE NORTHWESTERLY 8.30 FEET OF THE SOUTHEASTERLY 148.83 FEET OF LOT 16B AS PLATTED IN THE RESUBDIVISION OF LOTS 15, 16, & 17 IN STAGGS INDUSTRIAL DEVELOPMENT RECORDED SEPTEMBER 14, 1965 IN PLAT BOOK H-2 AT PAGE 51 OF SAID RECORDS.
+- CONTAINING AN AREA OF 16,235 SQUARE FEET OF LAND, MORE OR LESS.
+- LEGAL DESCRIPTION LOT 16B2:
+
+Region 1, Piece 2:
+- LOT 12 [fragment from title text]
+- LOT 16B OF THE "RESUBDIVISION OF [fragment from title text]
+- LOT 15D
+- RESUBDIVISION OF LOTS 15, 16 AND 17 IN STAGGS INDUSTRIAL DEVELOPMENT PLAT BOOK H-2, PAGE 51
+Region 1, Piece 1:
+- 20' WATERWAY (labeled along the dashed waterway boundary)
+- LOT 11 (labeled within the lot area)
+- STAGGS INDUSTRIAL DEVELOPMENT PLAT BOOK Z, PAGE 25 (plat reference title)
+
+Region 1, Piece 2:
+- 20' WATERWAY (labeled along the dashed waterway boundary)
+- STAGGS INDUSTRIAL DEVELOPMENT PLAT BOOK Z, PAGE 25 (plat reference title)
+Region 1, Piece 1:
+- LEGAL DESCRIPTION LOT 16B2:
+  - LOT 16B AS PLATTED IN THE RESUBDIVISION OF LOTS 15, 16, & 17 IN STAGGS INDUSTRIAL DEVELOPMENT RECORDED SEPTEMBER 14, 1965 IN PLAT BOOK H-2 AT PAGE 51 OF THE OFFICIAL RECORDS OF THE EL PASO COUNTY, COLORADO CLERK AND RECORDERS, EXCEPTING THEREFROM NORTHWESTERLY 8.30 FEET OF THE SOUTHEASTERLY 148.83 FEET THEREOF.
+  - CONTAINING AN AREA OF 20,008 SQUARE FEET OF LAND, MORE OR LESS.
+- PROPERTY TO EXCHANGE:
+  - THE NORTHWESTERLY 8.30 FEET OF THE SOUTHEASTERLY 148.83 FEET OF LOT 16B AS PLATTED IN THE RESUBDIVISION OF LOTS 15, 16, & 17 IN STAGGS INDUSTRIAL DEVELOPMENT RECORDED SEPTEMBER 14, 1965 IN PLAT BOOK H-2 AT PAGE 51 OF THE OFFICIAL RECORDS OF THE EL PASO COUNTY, COLORADO CLERK AND RECORDERS.
+  - CONTAINING AN AREA OF 1,235 SQUARE FEET OF LAND, MORE OR LESS.
+
+Region 1, Piece 2:
+- LOT 16A
+- NEW L[INE] (partial text)
+- A bearing/distance call along the boundary: `36'49"W 170.29'` (note: the degree symbol appears truncated or partially obscured in the image).
+Region 1, Piece 1:
+- `N52°52'00"W 50.00'` (boundary bearing and distance call)
+- `N52°52'00"W 51.17'` (boundary bearing and distance call)
+- `S37°08'00"W 100.00'` (boundary bearing and distance call)
+- `S37°08'00"W 8.30'` (boundary bearing and distance call)
+- `S52°52'00"E 148.` (boundary bearing and distance call, partially cut off)
+- `LOT 12A` (parcel/lot label)
+- `16,235 SF` (acreage/area label)
+- `NORTHWESTERLY 50' OF LOT` (property description label)
+
+Region 1, Piece 2:
+- `N52°52'00"W 150.00'` (boundary bearing and distance call)
+- `S37°08'00"E 108.30'` (boundary bearing and distance call)
+- `LOT 12A` (parcel/lot label)
+- `16,235 SF` (acreage/area label)
+Region 1, Piece 1:
+- "CONTAINING AN AREA OF 1,235 SQUARE FEET OF LAND, MORE OR LESS." (parcel acreage/area)
+
+Region 1, Piece 2:
+- "S10°36'49" [bearing along waterway/boundary]"
+- "S76..." [partial bearing call visible along the boundary line]"
+- "LOT 17A" (parcel/lot label)
+- "RESUBDIVISION OF LOTS 15, 16 AND... IN STAGGS INDUSTRIAL DEVELOPMENT... PLAT BOOK H-2, PAGE 51" (subdivision/plat reference)
+Region 1, Piece 1:
+- LOT 16B2 (parcel/lot label)
+- 20,008 SF (acreage/area label)
+- S76°58'30"E 135.81' (boundary bearing and distance call)
+- N37°08'00"E 88.60' (boundary bearing and distance call)
+- S5...E 148.83' [partially cut off at top edge] (boundary bearing and distance call)
+
+Region 1, Piece 2:
+- N37°08'00"E 88.60' (boundary bearing and distance call)
+- 29TH STREET (60' R.O.W.) (road frontage / right-of-way description)

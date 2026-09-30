@@ -1,0 +1,16 @@
+2f896c95 same
+27211ae5 same
+3affa529 same
+65be453d same
+a1136318 CHANGED
+  old: 'Porbian af Pacel 160.35-1-22200 Aree 0.25± acn'
+  new: 'PRONO 22279'
+db54d473 same
+798850fc CHANGED
+  old: 'City of Payette ~ 700 Center Avefue ~ Payette, ID 83661 ~ 208-642-6024'
+  new: 'EMMETT, ID 83617'
+83ab22d0 same
+8d75d3ed same
+510ea60f CHANGED
+  old: 'Des Moines, IA 50319-0034'
+  new: 'recorded in Book 10846, Page 771, of Polk County Iowa records.'

@@ -1,0 +1,19 @@
+Region 1, Piece 1:
+- PARCEL A
+- PARCEL B
+- PARCEL C
+
+Region 1, Piece 2:
+- Parcel 'B'
+Region 1, Piece 1:
+- `N 89°11'10" W` (boundary call along the top property line segment)
+- `399.26'` (boundary distance along the top property line segment)
+- `37.5'` (dimension at the top left corner, near the 1/16th line)
+- `N 01°51'34" E` (bearing call along the right border)
+- `527.32'` (distance call along the right border)
+
+Region 1, Piece 2:
+- `N 89°11'45" W` (boundary bearing/distance along the top property line of the parcel shown in this piece)
+- `30.00'` (dimension near the upper right/north area)
+- `N 87°31'02" W` (bearing and distance call along the northern side of Padilla Heights Road)
+- `NORTH-SOUTH CENTERLINE OF SECTION, BEING NORTH 2°07'34" EAST AS SHOWN ON RECORD OF SURVEY RECORDED IN BOOK 15 OF SURVEYS AT PAGE 14, RECORDS OF SKAGIT COUNTY, WASHINGTON.` (Basis of bearing statement)

@@ -1,0 +1,12 @@
+{
+  "shared_edge_calls": [
+    {
+      "distance_value": "322.74'",
+      "bearing": "S 59°41'15\" E",
+      "assigned_to": "blue (Lot 48)",
+      "evidence_location": "Central part of the plat, along the long diagonal boundary line separating Lot 48 and Lot 48-3.",
+      "confidence": 0.95,
+      "reasoning": "The text '322.74'' with its associated bearing sits directly along the long straight boundary segment of the blue polygon (Lot 48), acting as its eastern boundary line in that section."
+    }
+  ]
+}

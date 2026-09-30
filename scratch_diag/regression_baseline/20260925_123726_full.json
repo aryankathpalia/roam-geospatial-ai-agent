@@ -1,0 +1,3672 @@
+{
+  "db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b": {
+    "full_runs": [
+      {
+        "run": 0,
+        "elapsed_s": 149.9,
+        "result": {
+          "document_id": "db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b",
+          "inspection": {
+            "filename": "original.pdf",
+            "page_count": 15,
+            "metadata": {
+              "format": "PDF 1.6",
+              "title": "",
+              "author": "gsannazzaro",
+              "subject": "",
+              "keywords": "",
+              "creator": "Adobe Acrobat Standard DC 15.6.30495",
+              "producer": "Adobe Acrobat Standard DC 15.6.30495",
+              "creationDate": "D:20190417121800-07'00'",
+              "modDate": "D:20190417122131-07'00'",
+              "trapped": "",
+              "encryption": null
+            },
+            "pages": [
+              {
+                "page_number": 1,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": true,
+                "text_length": 264,
+                "image_count": 1
+              },
+              {
+                "page_number": 2,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": true,
+                "text_length": 1605,
+                "image_count": 0
+              },
+              {
+                "page_number": 3,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": false,
+                "text_length": 0,
+                "image_count": 1
+              },
+              {
+                "page_number": 4,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": true,
+                "text_length": 1504,
+                "image_count": 0
+              },
+              {
+                "page_number": 5,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": true,
+                "text_length": 1743,
+                "image_count": 0
+              },
+              {
+                "page_number": 6,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": true,
+                "text_length": 2761,
+                "image_count": 0
+              },
+              {
+                "page_number": 7,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": true,
+                "text_length": 1456,
+                "image_count": 0
+              },
+              {
+                "page_number": 8,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": true,
+                "text_length": 415,
+                "image_count": 0
+              },
+              {
+                "page_number": 9,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": true,
+                "text_length": 1084,
+                "image_count": 0
+              },
+              {
+                "page_number": 10,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": true,
+                "text_length": 1645,
+                "image_count": 0
+              },
+              {
+                "page_number": 11,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": true,
+                "text_length": 526,
+                "image_count": 0
+              },
+              {
+                "page_number": 12,
+                "width": 612.0,
+                "height": 792.0,
+                "has_text": false,
+                "text_length": 0,
+                "image_count": 1
+              },
+              {
+                "page_number": 13,
+                "width": 792.0,
+                "height": 612.0,
+                "has_text": false,
+                "text_length": 0,
+                "image_count": 1
+              },
+              {
+                "page_number": 14,
+                "width": 792.0,
+                "height": 612.0,
+                "has_text": false,
+                "text_length": 0,
+                "image_count": 1
+              },
+              {
+                "page_number": 15,
+                "width": 2592.0,
+                "height": 1728.0,
+                "has_text": false,
+                "text_length": 0,
+                "image_count": 0
+              }
+            ]
+          },
+          "pages": [
+            {
+              "page_number": 1,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.976,
+                  "bbox": [
+                    1051.9,
+                    1571.8,
+                    446.4,
+                    135.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Community Services Department\nPlanning and Building\n1001 E. Ninth St., Bldg. A\nReno, NV 89512-2845",
+                  "ocr_confidence": 0.978
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.966,
+                  "bbox": [
+                    1142.9,
+                    1741.7,
+                    359.8,
+                    36.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Telephone: 775.328.6100",
+                  "ocr_confidence": 0.978
+                },
+                {
+                  "class": "Picture",
+                  "confidence": 0.81,
+                  "bbox": [
+                    598.6,
+                    908.9,
+                    506.1,
+                    515.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "skipped"
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.749,
+                  "bbox": [
+                    337.9,
+                    246.4,
+                    1002.8,
+                    727.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Community Services Department\nPlanning and Building\nTENTATIVE PARCEL MAP\n(see page 6)\nPARCEL MAP WAIVER\n(see page 11)\nOUNT",
+                  "ocr_confidence": 0.963
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.64,
+                  "bbox": [
+                    618.5,
+                    801.8,
+                    457.2,
+                    79.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "APPLICATION",
+                  "ocr_confidence": 0.999
+                }
+              ]
+            },
+            {
+              "page_number": 2,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.922,
+                  "bbox": [
+                    435.2,
+                    140.6,
+                    820.2,
+                    48.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Washoe County Development Application",
+                  "ocr_confidence": 0.989
+                },
+                {
+                  "class": "Table",
+                  "confidence": 0.885,
+                  "bbox": [
+                    178.8,
+                    260.1,
+                    1334.2,
+                    1607.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Project Information\nStaff Assigned Case No.:\nProject Name:\nHANS BURKHART PARCEL MAP\nProject\nPARCEL SPLIT OF LOT 9A OF PARCEL MAP NUMBER 3529\nDescription:\nProject Address: 65 WATER BUCK WAY\nProject Area (acres or square feet):3.35 ACRES\nProject Location (with point of reference to major cross streets AND area locator):\n400 FEET EASTERLY FROM THE INTERSECTION OF RIVERDALE CIR. AND WATERBUCK WAY\nAssessor's Parcel No.(s):\nParcel Acreage:\nAssessor's Parcel No.(s):\nParcel Acreage:\n038-710-17\n3.35 AC.\nIndicate any previous Washoe County approvals associated with this application:\nCase No.(s).\nApplicant Information (attach additional sheets if necessary)\nProperty\nOwner:\nProfessional Consultant:\nName:HANS BURKHART\nName: LANDMARK SURVEYING\nAddress: 65 WATER BUCK WAY\nAddress: 2548 RAMPART TERRACE\nRENO, NV\nZip: 89539\nRENO, NV\nZip: 89519\nPhone: 775-240-7083\nFax:\nPhone: 775-324-0904\nFax: 324-0904\nEmail:\nEmail:hubtacpls@gmail.com\nCell:\nOther:\nCell: 775-772-6058\nOther:\nContact Person: HANS BURKHART\nContact Person: DENNIS CHAPMAN\nApplicant/Developer:\nOther Persons to be Contacted:\nName: SAME AS OWNER\nName:\nAddress:\nAddress:\nZip:\nZip:\nPhone:\nFax:\nPhone:\nFax:\nEmail:\nEmail:\nCell:\nOther:\nCell:\nOther:\nContact Person:\nContact Person:\nFor Office Use Only\nDate Received:\nInitial:\nPlanning Area:",
+                  "ocr_confidence": 0.978
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.823,
+                  "bbox": [
+                    1346.9,
+                    2098.8,
+                    155.0,
+                    22.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "December 2018",
+                  "ocr_confidence": 0.992
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.562,
+                  "bbox": [
+                    177.4,
+                    194.4,
+                    1352.4,
+                    77.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.438,
+                  "bbox": [
+                    188.8,
+                    195.8,
+                    1344.4,
+                    76.8
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_002_04_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Your entire application is a public record. \nIf you have a concern about releasing\n\npersonal information, please contact Planning and Building staff at 775.328.6100.",
+                  "ocr_confidence": 0.732
+                }
+              ]
+            },
+            {
+              "page_number": 3,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.963,
+                  "bbox": [
+                    595.3,
+                    175.4,
+                    443.5,
+                    41.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Property Owner Affidavit",
+                  "ocr_confidence": 0.996
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.94,
+                  "bbox": [
+                    1293.8,
+                    2012.7,
+                    148.2,
+                    21.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "December 2018",
+                  "ocr_confidence": 0.976
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.934,
+                  "bbox": [
+                    199.0,
+                    1580.4,
+                    538.0,
+                    45.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "G-10-19\nMy commission expires:",
+                  "ocr_confidence": 0.914
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.925,
+                  "bbox": [
+                    872.5,
+                    1234.0,
+                    765.0,
+                    59.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Addressb5 Waterbuck Verdi,Nv 8au3O",
+                  "ocr_confidence": 0.854
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.925,
+                  "bbox": [
+                    194.6,
+                    393.4,
+                    1258.9,
+                    120.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "The receipt of this application at the time of submittal does not guarantee the application complies with all\nrequirements of the Washoe County Development Code, the Washoe County Master Plan or the\napplicable area plan, the applicable regulatory zoning, or that the application is deemed complete and will\nbe processed.",
+                  "ocr_confidence": 0.983
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.883,
+                  "bbox": [
+                    208.9,
+                    1529.6,
+                    539.3,
+                    41.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Notary Public in and for said county and state",
+                  "ocr_confidence": 0.981
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.854,
+                  "bbox": [
+                    797.6,
+                    1060.9,
+                    633.9,
+                    49.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "HAMS BURRHART\nPrinted Name",
+                  "ocr_confidence": 0.923
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.716,
+                  "bbox": [
+                    200.0,
+                    1289.8,
+                    443.1,
+                    85.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Sfate of Nevada\nCounty of Washoe",
+                  "ocr_confidence": 0.903
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.713,
+                  "bbox": [
+                    859.3,
+                    1124.7,
+                    348.0,
+                    80.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "HR\nSigned",
+                  "ocr_confidence": 0.818
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.702,
+                  "bbox": [
+                    1063.9,
+                    1408.6,
+                    177.5,
+                    30.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "(Notary Stamp)",
+                  "ocr_confidence": 0.997
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.672,
+                  "bbox": [
+                    229.0,
+                    1746.8,
+                    1183.8,
+                    219.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "O\nCorporate Officer/Partner (Provide copy of record document indicating authority to sign.)\nPower of Attorney (Provide copy of Power of Attorney.)\n\nD\nOwner Agent (Provide notarized letter from property owner giving legal authority to agent.)\nProperty Agent (Provide copy of record document indicating authority to sign.)\n\n Letter from Government Agency with Stewardship",
+                  "ocr_confidence": 0.597
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.672,
+                  "bbox": [
+                    344.4,
+                    681.7,
+                    502.7,
+                    48.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "HAMS\nBURKHART",
+                  "ocr_confidence": 0.95
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.617,
+                  "bbox": [
+                    212.5,
+                    277.8,
+                    297.1,
+                    41.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Applicant Name:",
+                  "ocr_confidence": 0.97
+                },
+                {
+                  "class": "Seal",
+                  "confidence": 0.587,
+                  "bbox": [
+                    958.6,
+                    1473.4,
+                    357.0,
+                    132.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "JACKIE MORITZKY\nNOTARY PUBLIC\nSTATE OF NEVADA\nAppt. No.15-2793-2\nMy Appt. Expires Sept 10, 2019",
+                  "ocr_confidence": 0.962
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.56,
+                  "bbox": [
+                    220.1,
+                    1444.0,
+                    442.6,
+                    27.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "bu\nHans\n2AK\nhar",
+                  "ocr_confidence": 0.649
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.442,
+                  "bbox": [
+                    236.7,
+                    1668.1,
+                    686.8,
+                    36.6
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_003_15_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "*Owner refers to the following: (Please mark appropriate box.)",
+                  "ocr_confidence": 0.967
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.421,
+                  "bbox": [
+                    208.3,
+                    1383.4,
+                    589.6,
+                    56.7
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_003_16_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Subscribedand sworn to before me this\ngthday of\nAn\n2019.",
+                  "ocr_confidence": 0.824
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.369,
+                  "bbox": [
+                    187.9,
+                    762.2,
+                    1266.2,
+                    219.4
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_003_17_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "being duly sworn, depose and say that I am the owner* of the property or properties involved in this\napplication as listed below and that the foregoing statements and answers herein contained and the\ninformation herewith submitted are in all respects complete, true, and correct to the best of my knowledge\nand belief. I understand that no assurance or guarantee can be given by members of Planning and\nBuilding.\n(A separate Affidavit must be provided by each property owner named in the title report.)",
+                  "ocr_confidence": 0.972
+                }
+              ]
+            },
+            {
+              "page_number": 4,
+              "regions": [
+                {
+                  "class": "Table",
+                  "confidence": 0.97,
+                  "bbox": [
+                    284.7,
+                    1774.2,
+                    1204.5,
+                    136.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "\u9580\nIndividual wells\n\u25a1\nPrivate water\nProvider:\n\u25a1\nPublic water\nProvider:",
+                  "ocr_confidence": 0.892
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.955,
+                  "bbox": [
+                    215.8,
+                    1643.5,
+                    1278.6,
+                    75.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "7. Please describe the source of the water facilities necessary to serve the proposed tentative parcel\nmap:",
+                  "ocr_confidence": 0.986
+                },
+                {
+                  "class": "Table",
+                  "confidence": 0.94,
+                  "bbox": [
+                    247.7,
+                    493.5,
+                    1277.0,
+                    157.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "a. Please list the following:\nAPN of Parcel\nLand Use Designation\nExisting Acres\n038-710-17\nLDS\n3.35",
+                  "ocr_confidence": 0.993
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.938,
+                  "bbox": [
+                    245.6,
+                    682.8,
+                    1015.2,
+                    35.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "2. Please describe the existing conditions, structures, and uses located at the site:",
+                  "ocr_confidence": 0.977
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.936,
+                  "bbox": [
+                    198.2,
+                    1429.4,
+                    150.4,
+                    32.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "6. Utilities:",
+                  "ocr_confidence": 0.95
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.927,
+                  "bbox": [
+                    215.9,
+                    338.8,
+                    1075.8,
+                    36.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "1. What is the location (address or distance and direction from nearest intersection)?",
+                  "ocr_confidence": 0.985
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.911,
+                  "bbox": [
+                    189.9,
+                    1230.3,
+                    1323.0,
+                    152.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "5.\nWas the parcel or lot that is proposed for division created (recorded) within the last 5 years? (If yes,\npublic review of the parcel map will be required. See Planning and Building staff for additional\nmaterials that are required to be submitted.)\n\u25a1 Yes\n\u25a0 No",
+                  "ocr_confidence": 0.934
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.906,
+                  "bbox": [
+                    247.4,
+                    403.6,
+                    485.1,
+                    48.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "65 WATER BUCK WAY",
+                  "ocr_confidence": 0.949
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.901,
+                  "bbox": [
+                    533.5,
+                    241.4,
+                    653.3,
+                    32.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "(All required information may be separately attached)",
+                  "ocr_confidence": 0.987
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.896,
+                  "bbox": [
+                    540.9,
+                    152.8,
+                    619.1,
+                    85.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Tentative Parcel Map Application\nSupplemental Information",
+                  "ocr_confidence": 0.994
+                },
+                {
+                  "class": "Table",
+                  "confidence": 0.818,
+                  "bbox": [
+                    221.5,
+                    1476.9,
+                    1302.0,
+                    136.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "a.\nSewer Service\nSEPTIC\nb.\nElectrical Service/Generator\nC. Water Service\nDOMESTIC WELL",
+                  "ocr_confidence": 0.987
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.817,
+                  "bbox": [
+                    1344.1,
+                    2072.7,
+                    156.2,
+                    23.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "December 2018",
+                  "ocr_confidence": 0.971
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.695,
+                  "bbox": [
+                    200.3,
+                    2069.8,
+                    809.7,
+                    81.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "6",
+                  "ocr_confidence": 0.999
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.673,
+                  "bbox": [
+                    190.7,
+                    840.7,
+                    537.7,
+                    29.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "3. What are the proposed lot standards?",
+                  "ocr_confidence": 0.982
+                },
+                {
+                  "class": "Table",
+                  "confidence": 0.669,
+                  "bbox": [
+                    234.8,
+                    876.9,
+                    1288.2,
+                    124.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Parcel 1\nParcel 2\nParcel 3\nParcel 4\nProposed Minimum Lot Area\n85,396 SQ.FT.\n60,345 SQ. FT.\nProposed Minimum Lot Width\n197'\n138'",
+                  "ocr_confidence": 0.961
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.609,
+                  "bbox": [
+                    322.0,
+                    748.8,
+                    1070.7,
+                    49.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "THER IS A SINGLE FAMILY RESIDENCE ON THE PARCEL",
+                  "ocr_confidence": 0.948
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.496,
+                  "bbox": [
+                    239.8,
+                    745.8,
+                    1238.0,
+                    52.9
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_004_16_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.414,
+                  "bbox": [
+                    1344.1,
+                    2072.1,
+                    158.2,
+                    23.2
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_004_17_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.349,
+                  "bbox": [
+                    254.2,
+                    1730.3,
+                    298.7,
+                    31.5
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_004_18_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "a. Water System Type:",
+                  "ocr_confidence": 0.982
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.295,
+                  "bbox": [
+                    203.7,
+                    1033.2,
+                    1314.8,
+                    170.9
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_004_19_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "4. For parcel with split zoning what is the acreage/square footage of each zoning in the new parcels?\nParcel 1\nParcel 2\nParcel 3\nParcel 4\nProposed Zoning Area\n85,396 sq. ft.\n60,345 sq. ft.\nProposed Zoning Area",
+                  "ocr_confidence": 0.971
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.252,
+                  "bbox": [
+                    247.1,
+                    2068.3,
+                    668.4,
+                    57.7
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_004_20_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Washoe County Planning and Building\nTENTATIVE PARCEL MAP APPLICATION SUPPLEMENTAL INFORMATION",
+                  "ocr_confidence": 0.983
+                }
+              ]
+            },
+            {
+              "page_number": 5,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.961,
+                  "bbox": [
+                    207.6,
+                    925.0,
+                    1309.2,
+                    133.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "9. For most uses, the Washoe County Code, Chapter 110, Article 422, Water and Sewer Resource\nRequirements, requires the dedication of water rights to Washoe County when creating new parcels.\nPlease indicate the type and quantity of water rights you have available should dedication be\nrequired:",
+                  "ocr_confidence": 0.984
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.934,
+                  "bbox": [
+                    228.5,
+                    1282.3,
+                    1275.8,
+                    70.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "a. Title of those rights (as filed with the State Engineer in the Division of Water Resources of the\nDepartment of Conservation and Natural Resources):",
+                  "ocr_confidence": 0.98
+                },
+                {
+                  "class": "Table",
+                  "confidence": 0.904,
+                  "bbox": [
+                    246.0,
+                    165.7,
+                    1243.5,
+                    113.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "\u25a1 Now\n\u25a11-3 years\n\u25a1 3-5 years\n\u25a0\n5+years",
+                  "ocr_confidence": 0.776
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.896,
+                  "bbox": [
+                    205.5,
+                    1669.9,
+                    1292.5,
+                    97.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "11. Does property contain slopes or hillsides in excess of 15 percent and/or significant ridgelines? (If\nyes, and this is the second parcel map dividing this property, Article 424, Hillside Development of the\nWashoe County Development Code will apply.)",
+                  "ocr_confidence": 0.984
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.889,
+                  "bbox": [
+                    227.7,
+                    443.4,
+                    1106.6,
+                    33.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "8. What sewer services are necessary to accommodate the proposed tentative parcel map?",
+                  "ocr_confidence": 0.987
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.829,
+                  "bbox": [
+                    307.3,
+                    1787.1,
+                    1003.3,
+                    44.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": " Yes\nNo\nIf yes, include a separate set of attachments and maps.",
+                  "ocr_confidence": 0.905
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.725,
+                  "bbox": [
+                    1344.5,
+                    2072.3,
+                    155.1,
+                    23.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "December 2018",
+                  "ocr_confidence": 0.994
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.671,
+                  "bbox": [
+                    246.9,
+                    664.2,
+                    180.1,
+                    34.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "b. Available:",
+                  "ocr_confidence": 0.981
+                },
+                {
+                  "class": "Table",
+                  "confidence": 0.623,
+                  "bbox": [
+                    238.4,
+                    1071.2,
+                    1259.5,
+                    180.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "a. Permit #\n58928\nacre-feet per year\n2.2\nb. Certificate #\nacre-feet per year\nC.\nSurface Claim #\nacre-feet per year\nd. Other,#\nacre-feet per year",
+                  "ocr_confidence": 0.968
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.617,
+                  "bbox": [
+                    247.5,
+                    182.7,
+                    180.3,
+                    35.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "b. Available:",
+                  "ocr_confidence": 0.963
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.523,
+                  "bbox": [
+                    291.2,
+                    1591.6,
+                    1028.3,
+                    43.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "\u25a1 Yes\nNo\nIf yes, include a separate set of attachments and maps.",
+                  "ocr_confidence": 0.916
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.479,
+                  "bbox": [
+                    218.9,
+                    2067.6,
+                    723.0,
+                    58.5
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_005_11_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Washoe County Planning and Building\nTENTATIVE PARCEL MAP APPLICATION SUPPLEMENTAL INFORMATION",
+                  "ocr_confidence": 0.984
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.469,
+                  "bbox": [
+                    193.2,
+                    1472.4,
+                    1304.9,
+                    99.9
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_005_12_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Table",
+                  "confidence": 0.433,
+                  "bbox": [
+                    265.6,
+                    709.2,
+                    1255.6,
+                    51.4
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_005_13_Table.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Now\n\u25a11-3 years\n\u25a13-5 years\n5+ years",
+                  "ocr_confidence": 0.95
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.393,
+                  "bbox": [
+                    1344.0,
+                    2071.8,
+                    158.2,
+                    23.7
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_005_14_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.32,
+                  "bbox": [
+                    249.1,
+                    1786.2,
+                    1139.8,
+                    46.1
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_005_15_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.312,
+                  "bbox": [
+                    207.3,
+                    1469.5,
+                    1298.7,
+                    100.0
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_005_16_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "10. Does the property contain wetlands? (If yes, please attach a preliminary delineation map and\ndescribe the impact the proposal will have on the wetlands. Impacts to the wetlands may require a\npermit issued from the U.S. Army Corps of Engineers.)",
+                  "ocr_confidence": 0.978
+                }
+              ]
+            },
+            {
+              "page_number": 6,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.979,
+                  "bbox": [
+                    182.4,
+                    1339.2,
+                    1352.6,
+                    361.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Please complete the following additional questions if the project anticipates grading that involves:\n(1) Disturbed area exceeding twenty-five thousand (25,0oo) square feet not covered by streets,\nbuildings and landscaping; (2) More than one thousand (1,ooo) cubic yards of earth to be\nimported and placed as fill in a special flood hazard area; (3) More than five thousand (5,0oo)\ncubic yards of earth to be imported and placed as fill; (4) More than one thousand (1,ooo) cubic\nyards to be excavated, whether or not the earth will be exported from the property; or (5) If a\npermanent earthen structure will be established over four and one-half (4.5) feet high. If your\nproject exceeds any of the above criteria, you shall either provide a preliminary grading and\nroadway design plan for review OR if these criteria are exceeded with the final construction\ndrawings and not disclosed at the Tentative Parcel Map Application, you shall be required to apply\nfor a special use permit for grading and you will be delayed up to three months, if approved.",
+                  "ocr_confidence": 0.976
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.96,
+                  "bbox": [
+                    186.4,
+                    185.5,
+                    1327.9,
+                    131.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "12. Does property contain geologic hazards such as active faults; hillside or mountainous areas; is it\nsubject to avalanches, landslides, or flash floods; is it near a water body, stream, Significant\nHydrologic Resource as defined in Article 418, or riparian area such as the Truckee River, and/or an\narea of groundwater recharge",
+                  "ocr_confidence": 0.974
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.924,
+                  "bbox": [
+                    775.5,
+                    1280.8,
+                    149.4,
+                    38.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Grading",
+                  "ocr_confidence": 1.0
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.902,
+                  "bbox": [
+                    186.1,
+                    606.7,
+                    1347.2,
+                    70.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "14. If private roads are proposed, will the community be gated? If so, is a public trail system easement\nprovided through the subdivision?",
+                  "ocr_confidence": 0.988
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.898,
+                  "bbox": [
+                    244.6,
+                    337.6,
+                    1068.4,
+                    39.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "\u25a1 Yes\nNo\nIf yes, include a separate set of attachments and maps.",
+                  "ocr_confidence": 0.942
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.867,
+                  "bbox": [
+                    201.1,
+                    1735.0,
+                    964.9,
+                    33.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "18. How many cubic yards of material are you proposing to excavate on site?",
+                  "ocr_confidence": 0.982
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.753,
+                  "bbox": [
+                    1344.0,
+                    2072.8,
+                    156.5,
+                    22.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "December2018",
+                  "ocr_confidence": 0.997
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.699,
+                  "bbox": [
+                    201.0,
+                    410.4,
+                    1325.0,
+                    99.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "13. Does the tentative parcel map involve common open space as defined in Article 408 of the Washoe\nCounty Development Code? (If so, please identify all proposed non-residential uses and all the open\nspace parcels.)?",
+                  "ocr_confidence": 0.987
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.643,
+                  "bbox": [
+                    168.9,
+                    1736.6,
+                    1030.0,
+                    32.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.625,
+                  "bbox": [
+                    193.6,
+                    935.3,
+                    1298.1,
+                    70.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "16. Are there any applicable area plan modifiers in the Development Code in which the project is located\nthat require compliance? If so, which modifiers and how does the project comply?",
+                  "ocr_confidence": 0.98
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.618,
+                  "bbox": [
+                    185.8,
+                    769.1,
+                    1314.0,
+                    143.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "15. Are there any applicable policies of the adopted area plan in which the project is located that require\ncompliance? If so, which policies and how does the project comply.\n\u25a1Yes\n\u65e5\nNo\nIf yes, include a separate set of attachments and maps.",
+                  "ocr_confidence": 0.886
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.475,
+                  "bbox": [
+                    1343.9,
+                    2072.3,
+                    158.2,
+                    23.4
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_006_11_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.409,
+                  "bbox": [
+                    182.6,
+                    1101.2,
+                    1317.7,
+                    86.9
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_006_12_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "17. Is the project subject to Article 418, Significant Hydrologic Resources? If yes, please address Special\nReview Considerations within Section 110.418.30 in a separate attachment.",
+                  "ocr_confidence": 0.986
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.363,
+                  "bbox": [
+                    208.7,
+                    2068.1,
+                    737.4,
+                    58.0
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_006_13_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Washoe County Planning and Building\nTENTATIVE PARCEL MAP APPLICATION SUPPLEMENTAL INFORMATION",
+                  "ocr_confidence": 0.979
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.309,
+                  "bbox": [
+                    353.5,
+                    533.8,
+                    910.5,
+                    40.6
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_006_14_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "No\nIf yes, include a separate set of attachments and maps.",
+                  "ocr_confidence": 0.931
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.267,
+                  "bbox": [
+                    365.5,
+                    1193.2,
+                    911.5,
+                    40.5
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_006_15_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "No\nIf yes, include a separate set of attachments and maps.",
+                  "ocr_confidence": 0.988
+                }
+              ]
+            },
+            {
+              "page_number": 7,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.97,
+                  "bbox": [
+                    193.4,
+                    187.6,
+                    1310.6,
+                    128.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "19. How many cubic yards of material are you exporting or importing? If exporting of material is\nanticipated, where will the material be sent? If the disposal site is within unincorporated Washoe\nCounty, what measures will be taken for erosion control and revegetation at the site? If none, how\nare you balancing the work on-site?",
+                  "ocr_confidence": 0.976
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.966,
+                  "bbox": [
+                    184.8,
+                    1559.6,
+                    1355.0,
+                    70.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "25. What type of revegetation seed mix are you planning to use and how many pounds per acre do you\nintend to broadcast? Will you use mulch and, if so, what type?",
+                  "ocr_confidence": 0.972
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.951,
+                  "bbox": [
+                    179.9,
+                    1354.1,
+                    1359.6,
+                    71.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "24. Will the grading proposed require removal of any trees? If so, what species, how many, and of what\nsize?",
+                  "ocr_confidence": 0.982
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.944,
+                  "bbox": [
+                    197.4,
+                    978.8,
+                    1295.3,
+                    73.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "22. Are you planning any berms and, if so, how tall is the berm at its highest? How will it be stabilized\nand/or revegetated?",
+                  "ocr_confidence": 0.978
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.935,
+                  "bbox": [
+                    196.8,
+                    522.9,
+                    1314.5,
+                    65.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "20. Can the disturbed area be seen from of-site? If yes, from which directions, and which properties or\nroadways? What measures will be taken to mitigate their impacts?",
+                  "ocr_confidence": 0.982
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.93,
+                  "bbox": [
+                    195.6,
+                    778.1,
+                    1313.3,
+                    66.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "21. What is the slope (Horizontal/Vertical) of the cut and fil areas proposed to be? What methods will be\nused to prevent erosion until the revegetation is established?",
+                  "ocr_confidence": 0.981
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.916,
+                  "bbox": [
+                    193.5,
+                    1150.9,
+                    1334.9,
+                    105.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "23. Are retaining walls going to be required? If so, how high will the walls be, will there be multiple walls\nwith intervening terracing, and what is the wall construction (i.e. rockery, concrete, timber,\nmanufactured block)? How will the visual impacts be mitigated?",
+                  "ocr_confidence": 0.977
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.836,
+                  "bbox": [
+                    1343.9,
+                    2072.4,
+                    156.3,
+                    22.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "December 2018",
+                  "ocr_confidence": 0.973
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.557,
+                  "bbox": [
+                    200.2,
+                    2068.1,
+                    797.9,
+                    79.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "9",
+                  "ocr_confidence": 0.979
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.51,
+                  "bbox": [
+                    224.7,
+                    2068.2,
+                    712.7,
+                    57.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Washoe County Planning and Building\nTENTATIVE PARCEL MAP APPLICATION SUPPLEMENTAL INFORMATION",
+                  "ocr_confidence": 0.982
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.301,
+                  "bbox": [
+                    1343.6,
+                    2071.9,
+                    158.4,
+                    23.5
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_007_10_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                }
+              ]
+            },
+            {
+              "page_number": 8,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.955,
+                  "bbox": [
+                    196.7,
+                    556.2,
+                    1307.5,
+                    66.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "27. Have you reviewed the revegetation plan with the Washoe Storey Conservation District? If yes, have\nyou incorporated their suggestions?",
+                  "ocr_confidence": 0.989
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.937,
+                  "bbox": [
+                    204.8,
+                    152.9,
+                    857.6,
+                    32.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "26. How are you providing temporary irrigation to the disturbed area?",
+                  "ocr_confidence": 0.982
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.888,
+                  "bbox": [
+                    186.7,
+                    990.7,
+                    188.4,
+                    33.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "28. Surveyor:",
+                  "ocr_confidence": 0.96
+                },
+                {
+                  "class": "Table",
+                  "confidence": 0.828,
+                  "bbox": [
+                    233.4,
+                    1041.6,
+                    1276.2,
+                    296.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Name\nHANS BURKHART\nA..\nAaaress\n65 WATER BUCK WAY\nPhone\nCell\nE-mail\nFax\nNevada PLS #",
+                  "ocr_confidence": 0.921
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.812,
+                  "bbox": [
+                    1343.8,
+                    2072.4,
+                    155.9,
+                    23.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "December 2018",
+                  "ocr_confidence": 0.995
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.727,
+                  "bbox": [
+                    208.9,
+                    2070.2,
+                    783.6,
+                    82.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Washoe County Planning and Building\nTENTATIVE PARCEL MAP APPLICATION SUPPLEMENTAL INFORMATION\n10",
+                  "ocr_confidence": 0.987
+                }
+              ]
+            },
+            {
+              "page_number": 9,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.954,
+                  "bbox": [
+                    198.4,
+                    1702.7,
+                    154.3,
+                    31.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "5.\nUtilities:",
+                  "ocr_confidence": 0.98
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.936,
+                  "bbox": [
+                    196.4,
+                    1012.6,
+                    273.9,
+                    33.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "3. Please describe:",
+                  "ocr_confidence": 0.985
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.923,
+                  "bbox": [
+                    269.2,
+                    595.7,
+                    997.5,
+                    36.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "2. What is the location (address or distance and direction from nearest intersection)?",
+                  "ocr_confidence": 0.978
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.919,
+                  "bbox": [
+                    526.0,
+                    216.4,
+                    656.3,
+                    34.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "(All required information may be separately attached)",
+                  "ocr_confidence": 0.987
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.902,
+                  "bbox": [
+                    221.3,
+                    313.3,
+                    935.5,
+                    37.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "1. ldentify the public agency or utility for which the parcel is being created:",
+                  "ocr_confidence": 0.974
+                },
+                {
+                  "class": "Table",
+                  "confidence": 0.898,
+                  "bbox": [
+                    263.8,
+                    796.0,
+                    1244.4,
+                    182.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "APN of Parcel\nLand Use Designation\nExisting Acres\n038-710-17\nLDS\n3.35",
+                  "ocr_confidence": 0.994
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.868,
+                  "bbox": [
+                    1344.0,
+                    2072.5,
+                    155.4,
+                    22.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "December 2018",
+                  "ocr_confidence": 0.996
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.859,
+                  "bbox": [
+                    201.1,
+                    1510.4,
+                    517.9,
+                    33.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "4. What are the proposed lot standards?",
+                  "ocr_confidence": 0.985
+                },
+                {
+                  "class": "Table",
+                  "confidence": 0.841,
+                  "bbox": [
+                    228.5,
+                    1747.6,
+                    1299.4,
+                    136.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "a.\nSewer Service\nSEPTIC\nb.\nElectrical Service/Generator\nC.\nWater Service\nDOMESTIC WELL",
+                  "ocr_confidence": 0.984
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.714,
+                  "bbox": [
+                    243.0,
+                    1217.0,
+                    1277.1,
+                    69.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "b.\nThe existing conditions and uses in the vicinity to the north, south, east and west (i.e. vacant land,\nroadways, buildings, etc.):",
+                  "ocr_confidence": 0.972
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.711,
+                  "bbox": [
+                    514.6,
+                    125.7,
+                    671.1,
+                    96.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.669,
+                  "bbox": [
+                    204.7,
+                    2067.2,
+                    759.6,
+                    83.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "11",
+                  "ocr_confidence": 0.997
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.62,
+                  "bbox": [
+                    562.2,
+                    126.6,
+                    573.4,
+                    84.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Parcel Map Waiver Application\nSupplemental Information",
+                  "ocr_confidence": 0.992
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.601,
+                  "bbox": [
+                    240.7,
+                    1062.9,
+                    707.7,
+                    35.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "a. The existing conditions and uses located at the site:",
+                  "ocr_confidence": 0.98
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.457,
+                  "bbox": [
+                    215.8,
+                    2067.9,
+                    682.9,
+                    59.1
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_009_14_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Washoe County Planning and Building\nPARCEL MAP'WAIVER APPLICATION SUPPLEMENTAL INFORMATION",
+                  "ocr_confidence": 0.977
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.349,
+                  "bbox": [
+                    1343.6,
+                    2072.0,
+                    158.5,
+                    23.4
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_009_15_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.345,
+                  "bbox": [
+                    565.1,
+                    126.8,
+                    573.3,
+                    84.3
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_009_16_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Table",
+                  "confidence": 0.267,
+                  "bbox": [
+                    280.8,
+                    1296.1,
+                    1216.0,
+                    179.5
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_009_17_Table.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "North\nSouth\nEast\nWest",
+                  "ocr_confidence": 0.998
+                }
+              ]
+            },
+            {
+              "page_number": 10,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.953,
+                  "bbox": [
+                    240.3,
+                    1259.0,
+                    1293.6,
+                    134.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "d. If a public facility is proposed and is currently not listed in the Washoe County Capital\nImprovements Program and not available, please describe the funding mechanism for ensuring\navailability of sewer service. If a private system is proposed, please describe the system and the\nrecommended location(s) for the proposed facility:",
+                  "ocr_confidence": 0.985
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.909,
+                  "bbox": [
+                    206.1,
+                    2065.4,
+                    747.9,
+                    89.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Washoe County Planning and Building\nPARCEL MAP WAIVER APPLICATION SUPPLEMENTAL INFORMATION\n12",
+                  "ocr_confidence": 0.989
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.908,
+                  "bbox": [
+                    205.6,
+                    126.8,
+                    1281.9,
+                    83.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "6. Please describe the source and timing of the water facilities necessary to serve the proposed waiver.\na. Water System Type:",
+                  "ocr_confidence": 0.971
+                },
+                {
+                  "class": "Table",
+                  "confidence": 0.906,
+                  "bbox": [
+                    262.8,
+                    224.9,
+                    1250.3,
+                    136.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "\u25a1\nIndividual wells\n\u25a1\nPrivate water\nProvider:\n\u25a1 Public water\nProvider:",
+                  "ocr_confidence": 0.918
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.904,
+                  "bbox": [
+                    197.8,
+                    1510.6,
+                    1309.0,
+                    87.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "8. Please describe whether any of the following natural resources are related to the proposed waiver:\na. Property located in the FEMA 10O-year floodplain?",
+                  "ocr_confidence": 0.971
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.857,
+                  "bbox": [
+                    248.1,
+                    393.0,
+                    177.7,
+                    32.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "b. Available:",
+                  "ocr_confidence": 0.972
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.823,
+                  "bbox": [
+                    245.5,
+                    1843.2,
+                    1278.6,
+                    103.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "b.\nDoes property contain wetlands? (If yes, please attach a preliminary delineation map and\ndescribe the impact the proposal will have on the wetlands. Impacts to the wetlands may require\na permit issued from the U.S. Army Corps of Engineers.)",
+                  "ocr_confidence": 0.982
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.771,
+                  "bbox": [
+                    1343.7,
+                    2072.3,
+                    156.5,
+                    23.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "December 2018",
+                  "ocr_confidence": 0.981
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.737,
+                  "bbox": [
+                    251.9,
+                    524.5,
+                    1258.0,
+                    96.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "C. If a public facility is proposed and is currently not listed in the Washoe County Capital\nImprovements Program and not available, please describe the funding mechanism for ensuring\navailability of water service:",
+                  "ocr_confidence": 0.977
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.728,
+                  "bbox": [
+                    215.3,
+                    777.5,
+                    1287.1,
+                    82.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "7. What is the nature and timing of sewer services necessary to accommodate the proposed waiver?\na. Sewage System Type:",
+                  "ocr_confidence": 0.97
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.511,
+                  "bbox": [
+                    263.3,
+                    524.9,
+                    1250.4,
+                    98.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.333,
+                  "bbox": [
+                    248.3,
+                    1000.7,
+                    176.6,
+                    32.6
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_010_11_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "b. Available:",
+                  "ocr_confidence": 0.983
+                },
+                {
+                  "class": "Table",
+                  "confidence": 0.294,
+                  "bbox": [
+                    271.9,
+                    434.9,
+                    1251.0,
+                    56.3
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_010_12_Table.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "\u25a1 Now\n\u25a1 1-3 years\n\u25a1 3-5 years\n 5+ years",
+                  "ocr_confidence": 0.893
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.281,
+                  "bbox": [
+                    299.3,
+                    1694.5,
+                    156.0,
+                    31.0
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_010_13_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Explanation:",
+                  "ocr_confidence": 0.997
+                }
+              ]
+            },
+            {
+              "page_number": 11,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.941,
+                  "bbox": [
+                    199.3,
+                    664.1,
+                    169.8,
+                    32.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "9. Surveyor:",
+                  "ocr_confidence": 0.978
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.939,
+                  "bbox": [
+                    300.7,
+                    162.4,
+                    151.7,
+                    31.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Explanation:",
+                  "ocr_confidence": 0.953
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.829,
+                  "bbox": [
+                    1344.0,
+                    2072.7,
+                    155.5,
+                    22.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "December2018",
+                  "ocr_confidence": 0.998
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.776,
+                  "bbox": [
+                    248.6,
+                    316.1,
+                    1237.8,
+                    101.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "C.\nDoes property contain slopes or hillsides in excess of 15 percent and/or significant ridgelines? (If\nyes, and this is the second parcel map dividing this property, Article 424, Hillside Development of\nthe Washoe County Development Code will apply.)",
+                  "ocr_confidence": 0.949
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.7,
+                  "bbox": [
+                    218.0,
+                    2068.3,
+                    729.1,
+                    82.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "13",
+                  "ocr_confidence": 0.99
+                },
+                {
+                  "class": "Table",
+                  "confidence": 0.674,
+                  "bbox": [
+                    233.6,
+                    712.8,
+                    1273.2,
+                    217.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Name\nHANS BURKHART\nAddress\n65 WATER BUCK WAY\nPhone\nFax\nNevada PLS #",
+                  "ocr_confidence": 0.979
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.429,
+                  "bbox": [
+                    1343.7,
+                    2072.0,
+                    158.5,
+                    23.5
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_011_06_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.31,
+                  "bbox": [
+                    366.3,
+                    433.0,
+                    791.8,
+                    42.4
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_011_07_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "\u25a1 Yes, the Hillside Ordinance applies.\n\u25a1No, it does not.",
+                  "ocr_confidence": 0.963
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.259,
+                  "bbox": [
+                    214.6,
+                    2069.9,
+                    686.8,
+                    54.5
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_011_08_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Washoe County Planning and Building\nPARCEL MAP WAIVER APPLICATION SUPPLEMENTAL INFORMATION",
+                  "ocr_confidence": 0.978
+                }
+              ]
+            },
+            {
+              "page_number": 12,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.891,
+                  "bbox": [
+                    1256.8,
+                    1156.7,
+                    134.9,
+                    21.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Pay By Check",
+                  "ocr_confidence": 0.954
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.856,
+                  "bbox": [
+                    1274.0,
+                    219.9,
+                    273.0,
+                    71.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Washoe County Treasurer\nP.O.Box30039.Reno,NV 89520-3039\nph: (775) 328-2510 fax: (775) 328-2500\nEmail: tax@washoecounty.us",
+                  "ocr_confidence": 0.959
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.84,
+                  "bbox": [
+                    139.2,
+                    71.5,
+                    198.2,
+                    32.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Account Detail",
+                  "ocr_confidence": 0.989
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.823,
+                  "bbox": [
+                    1255.7,
+                    777.7,
+                    278.0,
+                    280.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "For your convenience,\nonline payment is\navailable on this site.\nE-check payments are\naccepted without a fee.\nHowever, a service\nfee does apply for\nonline credit card\npayments.\nSee Payment\nInformation for details.",
+                  "ocr_confidence": 0.977
+                },
+                {
+                  "class": "Table",
+                  "confidence": 0.7,
+                  "bbox": [
+                    153.5,
+                    420.4,
+                    1143.9,
+                    1475.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Account Detail\nBack to Account Detail\nChange of Address\nPrint this Page\nCollectionCart\nItems\nTotal\nCheckout\nView\nCollection Cart\n0\n$0.00\nPay Online\nWashoe County Parcel Information\nStatus\nLast Update\nParcel ID\nActive\n3/19/20192:06:42\n03871017\nAM\nCurrent Owner:\nSITUS:\n65WATERBUCKWAY\nHAB LIVING TRUST\nWCTY NV\nPO BOX 250\nVERDI, NV89439\nTaxing District\nGeo CD:\n4811\nLegal Description\nTownship 19 Section 8 Lot 9A Block Range 18 SubdivisionName_REVERSION\nTax Bill (click on desired tax year for due dates and further details)\nInterest\nBalance Due\nTax Year\nNet Tax\nTotal Paid\nPenalty/Fees\n$0.00\n$0.00\n$0.00\n$9,176.79\n$9,176.79\n2018\n$8,909.74\n$0.00\n$0.00\n$0.00\n2017\n$8,909.74\n$8,683.97\n$8,683.97\n$0.00\n$0.00\n$0.00\n2016\n$8,666.06\n$8,666.06\n$0.00\n$0.00\n$0.00\n2015\n$8,488.18\n$0.00\n$0.00\n$0.00\n2014\n$8,488.18\nTotal\n$0.00",
+                  "ocr_confidence": 0.988
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.571,
+                  "bbox": [
+                    1243.1,
+                    514.6,
+                    285.1,
+                    238.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "ALERTS:\nIryour real\nproperty taxes are\ndelinquent, the search\nresults displayed may\nnot refect the correct\namount owing.Please\ncontact our ofice\nfor the current amount\ndue.\n2",
+                  "ocr_confidence": 0.924
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.542,
+                  "bbox": [
+                    283.4,
+                    2103.7,
+                    1258.2,
+                    42.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "https://nv-washoe-treasurer.manatron.com/Tabs/TaxSearch/AccountDetail.aspx?p=038710.. 3/19/2019",
+                  "ocr_confidence": 0.989
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.477,
+                  "bbox": [
+                    145.9,
+                    301.4,
+                    208.8,
+                    33.9
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_012_07_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Washoe County Treasurer\nTammi Davis",
+                  "ocr_confidence": 0.99
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.417,
+                  "bbox": [
+                    1254.1,
+                    1206.8,
+                    231.9,
+                    32.7
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_012_08_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Please make checks payable to:\nWASHOE COUNTY TREASURER",
+                  "ocr_confidence": 0.974
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.316,
+                  "bbox": [
+                    1391.6,
+                    52.8,
+                    160.0,
+                    33.5
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_012_09_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Page 1 of 2",
+                  "ocr_confidence": 0.928
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.301,
+                  "bbox": [
+                    1254.5,
+                    1155.1,
+                    216.1,
+                    239.4
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_012_10_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Ovemight Address:\n1001 E. Ninth St., Ste D140\nReno,NV 89512-2845",
+                  "ocr_confidence": 0.962
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.3,
+                  "bbox": [
+                    1251.9,
+                    1257.1,
+                    149.8,
+                    50.9
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_012_11_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Mailing Address:\nP.O.Bo\u00d730039\nReno, NV 89520-3039",
+                  "ocr_confidence": 0.953
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.297,
+                  "bbox": [
+                    1294.3,
+                    1523.1,
+                    245.7,
+                    29.5
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_012_12_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Payment Infonation",
+                  "ocr_confidence": 0.998
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.291,
+                  "bbox": [
+                    202.7,
+                    2008.9,
+                    1303.1,
+                    38.6
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_012_13_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "The Washoe County Treasurer's Office makes every effort to produce and publish the most current and accurate information possible. No warranties, expressed or implied, are\nprovided for the data herein, its use, or its interpretation. If you have any questions, please contact us at (775) 328-2510 or tax@washoecounty.us",
+                  "ocr_confidence": 0.967
+                }
+              ]
+            },
+            {
+              "page_number": 13,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.914,
+                  "bbox": [
+                    1000.1,
+                    1266.4,
+                    904.0,
+                    77.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "RIVERDALE SUBDIVISION UNIT NO.2 (#2663)\nPORTION OF THE W 1/2 SECTION 8, T19N, R18E",
+                  "ocr_confidence": 0.946
+                },
+                {
+                  "class": "ParcelMap",
+                  "confidence": 0.836,
+                  "bbox": [
+                    239.9,
+                    151.8,
+                    1654.8,
+                    1132.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "38-55\n00.0\n38-69\n(#2754)\nRS 4269\nRIVERDALE SUBDIVISION\n038-710-18\n8\nRIVERDALE CIRCLE\n200r\n210.00\n75227 s1\nUNIT NO.3\n038-710-15\n68422 s1\nS\n389.17\n038-710-14\nLOT OA\nS\n4\n65805 s1\nREV.PM3529\n122.48\nWATER\nBUCK\n12\n038-710-17\nB\n3.346 0c.\n038-710-09\n1.810c.\n219.00\n481.5\n14.43\n038-710-10\n77833 s1\n38-69\n311.98\nLYNX\n38-55C\n53.95\n70.00\nSILVER\n43,66\n038-710-08\n038-710-04\nJ.81oc.\n2.42 0c.\n038-710-06\n038-710-03\n2.092 oc.\n038-710-06\n038-710-07\n583.00\n2.240c.\n153.58\n551.21\n545.10\n82517 s1\n79305 s1\nB\n453.93\n38-69\n66961\nFL000\n13\n038-710-02\n84813s1\nYEAR\n6\n318.10\n5\n102.92\n35.00\n203.00\nRIVER\n100\n156.00\n-12.0\n150.96\nTRUCKEE\n38-28",
+                  "ocr_confidence": 0.903,
+                  "needs_vision": true,
+                  "parcels": [],
+                  "vision_escalated": true
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.795,
+                  "bbox": [
+                    205.1,
+                    1427.5,
+                    492.1,
+                    64.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "NOTE:This map is prepered for the use of the Washoe County Assessor lor\nassessment and ilustrative purposes only. It does not represent a survey of\nthe premisas. No liabiity is assumed as to the sufficilency or the accuracy\nof the date dellineated hereon.",
+                  "ocr_confidence": 0.933
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.552,
+                  "bbox": [
+                    753.8,
+                    1463.9,
+                    620.4,
+                    30.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "Office of Washoe County Assessor, Nevada -Robert W. McGowan",
+                  "ocr_confidence": 0.971
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.42,
+                  "bbox": [
+                    1413.8,
+                    1457.3,
+                    350.6,
+                    35.7
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_013_04_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "NOTE: Areas of parcels which are less than 2 acres\nare shown In square feet.",
+                  "ocr_confidence": 0.951
+                }
+              ]
+            },
+            {
+              "page_number": 14,
+              "regions": [
+                {
+                  "class": "Text",
+                  "confidence": 0.947,
+                  "bbox": [
+                    966.4,
+                    1427.9,
+                    437.4,
+                    23.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "1THIBPLATCONTTRULTUDASUNVYPODUNVR\nHY DIRKOT UPCAVIBION AT THR INOTAHGS OF HANO BURKHARY",
+                  "ocr_confidence": 0.715
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.928,
+                  "bbox": [
+                    971.2,
+                    1532.9,
+                    431.4,
+                    31.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "4\uff0c TH HDNUNTE DEPXOTED ON THE PLAT ARE OF THE CHARACTR\nHODOUYPOTI1ATAR5O\nRUALLY",
+                  "ocr_confidence": 0.699
+                },
+                {
+                  "class": "ParcelMap",
+                  "confidence": 0.925,
+                  "bbox": [
+                    -4.5,
+                    51.3,
+                    1787.2,
+                    1343.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "\nOINT\n\n TH W\nM\n8MT\nDUND OODINATO\n\n4\n4\u5206\nASIS ARINO\nCUTOA H48 E0<NA/4)\nTHALIVIHOTNU\n\nTUTAL ARA = 335 AC.\nTATONEVADA\n148,741 S0 FT\nCOTY OA\nSCALE 140\nPARCD1\nnA.\n00,3aF.\n-710-14\nMV\nLT\nKY.K7\nWI VAAY\n710-10\n\u6700\nMTCA\n3\nTITUD\n4\n\n\nRPORTYFIRET ONTONEALTITLKCOHPANY DATDHCH\n\n\n\n\n\nMHWIOTEINDIOTORPLANNO\n\n\n\nVATUOKVAY\nPERT.H. 2704\nUTILITY COANSES CORTXFYCATE\nPOR T DIOTRIOT BCAD HEALTH\nTUTILITYEADDNTE EHOVN ON THIO PLAT HAVE N APPROVD Y\nTHUNRDPUIOUTLTY\uff0cCANIACALTVCAY\nAOTIOPO CNY\nDATE\nPER\nILVR LYOX WAY\nHA TTL\nNY\nT.H\n\u6bcf\nVADALLTOOCAY\nDATK\nVT/4COR SOTI0\nHAAOTITLD\nDA ATLTHVADA\nQ\nASHOCOUTY ONTY DVORDPAATHT\n8754\nNAEAODTITUE\nCHWTERCONUNICATIS\nDATE\nNN00-710-17\nNOTLS",
+                  "ocr_confidence": 0.51,
+                  "needs_vision": true,
+                  "parcels": [],
+                  "vision_escalated": true
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.92,
+                  "bbox": [
+                    963.8,
+                    1490.7,
+                    439.9,
+                    32.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "O. THIS PLAT COHPLIKS VITH TH APPLIOADLE TAYUTKG OF TIYB\nBYATADAYOALDINACINBOPOT NYH DATETHAYTH\nVORNINOOYAVITBNAAPROVA",
+                  "ocr_confidence": 0.669
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.903,
+                  "bbox": [
+                    1602.6,
+                    928.6,
+                    455.8,
+                    89.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "DISTRICT OARD O HALTH CRTIFICATE\nTMIOM\nAPPROVDDY\nTHVAHOC OOUNTY DIOTRYOTWOARD\nHEALTH,\nTHXO\nAPPROVAL\nCOHOKAKCVAOE\nPDAL\n\"VATKR\nHAO DEER FDUND TO HEKY ALL APPLIOALE RROUIREHKNTB AHD\nTIVATWLITY\nSAT\nT\nPROVIOTOYNVINDDYAL.ALTH BSRVICDIVIEIONOTH\nVASHO COLNTY HALTH DIWTRIOT",
+                  "ocr_confidence": 0.686
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.9,
+                  "bbox": [
+                    1609.9,
+                    451.1,
+                    439.5,
+                    147.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "THK UNDKROIANK\nHAT\nTHK\nPLAT HACE\nHA\nLV\n\nH\nLAT\n\nTAY\n\u4e2d\nVT\n\n\n\u53ef\n\n\nT\n\nREODRD\nAOAIHO\nTAT\n\n\nA\nNT ODLLrOTDATAXR\n",
+                  "ocr_confidence": 0.369
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.839,
+                  "bbox": [
+                    485.8,
+                    1396.5,
+                    439.5,
+                    67.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": " A PUOLIC UTXLITY CAOONT IS NLED CTD VITHIN EACA PAC\nFRYDOAUIVEPUPONYALLXHDAO NAINTAININO UTILITY\nPACILETIETO THAT PARCKLANOTHE RIOHT TO EXIY THAT PARCKL\nVITH AID FAOILITIKO FOR THK PURPOOK OF GKAVIHG ADJAOKNT\nPARCXLG AT LOCATIONE KUTUALLY AOREKD UPON DY THE OVNKR OF\nRCOORDAT\nTHR\nTIM\nAND\nTHEUTILITYOOHPAHY.",
+                  "ocr_confidence": 0.721
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.837,
+                  "bbox": [
+                    1141.7,
+                    561.3,
+                    415.4,
+                    151.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "LD\nTOUN\nFD BVMR ALMMM C17O\nPEFULIO UTILITY AO OASL TVAOONT\nPLOUTNPOCPL\nPORADIALMCAINO\nCONTMMLIC HONUDT POR TAACT HUPTO4",
+                  "ocr_confidence": 0.606
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.836,
+                  "bbox": [
+                    1603.8,
+                    678.5,
+                    435.6,
+                    150.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "DIRCCTUR DF PLANNING AND MUXLDING\nRTIFICAT\nMHINALPANOELHA OA\nMO\n1CA\nA\nDHA\n\nY\nCo\n\nUMIYANTIAL OBNFDANANDE\nVITNTKE\nTENTAYIVE MAP AND XTE\nOTO\nWIS\n\n\nr\nTHXNC\nMDTHOE OONOITIONE HAVE ON ATXEIED\nP\nRKOURDATIDN\nTHIMM\nTHIFENW\n\n\nMPROV\nMAOC\nY THE DIRKOTOR DR\n\nTMI\no\nMY\n\nDIVYOXON\nA\nGOUNTY,NEYABA\nAOOONDANOE VITH NEVADA AEVZOED YATUTKE YE.L YHROUN\n\u4e1a\n",
+                  "ocr_confidence": 0.436
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.745,
+                  "bbox": [
+                    967.2,
+                    1375.5,
+                    260.9,
+                    15.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "SURVEYORS CORTXFYCATE",
+                  "ocr_confidence": 0.872
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.734,
+                  "bbox": [
+                    1610.9,
+                    1316.2,
+                    435.5,
+                    52.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "THK UNNASIOHOD HEROY CERTIFIKO THAY ALL PROPKRTY YAHEN CN\nTHO LD POR TH PIOOALYCAR HAVZBEON PAKD AO THAT TC FULL\nAOUNT AY OD PROPOTY TAX FOR THE CONVDION OTE\nPRDPKRTY FADK AORIOULYURAL. UE HAO DEKH PAID PUREUANT YD\n1A",
+                  "ocr_confidence": 0.704
+                },
+                {
+                  "class": "Seal",
+                  "confidence": 0.721,
+                  "bbox": [
+                    6.1,
+                    1538.0,
+                    205.9,
+                    155.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "VXCNXTY\nMAF\n\n\nLHT.\n2",
+                  "ocr_confidence": 0.351
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.72,
+                  "bbox": [
+                    971.6,
+                    1459.6,
+                    426.4,
+                    23.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": ". THK LANOE DPIOTED LIS VITHIN TH VKEY I/E OF BOTIOH \nY.1R. 1E HD.",
+                  "ocr_confidence": 0.66
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.718,
+                  "bbox": [
+                    1602.6,
+                    1267.7,
+                    228.6,
+                    18.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "TAXATIDNCRTIFICATE",
+                  "ocr_confidence": 0.915
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.691,
+                  "bbox": [
+                    481.3,
+                    1525.7,
+                    447.1,
+                    31.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "4) ALL ODORDINATKO AND DXBTANOKO OHOVH HKRKON ARK GNOUND\nCODADINATKO AND DIBTAHOKE. DIVID GROUND COORDINATSSBY THZ\nOCYNFAOTLOOOLOTOTO CONVOTYORID CDDINATEOR",
+                  "ocr_confidence": 0.689
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.677,
+                  "bbox": [
+                    1607.2,
+                    87.7,
+                    452.9,
+                    98.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "\nTHXO\n0\nHA\n1\n1.\n1\nLIVIN\nTHIO\n1\n0\n:\nAT\nVT\nTCN\n\n\n1\n1\n\uff1a\nA\n2\n\nWHT\n\n0\n",
+                  "ocr_confidence": 0.319
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.589,
+                  "bbox": [
+                    485.7,
+                    1494.2,
+                    443.1,
+                    28.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "TH UTILXTYADGTE DVN A NOTOD ON YHI PLAT INCLUD\nUOK YOR INUTALLATION AND HAINYCHANOK OF OANLE TELKVIETOH\nPAOILITI",
+                  "ocr_confidence": 0.744
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.554,
+                  "bbox": [
+                    1612.8,
+                    1149.3,
+                    435.4,
+                    33.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "THRDOT/VLDEDNTDIOTDONTHHAI8IHCAANCC\nTHTHPROVIIATC4VACOUTYV\n",
+                  "ocr_confidence": 0.403
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.541,
+                  "bbox": [
+                    489.1,
+                    1469.0,
+                    438.0,
+                    22.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "A) THK NAYURAL DAAINAOK VILL HOY BE IHPKDKD DUAING THK\nIPROVOONTO THPAODL",
+                  "ocr_confidence": 0.683
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.522,
+                  "bbox": [
+                    884.0,
+                    998.0,
+                    265.5,
+                    44.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "VAHE CNYY PS POIHT VTEOLO34\nROUNDCDORDINAYD\nH14044007.77\n0100001",
+                  "ocr_confidence": 0.684
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.495,
+                  "bbox": [
+                    968.0,
+                    1603.7,
+                    202.0,
+                    14.0
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_014_20_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "TDNKG PGHAFAN PL EOOS",
+                  "ocr_confidence": 0.599
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.44,
+                  "bbox": [
+                    1545.0,
+                    1533.8,
+                    150.1,
+                    22.0
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_014_21_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "HANSBURIKHART",
+                  "ocr_confidence": 0.933
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.38,
+                  "bbox": [
+                    493.9,
+                    1565.5,
+                    423.1,
+                    28.7
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_014_22_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "S) ANY PROPOD SPTIO YOTO HUT HCST TH HINIHUN ETAOK\nUOOETTHCOONTC\nB) ANY FUTURE KPTIO PAOPOBAL HAY AKQUIRK THE POLLDVXHOI",
+                  "ocr_confidence": 0.675
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.344,
+                  "bbox": [
+                    1601.4,
+                    1111.4,
+                    439.0,
+                    32.0
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_014_23_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "WATER AND SEVER RESOAURCEREOUIREENTS\n",
+                  "ocr_confidence": 0.413
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.328,
+                  "bbox": [
+                    521.7,
+                    1606.7,
+                    378.7,
+                    42.8
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_014_24_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "A\nAOINOORDDOI\nNYIV AAPROVAL YVACOUNMYHCALYH DITRICT\nPRIOR TO APROVAL Y TH DIETRICT OPADD Y HALTH\nVAVATEVATRMDEANITATIDNAVIOSYOAP",
+                  "ocr_confidence": 0.716
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.328,
+                  "bbox": [
+                    1599.9,
+                    1379.3,
+                    158.5,
+                    10.9
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_014_25_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "WASHOECOUNTYTASURSOR",
+                  "ocr_confidence": 0.679
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.305,
+                  "bbox": [
+                    1613.9,
+                    317.4,
+                    443.8,
+                    56.2
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_014_26_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "ON THK\nDAY\n\u53ef\nSRRONAU\nWO AOIoOML.\n2\nT\nTAT\nTEASOVX IHTR\nV\n\nHODNT\nT\n\nAIXMYEPYLOIN\n\n\n\n\n",
+                  "ocr_confidence": 0.329
+                }
+              ]
+            },
+            {
+              "page_number": 15,
+              "regions": [
+                {
+                  "class": "ParcelMap",
+                  "confidence": 0.955,
+                  "bbox": [
+                    654.2,
+                    187.3,
+                    4636.6,
+                    3614.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "38-550-42\n5 PUE & DE\n5 PUE & DE\nKRONISH\nGROUND COORDINATEI\nPER THIS MAP\nPER THIS MAP\nN 14865934.85\nS41\u00b027'17\"\nF\n416.94\nE2233303.57\n158.00\n258.94\nGROUND COORDINATE:\nN 14869222.39\nE 2229634.73\nBASIS \u25a1F BEARING\nWASH0E C0UNTY GPS SYSTEM BETWEEN P0INTS V72SMO1O34 AND V72SMO1O37\nH.\nC\u25a1MPUTED AS N 44\u00b0 54' 37\u2033 E 2721.O5\u2032\n<NAD83/94)\nAS\nT\u25a1TAL AREA = 3. 35 AC.\n/\n= 145,741 SQ. FT.\nEXISTING\n2754\n\u5973\nN\n-5 PUE & DE\nPER T.M. # 2754\nSCALE 1\"= 4O'\nV\nPARCEL 2\nPARCEL 1\n85,396 SQ. FT.\n60,345 SQ. FT.\n\n\u039b\n0\n40\n80\n120\n160\n\u00f3\nEASEMEN\n38-710-14\n481.\nPODEWILS\n\u516c\nL\nW\nL\u25a1T 8\uff0c BLK B\uff0c T.M. # 2754\n/\nEt\n9\n\n\u4e00\n38-710-10\n191\n20.9\n162\nVAN WAAY\nS\u2220\nLOT 11\uff0c BLK B\uff0c T. M. # 2754\nLEGEND\n-\nSET 5/8 REBAR & CAP PLS # 55O6 UNLESS NOTED \u25a1THERWISE.\n\u039b\nF\u25a1UND 5/8\" REBAR & ALUMINUM CAP RLS # 217O.\n10\nPER\nPUE\n/\nTHIS\nPUE = PUBLIC UTILITY AND CABLE TV EASEMENT\nBYi\n8\n/\n/\nS. P.P.L.\n= SOUTHERN PACIFIC PIPE LINE\n/\n\n\nPUE\uff0c DE,\nRB = RADIAL BEARING\nPERPTEM E2754\n5\nO = CENTERLINE MONUMENT PER TRACT MAP # 2754.\n/\n\nRB= S 36\u00b0 28 39 W\n\nGROUND COORDINATE:\n-\nN 14869099.98\nPUE & DE\nE2229169.05\nPER\n'THIS MAP\n\n10\nPUE & DE\nRB= N 42\u00b0 28 53\"\nE\nC1\nC3\nC2\n142.69\nR=385.00\n@=21\u00b014'04\"\n20\n@=45\nWATER BUCK WAY\n\u00a9\n324.40\nPER T.M. # 2754\nE\n\u2295WASHOE COUNTY GPS P\u25a1INT V72SMO1O34\nGROUND COORDINATEI\nN 14864007.77\nO\nE2231382.51\nUTILITY COMPANIES CERTIFICATE\n4\nTHE UTILITY EASEMENTS SHOWN ON THIS PLAT HAVE BEEN APPROVED BY\n7\nTHE UNDERSIGNED PUBLIC UTILITY, CoMPANIES, AND CABLE TV COMPANY.\nW\nTS\nSILVER LYNX WAY\nDATE\nPER T.M. # 2754\n29\nG\nDATE\nWEST 1/4 CORNER SECTI0N 8\nCHARTER\nCOMMUNICATIONS\nDATE\nNAME AND TITLE",
+                  "ocr_confidence": 0.781,
+                  "needs_vision": true,
+                  "parcels": [],
+                  "vision_escalated": true
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.951,
+                  "bbox": [
+                    2159.9,
+                    3984.3,
+                    1299.7,
+                    56.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "2) THE nATURAL DRAInAGE WILL I\nNOT BE IMPEDED DURING THE\nIMPROVEMENT \u25a1F THESE PARCELS.",
+                  "ocr_confidence": 0.868
+                },
+                {
+                  "class": "Table",
+                  "confidence": 0.948,
+                  "bbox": [
+                    3942.2,
+                    2436.0,
+                    1063.3,
+                    118.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "CURVE\nARC\nDELTA\nRADIUS\nC1\n115.63\n15\u00b013'50\"\n435.00\nC2\n120.24\n17\u00b053/39\n385.00\nC3\n22.44\n385.00\n03\u00b020'25\"",
+                  "ocr_confidence": 0.951
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.944,
+                  "bbox": [
+                    2154.5,
+                    3788.9,
+                    1195.8,
+                    172.3
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "1) A PUBLIC UTILITY EASEMENT IS ALSo GRANTED WITHIN EACH PARCEL\nFoR THE EXCLUSIVE PURPoSE \u25a1F INSTALLING AND MAINTAInING UTILITY\nFACILITIES To THAT PARCEL AND THE RIGHT To EXI T THAT PARCEL\nWI TH SAI D F ACI LI TIES FoR THE PURPOSE oF SERVI NG ADJACENT\nPARCELS AT LoCATIoNS MUTUALLY\nAGREED UP\u25a1N BY THE OWNER \u25a1F\n\uff32\uff25\uff23\u25a1\uff32\uff24 \uff21\uff34\n\uff34\uff28\uff25\uff34\uff29M\uff25\nAND\nTHE\n\uff35\uff34\uff29\uff2c\uff29\uff34Y\nCoMPANY.",
+                  "ocr_confidence": 0.825
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.931,
+                  "bbox": [
+                    2153.3,
+                    4131.9,
+                    1206.7,
+                    83.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "4) ALL CooRDI NATES AND DI STANCES SHoWN HEREoN ARE GRoUND\nCooRDINATES AND DISTAnCES. DIVIDE GROUND CooRDINATES BY THE\nCOMBINED FACTOR \u25a1F 1.000197939 T0 CoNVERT TO GRID C0\u25a1RDINATES.",
+                  "ocr_confidence": 0.822
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.923,
+                  "bbox": [
+                    5240.2,
+                    836.1,
+                    1192.9,
+                    145.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "ON THIS\nDAY \u25a1F\n20\nPERSONAL\uff2cY\nAPPEARED BEFORE ME A NoTARY PUBLIC IN SAID CoUNTY, H. BURKHART,\nWHO ACKNOWLEDGED\nT\u25a1 ME THAT HE EXECUTED THE ABOVE INSTRUMENT\nIN WI TNESS WHEREOF I HEREUNTo SET MY HAND AND AFF IX MY OFF ICIAL\nSEAL ON THE DATE AND YEAR F IRST ABOVE WRITTEN.",
+                  "ocr_confidence": 0.891
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.914,
+                  "bbox": [
+                    3465.6,
+                    4041.5,
+                    1226.7,
+                    81.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "THIS PLAT COMPLIES WITH THE APPLICABLE STATUTES OF THIS\nSTATE AND ANY LOCAL ORDINANCES IN EFFECT ON THE DATE THAT THE\nGOVERNING BODY GAVE ITS FINAL APPROVAL.",
+                  "ocr_confidence": 0.907
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.895,
+                  "bbox": [
+                    3482.1,
+                    3725.7,
+                    699.3,
+                    38.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "SURVEYOR'S CERTIFICATE",
+                  "ocr_confidence": 0.951
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.874,
+                  "bbox": [
+                    5236.2,
+                    256.4,
+                    1209.5,
+                    211.0
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "THIS IS TO CERTIFY THAT THE UNDERSIGNED\uff0c H. BURKHART AS TRUSTEE\nFOR THE H. A.B. LIVING TRUST\uff0c IS THE OWNER \u25a1F THE TRACT OF LAND\nREPRESENTED \u25a1N THIS PLAT AND HAS CONSENTED To THE PREPARATI\u25a1N\nAND RECORDATION \u25a1F THIS PLAT, AND THAT THE SAME IS EXECUTED IN\nCOMPLIANCE WITH AND SUBJECT To THE PROVISIONS OF NRS 278. THE\nDRAINAGE\uff0c CABLE TV\uff0c AND PUBLIC UTLITY EASEMEnTS <PUE) SHOWN\nHEREON ARE HEREBY GRANTED FOR THE PURPOSE STATED.",
+                  "ocr_confidence": 0.907
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.87,
+                  "bbox": [
+                    3470.1,
+                    4152.6,
+                    1214.3,
+                    86.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "4.\nTHE MONUMENTS DEPICTED \u25a1N THE PLAT ARE \u25a1F THE CHARACTER\nSHOWN\uff0c \u25a1CCUPY THE POSITI\u25a1NS INDICATED\uff0c AND ARE \u25a1F SUFFICIENT\nNUMBER AND DURABILILTY.",
+                  "ocr_confidence": 0.902
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.865,
+                  "bbox": [
+                    5240.1,
+                    1929.4,
+                    1187.9,
+                    297.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "THE FINAL PARCEL MAP CASE N\u25a1.\nMEETS ALL\nAPPLICABLE STATUTES\uff0c \u25a1RDINANCES\uff0c AND CoDE PRoVISIoNS) IS IN\nSUB S TAnTIAL CoNFORMAnCE WITH THE TEnTATI VE MAP AND IT S\nCoNDITIONS, WHICH ARE INCORPORATED HEREIN BY THIS REFERENCE,\nAND THOSE CONDITIONS HAVE BEEN SATISFIED FOR RECoRDATION \u25a1F\nTHIS MAP.\nTHIS FINAL MAP IS APPROVED AND ACCEPTED THIS\nDAY\n\u25a1F\n20.\nBY THE DIRECTOR \u25a1F THE\nPLANNING AND BUILDInG DIVISIoN \u25a1F WASHOE CoUNTY\uff0c NEVADA, IN\nACCoRDANCE WITH NEVADA REVISED STATUTES 278. 741 THRoUGH\n278.4725.",
+                  "ocr_confidence": 0.89
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.858,
+                  "bbox": [
+                    5267.5,
+                    3562.5,
+                    1168.0,
+                    144.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "THE UNDERSIGNED HEREBY CERTIFIES THAT ALL PROPERTY TAXES ON\nIHI\nYEAR HAVE\nBEEN\nPAIDAND\nTHAT\nAMOUNT \u25a1F ANY DEFERRED PROPERTY TAXES F\u25a1R THE CONVERSI\u25a1N \u25a1F THE\nPRoPERTY FROM AGRICULTURAL USE HAS BEEN PAID PURSUANT To\nNRS361A. 265.",
+                  "ocr_confidence": 0.847
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.856,
+                  "bbox": [
+                    2144.8,
+                    4045.6,
+                    1213.9,
+                    78.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "3) THE UTILITY EASEMENTS SHOWN AND NOTED \u25a1N\nTHIS PLAT INCLUDE\nUSE FoR I NSTALLATI\u25a1N AnD MAINTEnANCE \u25a1F\nCABLE TELE\uff36ISI\u25a1N\nFACILITIES.",
+                  "ocr_confidence": 0.874
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.824,
+                  "bbox": [
+                    2126.3,
+                    4267.2,
+                    1233.3,
+                    61.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "REQUIREMENTS To THE COLDRON DITCH.\n6> ANY FUTURE SEPTIC PRoPoSAL MAY REQUIRE THE FoLLoWINGi",
+                  "ocr_confidence": 0.85
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.822,
+                  "bbox": [
+                    3485.0,
+                    3951.0,
+                    1204.9,
+                    63.8
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "2. THE LANDS DEPICTED LIE WITHIN THE WEST 1/2 \u25a1F SECTIoN 8,\nT.19N.\uff0c R. 18E. MDM.",
+                  "ocr_confidence": 0.909
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.82,
+                  "bbox": [
+                    3461.4,
+                    3865.3,
+                    1286.0,
+                    63.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "1. THIS PLAT REPRESENTS THE RESULTS \u25a1F A SURVEY PERFORMED UNDWER\nMY DIRECT SUPERVISION AT THE INSTANCE OF HANS BURKHART",
+                  "ocr_confidence": 0.917
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.806,
+                  "bbox": [
+                    5213.8,
+                    3004.1,
+                    1218.5,
+                    88.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "WATER AND SEWER RESOURCE REQUIREMENTS\nCERTIF ICATE",
+                  "ocr_confidence": 0.953
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.782,
+                  "bbox": [
+                    5233.1,
+                    3432.8,
+                    606.5,
+                    43.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "TAXATION CERTIFICATE",
+                  "ocr_confidence": 0.932
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.78,
+                  "bbox": [
+                    5259.6,
+                    3109.2,
+                    1195.2,
+                    90.9
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "THE PROJECT/DEVELOPMENT DEPICTED \u25a1N THIS MAP IS IN COMFORMANCE\nWI TH THE PROVISIONS OF ARTICLE 422 OF WASHOE COUNTY DEVELOPMENT\nCoDE ( CHAPTER 11O).",
+                  "ocr_confidence": 0.892
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.74,
+                  "bbox": [
+                    5212.9,
+                    1257.8,
+                    1234.1,
+                    167.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "THE UNDERSIGNED HEREBY CERTIF IES THAT THIS PLAT HAS BEEN\nEXAMINED AND THAT H. BURKHART AS TRUSTEE OF THE H. A. B. LIVING\nTRUST, \u25a1WNS oF RECoRD AN INTEREST IN THE LAnDS DELINEATED\nHEREON AND THAT HE IS THE \u25a1NLY \u25a1WNER \u25a1F RECORD \u25a1F SAID LAND,\nTHAT ALL \u25a1WNERS \u25a1F RECORD \u25a1F THE LAND HAVE SIGNED THE FINAL\nMAP.\n\uff34H\uff21\uff34",
+                  "ocr_confidence": 0.876
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.729,
+                  "bbox": [
+                    5229.9,
+                    2327.0,
+                    677.2,
+                    64.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "MOJRA HAUENSTEIN, DIRECTOR PLANNING\nAND BUILDING DIVISION",
+                  "ocr_confidence": 0.917
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.718,
+                  "bbox": [
+                    2158.9,
+                    3735.3,
+                    162.5,
+                    39.4
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "NOTESI",
+                  "ocr_confidence": 0.917
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.671,
+                  "bbox": [
+                    5232.5,
+                    1091.4,
+                    245.5,
+                    33.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "NOTARY PUBLIC",
+                  "ocr_confidence": 0.964
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.652,
+                  "bbox": [
+                    5228.3,
+                    726.9,
+                    304.2,
+                    83.1
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "STATE \u25a1F NEVADA\nS.S.\nCOUNTY \u25a1F WASHOE",
+                  "ocr_confidence": 0.903
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.633,
+                  "bbox": [
+                    2151.7,
+                    4040.3,
+                    1221.4,
+                    86.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.631,
+                  "bbox": [
+                    2229.9,
+                    4376.9,
+                    1042.8,
+                    91.5
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "B.\nREVIEW AND APPROVAL BY WASHOE CoUNTY HEALTH DISTRICT\nSEWAGE\uff0c WASTEWATER\uff0c AND SANITATION ADVISORY BOARD\nPRIOR TO APPROVAL BY THE DISTRICT BOPAERD \u25a1F HEALTH.",
+                  "ocr_confidence": 0.933
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.558,
+                  "bbox": [
+                    5236.8,
+                    2500.9,
+                    1223.7,
+                    244.2
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "DISTRICT BOARD OF HEALTH CERTIF ICATE\nTHIS MAP IS APPROVED BY THE WASHOE COUNTY DISTRICT BOARD \u25a1F\nHEALTH. TH I S APPRoVALCoNCERNS SE WAGE DI SPoSAL, WATER\nPOLLUTION\uff0c WATER QUALITY\uff0c AND WATER SUPPLY FACILITIES. THIS MAP\nHAS BEEN FoUND To MEET ALL APPLICABLE REQUIREMENTS AND\nPROVISIONS \u25a1F THE EnVIRONMENTAL HEALTH SERVICES DIVISION \u25a1F THE\nWASHOE COUNTY HEALTH DISTRICT.",
+                  "ocr_confidence": 0.884
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.525,
+                  "bbox": [
+                    5207.5,
+                    1604.5,
+                    717.8,
+                    22.7
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "FIRST AMERICAN TITLE INSURANCE COMPANY",
+                  "ocr_confidence": 0.953
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.521,
+                  "bbox": [
+                    3972.4,
+                    2157.2,
+                    1161.8,
+                    169.6
+                  ],
+                  "needs_review": false,
+                  "review_crop_path": null,
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "REFERENCESI\nPARCEL MAP # 3529.\n2)\nTRACT MAP # 2754.\n3)\nTITLE REPORT BY FIRST CEnTEnNIAL TITLE COMPANY DATED MARCH\n13\uff0c 2019 \u25a1RDER # 236430-RT",
+                  "ocr_confidence": 0.863
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.479,
+                  "bbox": [
+                    5227.3,
+                    1209.4,
+                    817.6,
+                    40.1
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_015_29_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "TITLE COMPANY CERTIF ICATE",
+                  "ocr_confidence": 0.942
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.452,
+                  "bbox": [
+                    2234.3,
+                    4357.9,
+                    432.5,
+                    19.3
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_015_30_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "A.\nAN ENGINEERED DESIGN.",
+                  "ocr_confidence": 0.942
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.446,
+                  "bbox": [
+                    5230.6,
+                    1831.6,
+                    1074.4,
+                    93.7
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_015_31_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "DIRECTOR \u25a1F PLANNING AND BUILDING\nCERTIF ICATE",
+                  "ocr_confidence": 0.939
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.394,
+                  "bbox": [
+                    5245.8,
+                    1427.8,
+                    1170.6,
+                    144.4
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_015_32_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "_HOLDS \u25a1F RECoRD A SECURITY INTEREST IN THE\nLAND AND THAT THERE ARE No LIENS \u25a1F RECORD AGAInST THE LAND\nDELINEATED HEREON FOR THE DELINQUENT STATE\uff0c COUNTY\uff0c\nMUNICPAL\nFEDERAL \u25a1R L\u25a1CAL TAXES \u25a1R ASSESSMEnTS CoLLECTED AS TAXES \u25a1R\nSPECIAL ASSESSMENTS,",
+                  "ocr_confidence": 0.898
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.39,
+                  "bbox": [
+                    3971.7,
+                    3021.3,
+                    595.9,
+                    90.9
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_015_33_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "SIERRA PACIFIC POWER COMPANY\nDBA NV ENERGY\nNAME AND TITLE:",
+                  "ocr_confidence": 0.924
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.388,
+                  "bbox": [
+                    3476.1,
+                    4346.9,
+                    632.4,
+                    34.3
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_015_34_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "DENNIS P.CHAPMAN P.L.S. # 5506",
+                  "ocr_confidence": 0.943
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.381,
+                  "bbox": [
+                    3965.0,
+                    3190.9,
+                    565.1,
+                    92.7
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_015_35_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "NEVADA BELL TELEPHONE COMPANY\nDBA AT&T NEVADA\nNAME AND TITLEI",
+                  "ocr_confidence": 0.939
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.375,
+                  "bbox": [
+                    3493.5,
+                    3780.4,
+                    1170.7,
+                    60.4
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_015_36_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "I\uff0c DEnNIS P. CHAPMAN A PROFESSIONAL LAND SURVEYoR LICENSED IN\nTHE STATE \u25a1F NEVADA\uff0c CERTIFY THATi",
+                  "ocr_confidence": 0.871
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.362,
+                  "bbox": [
+                    5225.7,
+                    3504.4,
+                    283.3,
+                    26.0
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_015_37_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "APN 038-710-17",
+                  "ocr_confidence": 0.955
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.36,
+                  "bbox": [
+                    5238.9,
+                    2821.9,
+                    651.7,
+                    35.1
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_015_38_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "FOR THE DISTRICT BOARD OF HEALTH",
+                  "ocr_confidence": 0.923
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.345,
+                  "bbox": [
+                    5232.3,
+                    218.1,
+                    599.2,
+                    36.4
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_015_39_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "OWNER'S CERTIFICATE",
+                  "ocr_confidence": 0.914
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.315,
+                  "bbox": [
+                    5247.3,
+                    3108.8,
+                    1199.8,
+                    91.2
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_015_40_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "",
+                  "ocr_confidence": null
+                },
+                {
+                  "class": "Text",
+                  "confidence": 0.308,
+                  "bbox": [
+                    5253.6,
+                    3300.5,
+                    977.1,
+                    38.1
+                  ],
+                  "needs_review": true,
+                  "review_crop_path": "data\\documents\\db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b\\review_crops\\page_015_41_Text.png",
+                  "extraction_status": "ocr_complete",
+                  "ocr_text": "WASHOE COUNTY CoMMUNITY SERVICES DEPARTMENT\nDATE",
+                  "ocr_confidence": 0.931
+                }
+              ]
+            }
+          ],
+          "pages_needing_review": 13
+        }
+      }
+    ],
+    "summaries": [
+      {
+        "n_regions": 3,
+        "n_parcels": 0,
+        "n_parcels_with_geometry": 0,
+        "n_valid": 0,
+        "valid_rate": null,
+        "mean_precision_ratio": null,
+        "area_match_rate": null,
+        "issue_buckets": {},
+        "pages_needing_review": 13,
+        "run": 0,
+        "elapsed_s": 149.9
+      }
+    ]
+  }
+}

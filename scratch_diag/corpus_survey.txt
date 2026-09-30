@@ -1,0 +1,117 @@
+0bc909da p 13 r3 pi0 | MAP 7 LOT 48                   | stated=None       | dup=None | ring=False | calls=0 | valid=None
+0bc909da p 13 r3 pi1 | MAP 7 LOT 48-3                 | stated=1.72       | dup=None | ring=True | calls=5 | valid=False
+0ed4084f p  6 r1 pi0 | PARENT PARCEL                  | stated=20.77      | dup=None | ring=True | calls=4 | valid=False
+0ed4084f p  7 r0 pi0 | 44-021-06                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+0ed4084f p  7 r0 pi1 | 44-021-07                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+0ed4084f p  7 r0 pi2 | 43-006-                        | stated=None       | dup=None | ring=False | calls=0 | valid=None
+0ed4084f p  7 r1 pi0 | 44-021-06                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+0ed4084f p  7 r1 pi1 | 43-006-11                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+0ed4084f p  7 r1 pi2 | 44-021-07                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+12794d01 p 13 r3 pi0 | MAP 7 LOT 48                   | stated=0.95       | dup=None | ring=False | calls=0 | valid=None
+12794d01 p 13 r3 pi1 | MAP 7 LOT 48-3                 | stated=1.72       | dup=None | ring=False | calls=0 | valid=None
+1600dbf6 p  6 r1 pi0 | Planned Utility Easement       | stated=1.03       | dup=None | ring=True | calls=5 | valid=True
+1600dbf6 p  7 r0 pi0 | 44-021-06                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+1600dbf6 p  7 r0 pi1 | 44-021-07                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+1600dbf6 p  7 r1 pi0 | 43-006-11                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+1600dbf6 p  7 r1 pi1 | 44-021-06                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+1600dbf6 p  7 r1 pi2 | 44-021-07                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+1600dbf6 p  9 r2 pi0 | Parcel 4                       | stated=None       | dup=None | ring=False | calls=0 | valid=None
+1cdd7b85 p  2 r5 pi0 | MAP 7 LOT 48-3                 | stated=None       | dup=None | ring=False | calls=0 | valid=None
+1cdd7b85 p 13 r3 pi0 | MAP 7 LOT 48                   | stated=0.95       | dup=None | ring=True | calls=3 | valid=False
+1cdd7b85 p 13 r3 pi1 | MAP 7 LOT 48-3                 | stated=1.72       | dup=None | ring=True | calls=1 | valid=False
+235898cf p 13 r1 pi0 | 038-710-19                     | stated=None       | dup=None | ring=False | calls=0 | valid=None
+235898cf p 13 r1 pi1 | 038-710-15                     | stated=None       | dup=None | ring=False | calls=0 | valid=None
+235898cf p 13 r1 pi2 | 038-710-14                     | stated=None       | dup=None | ring=False | calls=0 | valid=None
+235898cf p 13 r1 pi3 | 038-710-09                     | stated=1.81       | dup=None | ring=False | calls=0 | valid=None
+235898cf p 13 r1 pi4 | 038-710-17                     | stated=3.346      | dup=None | ring=False | calls=0 | valid=None
+235898cf p 13 r1 pi5 | LOT 9A REV. PM 3529            | stated=None       | dup=None | ring=False | calls=0 | valid=None
+235898cf p 13 r1 pi6 | 038-710-10                     | stated=None       | dup=None | ring=False | calls=0 | valid=None
+235898cf p 13 r1 pi7 | 038-710-02                     | stated=None       | dup=None | ring=False | calls=0 | valid=None
+235898cf p 13 r1 pi8 | 038-710-03                     | stated=2.24       | dup=None | ring=False | calls=0 | valid=None
+235898cf p 13 r1 pi9 | 038-710-04                     | stated=2.42       | dup=None | ring=False | calls=0 | valid=None
+235898cf p 13 r1 pi10 | 038-710-05                     | stated=2.092      | dup=None | ring=False | calls=0 | valid=None
+235898cf p 13 r1 pi11 | 038-710-06                     | stated=None       | dup=None | ring=False | calls=0 | valid=None
+235898cf p 13 r1 pi12 | 038-710-07                     | stated=None       | dup=None | ring=False | calls=0 | valid=None
+235898cf p 13 r1 pi13 | 038-710-08                     | stated=3.81       | dup=None | ring=False | calls=0 | valid=None
+235898cf p 14 r2 pi0 | PARCEL 1                       | stated=None       | dup=None | ring=True | calls=2 | valid=False
+235898cf p 14 r2 pi1 | PARCEL 2                       | stated=None       | dup=None | ring=True | calls=5 | valid=False
+235898cf p 15 r0 pi0 | 38-710-14                      | stated=None       | dup=None | ring=True | calls=1 | valid=False
+24afe815 p  6 r1 pi0 | PARENT PARCEL                  | stated=20.77      | dup=None | ring=True | calls=6 | valid=False
+24afe815 p  7 r0 pi0 | 44-021-06                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+24afe815 p  7 r0 pi1 | 44-021-07                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+24afe815 p  7 r0 pi2 | 43-006-11                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+24afe815 p  7 r1 pi0 | 44-021-06                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+24afe815 p  7 r1 pi1 | 44-021-07                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+24afe815 p  7 r1 pi2 | 43-006-11                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+25f843af p  5 r0 pi0 | 14.2 ACRES                     | stated=14.2       | dup=None | ring=True | calls=16 | valid=False
+2d116e58 p 28 r3 pi0 | PARCEL 1                       | stated=6.189      | dup=None | ring=True | calls=12 | valid=False
+2d116e58 p 28 r3 pi1 | PARCEL 2                       | stated=4.792      | dup=None | ring=True | calls=4 | valid=False
+390d4d58 p  7 r3 pi0 | REMAINDER PARCEL               | stated=120.4      | dup=None | ring=True | calls=4 | valid=False
+390d4d58 p  7 r3 pi1 | PARCEL 1                       | stated=40.00      | dup=None | ring=True | calls=4 | valid=False
+3ccb39f7 p  7 r3 pi0 | PARCEL 1                       | stated=40.00      | dup=None | ring=True | calls=4 | valid=False
+3ccb39f7 p  7 r3 pi1 | REMAINDER PARCEL               | stated=120.4      | dup=None | ring=True | calls=2 | valid=False
+3ea4cc01 p 13 r3 pi0 | MAP 7 LOT 48                   | stated=0.95       | dup=None | ring=True | calls=7 | valid=False
+3ea4cc01 p 13 r3 pi1 | MAP 7 LOT 48-3                 | stated=1.72       | dup=None | ring=True | calls=5 | valid=False
+57ba0f86 p 13 r3 pi0 | MAP 7 LOT 48                   | stated=0.95       | dup=None | ring=False | calls=0 | valid=None
+57ba0f86 p 13 r3 pi1 | MAP 7 LOT 48-3                 | stated=1.72       | dup=None | ring=False | calls=0 | valid=None
+57ba0f86 p 13 r15 pi0 | MAP 7 LOT 48                   | stated=0.95       | dup=None | ring=True | calls=4 | valid=False
+57ba0f86 p 13 r15 pi1 | MAP 7 LOT 48-3                 | stated=1.72       | dup=None | ring=True | calls=6 | valid=False
+64a4880f p 28 r3 pi0 | PARCEL 1                       | stated=6.189      | dup=None | ring=True | calls=4 | valid=False
+64a4880f p 28 r3 pi1 | PARCEL 2                       | stated=4.792      | dup=None | ring=True | calls=5 | valid=False
+6557e299 p 13 r3 pi0 | MAP 7 LOT 48                   | stated=0.95       | dup=None | ring=True | calls=6 | valid=False
+6557e299 p 13 r3 pi1 | MAP 7 LOT 48-3                 | stated=1.72       | dup=None | ring=True | calls=7 | valid=False
+6a816467 p  2 r5 pi0 | MAP 7 LOT 48                   | stated=None       | dup=None | ring=False | calls=0 | valid=None
+6a816467 p  2 r5 pi1 | MAP 7 LOT 48-3                 | stated=None       | dup=None | ring=False | calls=0 | valid=None
+6a816467 p 13 r15 pi0 | MAP 7 LOT 48                   | stated=1.07       | dup=None | ring=False | calls=0 | valid=None
+6a816467 p 13 r15 pi1 | MAP 7 LOT 48-3                 | stated=1.60       | dup=None | ring=True | calls=4 | valid=False
+6cbca296 p 28 r3 pi0 | PARCEL 1                       | stated=6.389      | dup=None | ring=True | calls=3 | valid=False
+6cbca296 p 28 r3 pi1 | PARCEL 2                       | stated=4.732      | dup=None | ring=True | calls=3 | valid=False
+6ddcedc5 p  6 r0 pi0 | PARCEL 1                       | stated=40.00      | dup=None | ring=False | calls=0 | valid=None
+6ddcedc5 p  7 r3 pi0 | REMAINDER PARCEL               | stated=120.4      | dup=None | ring=True | calls=2 | valid=False
+6ddcedc5 p  7 r3 pi1 | PARCEL 1                       | stated=40.00      | dup=None | ring=True | calls=3 | valid=False
+6ddcedc5 p  8 r0 pi0 | 17-2-1-1                       | stated=118.86     | dup=None | ring=True | calls=1 | valid=False
+6ddcedc5 p  8 r0 pi1 | 17-2-1-2                       | stated=54.24      | dup=None | ring=False | calls=0 | valid=None
+6ddcedc5 p  8 r0 pi2 | 17-2-1-3                       | stated=160.35     | dup=None | ring=False | calls=0 | valid=None
+6ddcedc5 p  8 r0 pi3 | 17-2-1-4                       | stated=145.40     | dup=None | ring=False | calls=0 | valid=None
+6ddcedc5 p  8 r0 pi4 | 17-2-1-5                       | stated=161.30     | dup=None | ring=False | calls=0 | valid=None
+6ddcedc5 p  8 r0 pi5 | PALOMINO VALLEY GENERAL IMPROV | stated=15.01      | dup=None | ring=True | calls=4 | valid=False
+70aa3221 p 13 r3 pi0 | MAP 7 LOT 48                   | stated=1.07       | dup=None | ring=True | calls=6 | valid=False
+70aa3221 p 13 r3 pi1 | MAP 7 LOT 48-3                 | stated=1.60       | dup=None | ring=True | calls=7 | valid=False
+74af50d4 p  2 r0 pi0 | None                           | stated=None       | dup=None | ring=False | calls=0 | valid=None
+74af50d4 p  3 r0 pi0 | None                           | stated=None       | dup=None | ring=False | calls=0 | valid=None
+74af50d4 p  6 r0 pi0 | None                           | stated=None       | dup=None | ring=True | calls=2 | valid=False
+74af50d4 p  7 r0 pi0 | PARCEL A                       | stated=None       | dup=None | ring=False | calls=0 | valid=None
+74af50d4 p  7 r0 pi1 | PARCEL B                       | stated=None       | dup=None | ring=False | calls=0 | valid=None
+74af50d4 p  7 r0 pi2 | PARCEL C                       | stated=None       | dup=None | ring=False | calls=0 | valid=None
+74af50d4 p  8 r0 pi0 | PARCEL A                       | stated=None       | dup=None | ring=False | calls=0 | valid=None
+74af50d4 p  8 r0 pi1 | PARCEL B                       | stated=None       | dup=None | ring=False | calls=0 | valid=None
+74af50d4 p  8 r0 pi2 | PARCEL C                       | stated=None       | dup=None | ring=False | calls=0 | valid=None
+7755d569 p 13 r3 pi0 | MAP 7 LOT 48-3                 | stated=1.72       | dup=None | ring=True | calls=6 | valid=False
+787de9d2 p  6 r1 pi0 | PARENT PARCEL A                | stated=20.77      | dup=None | ring=True | calls=5 | valid=False
+787de9d2 p  7 r0 pi0 | 44-021-06                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+787de9d2 p  7 r0 pi1 | 44-021-07                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+787de9d2 p  7 r0 pi2 | 43-006-11                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+787de9d2 p  7 r1 pi0 | 44-021-06                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+787de9d2 p  7 r1 pi1 | 44-021-07                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+787de9d2 p  7 r1 pi2 | 43-006-11                      | stated=None       | dup=None | ring=False | calls=0 | valid=None
+787de9d2 p  9 r2 pi0 | PARCEL 1                       | stated=None       | dup=None | ring=False | calls=0 | valid=None
+8d10744d p 13 r1 pi0 | None                           | stated=None       | dup=None | ring=False | calls=0 | valid=None
+8d10744d p 14 r2 pi0 | None                           | stated=None       | dup=None | ring=False | calls=0 | valid=None
+8d10744d p 15 r0 pi0 | PARCEL 1                       | stated=1.96       | dup=None | ring=True | calls=5 | valid=False
+8d10744d p 15 r0 pi1 | PARCEL 2                       | stated=1.39       | dup=None | ring=True | calls=4 | valid=False
+8fdcbca1 p  2 r5 pi0 | MAP 7 LOT 48-3                 | stated=None       | dup=None | ring=True | calls=7 | valid=False
+8fdcbca1 p 13 r3 pi0 | MAP 7 LOT 48                   | stated=0.95       | dup=None | ring=True | calls=7 | valid=False
+8fdcbca1 p 13 r3 pi1 | MAP 7 LOT 48-3                 | stated=1.72       | dup=None | ring=False | calls=0 | valid=None
+a87b859d p 28 r3 pi0 | PARCEL 1                       | stated=6.389      | dup=None | ring=True | calls=11 | valid=False
+a87b859d p 28 r3 pi1 | PARCEL 2                       | stated=4.732      | dup=None | ring=True | calls=1 | valid=False
+a9b2056d p 28 r3 pi0 | PARCEL 1                       | stated=6.389      | dup=None | ring=True | calls=5 | valid=False
+a9b2056d p 28 r3 pi1 | PARCEL 2                       | stated=4.732      | dup=None | ring=True | calls=4 | valid=False
+ba118332 p 15 r0 pi0 | Podewils Lot 8, Blk B, T.M. #  | stated=3.35       | dup=None | ring=True | calls=6 | valid=False
+bec76ab0 p 11 r0 pi0 | PARCEL 1                       | stated=1.23       | dup=None | ring=True | calls=5 | valid=False
+c6094112 p 28 r3 pi0 | PARCEL 1                       | stated=6.189      | dup=None | ring=True | calls=2 | valid=False
+c6094112 p 28 r3 pi1 | PARCEL 2                       | stated=4.732      | dup=None | ring=True | calls=2 | valid=False
+c86ef55f p  5 r1 pi0 | Lot 1                          | stated=0.73       | dup=None | ring=True | calls=1 | valid=False
+c86ef55f p  5 r1 pi1 | Lot 2                          | stated=0.32       | dup=None | ring=True | calls=1 | valid=False
+e2e79208 p  6 r0 pi0 | PROPOSED PARCEL A              | stated=1.34       | dup=None | ring=False | calls=0 | valid=None
+e2e79208 p  6 r0 pi1 | PROPOSED PARCEL B              | stated=2.21       | dup=None | ring=False | calls=0 | valid=None
+e2e79208 p  6 r0 pi2 | PROPOSED PARCEL C              | stated=2.65       | dup=None | ring=False | calls=0 | valid=None

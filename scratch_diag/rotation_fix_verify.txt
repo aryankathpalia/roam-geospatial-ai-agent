@@ -1,0 +1,3 @@
+NVZ p9: 220 lines, mean_conf=0.87, reliable=True (floor=0.6)
+65be453d p6 (was rotated/garbled): 172 lines, mean_conf=0.61, reliable=True (floor=0.6)
+42f617a1 region2: 106 lines, mean_conf=0.90, reliable=True (floor=0.6)

@@ -1,0 +1,273 @@
+Region 1, Piece 1:
+- nothing relevant
+
+Region 1, Piece 2:
+- nothing relevant
+
+Region 1, Piece 3:
+- nothing relevant
+
+Region 1, Piece 4:
+- nothing relevant
+
+Region 1, Piece 5:
+- nothing relevant
+
+Region 1, Piece 6:
+- nothing relevant
+
+Region 2, Piece 1:
+- nothing relevant
+
+Region 2, Piece 2:
+- nothing relevant
+
+Region 3, Piece 1:
+- nothing relevant
+
+Region 3, Piece 2:
+- nothing relevant
+
+Region 3, Piece 3:
+- nothing relevant
+
+Region 3, Piece 4:
+- nothing relevant
+
+Region 3, Piece 5:
+- nothing relevant
+
+Region 3, Piece 6:
+- nothing relevant
+
+Region 3, Piece 7:
+- nothing relevant
+
+Region 3, Piece 8:
+- nothing relevant
+
+Region 3, Piece 9:
+- nothing relevant
+
+Region 3, Piece 10:
+- nothing relevant
+
+Region 3, Piece 11:
+- nothing relevant
+
+Region 3, Piece 12:
+- nothing relevant
+
+Region 3, Piece 13:
+- nothing relevant
+
+Region 3, Piece 14:
+- nothing relevant
+
+Region 3, Piece 15:
+- nothing relevant
+
+Region 3, Piece 16:
+- nothing relevant
+
+Region 3, Piece 17:
+- nothing relevant
+
+Region 3, Piece 18:
+- nothing relevant
+
+Region 3, Piece 19:
+- nothing relevant
+
+Region 3, Piece 20:
+- nothing relevant
+
+Region 3, Piece 21:
+- nothing relevant
+
+Region 3, Piece 22:
+- nothing relevant
+
+Region 3, Piece 23:
+- nothing relevant
+
+Region 3, Piece 24:
+- nothing relevant
+
+Region 3, Piece 25:
+- nothing relevant
+
+Region 4, Piece 1:
+- nothing relevant
+
+Region 4, Piece 2:
+- N 89°14'27"W 2622.1'
+
+Region 4, Piece 3:
+- 2622.18 (Rec.)
+- 2620.24
+- 17-2-1-1
+
+Region 4, Piece 4:
+- N 89°13'29"W
+- 2622.18 (Rec.)
+- 935.24
+- 37.14' (road easement / offset call)
+- 37.14' (road easement / offset call)
+
+Region 4, Piece 5:
+- 2641.58
+- 1706.34
+- 17-2-1-2 Section 17 = 41.47 Ac. Section 16 = 12.77 Ac. TOTAL = 54.24 Ac.
+
+Region 4, Piece 6:
+- nothing relevant
+
+Region 4, Piece 7:
+- nothing relevant
+
+Region 4, Piece 8:
+- nothing relevant
+
+Region 4, Piece 9:
+- nothing relevant
+
+Region 4, Piece 10:
+- 2662.15
+- 2655.18 (Rec.)
+- N 00°53'03"E
+- 1331.08
+
+Region 4, Piece 11:
+- N 89°19'29"W
+
+Region 4, Piece 12:
+- 17-2-1-1 118.86Ac.
+- 4234.72
+
+Region 4, Piece 13:
+- 17-2-1-3 160.35Ac.
+
+Region 4, Piece 14:
+- 17-2-1-2 Section 17 = 41.47 Ac. Section 16 = 12.77 Ac. TOTAL = 54.24 Ac. (partial duplicate/overlap from Piece 5)
+
+Region 4, Piece 15:
+- 2645.23
+- 1322.61
+- N 00°48'47"E
+
+Region 4, Piece 16:
+- nothing relevant
+
+Region 4, Piece 17:
+- nothing relevant
+
+Region 4, Piece 18:
+- N 00°53' 03" E (fragment)
+
+Region 4, Piece 19:
+- N 00°53' 11" E
+- 1331.07
+- 2671.62
+- 2655.18 (Rec.)
+
+Region 4, Piece 20:
+- 1333.30
+- N 89°25'00"W
+- 4062.98
+- 17-2-1-3 160.35Ac.
+
+Region 4, Piece 21:
+- 17-2-1-4 GROSS = 160.41Ac. NET = 145.40Ac.
+- 17-2-1-5 161.30Ac.
+
+Region 4, Piece 22:
+- 5268.49
+- N 89°25'00"W 1200.00
+- 1320.11
+- 775.66
+
+Region 4, Piece 23:
+- 325.12
+- N 00°48'47"E
+- 1320.11
+- 775.66
+- 2645.23
+
+Region 4, Piece 24:
+- nothing relevant
+
+Region 4, Piece 25:
+- nothing relevant
+
+Region 4, Piece 26:
+- N 00°57'11"E
+
+Region 4, Piece 27:
+- N 00°57'11"E (fragment)
+- 1338.31
+- N 89°38'04"W
+
+Region 4, Piece 28:
+- 2630.10 (Rec.)
+- 2631.54
+- 17-2-1-5 161.30Ac.
+
+Region 4, Piece 29:
+- N 89°46'17"W
+- 2630.10
+
+Region 4, Piece 30:
+- 2640.33
+- 2630.10 (Rec.)
+- 1325.12
+
+Region 4, Piece 31:
+- 1325.12
+- N 00° (fragment)
+
+Region 4, Piece 32:
+- nothing relevant
+
+Region 4, Piece 33:
+- nothing relevant
+
+Region 4, Piece 34:
+- 5265.16
+- 1202.18
+- N 00°35'00"E 544.45
+- N 89°25'00"W 1200.00
+- N25°57'09"W 355.40'
+- PALOMINO VALLEY GENERAL IMPROVEMENT DISTRICT MATERIALS PIT & YARD 15.01 Ac.
+- N 33°05'33"W 637.27'
+
+Region 4, Piece 35:
+- 1322.61
+- 5280.00 (Rec.)
+- 5265.16
+- 1202.18
+- 1320.11
+- 66'
+
+Region 4, Piece 36:
+- CURVE TABLE:
+  - 1: RADIUS 1000.00, DELTA 7°08'24", ARC LGT 124.62, TAN 62.39
+  - 2: RADIUS 1000.00, DELTA 8°10'13", ARC LGT 142.60, TAN 71.42
+  - 3: RADIUS 1000.00, DELTA 1°36'36", ARC LGT 28.10, TAN 14.05
+
+Region 4, Piece 37:
+- 2671.62
+- 2655.18 (Rec.)
+
+Region 4, Piece 38:
+- 1333.30
+- 2655.18 (Rec.)
+- 2671.62
+
+Region 4, Piece 39:
+- N 89°33'36"W
+- 17-2-1-4 GROSS = 160.41 Ac. NET = 145.40 Ac.
+- 17-2-1-5 161.30 Ac.
+
+Region 4, Piece 40:
+- nothing relevant

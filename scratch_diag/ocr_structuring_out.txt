@@ -1,0 +1,61 @@
+
+======================================================================
+NVZ (regression check -- vision already gets this right)
+======================================================================
+INFO: Could not find files for the given pattern(s).
+C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:718: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mCreating model: ('PP-LCNet_x1_0_doc_ori', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-LCNet_x1_0_doc_ori`.[0m
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I0924 00:50:04.270934 33632 onednn_context.cc:81] oneDNN v3.6.2
+[32mCreating model: ('PP-LCNet_x1_0_textline_ori', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-LCNet_x1_0_textline_ori`.[0m
+[32mCreating model: ('PP-OCRv5_mobile_det', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-OCRv5_mobile_det`.[0m
+[32mCreating model: ('PP-OCRv5_mobile_rec', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-OCRv5_mobile_rec`.[0m
+OCR: 220 lines, reliable=True
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+parcel_labels_found: ['PARCEL 1', 'PARCEL 2']
+  PARCEL 1: calls=4 closure=30.2 prec=1:52.0 area=2.98 stated=2.78 match=True valid=False
+     N0°48'45"E 220.00
+     S89°11'17"E 550.75
+     S0°02'31"E 250.00
+     N89°11'15"W 550.75
+     - Weak closure: precision ratio 1:52 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.
+  PARCEL 2: calls=4 closure=38.01 prec=1:30.2 area=1.764 stated=1.78 match=True valid=False
+     N0°48'45"E 220.00
+     S89°11'17"E 325.30
+     S0°02'31"E 250.00
+     N89°11'15"W 352.40
+     - Weak closure: precision ratio 1:30 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.
+
+======================================================================
+a1136318 (split-pair case)
+======================================================================
+OCR: 283 lines, reliable=True
+parcel_labels_found: ['Lot 1', 'Lot 2']
+  Lot 1: calls=4 closure=65.87 prec=1:8.3 area=0.427 stated=0.42 match=True valid=False
+     N68°38'43"E 67.89
+     S21°13'27"E 193.27
+     S69°05'58"W 124.76
+     N21°13'27"W 159.18
+     - Weak closure: precision ratio 1:8 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.
+  Lot 2: calls=4 closure=71.09 prec=1:6.4 area=0.244 stated=0.32 match=False valid=False
+     N68°38'43"E 24.60
+     S21°13'27"E 182.69
+     S69°05'58"W 91.89
+     N21°13'27"W 159.18
+     - Weak closure: precision ratio 1:6 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.
+     - Walked area (10,632 sqft) differs from the document's stated area (13,939 sqft) by 24% -- beyond the 15% tolerance.
+
+======================================================================
+db54d473 (large-crop case)
+======================================================================
+OCR: 341 lines, reliable=True
+parcel_labels_found: ['PARCEL 1', 'PARCEL 2']
+  PARCEL 1: calls=0 closure=None prec=1:None area=None stated=None match=None valid=None
+     - no calls
+  PARCEL 2: calls=0 closure=None prec=1:None area=None stated=None match=None valid=None
+     - no calls

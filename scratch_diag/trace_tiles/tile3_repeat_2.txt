@@ -1,0 +1,21 @@
+Region 1, Piece 1:
+
+**Boundary Bearing and Distance Calls (and related record/tie calls):**
+- **N89°11'15"E 1077.91'** (labeled along the section line/tie at the top right)
+- **S0°48'45"W 220.00'** (along the eastern property boundary)
+- **(S0°02'31"E 250.00' - R4)** (prior-record citation in parentheses along the eastern boundary)
+- **N0°48'45"E 2637.36'** (appears to be a TIE along the section line between control/section points, not an ordinary parcel boundary call)
+- **(N0°48'59"E 2637.29' - R1)** (prior-record citation in parentheses)
+- **(N0°49'02"E 2637.35' - R3)** (prior-record citation in parentheses)
+- **352.40'** (along the northern and southern property boundaries)
+
+**Ground / State-Plane Coordinates:**
+- **N: 14928989.71 E: 2253610.44** (Ground Coordinates - Measured, at the Washoe County Control Point)
+- **N: 14928989.62 E: 2253610.74** (Ground Coordinates - Record, at the Washoe County Control Point)
+- **N 14926897.47 E 2252502.76** (Ground Coordinates near the northern property boundary)
+
+**Basis-of-Bearings / Datum / Coordinate-Zone Statement:**
+- **WASHOE COUNTY CONTROL POINT N22SM01029 USGLO 2" BRASS CAP S12/7/13/18 1942**
+
+**Parcel / Lot Label or Acreage:**
+- **PARCEL 1 1.78 ACRES**

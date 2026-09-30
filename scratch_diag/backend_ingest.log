@@ -1,0 +1,86 @@
+INFO:     Started server process [25176]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:53852 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59280 - "POST /documents/upload HTTP/1.1" 200 OK
+C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py:197: UserWarning: Specified provider 'CUDAExecutionProvider' is not in available provider names.Available providers: 'AzureExecutionProvider, CPUExecutionProvider'
+  warnings.warn(
+INFO:     127.0.0.1:57336 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49758 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO: Could not find files for the given pattern(s).
+C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:718: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+INFO:     127.0.0.1:59301 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+[32mCreating model: ('PP-OCRv5_mobile_det', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-OCRv5_mobile_det`.[0m
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I0928 16:50:26.756964 14580 onednn_context.cc:81] oneDNN v3.6.2
+[32mCreating model: ('PP-OCRv5_mobile_rec', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-OCRv5_mobile_rec`.[0m
+INFO:     127.0.0.1:62229 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49942 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57573 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51339 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56338 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54019 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54873 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64331 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60814 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51040 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60366 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61213 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65162 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52378 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65480 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51363 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64917 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-LCNet_x1_0_doc_ori`.[0m
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+INFO:     127.0.0.1:55735 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53517 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59257 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55875 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65437 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59165 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59460 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49673 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50421 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54789 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58181 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61999 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59923 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64901 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61316 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63740 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64706 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63666 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57717 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50331 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51610 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51609 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52657 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56420 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64328 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55396 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49672 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62727 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61962 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51191 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57970 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52632 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54904 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54429 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60068 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52136 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52421 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64178 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55764 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55927 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56690 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55448 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+Gemini gemini-3.5-flash returned 503 (round 1)
+INFO:     127.0.0.1:50688 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/progress HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58007 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/pages/9/regions/0/crop.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/pages/9/regions/0/crop.png HTTP/1.1" 200 OK

@@ -1,0 +1,132 @@
+Region 1, Piece 1:
+- P19684
+- P19763
+
+Region 1, Piece 2:
+- P19764
+- P19698
+- P19785
+- P19693
+- P113
+- P19693 (repeated)
+
+Region 1, Piece 3:
+- P19770
+- P19771
+- P19702
+
+Region 1, Piece 4:
+- P19771 (repeated)
+- P19702 (repeated)
+- P19697
+- P19772
+- P19773
+- P131234
+- P19773 (repeated)
+
+Region 2, Piece 1:
+- P19688
+- P19687
+- P19712
+- P19677
+- P19689
+- P19724
+- P19721
+
+Region 2, Piece 2:
+- P19687 (repeated)
+- P19712 (repeated)
+- P19677 (repeated)
+- P19713
+- P19676
+- P19707
+- P19675
+
+Region 2, Piece 3:
+- P19720
+- P19721
+- P19728
+- P99590
+- P103360
+- P19729
+- P19770
+- P19685
+- P19771
+- P19702
+
+Region 2, Piece 4:
+- P19675
+- P104357 (LOT 1)
+- P19765
+- P19684
+- P19761
+- P19763
+
+Region 2, Piece 5:
+- P19737
+- P19736
+- P19756
+- P19757
+- P19767
+- P19768
+- P19774
+- P19702
+- P19773
+- P19701
+- P19779
+- P19697
+- P19772
+- P19769
+
+Region 2, Piece 6:
+- P19764
+- P19785
+- P19766
+- P19772
+- P19698
+- P19706
+- P19782
+- P19693
+- P19694
+- P19787
+- P19777
+- P19695
+- P19783
+
+Region 3, Piece 1:
+- Nothing relevant
+
+Region 3, Piece 2:
+- Nothing relevant
+
+Region 3, Piece 3:
+- Nothing relevant
+
+Region 3, Piece 4:
+- Nothing relevant
+
+Region 4, Piece 1:
+- Nothing relevant
+
+Region 4, Piece 2:
+- Nothing relevant
+
+Region 4, Piece 3:
+- P19785
+
+Region 4, Piece 4:
+- P19769
+- P19772
+
+Region 5, Piece 1:
+- Nothing relevant
+
+Region 5, Piece 2:
+- Nothing relevant
+
+Region 5, Piece 3:
+- Nothing relevant
+
+Region 5, Piece 4:
+- P19769
+- P19772

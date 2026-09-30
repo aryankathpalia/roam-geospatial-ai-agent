@@ -1,0 +1,51 @@
+{
+  "parcel_labels_found": [
+    {
+      "region_index": 1,
+      "label": "MAP 7 LOT 48"
+    },
+    {
+      "region_index": 1,
+      "label": "MAP 7 LOT 48-3"
+    }
+  ],
+  "parcels": [
+    {
+      "region_index": 1,
+      "boundary_calls": [],
+      "tie_point": null,
+      "basis_of_bearings": "THE BEARING SYSTEM OF THIS PLAN IS BASED ON NH STATE PLANE COORDINATE (NAD83/2011).",
+      "parcel_label": "MAP 7 LOT 48",
+      "stated_area_acres": "0.95",
+      "ambiguous_alternates": [],
+      "curve_calls": []
+    },
+    {
+      "region_index": 1,
+      "boundary_calls": [
+        {
+          "bearing": "N 66°04'20\" E",
+          "distance": "11.63'"
+        },
+        {
+          "bearing": "N 61°53'54\" E",
+          "distance": "105.55'"
+        },
+        {
+          "bearing": "S 55°14'15\" E",
+          "distance": "322.74'"
+        },
+        {
+          "bearing": "S 54°45'01\" E",
+          "distance": "209.93'"
+        }
+      ],
+      "tie_point": null,
+      "basis_of_bearings": "THE BEARING SYSTEM OF THIS PLAN IS BASED ON NH STATE PLANE COORDINATE (NAD83/2011).",
+      "parcel_label": "MAP 7 LOT 48-3",
+      "stated_area_acres": "1.72",
+      "ambiguous_alternates": [],
+      "curve_calls": []
+    }
+  ]
+}

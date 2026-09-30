@@ -1,0 +1,217 @@
+[2f896c95-b0f3-4a49-a447-4b3ca6129c27] (8 pages, 4 parcelmap regions)
+  run 1/3...
+C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py:197: UserWarning: Specified provider 'CUDAExecutionProvider' is not in available provider names.Available providers: 'AzureExecutionProvider, CPUExecutionProvider'
+  warnings.warn(
+INFO: Could not find files for the given pattern(s).
+C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:718: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mCreating model: ('PP-OCRv5_mobile_det', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-OCRv5_mobile_det`.[0m
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I0924 13:03:08.284173 20300 onednn_context.cc:81] oneDNN v3.6.2
+[32mCreating model: ('PP-OCRv5_mobile_rec', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-OCRv5_mobile_rec`.[0m
+I0924 13:03:18.157371 20564 onednn_context.cc:81] oneDNN v3.6.2
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x5400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+  run 2/3...
+I0924 13:07:16.049299 12280 onednn_context.cc:81] oneDNN v3.6.2
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x5400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+  run 3/3...
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x5400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[27211ae5-0099-4b0d-8176-f1483897b766] (13 pages, 3 parcelmap regions)
+  run 1/3...
+I0924 13:13:14.564054 23820 onednn_context.cc:81] oneDNN v3.6.2
+  run 2/3...
+  run 3/3...
+[3affa529-5b4f-42d7-b336-596315433572] (15 pages, 4 parcelmap regions)
+  run 1/3...
+I0924 13:23:31.694495 15356 onednn_context.cc:81] oneDNN v3.6.2
+I0924 13:23:42.191672  1292 onednn_context.cc:81] oneDNN v3.6.2
+  run 2/3...
+I0924 13:30:37.244098 13384 onednn_context.cc:81] oneDNN v3.6.2
+I0924 13:31:17.241890  4692 onednn_context.cc:81] oneDNN v3.6.2
+  run 3/3...
+[65be453d-f014-4024-84d6-60a2d0052aeb] (8 pages, 6 parcelmap regions)
+  run 1/3...
+  run 2/3...
+  run 3/3...
+[a1136318-03ef-438d-9f02-8fcdcb5dca30] (5 pages, 3 parcelmap regions)
+  run 1/3...
+  run 2/3...
+I0924 13:47:04.571095  9292 onednn_context.cc:81] oneDNN v3.6.2
+  run 3/3...
+I0924 13:50:22.672376 19956 onednn_context.cc:81] oneDNN v3.6.2
+[db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b] (15 pages, 5 parcelmap regions)
+  run 1/3...
+I0924 13:54:22.329006 12248 onednn_context.cc:81] oneDNN v3.6.2
+I0924 13:55:51.853058 29856 onednn_context.cc:81] oneDNN v3.6.2
+[33mResized image size (7200x1200) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1200) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1200) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1200) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+  run 2/3...
+I0924 14:00:00.177340  2712 onednn_context.cc:81] oneDNN v3.6.2
+I0924 14:00:03.240612 34040 onednn_context.cc:81] oneDNN v3.6.2
+[33mResized image size (7200x1200) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1200) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1200) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1200) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+  run 3/3...
+I0924 14:05:33.901050  1228 onednn_context.cc:81] oneDNN v3.6.2
+[33mResized image size (7200x1200) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1200) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1200) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1200) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[798850fc-1be3-4bc6-9f53-1441c39cbd04] (29 pages, 1 parcelmap regions)
+  run 1/3...
+I0924 14:15:16.451560 20752 onednn_context.cc:81] oneDNN v3.6.2
+  run 2/3...
+  run 3/3...
+[83ab22d0-b950-4f5d-ad33-5f0fd6105dbe] (12 pages, 2 parcelmap regions)
+  run 1/3...
+  run 2/3...
+  run 3/3...
+[8d75d3ed-d9e7-4bfb-874a-0b52063883eb] (103 pages, 74 parcelmap regions)
+  run 1/3...
+[33mResized image size (7200x4800) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x4800) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x4800) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+Gemini gemini-3.5-flash-lite returned 503; falling back to gemini-3.1-flash-lite
+Gemini gemini-3.5-flash-lite returned 503; falling back to gemini-3.1-flash-lite
+  run 2/3...
+[33mResized image size (7200x4800) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x4800) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x4800) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+Gemini gemini-3.5-flash-lite returned 503; falling back to gemini-3.1-flash-lite
+  run 3/3...
+[33mResized image size (7200x4800) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x4800) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x4800) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+Gemini gemini-3.5-flash-lite returned 503; falling back to gemini-3.1-flash-lite
+[510ea60f-f577-420d-b1e0-f2d3e0352661] (196 pages, 28 parcelmap regions)
+  run 1/3...
+[33mResized image size (6800x1466) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (6800x1467) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (6800x1467) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x2000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x2000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x2000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+Gemini gemini-3.5-flash-lite returned 503; falling back to gemini-3.1-flash-lite
+  run 2/3...
+[33mResized image size (6800x1466) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (6800x1467) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (6800x1467) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x2000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x2000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x2000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+Gemini gemini-3.5-flash-lite returned 503; falling back to gemini-3.1-flash-lite
+  run 3/3...
+[33mResized image size (6800x1466) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (6800x1467) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (6800x1467) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x2000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x2000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x2000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+Gemini gemini-3.5-flash-lite returned 503; falling back to gemini-3.1-flash-lite
+Gemini gemini-3.5-flash-lite returned 503; falling back to gemini-3.1-flash-lite
+Gemini gemini-3.5-flash-lite returned 503; falling back to gemini-3.1-flash-lite
+
+Full results (local only, gitignored): scratch_diag\regression_baseline\20260924_130251_full.json
+Scorecard (safe to commit): C:\Users\preet\OneDrive\Desktop\roam\tests\regression\baseline_scorecard.json

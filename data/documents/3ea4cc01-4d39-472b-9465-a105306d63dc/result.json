@@ -1,0 +1,2498 @@
+{
+  "document_id": "3ea4cc01-4d39-472b-9465-a105306d63dc",
+  "inspection": {
+    "filename": "original.pdf",
+    "page_count": 13,
+    "metadata": {
+      "format": "PDF 2.0",
+      "title": "",
+      "author": "",
+      "subject": "",
+      "keywords": "",
+      "creator": "PDF-XChange Editor 9.1.356",
+      "producer": "PDF-XChange Core API SDK (9.1.356)",
+      "creationDate": "D:20220928133309-04'00'",
+      "modDate": "D:20220928133309-04'00'",
+      "trapped": "",
+      "encryption": null
+    },
+    "pages": [
+      {
+        "page_number": 1,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 2
+      },
+      {
+        "page_number": 2,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 2
+      },
+      {
+        "page_number": 3,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 2
+      },
+      {
+        "page_number": 4,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 2
+      },
+      {
+        "page_number": 5,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 2
+      },
+      {
+        "page_number": 6,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 2
+      },
+      {
+        "page_number": 7,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 2
+      },
+      {
+        "page_number": 8,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 2
+      },
+      {
+        "page_number": 9,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 2
+      },
+      {
+        "page_number": 10,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 2
+      },
+      {
+        "page_number": 11,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 2
+      },
+      {
+        "page_number": 12,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 2
+      },
+      {
+        "page_number": 13,
+        "width": 1224.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 2
+      }
+    ]
+  },
+  "pages": [
+    {
+      "page_number": 1,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.983,
+          "bbox": [
+            236.1,
+            1568.4,
+            1256.7,
+            116.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "7. Will the project impact shared facilities such as schools (i.e., residential developments\nwhere Derry's students are tuitioned in another municipality), solid waste disposal\nfacilities, or other utilities located in another community?",
+          "ocr_confidence": 0.978
+        },
+        {
+          "class": "Text",
+          "confidence": 0.983,
+          "bbox": [
+            226.7,
+            1356.8,
+            1271.2,
+            86.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "5. Is the proposed development of 200 or more residential dwelling units where any portion\nof the development is within 1,000 feet of a municipal boundary?",
+          "ocr_confidence": 0.966
+        },
+        {
+          "class": "Text",
+          "confidence": 0.979,
+          "bbox": [
+            239.2,
+            1461.2,
+            1240.4,
+            85.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "6. Is the proposed development anticipated to have emissions such as light, noise, smoke,\nodors, or particles that may impact a neighboring community?",
+          "ocr_confidence": 0.977
+        },
+        {
+          "class": "Text",
+          "confidence": 0.978,
+          "bbox": [
+            240.0,
+            912.2,
+            1277.4,
+            171.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "2. Is the proposed development located within 1,000 feet of any aquifer or surface waters that\ntranscend municipal boundaries and will there be either a large water withdrawal (defined\nas 57,600 gallons by NHDES) or will there be indoor, outdoor, or underground storage of\nchemicals or other potential pollutants?",
+          "ocr_confidence": 0.972
+        },
+        {
+          "class": "Text",
+          "confidence": 0.975,
+          "bbox": [
+            180.8,
+            600.6,
+            1316.9,
+            161.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Please find this memo as a staff recommendation on the Regional Impact Determination for the\nLot Line Adjustment Application for Cheryl & Douglas Kimball and Russell Parolisi, Jr., on the\nApril 06, 2022 Planning Board agenda. Please review this under the \"Other Business/Planning\nDirector Updates'\" portion of the agenda.",
+          "ocr_confidence": 0.968
+        },
+        {
+          "class": "Text",
+          "confidence": 0.97,
+          "bbox": [
+            237.2,
+            1209.1,
+            1279.6,
+            127.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "4. Is the project a proposed non-residential development that will generate 500 or more\nvehicle trips per day into an adjacent community as determined by the most recent\npublished version of the ITE Trip Generation Manual?",
+          "ocr_confidence": 0.973
+        },
+        {
+          "class": "Text",
+          "confidence": 0.967,
+          "bbox": [
+            237.6,
+            1103.3,
+            1272.1,
+            85.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "3. Is the proposed development creating a new road or a point of access between\nmunicipalities?",
+          "ocr_confidence": 0.983
+        },
+        {
+          "class": "Text",
+          "confidence": 0.956,
+          "bbox": [
+            241.8,
+            848.9,
+            1025.0,
+            42.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "1. Is the proposed development directly adjacent to a municipal boundary?",
+          "ocr_confidence": 0.984
+        },
+        {
+          "class": "Text",
+          "confidence": 0.929,
+          "bbox": [
+            195.6,
+            789.5,
+            1161.9,
+            40.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Below, please find the general criteria considered by staff in making this recommendation:",
+          "ocr_confidence": 0.973
+        },
+        {
+          "class": "Picture",
+          "confidence": 0.801,
+          "bbox": [
+            1133.3,
+            157.9,
+            304.1,
+            110.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "skipped"
+        },
+        {
+          "class": "Text",
+          "confidence": 0.674,
+          "bbox": [
+            199.0,
+            337.9,
+            894.3,
+            179.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "DATE:\nApril 06, 2022\nTO:\nJohn O'Connor, Chairman, Derry Planning Board\nFROM:\nElizabeth Robidoux, Planning Assistant\nSUBJECT: Regional Impact Recommendations",
+          "ocr_confidence": 0.975
+        },
+        {
+          "class": "Text",
+          "confidence": 0.53,
+          "bbox": [
+            200.9,
+            184.2,
+            485.5,
+            63.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "MEMORANDUM",
+          "ocr_confidence": 0.998
+        }
+      ]
+    },
+    {
+      "page_number": 2,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.969,
+          "bbox": [
+            196.8,
+            1635.2,
+            1310.3,
+            120.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Staff recommends the Board determine that the project is not of Regional Impact. The project\ndoes not meet the criteria for making a regional impact determination. Please see the\nrecommended motion contained in the staff report.",
+          "ocr_confidence": 0.974
+        },
+        {
+          "class": "Text",
+          "confidence": 0.964,
+          "bbox": [
+            180.7,
+            350.8,
+            1324.6,
+            119.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "PROJECT\u2013 Review for acceptance and consideration a Lot Line Adjustment application. These\nparcels are located at 288 and 292 Island Pond Road, in the Low Density District, and are identified\nas Parcel 07048 and 07048-003, respectively.",
+          "ocr_confidence": 0.978
+        },
+        {
+          "class": "Text",
+          "confidence": 0.929,
+          "bbox": [
+            196.1,
+            1543.9,
+            259.2,
+            35.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Recommendation:",
+          "ocr_confidence": 0.997
+        },
+        {
+          "class": "Text",
+          "confidence": 0.921,
+          "bbox": [
+            836.8,
+            1331.8,
+            324.9,
+            82.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "PID 07048 288 Island Pond\nPID 07048-003, 292 Island Pond\nTown of Derry",
+          "ocr_confidence": 0.961
+        },
+        {
+          "class": "Text",
+          "confidence": 0.896,
+          "bbox": [
+            199.0,
+            289.5,
+            268.1,
+            35.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Project Summary:",
+          "ocr_confidence": 0.947
+        },
+        {
+          "class": "ParcelMap",
+          "confidence": 0.844,
+          "bbox": [
+            494.2,
+            535.0,
+            672.7,
+            786.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "G\n0704\n03047-001\n07042500707047-009\n07054-003\n03046\nQ\nD\n07047-005\n07054-002\n\u65e5\n07647-02\n0\n07054-001\n\n07042006\nex0-008\n07047-013\n070g7-04\n07053\nQ\n07047015\nO\n6707-010\n0705\n107047-002\n0904102\n07047:027\n07050-005\nt1\n\u2460\na\n0001\n\u221a\n\n0\n07047\np\n87038\n07050-003\n07048-033\n07050-002\n02048-001R\n07014\n07095\n1\n07098-0011\n97048-0028\n07050-001\n67048-002\n\u2460\n07049\n0705\n07052\n04087\n0\n07049-001\nVass.ceEEanm.S",
+          "ocr_confidence": 0.667,
+          "needs_vision": true,
+          "category": "undimensioned_drawing",
+          "parcels": [],
+          "vision_escalated": true
+        }
+      ]
+    },
+    {
+      "page_number": 3,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.962,
+          "bbox": [
+            245.8,
+            1143.5,
+            976.7,
+            170.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "WAIVERS: See letter dated March 15,2022, from Promised land Survey\nLDCR-Section 170-24,A.11-topography\nLDCR-Section 170-24,A.13-wetland mapping\nLDCR-Section 170-25.B.-lot size calculations\nLDCR-Section 170-25.C.-high intensity soil survey mapping",
+          "ocr_confidence": 0.969
+        },
+        {
+          "class": "Text",
+          "confidence": 0.954,
+          "bbox": [
+            238.9,
+            927.3,
+            1217.2,
+            106.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "PURPOSE: The purpose of this plan is for a lot line adjustment between the above\nreferenced parcels.\nThe parcels are located in the Low-Density\nResidential District.",
+          "ocr_confidence": 0.977
+        },
+        {
+          "class": "Text",
+          "confidence": 0.943,
+          "bbox": [
+            238.0,
+            1528.5,
+            1214.8,
+            70.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "RECOMMENDATION: Staff would recommend approval of both the waiver requests and\nlot-line adjustment plan.",
+          "ocr_confidence": 0.964
+        },
+        {
+          "class": "Text",
+          "confidence": 0.943,
+          "bbox": [
+            1201.3,
+            2031.2,
+            232.8,
+            28.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Derry, New Hampshire",
+          "ocr_confidence": 0.973
+        },
+        {
+          "class": "Text",
+          "confidence": 0.924,
+          "bbox": [
+            244.0,
+            2028.4,
+            124.7,
+            32.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Staff Report",
+          "ocr_confidence": 0.968
+        },
+        {
+          "class": "Text",
+          "confidence": 0.917,
+          "bbox": [
+            245.1,
+            1457.4,
+            311.0,
+            34.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "STATEPERMITS:NA",
+          "ocr_confidence": 0.983
+        },
+        {
+          "class": "Text",
+          "confidence": 0.91,
+          "bbox": [
+            246.8,
+            717.2,
+            210.0,
+            36.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "PROJECT:NA",
+          "ocr_confidence": 0.987
+        },
+        {
+          "class": "Text",
+          "confidence": 0.903,
+          "bbox": [
+            243.9,
+            1833.4,
+            444.0,
+            31.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "George H. Sioras, Planning Director",
+          "ocr_confidence": 0.949
+        },
+        {
+          "class": "Text",
+          "confidence": 0.9,
+          "bbox": [
+            242.3,
+            783.7,
+            1202.5,
+            75.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "LOCATION:Parcel ID07048 &07048-003, 288 Island Pond Road &292 Island Pond\nRoad.",
+          "ocr_confidence": 0.97
+        },
+        {
+          "class": "Text",
+          "confidence": 0.899,
+          "bbox": [
+            250.0,
+            328.5,
+            546.5,
+            72.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "APPLICANT: Cheryl & Douglas Kimball\nRussell Parolisi",
+          "ocr_confidence": 0.964
+        },
+        {
+          "class": "Text",
+          "confidence": 0.813,
+          "bbox": [
+            250.0,
+            1070.8,
+            582.2,
+            32.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "TOWN DEPARTMENTSIGNATURES:NA",
+          "ocr_confidence": 0.978
+        },
+        {
+          "class": "Text",
+          "confidence": 0.772,
+          "bbox": [
+            249.7,
+            646.9,
+            249.7,
+            36.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "DEVELOPER:NA",
+          "ocr_confidence": 0.99
+        },
+        {
+          "class": "Text",
+          "confidence": 0.75,
+          "bbox": [
+            245.5,
+            1635.6,
+            45.5,
+            29.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "BY:",
+          "ocr_confidence": 0.965
+        },
+        {
+          "class": "Text",
+          "confidence": 0.666,
+          "bbox": [
+            253.3,
+            191.5,
+            632.3,
+            39.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Planning Department, April 6, 2022",
+          "ocr_confidence": 0.989
+        }
+      ]
+    },
+    {
+      "page_number": 4,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.979,
+          "bbox": [
+            242.6,
+            568.6,
+            1211.8,
+            76.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Pursuant to RSA 36:56, the Board finds the proposal as presented at this time meets the\ndefinition of a development of regional impact.",
+          "ocr_confidence": 0.968
+        },
+        {
+          "class": "Text",
+          "confidence": 0.969,
+          "bbox": [
+            248.4,
+            996.1,
+            1195.9,
+            148.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "The Board finds after review of the waiver requests that strict conformity to the\nregulations would pose an unnecessary hardship to the applicant and the waiver would\nnot be contrary to the spirit and intent of the regulations and grants a waiver from the\nfollowing regulations:",
+          "ocr_confidence": 0.981
+        },
+        {
+          "class": "Text",
+          "confidence": 0.964,
+          "bbox": [
+            253.9,
+            264.7,
+            274.5,
+            35.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Accept Jurisdiction",
+          "ocr_confidence": 0.994
+        },
+        {
+          "class": "Text",
+          "confidence": 0.962,
+          "bbox": [
+            257.0,
+            1912.5,
+            1184.6,
+            78.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": " Obtain written approval from the Planning Director/designee that the GIS disk is\nreceived and is operable and it complies with LDCR Section 170-24.C",
+          "ocr_confidence": 0.966
+        },
+        {
+          "class": "Text",
+          "confidence": 0.962,
+          "bbox": [
+            246.1,
+            1416.3,
+            301.0,
+            37.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Approve pursuant to",
+          "ocr_confidence": 0.987
+        },
+        {
+          "class": "Text",
+          "confidence": 0.961,
+          "bbox": [
+            243.8,
+            339.8,
+            1191.5,
+            110.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Move to accept jurisdiction of the Lot Line Adjustment plan plan before the Board for\nCheryl & Douglas Kimball, PID 07048, 288 Island Pond Road and Russell A. Parolisi,\nJr., PID 07048-003, 292 Island Pond Road.",
+          "ocr_confidence": 0.964
+        },
+        {
+          "class": "Text",
+          "confidence": 0.957,
+          "bbox": [
+            253.6,
+            1529.2,
+            894.4,
+            39.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "RSA 676:4 II\u2013Expedited Review, with the following conditions:",
+          "ocr_confidence": 0.962
+        },
+        {
+          "class": "Text",
+          "confidence": 0.955,
+          "bbox": [
+            248.4,
+            1678.4,
+            765.2,
+            43.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": " Subject to on-site inspection by the Town's engineer",
+          "ocr_confidence": 0.977
+        },
+        {
+          "class": "Text",
+          "confidence": 0.945,
+          "bbox": [
+            250.4,
+            1604.3,
+            430.3,
+            41.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": " Subject to owner's signature",
+          "ocr_confidence": 0.921
+        },
+        {
+          "class": "Text",
+          "confidence": 0.945,
+          "bbox": [
+            341.9,
+            1184.8,
+            637.7,
+            153.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "LDCR Section 170-24.A.11, Topography\nLDCR Section 170-24.A.13, Wetland Mapping\nLDCR Section170-25.B, Lot Size Calculations\nLDCR Section 170-25.C, HISS Mapping",
+          "ocr_confidence": 0.97
+        },
+        {
+          "class": "Text",
+          "confidence": 0.941,
+          "bbox": [
+            248.6,
+            494.6,
+            490.8,
+            34.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Determination of Regional Impact",
+          "ocr_confidence": 0.972
+        },
+        {
+          "class": "Text",
+          "confidence": 0.933,
+          "bbox": [
+            253.4,
+            122.2,
+            611.9,
+            36.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "PLANNING BOARDSUGGESTED MOTION",
+          "ocr_confidence": 0.949
+        },
+        {
+          "class": "Text",
+          "confidence": 0.884,
+          "bbox": [
+            245.7,
+            2098.4,
+            134.8,
+            30.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Staff Report",
+          "ocr_confidence": 0.976
+        },
+        {
+          "class": "Text",
+          "confidence": 0.839,
+          "bbox": [
+            243.6,
+            1835.0,
+            552.1,
+            40.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "\u25a1 Note approved waiver (s) on the plan",
+          "ocr_confidence": 0.962
+        },
+        {
+          "class": "Text",
+          "confidence": 0.824,
+          "bbox": [
+            249.5,
+            722.7,
+            354.6,
+            39.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Open the Public Hearing",
+          "ocr_confidence": 0.957
+        },
+        {
+          "class": "Text",
+          "confidence": 0.819,
+          "bbox": [
+            248.3,
+            878.1,
+            211.5,
+            36.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Grant Waivers",
+          "ocr_confidence": 0.991
+        },
+        {
+          "class": "Text",
+          "confidence": 0.666,
+          "bbox": [
+            1140.2,
+            121.9,
+            198.4,
+            36.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "April 06, 2022",
+          "ocr_confidence": 0.95
+        },
+        {
+          "class": "Text",
+          "confidence": 0.666,
+          "bbox": [
+            244.7,
+            1755.6,
+            1090.2,
+            44.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": " Establish escrow for the setting of bounds or certify the bounds have been set",
+          "ocr_confidence": 0.967
+        },
+        {
+          "class": "Text",
+          "confidence": 0.653,
+          "bbox": [
+            250.0,
+            799.1,
+            356.5,
+            37.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Close the Public Hearing",
+          "ocr_confidence": 0.978
+        },
+        {
+          "class": "Text",
+          "confidence": 0.652,
+          "bbox": [
+            1181.9,
+            2101.9,
+            256.5,
+            27.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Derry, New Hampshire",
+          "ocr_confidence": 0.953
+        }
+      ]
+    },
+    {
+      "page_number": 5,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.934,
+          "bbox": [
+            1184.0,
+            2100.1,
+            253.1,
+            28.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Derry, New Hampshire",
+          "ocr_confidence": 0.979
+        },
+        {
+          "class": "Text",
+          "confidence": 0.929,
+          "bbox": [
+            272.8,
+            413.4,
+            1173.1,
+            115.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Submission of the appropriate recording fees, payable to the Rockingham County\nRegistry of Deeds. [This includes the $25.00 LCHIP fee, recording fees for the mylar\nand the Notice of Decision.]",
+          "ocr_confidence": 0.976
+        },
+        {
+          "class": "Text",
+          "confidence": 0.91,
+          "bbox": [
+            254.3,
+            121.7,
+            604.5,
+            35.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "PLANNING BOARD SUGGESTED MOTION",
+          "ocr_confidence": 0.947
+        },
+        {
+          "class": "Text",
+          "confidence": 0.889,
+          "bbox": [
+            1140.5,
+            120.4,
+            201.7,
+            37.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "April 06, 2022",
+          "ocr_confidence": 0.955
+        },
+        {
+          "class": "Text",
+          "confidence": 0.835,
+          "bbox": [
+            267.8,
+            338.2,
+            735.5,
+            35.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": " Conditions precedent shall be met within 6 months.",
+          "ocr_confidence": 0.975
+        },
+        {
+          "class": "Text",
+          "confidence": 0.827,
+          "bbox": [
+            243.9,
+            2099.1,
+            134.3,
+            26.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Staff Report",
+          "ocr_confidence": 0.958
+        },
+        {
+          "class": "Text",
+          "confidence": 0.815,
+          "bbox": [
+            255.3,
+            221.0,
+            1191.4,
+            79.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Subject to receipt of applicable state or local permits relating to the project (i.e., AoT,\n\u221a\nWetland, Building Department, Fire Department, Water/Wastewater, Driveway, etc. )",
+          "ocr_confidence": 0.725
+        }
+      ]
+    },
+    {
+      "page_number": 6,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.811,
+          "bbox": [
+            223.5,
+            1962.5,
+            1261.4,
+            69.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "1.\nOther information which may be required under applicable sections of the LDCR to constitute a\ncomplete application.",
+          "ocr_confidence": 0.93
+        },
+        {
+          "class": "Seal",
+          "confidence": 0.707,
+          "bbox": [
+            783.6,
+            130.1,
+            130.9,
+            142.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "",
+          "ocr_confidence": null
+        },
+        {
+          "class": "Text",
+          "confidence": 0.667,
+          "bbox": [
+            185.9,
+            2068.3,
+            415.0,
+            60.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Derry Planning Board Application\nCorrected RSA reference 3/30/2016",
+          "ocr_confidence": 0.978
+        },
+        {
+          "class": "Text",
+          "confidence": 0.623,
+          "bbox": [
+            176.8,
+            956.1,
+            1329.7,
+            125.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Failure to comply with the application procedures and/or failure to comply with all applicable laws, ordinances and\nregulations shall be grounds for summary disapproval of the application. All required items must be submitted with\nthe application. Please refer to the Town of Derry Land Development Control Regulations (LDCR) or contact the\nPlanning Department for guidance.",
+          "ocr_confidence": 0.982
+        },
+        {
+          "class": "Text",
+          "confidence": 0.473,
+          "bbox": [
+            1395.1,
+            2072.2,
+            87.9,
+            28.7
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\3ea4cc01-4d39-472b-9465-a105306d63dc\\review_crops\\page_006_04_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Page 1",
+          "ocr_confidence": 0.934
+        },
+        {
+          "class": "ScannedPrintout",
+          "confidence": 0.414,
+          "bbox": [
+            182.3,
+            108.6,
+            1393.8,
+            890.5
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\3ea4cc01-4d39-472b-9465-a105306d63dc\\review_crops\\page_006_05_ScannedPrintout.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "MAR162022\nAPPLICATION TO THE PLANPeroy BlaopingDepartment\nTown of Derry\nPromised Land Survey, LLC\n603-432-2112\ntap@promisedlandsurvey.com\nApplicant(s)\nTelephone\nemail address\n288&292 Island Pond Road\nMap 7 Lots 48 & 48-3\nProperty Address\nParcel ID(tax map/lot)\nCheryl & Douglas Kimball (288 Island Pond Rd, Map 7 Lot 48) RussellA. Parolisi, Jr. (292 Island Pond, Map 7 Lot 48-3)\nName of Property Owner(s)\nTelephone\nemail address\nPromised Land Survey, LLC\n603-432-2112\ntap@promisedlandsurvey.com\nName of Agent\nTelephone\nemail address\nType of Application\nSubdivision Design Review\nSubdivision Final Phase\nSite Plan Determination\nSite Plan Design Review\nSite Plan Final Phase\n\u0107\nLot Line Adjustment\nParking Lot Expansion\nOther (please describe)",
+          "ocr_confidence": 0.951
+        }
+      ]
+    },
+    {
+      "page_number": 7,
+      "regions": [
+        {
+          "class": "Seal",
+          "confidence": 0.903,
+          "bbox": [
+            776.2,
+            126.6,
+            136.2,
+            146.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "",
+          "ocr_confidence": null
+        },
+        {
+          "class": "Text",
+          "confidence": 0.88,
+          "bbox": [
+            1083.2,
+            400.9,
+            311.5,
+            239.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "sets, abutter mailing labels\n4\nScale\nV\nAouse Numbers (see Fire Dept.)\nV\nTitle Block (lowerright hand corner)\n8urveyor's Cert & Seal\ntate Subdivision approval\nAgent Authorization\nM\neptic Systems(abutters)\nw9Form",
+          "ocr_confidence": 0.751
+        },
+        {
+          "class": "Text",
+          "confidence": 0.811,
+          "bbox": [
+            695.2,
+            312.4,
+            280.6,
+            30.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Application Checklist",
+          "ocr_confidence": 0.992
+        },
+        {
+          "class": "ScannedPrintout",
+          "confidence": 0.521,
+          "bbox": [
+            208.4,
+            382.8,
+            1182.6,
+            1415.0
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\3ea4cc01-4d39-472b-9465-a105306d63dc\\review_crops\\page_007_03_ScannedPrintout.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Fees\n8 Prints (24x 36, rolled)\nParcel Boundaries\nLot Boundaries\nLocus\nNorth Point\nMonumentation\nLot Numbers (see Tax Assessor)\nZone\nApproval Block\nError of Closure\nOwner's Signature(s)\nState Plan Coordinates\nTRC Signatures\nTax Lot Numbers (abutters)\nWells (abutters)\nBuildings & Easements (abutters)\nSubdivision Applications \u2014 Design Review and Final Application\nStreet Names\n\nRoad Profile-(ProposedNev/ROW/)\nStopping Sight Distances\nRoad Profile- (Existing)\nRoad Class\nDriveway Locations\nPE Stamp\nCurbs & Sidewalks\nEasements (Dinensions)\nLot Area (Sq. Ft. & Acreage)\nV\nExisting buildings\nSLOT\nSoil Type Boundaries Certified by a Soil Scientist on Plan\nPercolation Test Locations/Data\nNA\n\nBearings and Radii\nLot Size Calculations\nDrainage Calc. (Preliminary)\nEdges of Wet Area\nWatercourses\nWater and Sewer mains\nWater & Sewer Mains\nBridge & Culvert Designs\nCatch Basin Locations\nEasements (Dimensions)\nFlood Plain/Conservation Corridor\nPublic Dedication of Land\nCurrent Use Status (see Tax Assessor)\nWaivers (lf.Iny Requested)\nCopies of all applications for 3\"d party approvals\nImpact Reports (See LDCR)\nSite Plan Applications \u2013 Design Review and Final Phase\nProposed Use\nZoning Classification\nStreet Width\nRights of Way\nRoad Profile\nExisting Classification\nDriveway Locations\nProposed Contours\nParking & Paving\nCurbs and Sidewalks\nEasements(Bearing & Dimensions)\nOn Site Traffic Flow\nLot Area (Sq. Ft. & Acreage)\nExisting buildings\nExisting/Proposed Buildings\nSetbacks\nSignage (with details)\nBearings and Radii\nExterior Lighting (with details)\nTopography (vith soil types)\nDrainage Calc. (Preliminary)\nEdges of Wet Areas\nWatercourses\nCatch Basin Locations\nWater & Sewer Mains\nFlood Plain/Conservation Corridor",
+          "ocr_confidence": 0.937
+        }
+      ]
+    },
+    {
+      "page_number": 8,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.965,
+          "bbox": [
+            94.5,
+            705.9,
+            757.3,
+            150.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Re:\nLot Line Adiustment\nMap 7 Lots 48 & 48-3\n288&292Island\nWaiverRequest-Lot Line Adjustment Plat",
+          "ocr_confidence": 0.953
+        },
+        {
+          "class": "Text",
+          "confidence": 0.965,
+          "bbox": [
+            131.8,
+            1441.2,
+            1416.6,
+            117.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "ArticleV. Section 170-25 C,- High Intensity Soil Suryey Mapping. The subiect Iots are both\npre-existing and non-conforming. A variance was granted to allow for Map 7 Lot 48, 288 Island\nPond Rd, to become more non-conforming.",
+          "ocr_confidence": 0.929
+        },
+        {
+          "class": "Text",
+          "confidence": 0.959,
+          "bbox": [
+            99.6,
+            899.9,
+            315.5,
+            33.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Dear Planning Board:",
+          "ocr_confidence": 0.952
+        },
+        {
+          "class": "Text",
+          "confidence": 0.932,
+          "bbox": [
+            96.6,
+            1792.3,
+            187.6,
+            32.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Respectfully,",
+          "ocr_confidence": 0.991
+        },
+        {
+          "class": "Text",
+          "confidence": 0.924,
+          "bbox": [
+            129.3,
+            1318.8,
+            1428.4,
+            121.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Article V, Section 170-25, B.-Minimum Lot Size Calculations By Soil Type. The subject lots are\nboth pre-existing and non-conforming. A variance was granted to allow for Map 7 Lot 48, 288\nIsland Pond Rd, to become more non-conforming.",
+          "ocr_confidence": 0.957
+        },
+        {
+          "class": "Text",
+          "confidence": 0.923,
+          "bbox": [
+            80.7,
+            1637.3,
+            1457.1,
+            74.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "We appreciate your consideration in this matter. If you have any questions or comments, please\ncontact me[phone and email in contact information].",
+          "ocr_confidence": 0.968
+        },
+        {
+          "class": "Text",
+          "confidence": 0.918,
+          "bbox": [
+            1137.1,
+            215.6,
+            518.6,
+            96.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "POBox447 Derry, NH03038\nTel:(603)432-2112\u00b7Fax:(603)432-880C\nwww.PromisedLandSurvey.com",
+          "ocr_confidence": 0.974
+        },
+        {
+          "class": "Text",
+          "confidence": 0.916,
+          "bbox": [
+            107.1,
+            513.3,
+            535.5,
+            150.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "To:\nTown of Derry, NH\nPlanning Board\n14Manning Street\nDerry, New Hampshire 03038",
+          "ocr_confidence": 0.94
+        },
+        {
+          "class": "Text",
+          "confidence": 0.905,
+          "bbox": [
+            97.3,
+            2004.6,
+            376.6,
+            33.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Timothy A. Peloquin, LLS",
+          "ocr_confidence": 0.946
+        },
+        {
+          "class": "Text",
+          "confidence": 0.902,
+          "bbox": [
+            111.1,
+            1240.8,
+            1447.6,
+            83.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Article V, Section 170-24, A.13-Wetland Mapping.There is no proposed development as part\nof this application.",
+          "ocr_confidence": 0.96
+        },
+        {
+          "class": "Text",
+          "confidence": 0.898,
+          "bbox": [
+            810.1,
+            136.2,
+            698.1,
+            66.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Promised Land Survey, LLC",
+          "ocr_confidence": 0.96
+        },
+        {
+          "class": "Text",
+          "confidence": 0.885,
+          "bbox": [
+            114.9,
+            1165.9,
+            1392.4,
+            76.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Article V, Section 170-24, A. 11-Entire Site Topography. There is no proposed development as\npartof this application.",
+          "ocr_confidence": 0.964
+        },
+        {
+          "class": "Text",
+          "confidence": 0.871,
+          "bbox": [
+            100.0,
+            438.6,
+            236.2,
+            35.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "March 15, 2022",
+          "ocr_confidence": 0.941
+        },
+        {
+          "class": "Text",
+          "confidence": 0.848,
+          "bbox": [
+            84.1,
+            973.9,
+            1472.0,
+            77.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "On behalf of our clients, Cheryl &Douglas Kimball (288 Island Pond Rd)and Russell A. Parolisi,JR\nwe respectfully request a waiver from the following:",
+          "ocr_confidence": 0.954
+        },
+        {
+          "class": "Text",
+          "confidence": 0.729,
+          "bbox": [
+            122.7,
+            1085.7,
+            1343.7,
+            77.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Waivers from the following land development control regulations (dated: May 19, 2021) Are\nRequested As Part Of This Application:",
+          "ocr_confidence": 0.952
+        },
+        {
+          "class": "Picture",
+          "confidence": 0.399,
+          "bbox": [
+            82.8,
+            99.6,
+            240.4,
+            247.9
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\3ea4cc01-4d39-472b-9465-a105306d63dc\\review_crops\\page_008_15_Picture.png",
+          "extraction_status": "skipped"
+        },
+        {
+          "class": "Seal",
+          "confidence": 0.316,
+          "bbox": [
+            82.8,
+            99.6,
+            240.4,
+            247.9
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\3ea4cc01-4d39-472b-9465-a105306d63dc\\review_crops\\page_008_16_Seal.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "B",
+          "ocr_confidence": 0.044
+        }
+      ]
+    },
+    {
+      "page_number": 9,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.544,
+          "bbox": [
+            641.6,
+            168.0,
+            403.1,
+            38.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Abutters List (03-15-2022)",
+          "ocr_confidence": 0.981
+        },
+        {
+          "class": "Table",
+          "confidence": 0.254,
+          "bbox": [
+            325.5,
+            141.6,
+            866.0,
+            1479.6
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\3ea4cc01-4d39-472b-9465-a105306d63dc\\review_crops\\page_009_01_Table.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "288 & 292 Island Pond Road\nDerry, NH 03038\nMap 07 Lots 048 & 048-003\nMap\nLot\nOwner\nLandowners\n07\n048\nCheryl & Douglas Kimball\n288 Island Pond Rd\nDerry, NH03038\n07\n048-003\nRussell A. Parolisi, Jr.\n292 Island Pond Rd\nDerry,NH 03038\nAbutters\n07\n047\nHarold Wallace\n278 Island Pond Rd\nDerry, NH 03038\n07\n048-001L\nJohn C. Dyson\nCarol A. Bailey\n294L Island Pond Rd\nDerry, NH 03038\n07\n048-001R\n\nJudith C. Reitano Revocable Trust\nJudith C. Reitano, Tt\n294R Island Pond Rd\nDerry, NH 03038\n07\n048-002L\nLinda Joan Cournoyer\n296L Island Pond Rd\nDerry,NH03038\n07\n048-002R\nJoan E.Witkowski\nMelissa A. Mooney\n296R Island Pond Rd\nDerry, NH03038\n07\n050\nKevin J.& Judith E.Follo",
+          "ocr_confidence": 0.947
+        }
+      ]
+    },
+    {
+      "page_number": 10,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.845,
+          "bbox": [
+            820.3,
+            697.6,
+            231.5,
+            108.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Town of Derry\n14Manning St\nDerry,NH03038",
+          "ocr_confidence": 0.983
+        },
+        {
+          "class": "Text",
+          "confidence": 0.823,
+          "bbox": [
+            784.8,
+            2104.3,
+            114.4,
+            28.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Page2of2",
+          "ocr_confidence": 0.988
+        },
+        {
+          "class": "Text",
+          "confidence": 0.465,
+          "bbox": [
+            820.7,
+            557.2,
+            385.1,
+            104.3
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\3ea4cc01-4d39-472b-9465-a105306d63dc\\review_crops\\page_010_02_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Promised Land Survey, LLC\nPOBox447\nDerry,NH 03038",
+          "ocr_confidence": 0.962
+        }
+      ]
+    },
+    {
+      "page_number": 11,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.952,
+          "bbox": [
+            124.6,
+            714.8,
+            1276.6,
+            167.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Re: Permission to Represent~Planning Board Application\nCheryl & Douglas Kimball/ Russell A. Parolisi, Jr.\nLot Line Adjustment proposal at 288 & 292 Island Pond Road, Derry, NH\nMap 7Lots 48 & 48-3",
+          "ocr_confidence": 0.937
+        },
+        {
+          "class": "Text",
+          "confidence": 0.917,
+          "bbox": [
+            115.3,
+            1102.1,
+            1446.9,
+            173.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "We, Cheryl & Douglas Kimball and Russell A. Parolisi, Jr., landowners ofrecord of the\nsubject properties, hereby give permission to Timothy A. Peloquin, LLS of Promised\nLand Survey, LLC, Derry, NH to represent our interests in the PB application of this\ndate.",
+          "ocr_confidence": 0.957
+        },
+        {
+          "class": "Text",
+          "confidence": 0.904,
+          "bbox": [
+            127.3,
+            331.4,
+            258.5,
+            35.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "March 15,2022",
+          "ocr_confidence": 0.963
+        },
+        {
+          "class": "Text",
+          "confidence": 0.827,
+          "bbox": [
+            118.5,
+            1621.6,
+            656.9,
+            81.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Cheryl & Douglas Kimball\n288 Island Pond Road, Derry,NH 03038",
+          "ocr_confidence": 0.946
+        },
+        {
+          "class": "Text",
+          "confidence": 0.788,
+          "bbox": [
+            127.9,
+            459.7,
+            481.7,
+            163.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Town of Derry, NH\nPlanning Board (PB)\n14Manning Street\nDerry, NewHampshire 03038",
+          "ocr_confidence": 0.962
+        },
+        {
+          "class": "Text",
+          "confidence": 0.736,
+          "bbox": [
+            119.1,
+            1361.8,
+            209.1,
+            38.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Respectfully,",
+          "ocr_confidence": 0.99
+        },
+        {
+          "class": "Text",
+          "confidence": 0.708,
+          "bbox": [
+            116.8,
+            1970.2,
+            671.2,
+            44.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "292Island PondRoad,Derry, NH03038",
+          "ocr_confidence": 0.914
+        },
+        {
+          "class": "Text",
+          "confidence": 0.413,
+          "bbox": [
+            117.2,
+            1927.6,
+            367.6,
+            36.8
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\3ea4cc01-4d39-472b-9465-a105306d63dc\\review_crops\\page_011_07_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Russell A. Parolisi, Jr.",
+          "ocr_confidence": 0.959
+        },
+        {
+          "class": "Text",
+          "confidence": 0.279,
+          "bbox": [
+            117.4,
+            971.8,
+            184.0,
+            41.2
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\3ea4cc01-4d39-472b-9465-a105306d63dc\\review_crops\\page_011_08_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "DearPBA,",
+          "ocr_confidence": 0.982
+        }
+      ]
+    },
+    {
+      "page_number": 12,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.974,
+          "bbox": [
+            294.8,
+            549.0,
+            376.1,
+            131.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Town of Derry, NH\nPlanning Board (PB)\n14Manning Street\nDerry, New Hampshire 03038",
+          "ocr_confidence": 0.956
+        },
+        {
+          "class": "Text",
+          "confidence": 0.969,
+          "bbox": [
+            286.6,
+            1446.9,
+            510.1,
+            63.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Cheryl & Douglas Kimbal\n288 Island Pond Road, Derry,NH 03038",
+          "ocr_confidence": 0.925
+        },
+        {
+          "class": "Text",
+          "confidence": 0.962,
+          "bbox": [
+            285.7,
+            748.7,
+            990.6,
+            130.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Re: Permission toRepresent~Planning Board Application\nCheryl & Douglas Kimball /RussellA. Parolisi, Jr.\nLot Line Adjustment proposal at 288& 292 Island Pond Road, Derry, NH\nMap 7 Lots 48& 48-3",
+          "ocr_confidence": 0.94
+        },
+        {
+          "class": "Text",
+          "confidence": 0.95,
+          "bbox": [
+            286.3,
+            1248.0,
+            162.1,
+            28.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Respectfully,",
+          "ocr_confidence": 0.985
+        },
+        {
+          "class": "Text",
+          "confidence": 0.94,
+          "bbox": [
+            277.4,
+            1050.1,
+            1104.2,
+            131.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "We, Cheryl & Douglas Kimball and Russell A. Parolisi, Jr., landowners of record of the\nLlsafPromised\nLand Survey, LLC, Derry, NH to represent our interests in the PB application of this\n\n0((\ndaie.",
+          "ocr_confidence": 0.661
+        },
+        {
+          "class": "Text",
+          "confidence": 0.908,
+          "bbox": [
+            290.2,
+            947.1,
+            133.0,
+            30.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Dear PBA,",
+          "ocr_confidence": 0.933
+        },
+        {
+          "class": "Text",
+          "confidence": 0.807,
+          "bbox": [
+            280.4,
+            1682.8,
+            512.1,
+            65.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Russell A. Parolisi, Jr.\n292 Island Pond Road, Derry, NH 03038",
+          "ocr_confidence": 0.945
+        }
+      ]
+    },
+    {
+      "page_number": 13,
+      "regions": [
+        {
+          "class": "ParcelMap",
+          "confidence": 0.968,
+          "bbox": [
+            2502.6,
+            122.5,
+            697.1,
+            469.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "LOCUSMAP\nWARNER HILL RD\nDREW RD\nISLAND POND\nTARYN RD\nISLAND POND RD",
+          "ocr_confidence": 0.97,
+          "needs_vision": true,
+          "category": "not_a_parcel_drawing",
+          "parcels": [],
+          "vision_escalated": true
+        },
+        {
+          "class": "Text",
+          "confidence": 0.838,
+          "bbox": [
+            2521.1,
+            617.4,
+            461.7,
+            64.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "APPROVEDBYTHETOWVNOFDERRY\nPLANNTNG BOARDON:\nCERTFIED BY:",
+          "ocr_confidence": 0.956
+        },
+        {
+          "class": "Text",
+          "confidence": 0.828,
+          "bbox": [
+            201.2,
+            819.4,
+            283.3,
+            16.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "DEEDSOFREFERENCE",
+          "ocr_confidence": 0.997
+        },
+        {
+          "class": "ParcelMap",
+          "confidence": 0.709,
+          "bbox": [
+            125.4,
+            117.3,
+            2716.6,
+            1592.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "5/8\u00b0REBAR(F)\n0.4HIGH\n(HELD)\nPSC\n19-10\nGRAVEL\n141\nN6604'20E.\n50\n11.63\nNETT\n4\n(TRANS)\nN6153'54E\n3/8REBAR(F)\n-105.55\n0.1BELOW GRADE\n(HELD)\nGRAVEL\n\n\n3/8\u00b0REBAR(F)\n2-10\n\nBENT SELY\nS\n(909-60)\n0.2BELOW GRADE\n(TIE TO CORNER:\n\nN6O^4146W,0.36)\n3'-4WRE FENCE\n2\nTANK\nW\nCOVER\nDECK\nO\n288 ISLAND\nPOND RD\n2\nAPPROX\nM\u2220112N\n.26602\nMAP 7 LOT 48\nV\n46,550 Sq. Ft\n\u00ae\n1.07 AC.\nCHAIRMAN\nWELL\nNEW AREA:\nn\n41,368 Sq. Ft\n0.95 AC\n322.74\n15-\nMAP 7 LOT 47\nSECRETARY\n2\nN/F HAROLD WALLACE\n278ISLAND POND RD\nAREA OF TRANSFER FROM\n1\nDERRY.NH03038\nLANDOVNERSOFRECORD\nMAP 7 LOT 48 TO MAP 7 LOT 48-3\\\n(2837-2957)\nMAP 7 LOT 48\nDATUM\n5,179 Sq. Ft\n5/8\u00b0REBARW/CAP\nCHERYL & DOUGLAS KIMBALL\nHORIZONTAL:NAD83-2011\n0.12 AC.\n(TO BE SET)\n288ISLANDPOND RD\nVERTICAL:NAVD88-GEOI018\n(TYP.)\nDERRY, NH 03038\nAREA OF ENCROACHMENT\nROCKINGHAM, COUNTY REGISTRY OF DEEDS BOOK 6141 / PAGE 0255\nTO BE RESTORED\nSHED\n(TO BE\nATV\nTREES TO BE PLANTED OR\n8\nREMOVED)\n50NYNEX\nTRAIL\n6'HIGH STOCKADE\n-(125.01)\nCHERYL KIMBALL\nFENCE TO BE INSTALLED\nWAVER REQUESTS\n\u6587\nALONG NEW COURSES\nOF66.91&32.24\nS4226'48\u00b0\nPSNH\n66.91\nDOUGLAS KIMBALL\n19\n1\n11A\n1\n501/4\u00d7\nMAP 7 LOT 48-3\nNETT\nS7739'32\u00b0W\nRAGE\nRUSSELL A.PAROLSI,JR\n\n2\n292 ISLAND POND RD\n1RON PIPE(S)\n164.41\nSHED\nDERRY, NH 03038\n0.8HIGH,W/CAP\n\"PROMISED LAND SURVEY.\nC\nROCKINGHAM, COUNTY REGISTRY OF DEEDS BOOK 4189 PAGE 1073\nLDR(LOW DENSITY RESIDENTIAL) MINIMUM:\nAREA: 3.00 ACRES (BY SOILS)\nN:137,042.75\n7739'32\nFRONTAGE:200\nE:1,101,226.83\n(125.11)\nTO BE REMOVED\n\u221a\nWDTH:20O'ATFRONT 35'SETBACK\nZ:289.78\nRUSSELL A. PAROLISI, JR\nSETBACKS:\nFRONT-35\nSIDE-15\nPAVEMENT\n1/2REBAR(F)\nREAR-15'\n0.3'HIGH\nWETLANDS >1 AC IN SIZE-75\n(HELD)\nT/\n\n\nM9919.22N\nWETLANDS<1 AC IN SIZE - 30\n210\nEEO\nPOOL\n.9991\n(8061-908)\nASEROX.\n2O2 SRAD\n\n?\n\u00ae\nWELL\nWELL\nSHEDS\nX\n\n827\nTIMOTHY\n\nPELDO\n5\n209.93\nMAP 7 LOT 48-3\nTIMOTHY A. PELOQUIN, LLS\nDRILL\n69,885 Sq. Ft\n0\nHOLE (F)\n1.60 AC.\nLEGEND\n(HELD)\nNEW AREA:\n75,086 Sq. Ft\ne\nUTUTY POLE\n1.72 AC.\n\u65e5\nBOUND\n\u25a1\nCATCH BASIN\nO\nIRON PIPE/REBAR\n\u00ae\nWELL\nW\n2\nGUYMRE\nEDGE OF PAVEMENT",
+          "ocr_confidence": 0.765,
+          "needs_vision": true,
+          "category": "boundary_plat",
+          "parcels": [
+            {
+              "vision_geometry": {
+                "boundary_calls": [
+                  {
+                    "bearing": "N 24\u00b011'47\" W",
+                    "distance": "209.92'"
+                  },
+                  {
+                    "bearing": "S 55\u00b014'15\" E",
+                    "distance": "322.74'"
+                  }
+                ],
+                "tie_point": null,
+                "basis_of_bearings": null,
+                "parcel_label": "MAP 7 LOT 48",
+                "stated_area_acres": "0.95",
+                "ambiguous_alternates": [],
+                "curve_calls": []
+              },
+              "resolved_boundary_calls": [
+                {
+                  "bearing": "N 61\u00b053'54\" E ",
+                  "distance": "105.55'"
+                },
+                {
+                  "bearing": "N 68\u00b004'20\" E ",
+                  "distance": "11.63'"
+                },
+                {
+                  "bearing": "N 24\u00b011'47\" W ",
+                  "distance": "208.82'"
+                },
+                {
+                  "bearing": "S 59\u00b041'15\" E ",
+                  "distance": "322.74'"
+                },
+                {
+                  "bearing": "S 77\u00b039'32\" W ",
+                  "distance": "164.41'"
+                },
+                {
+                  "bearing": "S 22\u00b023'08\" W ",
+                  "distance": "32.24'"
+                },
+                {
+                  "bearing": "S 42\u00b026'46\" W ",
+                  "distance": "66.91'"
+                }
+              ],
+              "boundary_geojson": {
+                "type": "Feature",
+                "properties": {
+                  "closure_error_ft": 0.0,
+                  "unparsed_calls": 0,
+                  "curve_diagnostics": []
+                },
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [
+                        175.89,
+                        99.58
+                      ],
+                      [
+                        168.72,
+                        83.87
+                      ],
+                      [
+                        88.26,
+                        101.05
+                      ],
+                      [
+                        88.37,
+                        207.52
+                      ],
+                      [
+                        141.56,
+                        210.81
+                      ],
+                      [
+                        146.85,
+                        210.67
+                      ],
+                      [
+                        207.13,
+                        112.38
+                      ],
+                      [
+                        175.89,
+                        99.58
+                      ]
+                    ]
+                  ]
+                }
+              },
+              "spatial_validation": {
+                "valid": false,
+                "issues": [
+                  "Walked area (8,665 sqft) differs from the document's stated area (41,382 sqft) by 79% -- beyond the 15% tolerance."
+                ],
+                "perimeter_ft": 379.89,
+                "precision_ratio": null,
+                "self_intersects": false,
+                "area_sqft": 8664.7,
+                "area_acres": 0.199,
+                "stated_area_sqft": 41382.0,
+                "area_matches_stated": false,
+                "area_diff_pct": 79.06,
+                "curve_diagnostics": []
+              },
+              "human_edited": true,
+              "confirmed_boundary_pixels": {
+                "vertices": [
+                  [
+                    1704.6162442957523,
+                    1063.3833596877982
+                  ],
+                  [
+                    1658.8656411201432,
+                    1163.697320575635
+                  ],
+                  [
+                    1145.0908881072703,
+                    1053.9745067557385
+                  ],
+                  [
+                    1145.8146373665345,
+                    374.16419036110847
+                  ],
+                  [
+                    1485.4675666648727,
+                    353.1497864268346
+                  ],
+                  [
+                    1519.2172936614857,
+                    354.0619069822799
+                  ],
+                  [
+                    1904.143151624319,
+                    981.6263662347021
+                  ]
+                ],
+                "crop_width": 3059.0,
+                "crop_height": 1837.0
+              },
+              "human_confirmed": true,
+              "boundary_geojson_wgs84": {
+                "type": "Feature",
+                "properties": {
+                  "closure_error_ft": 0.0,
+                  "unparsed_calls": 0,
+                  "anchor_lat": 42.8808677,
+                  "anchor_lon": -71.3264492,
+                  "georeferenced": "from_confirmed_boundary"
+                },
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [
+                        -71.325793,
+                        42.8811409
+                      ],
+                      [
+                        -71.3258197,
+                        42.8810978
+                      ],
+                      [
+                        -71.3261199,
+                        42.881145
+                      ],
+                      [
+                        -71.3261195,
+                        42.8814371
+                      ],
+                      [
+                        -71.325921,
+                        42.8814461
+                      ],
+                      [
+                        -71.3259013,
+                        42.8814457
+                      ],
+                      [
+                        -71.3256764,
+                        42.881176
+                      ],
+                      [
+                        -71.325793,
+                        42.8811409
+                      ]
+                    ]
+                  ]
+                }
+              },
+              "boundary_source": "manual_confirmed_uncalibrated",
+              "calibration": {
+                "status": "unverified",
+                "scale_ft_per_px": 0.3096400351350167,
+                "rotation_deg": null,
+                "scale_from_area": 0.3096400351350167,
+                "scale_from_edges": 0.3103037355128308,
+                "scale_agreement_pct": 0.2143457894663718,
+                "corroborating_edge_count": 3,
+                "notes": [
+                  "4 corroborating edges have bearings but disagree on line orientation by up to 59.5deg (>5.0deg) -- not averaging them.",
+                  "no corroborating edge has a printed bearing that agrees closely enough -- rotation unverified.",
+                  "gemini association returned 7 edge reading(s)"
+                ],
+                "corroborations": [
+                  {
+                    "edge_index": 3,
+                    "value": 105.55,
+                    "azimuth": 61.89833333333333,
+                    "source": "gemini_association",
+                    "pct_err": 0.17
+                  },
+                  {
+                    "edge_index": 6,
+                    "value": 66.91,
+                    "azimuth": 137.55333333333334,
+                    "source": "gemini_association",
+                    "pct_err": 0.21
+                  },
+                  {
+                    "edge_index": 1,
+                    "value": 164.41,
+                    "azimuth": 257.6588888888889,
+                    "source": "gemini_association",
+                    "pct_err": 1.07
+                  },
+                  {
+                    "edge_index": 1,
+                    "value": 164.66,
+                    "azimuth": 337.13444444444445,
+                    "source": "gemini_association",
+                    "pct_err": 1.22
+                  }
+                ]
+              }
+            },
+            {
+              "vision_geometry": {
+                "boundary_calls": [
+                  {
+                    "bearing": "N 22\u00b051'56\" W",
+                    "distance": "164.66'"
+                  },
+                  {
+                    "bearing": "S 77\u00b039'32\" W",
+                    "distance": "164.41'"
+                  },
+                  {
+                    "bearing": "S 03\u00b023'08\" E",
+                    "distance": "32.24'"
+                  },
+                  {
+                    "bearing": "S 42\u00b026'48\" W",
+                    "distance": "66.91'"
+                  },
+                  {
+                    "bearing": "S 54\u00b045'01\" E",
+                    "distance": "209.93'"
+                  }
+                ],
+                "tie_point": {
+                  "northing": "137,042.75",
+                  "easting": "1,101,226.83",
+                  "anchors_corner": "north/northwest corner near Island Pond Rd"
+                },
+                "basis_of_bearings": null,
+                "parcel_label": "MAP 7 LOT 48-3",
+                "stated_area_acres": "1.72",
+                "ambiguous_alternates": [],
+                "curve_calls": []
+              },
+              "resolved_boundary_calls": [
+                {
+                  "bearing": "S 59\u00b041'15\" E ",
+                  "distance": "123.01'"
+                },
+                {
+                  "bearing": "S 54\u00b045'01\" E ",
+                  "distance": "209.93'"
+                },
+                {
+                  "bearing": "N 22\u00b051'56\" W ",
+                  "distance": "184.66'"
+                },
+                {
+                  "bearing": "N 22\u00b004'05\" W ",
+                  "distance": "74.08'"
+                },
+                {
+                  "bearing": "S 65\u00b053'20\" W ",
+                  "distance": "396.68'"
+                }
+              ],
+              "boundary_geojson": {
+                "type": "Feature",
+                "properties": {
+                  "closure_error_ft": 0.0,
+                  "unparsed_calls": 0,
+                  "curve_diagnostics": []
+                },
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [
+                        60.12,
+                        35.32
+                      ],
+                      [
+                        80.6,
+                        -128.88
+                      ],
+                      [
+                        114.3,
+                        -129.13
+                      ],
+                      [
+                        159.65,
+                        -178.71
+                      ],
+                      [
+                        -37.89,
+                        -411.46
+                      ],
+                      [
+                        -168.2,
+                        -39.23
+                      ],
+                      [
+                        60.12,
+                        35.32
+                      ]
+                    ]
+                  ]
+                }
+              },
+              "spatial_validation": {
+                "valid": false,
+                "issues": [
+                  "Walked area (27,572 sqft) differs from the document's stated area (74,923 sqft) by 63% -- beyond the 15% tolerance."
+                ],
+                "perimeter_ft": 966.02,
+                "precision_ratio": null,
+                "self_intersects": false,
+                "area_sqft": 27572.44,
+                "area_acres": 0.633,
+                "stated_area_sqft": 74923.2,
+                "area_matches_stated": false,
+                "area_diff_pct": 63.2,
+                "curve_diagnostics": []
+              },
+              "human_edited": true,
+              "confirmed_boundary_pixels": {
+                "vertices": [
+                  [
+                    1142.0462871539373,
+                    1052.199399617587
+                  ],
+                  [
+                    1665.7975467124709,
+                    1166.1935007745053
+                  ],
+                  [
+                    1702.7683615097599,
+                    1063.496074698282
+                  ],
+                  [
+                    1903.0260362722258,
+                    978.257127479637
+                  ],
+                  [
+                    2401.7751732755296,
+                    1832.1425989554443
+                  ],
+                  [
+                    1124.2992597284692,
+                    1829.997845784317
+                  ]
+                ],
+                "crop_width": 3059.0,
+                "crop_height": 1837.0
+              },
+              "human_confirmed": true,
+              "boundary_geojson_wgs84": {
+                "type": "Feature",
+                "properties": {
+                  "closure_error_ft": 0.0,
+                  "unparsed_calls": 0,
+                  "anchor_lat": 42.8808677,
+                  "anchor_lon": -71.3264492,
+                  "georeferenced": "from_confirmed_boundary"
+                },
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [
+                        -71.3262249,
+                        42.8809646
+                      ],
+                      [
+                        -71.3261485,
+                        42.8805141
+                      ],
+                      [
+                        -71.3260228,
+                        42.8805134
+                      ],
+                      [
+                        -71.3258536,
+                        42.8803774
+                      ],
+                      [
+                        -71.3265906,
+                        42.8797388
+                      ],
+                      [
+                        -71.3270767,
+                        42.8807601
+                      ],
+                      [
+                        -71.3262249,
+                        42.8809646
+                      ]
+                    ]
+                  ]
+                }
+              },
+              "boundary_source": "manual_confirmed_calibrated",
+              "calibration": {
+                "status": "single_source",
+                "scale_ft_per_px": 0.3087168066634449,
+                "rotation_deg": 70.61018516673413,
+                "scale_from_area": 0.3087168066634449,
+                "scale_from_edges": 0.3012644661829573,
+                "scale_agreement_pct": 2.4139730392495102,
+                "corroborating_edge_count": 1,
+                "notes": [
+                  "resolved 180deg direction ambiguity using the previous (uncalibrated) placement as a reference (candidate A err=264961, candidate B err=455023)",
+                  "1 corroborating edge(s): [2]",
+                  "gemini association returned 6 edge reading(s)"
+                ],
+                "corroborations": [
+                  {
+                    "edge_index": 2,
+                    "value": 66.91,
+                    "azimuth": 137.55333333333334,
+                    "source": "gemini_association",
+                    "pct_err": 0.42
+                  }
+                ]
+              }
+            }
+          ],
+          "vision_escalated": true
+        },
+        {
+          "class": "Text",
+          "confidence": 0.683,
+          "bbox": [
+            196.8,
+            844.6,
+            247.9,
+            28.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "4189-1073\uff08292(SLAND PONDRD\uff09\n6141-255\uff08288ISLANDPONDRD\uff09",
+          "ocr_confidence": 0.934
+        },
+        {
+          "class": "Text",
+          "confidence": 0.665,
+          "bbox": [
+            206.0,
+            947.4,
+            589.2,
+            70.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "VERTICAL AND HORIZONTAL DATA SHOWN ARE BASED ON GPS OBSERVATONS BY PROMISED LAND\nSURVEY, LLC IN OCTOBER OF 2OZ1 USING CARLSON BRX7 GPS OBSERVATIONS WERE ADJUSTED\nUSING A LEAST SQUARES ADJUSTMENT UTLZING CORS STATIONS ZBWI (NASHUA, NH). MASA\n(SALISBURY, MA),& NHUN (DURHAM, NH) AND WERE INSTRUMENT (LEICA TSI6)VERIFIED AND\nINCORPORATED INTO THE CLOSED TRAVERSE WHICH HAD A CLOSURE OF 1:6B,931.",
+          "ocr_confidence": 0.931
+        },
+        {
+          "class": "Text",
+          "confidence": 0.595,
+          "bbox": [
+            2618.8,
+            1595.3,
+            478.2,
+            121.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "LOTLINE ADJUSTMENT PLAT\nMAP7LOTS48 &z 48-3\n288& 292ISLAND PONDRD\nDERRY,NEWHIAMPSHIIRE\nDECEMBER15,2021",
+          "ocr_confidence": 0.949
+        },
+        {
+          "class": "Text",
+          "confidence": 0.589,
+          "bbox": [
+            199.9,
+            1923.8,
+            571.9,
+            107.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "NOTE:\nSHEET 1 OF 1 SHALL BE RECORDED AT THE ROCKINGHAM COUNTY\nREGISTRY OF DEEDS UPON APPROVAL BY THE DERRY PLANNING\nBOARD. THIS SHEET CONSTITUTES THE APPLICATION APPROVED BY\nTHE DERRY PLANNING BOARD AND SHALL BE ON FILE AT THE\nDERRY PLANNING DEPARTMENT.",
+          "ocr_confidence": 0.967
+        },
+        {
+          "class": "Text",
+          "confidence": 0.535,
+          "bbox": [
+            196.6,
+            1309.4,
+            590.0,
+            89.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "VARIANCE\nTHE ZONING BOARD OF ADJUSTMENTS VOTED TO APPROVED A VARIANCE TO ARTCLE V SECTION\n165-48.B.1 & 4 ON FEBRUARY 17, 202Z CASE 22-118. THIS VARIANCE ALLOWS FOR THE LOT\nLNE ADJUSTMENT, AS SHOWN, WTH MAP7 LOT 48 BECOMING MORE NON-CONFORMING AND\nFOR THE EXISTING GARAGE ON MAP 7 LOT 48-3 TO REMAIN LESS THAN 15' FROM THE REAR\nBOUNDARY LNE.",
+          "ocr_confidence": 0.943
+        },
+        {
+          "class": "Text",
+          "confidence": 0.501,
+          "bbox": [
+            2823.8,
+            1389.3,
+            348.5,
+            49.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "I FURTHER CERTIFY THAT I HAVE FILED A COPY\nOF THIS PLAT WITH THE TOWN OF DERRY, NH\nIN ACCORDANCE WITH RSA 676.18 V.",
+          "ocr_confidence": 0.936
+        },
+        {
+          "class": "Text",
+          "confidence": 0.489,
+          "bbox": [
+            195.5,
+            481.6,
+            91.2,
+            19.4
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\3ea4cc01-4d39-472b-9465-a105306d63dc\\review_crops\\page_013_10_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "NOTES",
+          "ocr_confidence": 0.995
+        },
+        {
+          "class": "Text",
+          "confidence": 0.447,
+          "bbox": [
+            2508.7,
+            1240.7,
+            648.0,
+            141.1
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\3ea4cc01-4d39-472b-9465-a105306d63dc\\review_crops\\page_013_11_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "LANDSURVEYOR'SCERTIFICATION\n1\uff0c TIMOTHY A. PELOQUIN, LLS, HEREBY CERTIFY THAT THIS LOT LINE ADJUSTMENT\nPLAT WAS PREPARED BY ME, AND/OR OTHERS UNDER MY DIRECT SUPERVISION\nAND THAT THE FIELD WORK PERFORMED IN THE PREPARATION OF THIS PLAT HAS\nA LINEAR ERROR OF CLOSURE NO GREATER THAN ONE FOOT IN TEN THOUSAND\nFEET AND HAS A MINIMUM LINEAR ERROR OF CLOSURE NO GREATER THAN ONE\nFOOT IN FIFTEEN THOUSAND FEET IN ACCORDANCE WITH SECTION 4.2. OF THE\nNHLSA ETHICS AND STANDARDS.",
+          "ocr_confidence": 0.956
+        },
+        {
+          "class": "Text",
+          "confidence": 0.435,
+          "bbox": [
+            202.3,
+            483.8,
+            584.7,
+            326.4
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\3ea4cc01-4d39-472b-9465-a105306d63dc\\review_crops\\page_013_12_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "1) THE PURPOSE OF THIS PLAN IS TO DEPICT A LOT UINE ADJUSTMENT BETWEEN MAP 7 LOT 4B\n(288 ISLAND POND ROAD)AND MAP 7 LOT 48-3(292 ISLAND POND ROAD)IN DERRY, NEW\nHAMPSHIRE.\n3)THESE PARCELS OF LANO (MAP 7 LOTS 48 & 4B-3) DO NOT UE WTHIN A SPECAL FLOOD\nHAZARD AREA AS INTERPOLATED FROM THE FLOOD INSURANCE RATE MAP (FIRM) FOR\nROCKINGHAM COUNTY, NEW HAMPSHIRE(ALL JURISDICTONS) 3O015CO363E, HAVNG AN\nEFFECTIVE DATE OF MAY 17. 2005.\n4)\nTHE SUBJECT LOTS ARE SERVCED BY PRIVATE, ONSITE SEPTICS AND WELLS\ns\nTHE BEARING SYSTEM OF THIS PLAN IS BASED ON NH STATE PLANE COORDINATE\n(NAD83/2011).\nSIZE PAPER.\nB$\nALL DISTANCES, UNLESS OTHERWSE INDICATED, ARE US SURVEY FEET HORIZONTAL DISTANCES\nALLZONING INFORMATON SHALL BEVERIFIED PRIOR TO ANY BUILDING OR CONSTRUCTION\nACTIVTY.\nPLANOFREFERENCE\n1)\"SUBDIVSION PLAN IN DERRY, NH.:PREPARED FOR: SAMUEL &PRISCLLA PARTEN; DATED:\nJUNE, 1984:SEE RCRD PLAN No.D-12630.",
+          "ocr_confidence": 0.895
+        },
+        {
+          "class": "Text",
+          "confidence": 0.361,
+          "bbox": [
+            189.4,
+            549.3,
+            632.1,
+            25.5
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\3ea4cc01-4d39-472b-9465-a105306d63dc\\review_crops\\page_013_13_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "OF 2021.",
+          "ocr_confidence": 0.945
+        },
+        {
+          "class": "Text",
+          "confidence": 0.322,
+          "bbox": [
+            209.8,
+            1044.8,
+            567.3,
+            96.8
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\3ea4cc01-4d39-472b-9465-a105306d63dc\\review_crops\\page_013_14_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "WAIVERS FROM THE FOLLOWNG LAND DEVELOPMENT CONTROL REGULATIONS (DATED: MAY 19,\n2021)ARE REQUESTED AS PART OF THIS APPUCATION:\nARTICLE V,\nSECTON 170-24, A. 11 - ENTIRE SITE TOPOGRAPHY.\nARTCEV\nSECTON170-24.\nA.13\nWETANDMAPPING\nARTICLE V, SECTION 17O-25. B.- MINIMUM LOT SIZE CALCULAONS BY SOIL TYPE\nARTCLE V. SECTON 17O-25, C.- HIGH INTENSITY SOIL SURVEY MAPPING\nZONING",
+          "ocr_confidence": 0.916
+        }
+      ]
+    }
+  ],
+  "pages_needing_review": 7,
+  "anchor_lat": 42.8808677,
+  "anchor_lon": -71.3264492,
+  "anchor": {
+    "precision": "city",
+    "source": "geocoded \"Derry, NH 03038\""
+  }
+}

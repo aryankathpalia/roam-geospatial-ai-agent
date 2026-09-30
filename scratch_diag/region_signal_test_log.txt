@@ -1,0 +1,84 @@
+[2f896c95-b0f3-4a49-a447-4b3ca6129c27] OCR-only pass for 4 labeled regions...
+C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py:197: UserWarning: Specified provider 'CUDAExecutionProvider' is not in available provider names.Available providers: 'AzureExecutionProvider, CPUExecutionProvider'
+  warnings.warn(
+INFO: Could not find files for the given pattern(s).
+C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:718: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mCreating model: ('PP-OCRv5_mobile_det', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-OCRv5_mobile_det`.[0m
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I0927 14:26:52.386225 30000 onednn_context.cc:81] oneDNN v3.6.2
+[32mCreating model: ('PP-OCRv5_mobile_rec', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-OCRv5_mobile_rec`.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+I0927 14:29:05.782018 23344 onednn_context.cc:81] oneDNN v3.6.2
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x5400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[27211ae5-0099-4b0d-8176-f1483897b766] OCR-only pass for 4 labeled regions...
+I0927 14:39:42.950325 26800 onednn_context.cc:81] oneDNN v3.6.2
+[3affa529-5b4f-42d7-b336-596315433572] OCR-only pass for 4 labeled regions...
+[65be453d-f014-4024-84d6-60a2d0052aeb] OCR-only pass for 5 labeled regions...
+[a1136318-03ef-438d-9f02-8fcdcb5dca30] OCR-only pass for 2 labeled regions...
+[db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b] OCR-only pass for 3 labeled regions...
+I0927 15:08:14.087689 17800 onednn_context.cc:81] oneDNN v3.6.2
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[798850fc-1be3-4bc6-9f53-1441c39cbd04] OCR-only pass for 1 labeled regions...
+I0927 15:25:34.852943 25200 onednn_context.cc:81] oneDNN v3.6.2
+I0927 15:34:13.229722 31824 onednn_context.cc:81] oneDNN v3.6.2
+[83ab22d0-b950-4f5d-ad33-5f0fd6105dbe] OCR-only pass for 1 labeled regions...
+[8d75d3ed-d9e7-4bfb-874a-0b52063883eb] OCR-only pass for 81 labeled regions...
+I0927 15:51:32.853598 20964 onednn_context.cc:81] oneDNN v3.6.2
+I0927 15:56:41.770426  7492 onednn_context.cc:81] oneDNN v3.6.2
+[33mResized image size (7200x4800) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x4800) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x4800) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x2400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+I0927 16:11:48.791358 32120 onednn_context.cc:81] oneDNN v3.6.2
+I0927 16:12:03.330633 16660 onednn_context.cc:81] oneDNN v3.6.2
+I0927 16:12:15.713363 23640 onednn_context.cc:81] oneDNN v3.6.2
+[33mResized image size (7200x4800) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+I0927 16:14:17.470798 13688 onednn_context.cc:81] oneDNN v3.6.2
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[510ea60f-f577-420d-b1e0-f2d3e0352661] OCR-only pass for 27 labeled regions...
+I0927 16:36:54.478791 34620 onednn_context.cc:81] oneDNN v3.6.2
+[33mResized image size (6800x1466) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (6800x1467) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (6800x1467) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+I0927 16:40:50.417521  3796 onednn_context.cc:81] oneDNN v3.6.2
+I0927 16:41:44.419731 13652 onednn_context.cc:81] oneDNN v3.6.2
+I0927 16:42:02.604347 29676 onednn_context.cc:81] oneDNN v3.6.2
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x2000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x2000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x2000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (8400x3000) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+
+=== SIGNAL SEPARABILITY (>=2 bearing tokens AND >=2 distance tokens) ===
+plat regions:     23, flagged-as-source: 5 (21.7%)
+non-plat regions: 109, WRONGLY flagged-as-source: 3 (2.8%)

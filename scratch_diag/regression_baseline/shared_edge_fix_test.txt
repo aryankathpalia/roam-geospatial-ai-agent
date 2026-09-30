@@ -1,0 +1,42 @@
+INFO: Could not find files for the given pattern(s).
+C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:718: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-LCNet_x1_0_doc_ori`.[0m
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I0925 17:14:07.773381 30312 onednn_context.cc:81] oneDNN v3.6.2
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+running 6 crops through extraction...
+
+=== db54d473_p15 ===
+  2 parcel(s) found: ['PARCEL 1', 'PARCEL 2']
+  PARCEL 1: 1 calls, precision 1:1.0, valid=False, area_acres=None
+  PARCEL 2: 1 calls, precision 1:1.0, valid=False, area_acres=None
+
+=== 27211ae5_p13 ===
+  2 parcel(s) found: ['MAP 7 LOT 48', 'MAP 7 LOT 48-3']
+  MAP 7 LOT 48: 1 calls, precision 1:1.0, valid=False, area_acres=None
+  MAP 7 LOT 48-3: 3 calls, precision 1:1.3, valid=False, area_acres=0.16
+
+=== 798850fc_p28 ===
+  2 parcel(s) found: ['PARCEL 1', 'PARCEL 2']
+  PARCEL 1: 3 calls, precision 1:1.1, valid=False, area_acres=0.089
+  PARCEL 2: 2 calls, precision 1:1.4, valid=False, area_acres=None
+
+=== 2f896c95_p6 ===
+  2 parcel(s) found: ['REMAINDER PARCEL 17-2-1-4', 'PARCEL 1']
+  REMAINDER PARCEL 17-2-1-4: 2 calls, precision 1:1.3, valid=False, area_acres=None
+  PARCEL 1: 2 calls, precision 1:1.4, valid=False, area_acres=None
+
+=== 2f896c95_p7 ===
+  6 parcel(s) found: ['17-2-1-2', '17-2-1-1', '17-2-1-3', '17-2-1-4', '17-2-1-5', 'PALOMINO VALLEY GENERAL IMPROVEMENT DISTRICT MATERIALS PIT & YARD']
+  17-2-1-2: 1 calls, precision 1:1.0, valid=False, area_acres=None
+  17-2-1-1: no traverse (This parcel was identified in the document (it has its own label/description) but no boundary dimensions could be confidently attributed to it specifically -- needs manual review against the source document.)
+  17-2-1-3: no traverse (This parcel was identified in the document (it has its own label/description) but no boundary dimensions could be confidently attributed to it specifically -- needs manual review against the source document.)
+  17-2-1-4: 1 calls, precision 1:1.0, valid=False, area_acres=None
+  17-2-1-5: no traverse (This parcel was identified in the document (it has its own label/description) but no boundary dimensions could be confidently attributed to it specifically -- needs manual review against the source document.)
+  PALOMINO VALLEY GENERAL IMPROVEMENT DISTRICT MATERIALS PIT & YARD: 4 calls, precision 1:1.2, valid=False, area_acres=3.524
+
+=== 2f896c95_p8 ===
+  2 parcel(s) found: ['17-2-1-4', '17-2-1-5']
+  17-2-1-4: no traverse (This parcel was identified in the document (it has its own label/description) but no boundary dimensions could be confidently attributed to it specifically -- needs manual review against the source document.)
+  17-2-1-5: no traverse (This parcel was identified in the document (it has its own label/description) but no boundary dimensions could be confidently attributed to it specifically -- needs manual review against the source document.)

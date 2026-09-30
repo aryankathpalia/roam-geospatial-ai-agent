@@ -1,0 +1,79 @@
+{
+  "parcel_labels_found": [
+    {
+      "region_index": 1,
+      "label": "LOT 1"
+    },
+    {
+      "region_index": 1,
+      "label": "LOT 2"
+    },
+    {
+      "region_index": 1,
+      "label": "LOT 3"
+    }
+  ],
+  "parcels": [
+    {
+      "region_index": 1,
+      "boundary_calls": [
+        {
+          "bearing": "S47°23'19\"E",
+          "distance": "39.50'"
+        }
+      ],
+      "tie_point": null,
+      "basis_of_bearings": null,
+      "parcel_label": "LOT 1",
+      "stated_area_acres": null,
+      "ambiguous_alternates": [],
+      "curve_calls": []
+    },
+    {
+      "region_index": 1,
+      "boundary_calls": [
+        {
+          "bearing": "N88°41'33\"W",
+          "distance": "100.00'"
+        },
+        {
+          "bearing": "S1°18'27\"W",
+          "distance": "64.60'"
+        }
+      ],
+      "tie_point": null,
+      "basis_of_bearings": null,
+      "parcel_label": "LOT 2",
+      "stated_area_acres": "0.25",
+      "ambiguous_alternates": [],
+      "curve_calls": [
+        {
+          "delta": "17°39'28\"",
+          "radius": "222.50'",
+          "arc_length": "68.57'",
+          "turn": null,
+          "after_call_index": 0
+        }
+      ]
+    },
+    {
+      "region_index": 1,
+      "boundary_calls": [
+        {
+          "bearing": "N88°41'33\"W",
+          "distance": "109.90'"
+        },
+        {
+          "bearing": "S1°18'27\"W",
+          "distance": "80.00'"
+        }
+      ],
+      "tie_point": null,
+      "basis_of_bearings": "N1°18'27\"E 363.50'",
+      "parcel_label": "LOT 3",
+      "stated_area_acres": "0.31",
+      "ambiguous_alternates": [],
+      "curve_calls": []
+    }
+  ]
+}

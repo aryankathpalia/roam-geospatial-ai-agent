@@ -1,0 +1,67 @@
+{
+  "edges": [
+    {
+      "edge_index": 0,
+      "bearing": "N 61°53'54\" E",
+      "distance": "105.55'",
+      "evidence_location": "Printed just above the upper horizontal segment near the northern corner",
+      "confidence": 1.0,
+      "read_or_inferred": "read",
+      "self_report_reasoning": "Clearly legible text directly adjacent to the northernmost horizontal property line segment."
+    },
+    {
+      "edge_index": 1,
+      "bearing": "S 32°27'48\" E",
+      "distance": "322.74'",
+      "evidence_location": "Printed alongside the long upper-right diagonal boundary line",
+      "confidence": 1.0,
+      "read_or_inferred": "read",
+      "self_report_reasoning": "Clearly legible survey calls running parallel to and centered along the long northeast boundary line."
+    },
+    {
+      "edge_index": 2,
+      "bearing": "S 42°26'46\" W",
+      "distance": "66.91'",
+      "evidence_location": "Printed just below the short upper-right jog segment",
+      "confidence": 1.0,
+      "read_or_inferred": "read",
+      "self_report_reasoning": "Clearly legible bearing and distance text directly next to this small angled segment."
+    },
+    {
+      "edge_index": 3,
+      "bearing": "S 33°21'39\" E",
+      "distance": "32.24'",
+      "evidence_location": "Printed vertically along the short jog segment on the eastern boundary",
+      "confidence": 1.0,
+      "read_or_inferred": "read",
+      "self_report_reasoning": "Legible survey call aligned precisely with this specific boundary segment."
+    },
+    {
+      "edge_index": 4,
+      "bearing": "S 77°39'32\" W",
+      "distance": "164.41'",
+      "evidence_location": "Printed just below the long lower-right diagonal segment near the asphalt/pavement area",
+      "confidence": 1.0,
+      "read_or_inferred": "read",
+      "self_report_reasoning": "Clearly legible text situated parallel to the lower boundary segment traversing the paved driveway area."
+    },
+    {
+      "edge_index": 5,
+      "bearing": "N 22°51'56\" W",
+      "distance": "164.66'",
+      "evidence_location": "Printed vertically to the left of the western boundary line near the paved area",
+      "confidence": 1.0,
+      "read_or_inferred": "read",
+      "self_report_reasoning": "Clearly legible text running vertically alongside this segment on the western side of the parcel."
+    },
+    {
+      "edge_index": 6,
+      "bearing": "N 24°41'43\" W",
+      "distance": "209.92'",
+      "evidence_location": "Printed vertically along the western boundary line adjacent to Island Pond Road",
+      "confidence": 1.0,
+      "read_or_inferred": "read",
+      "self_report_reasoning": "Clearly legible survey call running parallel to the northwestern boundary line facing Island Pond Road."
+    }
+  ]
+}

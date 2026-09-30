@@ -1,0 +1,65 @@
+INFO: Could not find files for the given pattern(s).
+C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:718: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mCreating model: ('PP-LCNet_x1_0_doc_ori', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-LCNet_x1_0_doc_ori`.[0m
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I0928 13:48:40.831784 15028 onednn_context.cc:81] oneDNN v3.6.2
+[32mCreating model: ('PP-LCNet_x1_0_textline_ori', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-LCNet_x1_0_textline_ori`.[0m
+[32mCreating model: ('PP-OCRv5_mobile_det', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-OCRv5_mobile_det`.[0m
+[32mCreating model: ('PP-OCRv5_mobile_rec', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-OCRv5_mobile_rec`.[0m
+
+========================================================================
+27211ae5_shared_edge
+========================================================================
+genuine calls: 39 (3 bearing+distance, 36 distance_only)
+excluded by easement/PUE/EXISTING/GRANTED keyword (own or within 80px): 0
+remaining after exclusion: 39
+  threshold=20px: 0 associated (0 bearing+distance), 0/10 edges have >=1 candidate
+  threshold=40px: 0 associated (0 bearing+distance), 0/10 edges have >=1 candidate
+  threshold=60px: 0 associated (0 bearing+distance), 0/10 edges have >=1 candidate
+  threshold=90px: 0 associated (0 bearing+distance), 0/10 edges have >=1 candidate
+  threshold=110px: 0 associated (0 bearing+distance), 0/10 edges have >=1 candidate
+  threshold=130px: 1 associated (0 bearing+distance), 1/10 edges have >=1 candidate
+
+  -- working set at 110px --
+
+  RESULT: unplaceable -- zero bearing+distance candidates survived association at all.
+
+========================================================================
+nvz_parcel1
+========================================================================
+genuine calls: 39 (4 bearing+distance, 35 distance_only)
+excluded by easement/PUE/EXISTING/GRANTED keyword (own or within 80px): 9
+remaining after exclusion: 30
+  threshold=20px: 1 associated (0 bearing+distance), 1/4 edges have >=1 candidate
+  threshold=40px: 2 associated (0 bearing+distance), 2/4 edges have >=1 candidate
+  threshold=60px: 5 associated (0 bearing+distance), 4/4 edges have >=1 candidate
+  threshold=90px: 7 associated (1 bearing+distance), 4/4 edges have >=1 candidate
+  threshold=110px: 9 associated (2 bearing+distance), 4/4 edges have >=1 candidate
+  threshold=130px: 10 associated (2 bearing+distance), 4/4 edges have >=1 candidate
+
+  -- working set at 110px --
+  edge0 (len=765px, angle=89.6deg): distance_only:'2107.74'
+  edge1 (len=312px, angle=180.0deg): distance_only:'1077.91', bearing+distance:'S0°48\'45"W220.00°', distance_only:'29629'
+  edge2 (len=765px, angle=270.0deg): distance_only:'5.00', distance_only:'68.0', bearing+distance:'N89*11\'15"W 903.15"', distance_only:'0032168'
+  edge3 (len=307px, angle=0.0deg): distance_only:'68'
+
+  best hypothesis: seed edge2 call='N89*11\'15"W 903.15"' scale=0.1163 ft/px rotation=0.8deg
+  agreeing edges: 1 ([2])
+  support: []
+  VERDICT: unverified
+
+--- diagnostic: raw distances for every bearing+distance call, 27211ae5_shared_edge ---
+  text='S655320W 396.68'                        nearest_edge=6 dist_px=1087 orient_ok=False excluded_kw=False
+  text='N225156W 9991'                          nearest_edge=0 dist_px=444 orient_ok=False excluded_kw=False
+  text="N2204'05W 75.08"                        nearest_edge=6 dist_px=509 orient_ok=False excluded_kw=False
+
+--- diagnostic: raw distances for every bearing+distance call, nvz_parcel1 ---
+  text='N0°48\'45"E 220.00*'                    nearest_edge=3 dist_px=734 orient_ok=True excluded_kw=False
+  text='(N0°02\'31"W 250.00") (R4)'             nearest_edge=3 dist_px=718 orient_ok=True excluded_kw=False
+  text='S0°48\'45"W220.00°'                     nearest_edge=1 dist_px=106 orient_ok=True excluded_kw=False
+  text='N89*11\'15"W 903.15"'                   nearest_edge=2 dist_px=77 orient_ok=True excluded_kw=False

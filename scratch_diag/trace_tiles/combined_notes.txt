@@ -1,0 +1,122 @@
+Region 1, Piece 1:
+Region 1, Piece 1:
+
+- **Ground Coordinates:** 
+  - N 14926910.28
+  - E 2251599.70
+
+- **Boundary Bearing and Distance Calls (and associated record calls):**
+  - $\text{N}0^\circ48'45''\text{E } 220.00'$ (as-surveyed boundary call)
+  - $(\text{N}0^\circ02'31''\text{W } 250.00')\text{ (R4)}$ (prior-record citation in parentheses)
+
+- **Tie Lines:**
+  - $\text{S}1^\circ39'59''\text{W } 30.00'\text{ (TIE)}$ (tie line connected to the monument/reference point)
+
+- **Parcel / Lot Labels and Acreage:**
+  - `PARCEL 2`
+  - `2.78 ACRES`
+
+Region 1, Piece 2:
+Region 1, Piece 1:
+
+* **Parcel/lot label or acreage:**
+  * `STEVEN D & CORINA B. POKRAJAC`
+  * `PARCEL 2B RS 6231 (R3)`
+  * `APN: 086-260-22`
+
+* **Boundary bearing and distance calls (and prior-record citations):**
+  * `S89°11'15"E 903.15'` (Top boundary)
+  * `(S89°09'41"E) (R3)` (Prior-record citation above top boundary)
+  * `(N89°57'29"E) (R4)` (Prior-record citation above top boundary)
+  * `N89°11'15"W 903.15'` (Bottom boundary)
+  * `(N89°57'29"E) (R4)` (Prior-record citation below bottom boundary)
+  * `S0°48'45"W` (Interior/dividing line vertical bearing)
+
+Region 1, Piece 3:
+Based on the provided image, here are the findings for Region 1, Piece 1:
+
+**Region 1, Piece 1:**
+
+* **Basis-of-Bearings / Datum / Coordinate-Zone Statements:**
+  * "WASHOE COUNTY CONTROL POINT N22SM01029 USGLO 2" BRASS CAP S12/7/13/18 1942"
+  * "GROUND COORDINATES (MEASURED) N: 14928989.71 E: 2253610.44"
+  * "GROUND COORDINATES (RECORD) N: 14928989.62 E: 2253610.74"
+
+* **Ground / State-Plane Coordinates:**
+  * "N 14926897.47 E 2252502.76" (located near the upper-right parcel corner)
+
+* **Parcel / Lot Labels or Acreage:**
+  * "PARCEL 1"
+  * "1.78 ACRES"
+
+* **Boundary Bearing and Distance Calls & Tie Lines:**
+  * **Tie / Section Line / Control-Point Lines (not parcel boundary calls):**
+    * `N89°11'11"E 1077.91'` — appears to be a tie line connecting to the section line / control point.
+    * `N0°48'45"E 2637.36'` — appears to be a tie/section-line distance (connecting to the Washoe County Control Point area).
+    * `(N0°48'59"E 2637.29' - R1)` — record/tie citation in parentheses.
+    * `(N0°49'02"E 2637.35' - R3)` — record/tie citation in parentheses.
+    * `2107.74'` — distance call along the section/tie line.
+    * `529.62'` — distance call along the section/tie line.
+  * **Parcel Boundary Calls (and record citations):**
+    * `S0°48'45"W 220.00'` — parcel boundary bearing and distance call.
+    * `(S0°02'31"E 250.00' - R4)` — prior-record citation in parentheses.
+
+Region 1, Piece 4:
+Based on the provided image (Region 1, Piece 1), here are the extracted items matching your criteria, transcribed exactly as written:
+
+**Region 1, Piece 1:**
+
+*   **Boundary / Prior-Record / Other Calls (with context):**
+    *   `(N89°57'29"E) (R2)` — Appears above a dashed line near the top. (This is a prior-record citation in parentheses).
+    *   `30' QUITCLAIM AREA (R6)` — Labeled pointing to the dashed line area ("30' QUITCLAIM AREA").
+
+*   **Parcel/Lot Label or Ownership Text:**
+    *   `JAMES KRANTZ & LINDA HOUGHTON TRUST`
+    *   `DEED 4286292`
+    *   `APN: 086-250-67`
+
+*   **Basis-of-Bearings / Datum / Coordinate-Zone Statement:**
+    *   `BASIS OF BEARINGS`
+    *   `THE BASIS OF BEARINGS FOR THIS SURVEY IS NEVADA STATE PLANE, WEST ZONE`
+    *   `NAD83(94) BASED ON REAL TIME KINEMATIC (RTK) GPS OBSERVATIONS UTILIZING`
+    *   `CORRECTIONS FROM THE NORTHERN NEVADA COOPERATIVE REAL TIME NETWORK.`
+    *   `COORDINATES AND DISTANCES HEREON ARE AT GROUND LEVEL BASED ON A`
+    *   `COMBINED GRID TO GROUND FACTOR OF 1.000197939.`
+
+Region 1, Piece 5:
+Region 1, Piece 1:
+
+- **S89°11'17"E 329.80'** -- Boundary/road frontage bearing and distance call for Placerville Road (along the northern right-of-way).
+- **(N89°57'29"E) (R2)** -- Record information (prior-record citation) corresponding to the Placerville Road frontage bearing, shown in parentheses.
+- **30' QUITCLAIM AREA (R5)** -- Label indicating a 30' quitclaim/dedication area along Placerville Road.
+- **ORLANDO G. & REGINA M. JASSO** -- Parcel owner label.
+- **DEED 5217588** -- Deed reference number for the parcel.
+- **APN: 086-250-75** -- Assessor Parcel Number (APN) for the parcel.
+
+Region 1, Piece 6:
+Region 1, Piece 1:
+
+**Boundary bearing and distance calls:**
+- S89°11'17"E 325.30'
+- (N89°57'29"E) (R2) — *prior-record citation in parentheses, located near the top boundary line.*
+
+**Tie-line measurements / control point calls:**
+- The top-center call `S89°11'17"E 325.30'` / `(N89°57'29"E) (R2)` with a curved leader pointing to the dashed line near `30' QUITCLAIM AREA (R5)` appears to relate to the right-of-way/quitclaim area rather than a standard parcel boundary line.
+
+**Ground/state-plane coordinates:**
+- GROUND COORDINATES (MEASURED):
+  N: 14926352.62
+  E: 2253573.04
+- GROUND COORDINATES (RECORD):
+  N: 14926352.55
+  E: 2253573.13
+
+**Basis-of-bearings / datum / coordinate-zone statement:**
+- WASHOE COUNTY CONTROL POINT
+  N22SM01113 USGLO BRASS CAP
+  1/4 CORNER 13/18 1942
+
+**Parcel/lot labels or acreage:**
+- PARCEL 1 | 77,526 SQ. FT. | 1.78 ACRES
+- PARCEL 2 | 121,165 SQ. FT. | 2.78 ACRES
+- TOTAL | 198,691 SQ. FT. | 4.56 ACRES

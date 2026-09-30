@@ -1,0 +1,90 @@
+[
+  {
+    "region_index": 2,
+    "boundary_calls": [
+      {
+        "bearing": "N21° 13' 27\"W",
+        "distance": "159.18'"
+      },
+      {
+        "bearing": "S69° 05' 58\"W",
+        "distance": "124.76'"
+      },
+      {
+        "bearing": "S21° 13' 27\"E",
+        "distance": "193.20'"
+      },
+      {
+        "bearing": "N65° 22' 13\"E",
+        "distance": "5.32'"
+      },
+      {
+        "bearing": "N63° 37' 29\"E",
+        "distance": "6.89'"
+      },
+      {
+        "bearing": "S27° 04' 12\"E",
+        "distance": "32.43'"
+      },
+      {
+        "bearing": "S62° 00' 09\"E",
+        "distance": "11.31'"
+      },
+      {
+        "bearing": "N56° 40' 56\"E",
+        "distance": "51.12'"
+      }
+    ],
+    "tie_point": null,
+    "basis_of_bearings": null,
+    "parcel_label": "Lot 1",
+    "stated_area_acres": "0.73",
+    "ambiguous_alternates": []
+  },
+  {
+    "region_index": 2,
+    "boundary_calls": [
+      {
+        "bearing": "S20° 54' 02\"E",
+        "distance": "83.98'"
+      },
+      {
+        "bearing": "S17° 37' 02\"E",
+        "distance": "64.85'"
+      },
+      {
+        "bearing": "S69° 05' 58\"W",
+        "distance": "91.89'"
+      },
+      {
+        "bearing": "N21° 52' 17\"W",
+        "distance": "62.99'"
+      },
+      {
+        "bearing": "N68° 38' 43\"E",
+        "distance": "100.00'"
+      },
+      {
+        "bearing": "N68° 38' 43\"E",
+        "distance": "32.40'"
+      },
+      {
+        "bearing": "S06° 53' 43\"W",
+        "distance": "22.70'"
+      },
+      {
+        "bearing": "S68° 38' 43\"W",
+        "distance": "24.60'"
+      },
+      {
+        "bearing": "N68° 38' 43\"E",
+        "distance": "68.53'"
+      }
+    ],
+    "tie_point": null,
+    "basis_of_bearings": null,
+    "parcel_label": "Lot 2",
+    "stated_area_acres": "0.32",
+    "ambiguous_alternates": []
+  }
+]

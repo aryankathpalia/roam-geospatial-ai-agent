@@ -1,0 +1,30 @@
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+[
+  {
+    "boundary_calls": [
+      {
+        "bearing": "N0\u00b048'45\"E",
+        "distance": "220.00'"
+      },
+      {
+        "bearing": "N0\u00b048'45\"E",
+        "distance": "2637.36'"
+      },
+      {
+        "bearing": "S89\u00b011'15\"E",
+        "distance": "903.15'"
+      },
+      {
+        "bearing": "S0\u00b048'45\"W",
+        "distance": "220.00'"
+      },
+      {
+        "bearing": "N89\u00b011'15\"W",
+        "distance": "903.15'"
+      }
+    ],
+    "tie_point": null,
+    "basis_of_bearings": "THE BASIS OF BEARINGS FOR THIS SURVEY IS NEVADA STATE PLANE, WEST ZONE NAD83(94) BASED ON REAL TIME KINEMATIC (RTK) GPS OBSERVATIONS UTILIZING CORRECTIONS FROM THE NORTHERN NEVADA COOPERATIVE REAL TIME NETWORK. COORDINATES AND DISTANCES HEREON ARE AT GROUND LEVEL BASED ON A COMBINED GRID TO GROUND FACTOR OF 1.000197939.",
+    "parcel_label": "PARCEL 1"
+  }
+]

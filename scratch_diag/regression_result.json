@@ -1,0 +1,79 @@
+[
+  {
+    "vision_geometry": {
+      "boundary_calls": [
+        {
+          "bearing": "N89\u00b011'15\"W",
+          "distance": "903.15'"
+        },
+        {
+          "bearing": "S89\u00b011'15\"E",
+          "distance": "903.15'"
+        }
+      ],
+      "tie_point": {
+        "northing": "14926910.28",
+        "easting": "2251599.70",
+        "anchors_corner": ""
+      },
+      "basis_of_bearings": null,
+      "parcel_label": "PARCEL 2",
+      "stated_area_acres": "2.78",
+      "ambiguous_alternates": []
+    },
+    "spatial_validation": {
+      "valid": false,
+      "issues": [
+        "Only 2 boundary call(s) parsed -- too few to form a closed shape (need at least 3)."
+      ],
+      "perimeter_ft": 1806.3,
+      "precision_ratio": null,
+      "self_intersects": false,
+      "area_sqft": null,
+      "area_acres": null,
+      "stated_area_sqft": 121096.79999999999,
+      "area_matches_stated": null
+    }
+  },
+  {
+    "vision_geometry": {
+      "boundary_calls": [
+        {
+          "bearing": "N0\u00b048'45\"E",
+          "distance": "2637.36'"
+        },
+        {
+          "bearing": "N89\u00b011'15\"E",
+          "distance": "1077.91'"
+        },
+        {
+          "bearing": "S89\u00b011'17\"E",
+          "distance": "329.80'"
+        }
+      ],
+      "tie_point": {
+        "northing": "14926897.47",
+        "easting": "2252502.76",
+        "anchors_corner": ""
+      },
+      "basis_of_bearings": null,
+      "parcel_label": "PARCEL 1",
+      "stated_area_acres": "1.78",
+      "ambiguous_alternates": []
+    },
+    "spatial_validation": {
+      "valid": false,
+      "issues": [
+        "Weak closure: precision ratio 1:1 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.",
+        "Walked area (1,420,847 sqft) differs from the document's stated area (77,537 sqft) by 1732% -- beyond the 15% tolerance."
+      ],
+      "perimeter_ft": 4045.07,
+      "precision_ratio": 1.3,
+      "self_intersects": false,
+      "area_sqft": 1420846.72,
+      "area_acres": 32.618,
+      "stated_area_sqft": 77536.8,
+      "area_matches_stated": false
+    }
+  }
+]

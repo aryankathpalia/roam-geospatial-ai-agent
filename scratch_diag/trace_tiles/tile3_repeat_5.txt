@@ -1,0 +1,25 @@
+Based on the provided piece for Region 1, here is the list of requested items exactly as written:
+
+**Region 1, Piece 1:**
+
+* **Boundary Bearing and Distance Calls & Prior-Record Citations:**
+  * `S0*48'45"W 220.00'` (Boundary call along the east side of Parcel 1)
+  * `(S0*02'31"E 250.00' (R4))` (Prior-record citation in parentheses)
+
+* **Tie-Lines / Reference Lines (not parcel boundary calls):**
+  * `N89*11'15"E 1077.91'` (Tie-line connecting the northeast corner of the parcel to the section line / control point area)
+  * `N0*48'45"E 2637.36'` (Tie-line/section-line distance connecting to the control point/section area)
+  * `(N0*48'59"E 2637.29' - R1)` (Prior-record citation for the section/tie line in parentheses)
+  * `(N0*49'02"E 2637.35' - R3)` (Prior-record citation for the section/tie line in parentheses)
+
+* **Ground / State-Plane Coordinates:**
+  * `N: 14928989.71 E: 2253610.44` (Ground Coordinates (Measured) for Washoe County Control Point)
+  * `N: 14928989.62 E: 2253610.74` (Ground Coordinates (Record) for Washoe County Control Point)
+  * `N 14926897.47 E 2252502.76` (Ground Coordinates at the northeast corner of the parcel)
+
+* **Basis-of-Bearings / Datum / Coordinate-Zone Statements:**
+  * `WASHOE COUNTY CONTROL POINT N22SM01029 USGLO 2" BRASS CAP S12/7/13/18 1942`
+
+* **Parcel / Lot Labels or Acreage:**
+  * `PARCEL 1`
+  * `1.78 ACRES`

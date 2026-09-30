@@ -1,0 +1,53 @@
+{
+  "3": {
+    "counts": [
+      13,
+      11,
+      6,
+      13,
+      6,
+      6,
+      6,
+      0
+    ],
+    "zero_rate": 0.125,
+    "below2_rate": 0.125,
+    "best_single_run": 13,
+    "union_count": 32,
+    "union_beats_best_single": true
+  },
+  "4": {
+    "counts": [
+      5,
+      4,
+      5,
+      6,
+      5,
+      5,
+      6,
+      5
+    ],
+    "zero_rate": 0.0,
+    "below2_rate": 0.0,
+    "best_single_run": 6,
+    "union_count": 10,
+    "union_beats_best_single": true
+  },
+  "5": {
+    "counts": [
+      5,
+      4,
+      5,
+      6,
+      0,
+      5,
+      6,
+      5
+    ],
+    "zero_rate": 0.125,
+    "below2_rate": 0.125,
+    "best_single_run": 6,
+    "union_count": 9,
+    "union_beats_best_single": true
+  }
+}
