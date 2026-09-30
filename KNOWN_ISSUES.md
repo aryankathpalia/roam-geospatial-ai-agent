@@ -444,3 +444,67 @@ Failure (no key/quota) falls back to OCR-only with a note.
 Status: unit-tested with mocks only (tests/test_gemini_edge_association.py).
 The repeated-run evaluation on MAP 7 LOT 48 / LOT 48-3 and NVZ 1/2 still has to
 be run against real documents + a live key; no results exist yet.
+
+## Quadrant-letter disambiguation (2026-09-30) -- built; LOT 48 still UNVERIFIED, by design
+
+**Problem.** On MAP 7 LOT 48 edge6, both readers get the bearing's numeric core
+right but fail the trailing quadrant letter: Gemini read `S 42°26'48" E` (true
+value `W`), PaddleOCR dropped the letters. Nothing marks such a reading as
+uncertain -- a wrong letter still parses to a confident azimuth.
+
+**What was built** (`calibration._resolve_quadrant_ambiguity`, used only as a
+FALLBACK when the as-read rotation candidates already disagree, so any case that
+passes as-read is untouched). Rotation is folded mod 180, and flipping either
+letter yields the same single alternative, so each bearing has exactly two
+options: as read, or `(-az - angle_px) mod 180`. It picks the one rotation
+supported (read OR alt, within 1.5deg) by the most DISTINCT edges and accepts only if
+(a) >=2 distinct edges support it, (b) it is the unique best, and (c) EVERY
+bearing candidate lands in it. Otherwise nothing changes and a note says why. A
+flipped corroboration is tagged `quadrant_resolved` with `azimuth_as_read`.
+Tolerance is deliberately tighter (1.5deg) than the 5deg as-read check, because
+trying two options per bearing otherwise roughly doubles accidental agreement.
+
+**Environment caveat -- READ THIS.** The cloud session's `GEMINI_API_KEY` is a
+7-char placeholder (`MY_A...`); the proxy does not substitute a real key for
+`generativelanguage.googleapis.com` (header, query and bearer all return
+`API_KEY_INVALID`). NO live Gemini call could be made. Instead the real Gemini
+candidates SAVED from the earlier local session
+(`scratch_diag/gemini_edge_experiment/gem_*_run*.json`, corroborated candidates
+only) were replayed through the real `/confirm-boundary` endpoint with real
+PaddleOCR (`scratch_diag/replay_server.py`, `run_quadrant_replay.py`; outputs in
+`scratch_diag/quadrant_replay/`). This exercises the real calibration path but
+does NOT re-sample Gemini's run-to-run variance. Only corroborated candidates
+were saved, so the Easement replay has zero candidates.
+
+**Results.**
+- LOT 48 (5 saved runs): edge6 correctly resolves to W (S42°26'48"W = 222.45deg,
+  0.71deg from edge3's rotation; the E option is 85.6deg off) whenever it is allowed to.
+  But edge1 carries a second, conflicting distance-matched reading
+  (164.66' `N 22°52'W`, rotation 55deg, unresolvable under either quadrant), and
+  the all-candidates-must-land rule correctly refuses: **LOT 48 stays `unverified`**
+  ("1 bearing(s) match no quadrant option ... conflicting evidence").
+  Counterfactual (NOT shipped): with that one reading removed the real endpoint gives
+  `cross_validated`, rotation 335.26deg (edges 1,3,6); with only edge3+edge6 it gives
+  `cross_validated`, 335.08deg, 2 edges. So LOT 48 is now blocked ONLY by the edge1
+  conflict, not by the quadrant letter. Deciding how to treat two conflicting
+  readings on one edge (the tie is broken by bearing agreement) is a separate policy
+  decision -- not made here because the request called edge1 a genuine conflict.
+- Regression: LOT 48-3 identical to baseline (3/5 `single_source`, runs 1-2
+  unverified; run2's 7.5deg disagreement was NOT forced into agreement); NVZ Parcel 1
+  and 2 both still `cross_validated`; Easement unchanged (`unverified`, 0 edges) --
+  but that is trivial (nothing to disambiguate), so it is weak evidence.
+- False-positive cost is real, not zero. Monte Carlo on the REAL polygons, with
+  distances matching real edges but random bearings: accidental "rotation accepted"
+  rose from ~5.6-6.5% to 6.1-8.9% (+0.4 to +2.4 points; largest on the 6-7 edge parcels).
+  Pure random pairs: +4.6 points at 1.5deg vs a 5.6% as-read baseline. Tolerance
+  is the knob; tighten `_QUADRANT_RESOLUTION_TOLERANCE_DEG` to trade recall for FPs.
+
+**Still open.** (1) Re-run against LIVE Gemini once a real key is available
+(variance untested). (2) A lone `single_source` bearing gets NO quadrant check --
+LOT 48-3 runs 3/5 accept edge2's `S42°26'48"E` (the same misread line as LOT 48
+edge6, correct is W) giving rotation 70.6deg, which is probably wrong; a single
+edge cannot disambiguate itself. Pre-existing, not touched. (3) OCR dropped-letter
+readings still yield no azimuth at all (would need a letter-less DMS parser with
+curve-delta/tie-angle false-positive risk); not built. (4) A flipped edge's
+bearing is made to agree, so only its DISTANCE is independent evidence, yet it
+counts toward `cross_validated`; consumers should look at `quadrant_resolved`.

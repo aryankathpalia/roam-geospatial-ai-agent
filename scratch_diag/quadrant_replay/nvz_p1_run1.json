@@ -1,0 +1,51 @@
+{
+  "status": "cross_validated",
+  "scale_ft_per_px": 0.594376603229447,
+  "rotation_deg": 0.14687795597903636,
+  "scale_from_area": 0.594376603229447,
+  "scale_from_edges": 0.594308319624289,
+  "scale_agreement_pct": 0.011488272719177357,
+  "corroborating_edge_count": 4,
+  "notes": [
+    "resolved 180deg direction ambiguity using the previous (uncalibrated) placement as a reference (candidate A err=224650, candidate B err=860569)",
+    "4 corroborating edge(s): [0, 1, 2, 3]",
+    "gemini association returned 2 edge reading(s)"
+  ],
+  "corroborations": [
+    {
+      "edge_index": 3,
+      "value": 220.0,
+      "azimuth": 0.8125,
+      "source": "gemini_association",
+      "pct_err": 2.06
+    },
+    {
+      "edge_index": 3,
+      "value": 220.0,
+      "azimuth": 180.8125,
+      "source": "gemini_association",
+      "pct_err": 2.06
+    },
+    {
+      "edge_index": 2,
+      "value": 352.4,
+      "azimuth": null,
+      "source": "ocr_proximity",
+      "pct_err": 2.24
+    },
+    {
+      "edge_index": 1,
+      "value": 220.0,
+      "azimuth": 180.8125,
+      "source": "ocr_proximity",
+      "pct_err": 2.15
+    },
+    {
+      "edge_index": 0,
+      "value": 352.4,
+      "azimuth": null,
+      "source": "ocr_proximity",
+      "pct_err": 2.04
+    }
+  ]
+}

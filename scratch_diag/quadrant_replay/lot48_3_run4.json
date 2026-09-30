@@ -1,0 +1,23 @@
+{
+  "status": "single_source",
+  "scale_ft_per_px": 0.3087168066634449,
+  "rotation_deg": 54.855555829990124,
+  "scale_from_area": 0.3087168066634449,
+  "scale_from_edges": 0.3071939880374781,
+  "scale_agreement_pct": 0.49327363884887315,
+  "corroborating_edge_count": 1,
+  "notes": [
+    "resolved 180deg direction ambiguity using the previous (uncalibrated) placement as a reference (candidate A err=195180, candidate B err=524804)",
+    "1 corroborating edge(s): [0]",
+    "gemini association returned 1 edge reading(s)"
+  ],
+  "corroborations": [
+    {
+      "edge_index": 0,
+      "value": 164.66,
+      "azimuth": 337.13444444444445,
+      "source": "gemini_association",
+      "pct_err": 0.49
+    }
+  ]
+}
