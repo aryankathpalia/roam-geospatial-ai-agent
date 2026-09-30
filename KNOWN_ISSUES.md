@@ -582,3 +582,26 @@ Fixed at the same time: confirmed parcels passed `validate_traverse` an OPEN rin
 the closing edge, so a 345x225 ft rectangle measured half its area and every confirmed parcel
 showed a false ~50% area mismatch ("Needs review"). Parcels confirmed before this fix keep
 the wrong stored `spatial_validation` until they are confirmed again.
+
+## Why the Patnaude packet (WTDLP22-0003) landed in Toronto at 1/10 size (2026-09-30)
+
+Two independent causes, both fixed, neither from the confirm-boundary work:
+1. **Wrong country.** The top anchor candidate is the bare street "0 Ironwood Road" (the
+   application's Project Address). Nominatim ranked an Ironwood Road in Toronto first;
+   `geocode_anchor` only moves to the next candidate when a query FAILS, and this one
+   "succeeded". The same PDF names Palomino Valley / Washoe County / Nevada throughout. Now a
+   state-less accepted query is cross-checked against the best state- or ZIP-bearing candidate
+   ("Reno, NV 89512"); on a country/state mismatch the street is retried with the document's own
+   state, else the state-qualified candidate (city precision) is used. Verified only against a
+   mocked geocoder -- the cloud environment blocks Nominatim -- so the real
+   "0 Ironwood Road, Nevada" lookup is untested.
+2. **Parcel drawn ~10x too small.** When rotation could not be verified, the confirmed polygon
+   kept the seed's display scale, which fits the vision ring (one 40-acre parcel) to the whole
+   crop -- so a polygon drawn on a parcel that is a quarter of the sheet came out at 3.95 ac
+   instead of 40. A scale accepted by calibration (stated area, corroborated by printed
+   distances) is now applied even when rotation is unverified, assuming a north-up drawing;
+   the status stays unverified.
+
+Still true for this packet: no printed survey coordinate, so placement is "approximate" (street
+or city level). Better anchors that the sheet does state: PLSS (T22N R21E Sec. 17, M.D.M.) and
+APN 077-210-11 (county parcel GIS) -- not built.

@@ -415,35 +415,8 @@
     return pts.map(([x, y]) => `${x},${y}`).join(' ');
   }
 
-  // "Continue / Run Final Analysis" -- this does NOT recompute anything
-  // new. The bearings/distances/anchor/closure/area numbers below are
-  // whatever the normal pipeline (vision extraction -> walk_traverse ->
-  // georeference -> validate_traverse) already produced for this
-  // parcel when the document was processed. What's new is only the
-  // comparison: now that the boundary has been visually confirmed
-  // (or corrected) against the source drawing, this view lets you
-  // check whether those already-computed numbers actually describe
-  // the shape you just confirmed -- i.e. whether the geometry engine
-  // itself is sound, independent of whatever vision got wrong about
-  // which calls belong to this parcel in the first place.
-  let view: 'edit' | 'results' = 'edit';
-
   $: confirmedCount = parcelRefs.filter((r) => r.parcel.human_confirmed).length;
 
-  function goToResults() {
-    view = 'results';
-  }
-
-  function backToEdit() {
-    view = 'edit';
-  }
-
-  function formatCall(call: any): string {
-    if (call.call_type === 'curve') {
-      return `curve  R=${call.radius ?? '?'}  L=${call.arc_length ?? '?'}  Δ=${call.delta ?? '?'}  ${call.turn ?? ''}`;
-    }
-    return `${call.bearing ?? '?'}  ${call.distance ?? '?'}`;
-  }
 </script>
 
 <svelte:window on:keydown={onKeydown} />
@@ -474,99 +447,17 @@
     {#if parcelRefs.length > 0}
       <span class="spacer" />
       <span class="confirmed-count">{confirmedCount} / {parcelRefs.length} confirmed</span>
-      {#if view === 'edit'}
-        <button class="primary" on:click={goToResults} disabled={confirmedCount === 0}>
-          Continue / Run Final Analysis
-        </button>
-      {:else}
-        <button on:click={backToEdit}>← Back to editing</button>
-      {/if}
+      <a
+        class="primary-link"
+        class:disabled={confirmedCount === 0}
+        href={confirmedCount === 0 ? undefined : `/workspace?doc=${encodeURIComponent(documentId.trim())}`}
+      >
+        Continue to map →
+      </a>
     {/if}
   </div>
 
-  {#if view === 'results'}
-    <div class="results">
-      <p class="hint">
-        These bearings/distances/anchor/closure/area numbers are whatever the pipeline already
-        computed from vision extraction for each parcel -- nothing here was recomputed from the
-        shape you just confirmed. This is a comparison: does the pipeline's own geometry match the
-        boundary you visually verified?
-      </p>
-      {#each parcelRefs as ref}
-        <div class="result-card">
-          <h3>
-            {ref.label}
-            {#if ref.parcel.human_confirmed}<span class="badge">confirmed</span>{/if}
-          </h3>
-
-          {#if !ref.parcel.human_confirmed}
-            <p class="hint">Not confirmed yet -- skipped.</p>
-          {:else}
-            <div class="result-grid">
-              <div>
-                <h4>Resolved calls</h4>
-                {#if ref.parcel.resolved_boundary_calls?.length}
-                  <ol class="calls">
-                    {#each ref.parcel.resolved_boundary_calls as call}
-                      <li>{formatCall(call)}</li>
-                    {/each}
-                  </ol>
-                {:else}
-                  <p class="hint">No resolved calls on this parcel.</p>
-                {/if}
-              </div>
-              <div>
-                <h4>Validation</h4>
-                {#if ref.parcel.spatial_validation}
-                  <ul class="kv">
-                    <li>
-                      valid:
-                      <strong class:ok-text={ref.parcel.spatial_validation.valid}>
-                        {ref.parcel.spatial_validation.valid}
-                      </strong>
-                    </li>
-                    <li>precision ratio: 1:{ref.parcel.spatial_validation.precision_ratio ?? '—'}</li>
-                    <li>self-intersects: {ref.parcel.spatial_validation.self_intersects}</li>
-                    <li>
-                      area: {ref.parcel.spatial_validation.area_acres ?? '—'} ac ({ref.parcel
-                        .spatial_validation.area_sqft ?? '—'} sqft)
-                    </li>
-                    {#if ref.parcel.spatial_validation.issues?.length}
-                      <li class="error">
-                        issues:
-                        <ul>
-                          {#each ref.parcel.spatial_validation.issues as issue}
-                            <li>{issue}</li>
-                          {/each}
-                        </ul>
-                      </li>
-                    {/if}
-                  </ul>
-                {:else}
-                  <p class="hint">No spatial_validation on this parcel.</p>
-                {/if}
-
-                <h4>Georeference</h4>
-                {#if ref.parcel.boundary_geojson_wgs84}
-                  <p class="mono">
-                    anchor: {result?.anchor_lat?.toFixed?.(6) ?? '—'}, {result?.anchor_lon?.toFixed?.(
-                      6
-                    ) ?? '—'}
-                  </p>
-                  <p class="hint">
-                    {ref.parcel.boundary_geojson_wgs84.geometry?.coordinates?.[0]?.length ?? 0} WGS84
-                    vertices
-                  </p>
-                {:else}
-                  <p class="hint">{ref.parcel.georeference_error ?? 'Not georeferenced.'}</p>
-                {/if}
-              </div>
-            </div>
-          {/if}
-        </div>
-      {/each}
-    </div>
-  {:else if parcelRefs.length > 0}
+  {#if parcelRefs.length > 0}
     <div class="body">
       <aside>
         <h2>Parcels</h2>
@@ -724,9 +615,6 @@
   .ok {
     color: #2e7d32;
   }
-  .ok-text {
-    color: #2e7d32;
-  }
   .warn {
     color: #b45f00;
   }
@@ -737,64 +625,17 @@
     font-size: 0.8rem;
     color: #555;
   }
-  button.primary {
+  .primary-link {
+    padding: 0.35rem 0.8rem;
+    border-radius: 4px;
     background: #3477eb;
     color: #fff;
-    border: 1px solid #3477eb;
-    padding: 0.4rem 0.7rem;
-    border-radius: 4px;
-    cursor: pointer;
     font-size: 0.85rem;
+    text-decoration: none;
   }
-  button.primary:disabled {
-    background: #9fb8e6;
-    border-color: #9fb8e6;
-    cursor: not-allowed;
-  }
-  .results {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  .result-card {
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 0.75rem 1rem;
-  }
-  .result-card h3 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1rem;
-  }
-  .result-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-  }
-  .result-grid h4 {
-    margin: 0.5rem 0 0.25rem 0;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    color: #777;
-  }
-  .calls {
-    margin: 0;
-    padding-left: 1.2rem;
-    font-family: monospace;
-    font-size: 0.8rem;
-  }
-  .kv {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    font-size: 0.85rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-  }
-  .mono {
-    font-family: monospace;
-    font-size: 0.85rem;
-    margin: 0.2rem 0;
+  .primary-link.disabled {
+    opacity: 0.45;
+    pointer-events: none;
   }
   .body {
     display: grid;

@@ -92,3 +92,24 @@ def test_confirmed_parcel_area_uses_the_closing_edge(client):
     sv = _parcel(root)["spatial_validation"]
     assert abs(sv["area_acres"] - 1.78) < 0.03 and not sv["self_intersects"]
     assert sv["area_matches_stated"] is True
+
+
+def test_unverified_rotation_still_uses_the_corroborated_scale(client, monkeypatch):
+    # Patnaude packet: rotation could not be verified, but the scale was corroborated by
+    # 3 printed distances. The parcel must be sized by that scale (1.78 ac here), not by
+    # the seed's display scale (a 40-acre parcel was drawn as 3.95 acres).
+    c, root = client
+    real = docs.calibration_service.calibrate
+
+    def unverified_rotation(*a, **k):
+        res = real(*a, **k)
+        res.status, res.rotation_deg = "unverified", None
+        return res
+
+    monkeypatch.setattr(docs.calibration_service, "calibrate", unverified_rotation)
+    c.post(f"/documents/{NVZ}/confirm-boundary?wait=true", json=_payload())
+    p = _parcel(root)
+    assert p["calibration"]["status"] == "unverified" and p["boundary_source"] == "manual_confirmed_uncalibrated"
+    assert p["placement"]["status"] == "approximate"
+    assert abs(p["spatial_validation"]["area_acres"] - 1.78) < 0.05
+    assert any("north-up" in n for n in p["calibration"]["notes"])

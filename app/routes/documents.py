@@ -383,6 +383,8 @@ def _derive_confirmed_geometry(
     calibration_info = None
     calibration_ocr_lines = None
     polygon_page_px = None
+    page_pivot = None
+    local_pivot = None
     if verify:
         # --- calibrated reprojection ---
         # Try to independently verify scale AND rotation against this
@@ -509,6 +511,20 @@ def _derive_confirmed_geometry(
     else:
         points = old_local_points
         boundary_source = "manual_confirmed_uncalibrated"
+        # Rotation unverified does not make the SIZE a guess. The seed's display
+        # scale fits the vision ring to the crop, so on a sheet where the seed ring
+        # is one small parcel of a bigger drawing it is ~10x off (Patnaude packet:
+        # a 40-acre parcel drawn as 3.95 acres). When calibration did accept a
+        # scale (area-based, corroborated by the printed distances), use it and
+        # keep the seed's north-up orientation; the status stays unverified.
+        if verify and calibration_info.scale_ft_per_px and polygon_page_px is not None and local_pivot is not None:
+            points = calibration_service.reproject_page_px_to_local(
+                polygon_page_px, calibration_info.scale_ft_per_px, 0.0, page_pivot, local_pivot,
+            )
+            calibration_info.notes.append(
+                "size uses the stated-area/edge-corroborated scale; orientation assumes the drawing is "
+                "north-up because rotation could not be verified"
+            )
         if calibration_info.status == "unverified" and not calibration_info.notes:
             calibration_info.notes.append("no calibration evidence found; using inherited scale/rotation from the original seed.")
 
