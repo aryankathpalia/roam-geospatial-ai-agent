@@ -112,6 +112,16 @@ a {
 	color: var(--ok);
 }
 
+/* Distinct from .high (broken shape) and .moderate (approximate anchor
+   only) -- this is specifically "scale/rotation never independently
+   corroborated against the document's own printed evidence", which is
+   a different concern from either and must not read as a lesser shade
+   of the same warning. See calibrationGate() in workspace's +page.svelte. */
+.pill.unconfirmed {
+	background: rgba(107, 106, 99, 0.14);
+	color: var(--muted);
+}
+
 .field {
 	width: 100%;
 	border: 1px solid var(--line);
