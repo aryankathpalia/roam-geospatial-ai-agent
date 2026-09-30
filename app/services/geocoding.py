@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import re
 from typing import Any
 
 import httpx
@@ -187,6 +188,70 @@ async def geocode_anchor(
             logger.warning("Anchor geocode failed for %r: %s", query, exc)
             continue
         if results:
-            return results, query
+            return await _reconcile_with_locality(results, query, candidates, limit)
 
     return [], None
+
+
+# "<place>, XX" or a ZIP: the query says which state/area it means.
+_LOCALITY_RE = re.compile(r",\s*[A-Z]{2}\b|\b\d{5}(?:-\d{4})?\b", re.IGNORECASE)
+
+
+def _is_locality_qualified(query: str) -> bool:
+    return bool(_LOCALITY_RE.search(query))
+
+
+def _same_locality(a: Location, b: Location) -> bool:
+    if a.region and b.region:
+        return (a.country or "").lower() == (b.country or "").lower() and a.region.lower() == b.region.lower()
+    return (a.country or "").lower() == (b.country or "").lower()
+
+
+async def _reconcile_with_locality(
+    results: list[Location], query: str, candidates: list[str], limit: int
+) -> tuple[list[Location], str | None]:
+    """
+    A bare street ("0 Ironwood Road") geocodes to whichever same-named street
+    Nominatim ranks first -- confirmed on a Washoe County, Nevada application
+    whose project address is exactly that: it landed in Toronto, Canada, and
+    every parcel was drawn there. "Succeeded" is not "right", and the cascade
+    above only moves on when a query FAILS.
+
+    When the accepted query names no state/ZIP but another candidate does
+    (same document, e.g. "Reno, NV 89512"), check that the two agree on
+    country and state. If they don't, retry the street with the document's
+    own state appended; if that still disagrees, use the state-qualified
+    candidate's own (coarser, honestly city-level) result instead.
+    """
+
+    if _is_locality_qualified(query):
+        return results, query
+    reference = next((c for c in candidates if c != query and _is_locality_qualified(c)), None)
+    if reference is None:
+        return results, query
+
+    await asyncio.sleep(1.0)
+    try:
+        ref_results = await geocode_place(reference, limit=1)
+    except GeocodingError as exc:
+        logger.warning("Anchor cross-check geocode failed for %r: %s", reference, exc)
+        return results, query
+    if not ref_results or _same_locality(results[0], ref_results[0]):
+        return results, query
+
+    ref = ref_results[0]
+    logger.warning(
+        "Anchor %r resolved to %s/%s but %r resolves to %s/%s -- not trusting the bare street",
+        query, results[0].region, results[0].country, reference, ref.region, ref.country,
+    )
+    if ref.region:
+        qualified = f"{query}, {ref.region}"
+        await asyncio.sleep(1.0)
+        try:
+            again = await geocode_place(qualified, limit=limit)
+        except GeocodingError:
+            again = []
+        again = [loc for loc in again if _same_locality(loc, ref)]
+        if again:
+            return again, qualified
+    return ref_results, reference
