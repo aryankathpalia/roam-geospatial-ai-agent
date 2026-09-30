@@ -1,0 +1,38 @@
+Region 1, Piece 1:
+- N0°48'45"E 220.00' (boundary bearing and distance call)
+- (N0°02'31"W 250.00') (R4) (prior-record citation in parentheses)
+- 550.75' (boundary distance call)
+- PARCEL 2 2.78 ACRES (parcel label and acreage)
+
+Region 1, Piece 2:
+- S89°11'15"E 903.15' (boundary bearing and distance call)
+- (S89°09'41"E) (R3) (prior-record citation in parentheses)
+- (N89°57'29"E) (R4) (prior-record citation in parentheses)
+- PARCEL 2 2.78 ACRES (parcel label and acreage)
+- PARCEL 1 1.78 ACRES (parcel label and acreage)
+
+Region 1, Piece 3:
+- N89°11'15"W 903.15' (boundary bearing and distance call)
+- (N89°57'29"E) (R4) (prior-record citation in parentheses)
+- N0°48'45"W 220.00' (boundary bearing and distance call)
+- (S0°02'31"E 250.00') (R4) (prior-record citation in parentheses)
+- PARCEL 1 1.78 ACRES (parcel label and acreage)
+- GROUND COORDINATES N 14926897.47 E 2252502.76 (ground coordinate)
+- GROUND COORDINATES (MEASURED) N: 14928989.71 E: 2253610.44 (ground coordinate)
+- GROUND COORDINATES (RECORD) N: 14928989.62 E: 2253610.74 (ground coordinate)
+- N89°11'15"W 1077.91' -- appears to be a tie or measurement to adjacent control point / section line, not a parcel boundary call
+- N0°48'45"E 2637.36' (N0°48'59"E 2637.29' - R1) (N0°49'02"E 2637.35' - R3) -- appears to be a section line measurement / tie, not a parcel boundary call
+
+Region 1, Piece 4:
+- S1°39'59"W 30.00' (TIE) -- tie line measurement
+- S89°11'17"E 336.41' (N89°57'29"E) (R2) -- road frontage / quitclaim area bearing and distance call, not a parcel boundary call
+
+Region 1, Piece 5:
+- N89°11'15"W 903.15' (N89°57'29"E) (R4) -- boundary bearing and distance call
+- S89°11'17"E 329.80' (N89°57'29"E) (R2) -- road frontage / quitclaim area bearing and distance call, not a parcel boundary call
+
+Region 1, Piece 6:
+- S89°11'17"E 325.30' (N89°57'29"E) (R2) -- road frontage / quitclaim area bearing and distance call, not a parcel boundary call
+- GROUND COORDINATES (MEASURED) N: 14926352.62 E: 2253573.04 (ground coordinate)
+- GROUND COORDINATES (RECORD) N: 14926352.55 E: 2253573.13 (ground coordinate)
+- RESULTANT PARCEL AREAS: PARCEL 1: 77,526 SQ. FT., 1.78 ACRES; PARCEL 2: 121,165 SQ. FT., 2.78 ACRES; TOTAL: 198,691 SQ. FT., 4.56 ACRES (parcel labels and acreages)

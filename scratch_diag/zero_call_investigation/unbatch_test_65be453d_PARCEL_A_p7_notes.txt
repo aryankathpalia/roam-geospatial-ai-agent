@@ -1,0 +1,64 @@
+Region 1, Piece 1:
+Region 1, Piece 1:
+- PARCEL A: THE SOUTH 30 FEET OF THE WEST 200 FEET OF THE NORTHEAST QUARTER OF THE SOUTHEAST QUARTER, SECTION 3, TOWNSHIP 34 NORTH, RANGE 2 EAST OF THE WILLAMETTE MERIDIAN.
+- PARCEL B: THAT PORTION OF THE SOUTHEAST QUARTER OF THE SOUTHEAST QUARTER OF THE SOUTHEAST QUARTER; SECTION 3, TOWNSHIP 34 NORTH, RANGE 2 EAST OF THE WILLAMETTE MERIDIAN, DESCRIBED AS FOLLOWS: BEGINNING AT THE NORTHWEST CORNER OF SAID SOUTHEAST QUARTER OF THE SOUTHEAST QUARTER; THENCE EAST 380 FEET; THENCE SOUTH TO THE NORTH LINE OF THE COUNTY ROAD KNOWN AS STEVENSON ROAD OR PADILLA HEIGHTS ROAD; THENCE WEST ALONG THE NORTH LINE OF SAID COUNTY ROAD TO THE WEST LINE OF SAID SOUTHEAST QUARTER OF THE SOUTHEAST QUARTER; THENCE NORTH TO THE POINT OF BEGINNING.
+- PARCEL C: THAT PORTION OF THE SOUTHEAST QUARTER OF SECTION 3, TOWNSHIP 34 NORTH, RANGE 2 EAST OF THE WILLAMETTE MERIDIAN, DESCRIBED AS FOLLOWS: BEGINNING AT THE SOUTHEAST CORNER OF A TRACT OF LAND CONVEYED TO FRANK RILEY, JR., BY DEED RECORDED UNDER AUDITOR'S FILE NO. 368798, RECORDS OF SKAGIT COUNTY, WASHINGTON, SAID POINT BEING ON THE NORTH LINE OF THE COUNTY ROAD KNOWN AS STEVENSON ROAD OR PADILLA HEIGHTS ROAD; THENCE NORTH ALONG THE EAST LINE OF SAID TRACT AND SAID LINE EXTENDED NORTH A DISTANCE OF 643 FEET, MORE OR LESS, TO THE SOUTH LINE OF A TRACT CONVEYED TO CARL J. FOSS BY DEED RECORDED UNDER AUDITOR'S FILE NO. 376727; THENCE EAST ALONG THE SOUTH LINE OF SAID FOSS TRACT TO THE EAST LINE OF THE NORTHWEST QUARTER OF THE SOUTHEAST QUARTER; THENCE SOUTH TO THE NORTH LINE OF SAID COUNTY ROAD; THENCE WEST ALONG THE NORTH LINE OF SAID COUNTY ROAD TO THE POINT OF BEGINNING.
+
+Region 1, Piece 2:
+Region 1, Piece 1:
+
+- "Parcel 'B'" (parcel label)
+- "N 15° E, 3.6' FROM SET CORNER" (tie/monument reference note)
+- "FOUND ARMY CORP ENG. MONUMENT MARKED 'SW 16 1967'" (monument description)
+- "N 51°34' E" and "35.00'" (boundary bearing and distance call within the property boundary)
+- "S 45° E" and "380.00'" (boundary bearing and distance call within the property boundary)
+- "690.00'" (boundary distance call)
+
+Region 1, Piece 3:
+Region 1, Piece 1:
+
+- **N 89°11'10" W** (bearing call along the top boundary line)
+- **399.26'** (distance call along the top boundary line)
+- **37.6'** (short dimension call near the upper left end)
+- **527.32'** (distance call along the right boundary line, marked with **N 01°51'54" E**)
+- **N 01°51'54" E** (bearing call along the right boundary line)
+- Handwritten text:
+  - `13-0345`
+  - `500 26`
+  - `7`
+  - `P19769 and`
+  - `"These 'P#1S"`
+  - `in 1999`
+- Other text/callouts visible on the survey drawing:
+  - `1/16TH LINE`
+  - `REBAR & CAP`
+  - `LS 9662`
+  - `SET PREVIOUSLY`
+  - `FENCE/WIRE IS PROPERTY LINE`
+  - `REC. BOUNDARY LINE AGREEMENT`
+  - `RECORDED UNDER AUDITOR'S FILE`
+  - `NO. 9611100096`
+  - `R. O. S.`
+  - `BOOK 1, PAGE 15`
+
+Region 1, Piece 4:
+Region 1, Piece 1:
+
+- **Boundary bearing and distance calls:**
+  - `N 89°11'45" W` (along a section/subdivision line shown near the top-middle)
+  - `N 87°31'02" W` (with a distance/dimension line above it, running parallel to Padilla Heights Road)
+
+- **Basis-of-bearings / datum statement:**
+  - A text block on the right side stating:
+    `BASIS OF BEARING`
+    `NORTH-SOUTH CENTERLINE OF SECTION, BEING NORTH 2°07'34" EAST AS SHOWN ON RECORD OF SURVEY RECORDED IN BOOK 15 OF SURVEYS AT PAGE 14, RECORDS OF SKAGIT COUNTY, WASHINGTON.`
+
+- **Parcel/lot labels and text:**
+  - `PADILLA HEIGHTS ROAD` (road label)
+  - `Assessor's Unit "C"` (or similar handwritten script: `As a re Unit "C"` / `Parcel "C"`)
+  - `P19769`
+  - `P19772`
+  - `P19785`
+  - `VICINITY MAP`
+  - `SOUTHEAST 1/4 SECTION 3-34-2`
+  - `SURVEY IN BOOK 15 PAGE 14`

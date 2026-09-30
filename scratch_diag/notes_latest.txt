@@ -1,0 +1,53 @@
+Here are the extracted boundary calls, coordinates, basis-of-bearing statements, and parcel labels for each piece of Region 1:
+
+**Region 1, Piece 1:**
+- Boundary bearing and distance call: `N0*48'45"E 220.00'` (along with record information: `(N0*02'31"W 250.00' (R4))`)
+- Ground/state-plane coordinate: 
+  `GROUND COORDINATES`
+  `N 14926910.28`
+  `E 2251599.70`
+- Parcel/lot label or acreage: `PARCEL 2 2.78 ACRES`
+
+**Region 1, Piece 2:**
+- Boundary bearing and distance call: `S89*11'15"E 903.15'` (along with record information: `(S89*09'41"E) (R3)` and `(N89*57'29"E) (R4)`) and `N89*11'15"W 903.15'` (along with record information: `(N89*57'29"E) (R4)`)
+- Boundary bearing and distance call: `S0*48'45"W 220.00'`
+
+**Region 1, Piece 3:**
+- Boundary bearing and distance call: `N89*11'15"E 1077.91`
+- Boundary bearing and distance call: `S0*48'45"W 220.00'` (along with record information: `(S0*02'31"E 250.00) (R4)`) and `N0*48'45"E 2637.36'` (along with record information: `(N0*48'59"E 2637.29' - R1)` and `(N0*49'02"E 2637.35' - R3)`)
+- Ground/state-plane coordinate:
+  `GROUND COORDINATES (MEASURED)`
+  `N: 14928989.71`
+  `E: 2253610.44`
+  `GROUND COORDINATES (RECORD)`
+  `N: 14928989.62`
+  `E: 2253610.74`
+- Ground/state-plane coordinate:
+  `GROUND COORDINATES`
+  `N 14926897.47`
+  `E 2252502.76`
+- Parcel/lot label or acreage: `PARCEL 1 1.78 ACRES`
+
+**Region 1, Piece 4:**
+- Boundary bearing and distance call: `S89*11'17"E 336.41'` (along with record information: `(N89*57'29"E) (R2)`)
+- Basis-of-bearings / datum / coordinate-zone statement:
+  `BASIS OF BEARINGS`
+  `THE BASIS OF BEARINGS FOR THIS SURVEY IS NEVADA STATE PLANE, WEST ZONE NAD83(94) BASED ON REAL TIME KINEMATIC (RTK) GPS OBSERVATIONS UTILIZING CORRECTIONS FROM THE NORTHERN NEVADA COOPERATIVE REAL TIME NETWORK. COORDINATES AND DISTANCES HEREON ARE AT GROUND LEVEL BASED ON A COMBINED GRID TO GROUND FACTOR OF 1.000197939.`
+
+**Region 1, Piece 5:**
+- Boundary bearing and distance call: `S89*11'17"E 329.80'` (along with record information: `(N89*57'29"E) (R2)`)
+
+**Region 1, Piece 6:**
+- Boundary bearing and distance call: `S89*11'17"E 325.30'` (along with record information: `(N89*57'29"E) (R2)`)
+- Ground/state-plane coordinate:
+  `GROUND COORDINATES (MEASURED)`
+  `N: 14926352.62`
+  `E: 2253573.04`
+  `GROUND COORDINATES (RECORD)`
+  `N: 14926352.55`
+  `E: 2253573.13`
+- Parcel/lot label or acreage:
+  `RESULTANT PARCEL AREAS`
+  `PARCEL 1: 77,526 SQ. FT., 1.78 ACRES`
+  `PARCEL 2: 121,165 SQ. FT., 2.78 ACRES`
+  `TOTAL: 198,691 SQ. FT., 4.56 ACRES`

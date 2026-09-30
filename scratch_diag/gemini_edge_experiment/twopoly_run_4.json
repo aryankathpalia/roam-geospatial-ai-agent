@@ -1,0 +1,12 @@
+{
+  "shared_edge_calls": [
+    {
+      "distance_value": "322.74'",
+      "bearing": "S 59°41'15\" E",
+      "assigned_to": "blue (Lot 48)",
+      "evidence_location": "Along the long northeastern boundary of the blue polygon, running southeast towards the area of transfer.",
+      "confidence": 0.95,
+      "reasoning": "The text 322.74' and its associated bearing clearly run directly along the solid boundary line defining the edge of the blue polygon (Lot 48). It separates Lot 48 from Lot 47 and acts as part of the primary perimeter of the blue parcel before turning near the transfer area."
+    }
+  ]
+}

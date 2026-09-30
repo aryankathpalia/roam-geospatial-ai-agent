@@ -1,0 +1,83 @@
+Here is the extracted information for each piece of Region 1, following your instructions:
+
+---
+
+### Region 1, Piece 1
+* **Parcel/Lot label or acreage:**
+  * MAP 7 LOT 48 (288 ISLAND POND ROAD)
+  * MAP 7 LOT 48-3 (292 ISLAND POND ROAD)
+* **Basis-of-bearings / datum / coordinate-zone statement:**
+  * THE BEARING SYSTEM OF THIS PLAN IS BASED ON NH STATE PLANE COORDINATE (NAD83/2011).
+  * HORIZONTAL: NAD83-2011
+  * VERTICAL: NAVD88 – GEOID18
+
+---
+
+### Region 1, Piece 2
+* **Boundary bearing and distance calls:**
+  * N 66°04'20" E 11.63'
+  * N 61°53'54" E 105.55'
+  * N 24°11'47" W 209.92' (along Island Pond Rd frontage / right-of-way)
+* **Parcel/Lot label or acreage:**
+  * MAP 7 LOT 50-3 N/F KEVIN J. & LISA M. TORRE, 275 ISLAND POND RD, DERRY, NH 03038 (3594-676)
+  * MAP 7 LOT 48, 46,550 Sq. Ft, 1.07 Ac., NEW AREA: 41,368 Sq. Ft, 0.95 Ac.
+
+---
+
+### Region 1, Piece 3
+* **Boundary bearing and distance calls:**
+  * N 66°04'20" E 11.63'
+  * S 55°14'15" E 322.74'
+* **Parcel/Lot label or acreage:**
+  * MAP 7 LOT 47 N/F HAROLD WALLACE, 278 ISLAND POND RD, DERRY, NH 03038 (2837-2957)
+  * AREA OF TRANSFER FROM MAP 7 LOT 48 TO MAP 7 LOT 48-3: 5,179 Sq. Ft, 0.12 Ac.
+
+---
+
+### Region 1, Piece 4
+* **Parcel/Lot label or acreage:**
+  * LOCUS MAP
+
+---
+
+### Region 1, Piece 5
+* **Basis-of-bearings / datum / coordinate-zone statement:**
+  * HORIZONTAL: NAD83-2011
+  * VERTICAL: NAVD88 – GEOID18
+
+---
+
+### Region 1, Piece 6
+* **Boundary bearing and distance calls:**
+  * S 77°39'32" W 164.41'
+  * N 22°51'56" W 164.66' (along Island Pond Rd frontage / right-of-way)
+  * S 03°23'08" E 32.24'
+  * S 42°26'48" W 66.91'
+  * S 77°39'32" W 125.11' *(in parentheses, indicating prior-record citation)*
+* **Parcel/Lot label or acreage:**
+  * MAP 7 LOT 50-2 N/F TOBY CAPPELLO AKA TOBY BELLINGHIERI, 277 ISLAND POND RD, DERRY, NH 03038 (4805-1988)
+* **Ground/state-plane coordinates:**
+  * N: 137,042.75 E: 1,101,226.83 Z: 289.78 *(associated with the 1" Iron Pipe monument found near the frontage)*
+
+---
+
+### Region 1, Piece 7
+* **Boundary bearing and distance calls:**
+  * S 77°39'32" W 164.41'
+  * S 03°23'08" E 32.24'
+  * S 42°26'48" W 66.91'
+  * S 54°45'01" E 209.93'
+  * (125.01') *(in parentheses, indicating prior-record citation for the side boundary segment near shed/garage)*
+  * (125.11') *(in parentheses, indicating prior-record citation for the property line segment)*
+* **Parcel/Lot label or acreage:**
+  * MAP 7 LOT 48-3, 69,885 Sq. Ft, 1.60 Ac., NEW AREA: 75,060 Sq. Ft, 1.72 Ac.
+  * MAP 7 LOT 47 N/F HAROLD WALLACE, 278 ISLAND POND RD, DERRY, NH 03038 (2837-2957)
+  * AREA OF TRANSFER FROM MAP 7 LOT 48 TO MAP 7 LOT 48-3: 5,179 Sq. Ft, 0.12 Ac.
+
+---
+
+### Region 1, Piece 8
+* **Parcel/Lot label or acreage:**
+  * MAP 7 LOT 48 (CHERYL & DOUGLAS KIMBALL, 288 ISLAND POND RD, DERRY, NH 03038)
+  * MAP 7 LOT 48-3 (RUSSELL A. PAROLISI, JR, 292 ISLAND POND RD, DERRY, NH 03038)
+  * LOT LINE ADJUSTMENT MAP 7 LOTS 48 & 48-3, 288 & 292 ISLAND POND RD, DERRY, NEW HAMPSHIRE

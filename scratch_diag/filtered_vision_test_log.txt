@@ -1,0 +1,123 @@
+[2f896c95-b0f3-4a49-a447-4b3ca6129c27] 3 ground-truth plat regions -- building page entries...
+C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py:197: UserWarning: Specified provider 'CUDAExecutionProvider' is not in available provider names.Available providers: 'AzureExecutionProvider, CPUExecutionProvider'
+  warnings.warn(
+INFO: Could not find files for the given pattern(s).
+C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:718: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mCreating model: ('PP-OCRv5_mobile_det', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-OCRv5_mobile_det`.[0m
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I0927 14:27:37.290898 33664 onednn_context.cc:81] oneDNN v3.6.2
+[32mCreating model: ('PP-OCRv5_mobile_rec', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-OCRv5_mobile_rec`.[0m
+I0927 14:28:30.109025  4968 onednn_context.cc:81] oneDNN v3.6.2
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x5400) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+  -> 3 regions marked needs_vision (should equal 3)
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-LCNet_x1_0_doc_ori`.[0m
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+  -> {'plat_regions': 3, 'any_3plus': 0, 'closed': 0, 'valid': 0}
+[27211ae5-0099-4b0d-8176-f1483897b766] 2 ground-truth plat regions -- building page entries...
+I0927 14:40:48.891553  1280 onednn_context.cc:81] oneDNN v3.6.2
+  -> 1 regions marked needs_vision (should equal 2)
+Gemini gemini-3.5-flash returned 503 (round 1)
+  -> {'plat_regions': 1, 'any_3plus': 0, 'closed': 0, 'valid': 0}
+[3affa529-5b4f-42d7-b336-596315433572] 1 ground-truth plat regions -- building page entries...
+I0927 14:52:26.433079 33660 onednn_context.cc:81] oneDNN v3.6.2
+I0927 14:52:33.262434 25560 onednn_context.cc:81] oneDNN v3.6.2
+  -> 1 regions marked needs_vision (should equal 1)
+I0927 14:56:44.662029 11348 onednn_context.cc:81] oneDNN v3.6.2
+Gemini gemini-3.5-flash returned 503 (round 1)
+  -> {'plat_regions': 1, 'any_3plus': 0, 'closed': 0, 'valid': 0}
+[65be453d-f014-4024-84d6-60a2d0052aeb] 3 ground-truth plat regions -- building page entries...
+I0927 14:59:17.317589 12240 onednn_context.cc:81] oneDNN v3.6.2
+I0927 14:59:24.099627 21448 onednn_context.cc:81] oneDNN v3.6.2
+  -> 3 regions marked needs_vision (should equal 3)
+Gemini gemini-3.5-flash returned 503 (round 1)
+  -> {'plat_regions': 3, 'any_3plus': 0, 'closed': 0, 'valid': 0}
+[a1136318-03ef-438d-9f02-8fcdcb5dca30] 1 ground-truth plat regions -- building page entries...
+I0927 15:11:31.325289  3636 onednn_context.cc:81] oneDNN v3.6.2
+I0927 15:12:57.098098  6016 onednn_context.cc:81] oneDNN v3.6.2
+  -> 1 regions marked needs_vision (should equal 1)
+I0927 15:15:24.057538 35500 onednn_context.cc:81] oneDNN v3.6.2
+Gemini gemini-3.5-flash returned 503 (round 1)
+  -> {'plat_regions': 1, 'any_3plus': 0, 'closed': 0, 'valid': 0}
+[db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b] 2 ground-truth plat regions -- building page entries...
+I0927 15:28:31.452105 35008 onednn_context.cc:81] oneDNN v3.6.2
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+[33mResized image size (7200x1600) exceeds max_side_limit of 4000. Resizing to fit within limit.[0m
+  -> 2 regions marked needs_vision (should equal 2)
+Gemini gemini-3.5-flash returned 503 (round 1)
+  -> {'plat_regions': 2, 'any_3plus': 0, 'closed': 0, 'valid': 0}
+[798850fc-1be3-4bc6-9f53-1441c39cbd04] 1 ground-truth plat regions -- building page entries...
+  -> 1 regions marked needs_vision (should equal 1)
+Gemini gemini-3.5-flash returned 503 (round 1)
+Gemini gemini-3.1-flash-lite returned 503 (round 1)
+All Gemini models returned 503; retrying in 20s
+Gemini gemini-3.5-flash returned 503 (round 2)
+Gemini gemini-3.5-flash returned 503 (round 1)
+  -> {'plat_regions': 1, 'any_3plus': 0, 'closed': 0, 'valid': 0}
+[83ab22d0-b950-4f5d-ad33-5f0fd6105dbe] 1 ground-truth plat regions -- building page entries...
+I0927 15:54:27.060844 32592 onednn_context.cc:81] oneDNN v3.6.2
+  -> 1 regions marked needs_vision (should equal 1)
+Gemini gemini-3.5-flash returned 503 (round 1)
+Gemini gemini-3.5-flash returned 503 (round 1)
+  -> {'plat_regions': 1, 'any_3plus': 0, 'closed': 0, 'valid': 0}
+[8d75d3ed-d9e7-4bfb-874a-0b52063883eb] 4 ground-truth plat regions -- building page entries...
+I0927 16:05:48.411006 17008 onednn_context.cc:81] oneDNN v3.6.2
+I0927 16:12:13.593168 23956 onednn_context.cc:81] oneDNN v3.6.2
+Traceback (most recent call last):
+  File "C:\Users\preet\OneDrive\Desktop\roam\scratch_diag\filtered_vision_test.py", line 177, in <module>
+    asyncio.run(main())
+  File "C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 684, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\preet\OneDrive\Desktop\roam\scratch_diag\filtered_vision_test.py", line 125, in main
+    page_entries = await build_page_entries(doc_id)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\preet\OneDrive\Desktop\roam\scratch_diag\filtered_vision_test.py", line 88, in build_page_entries
+    band_results = await _default_ocr_dispatcher(band_jobs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\preet\OneDrive\Desktop\roam\app\pipeline\document_pipeline.py", line 80, in _default_ocr_dispatcher
+    lines = await loop.run_in_executor(None, ocr_band, band_bytes, y_offset)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\preet\OneDrive\Desktop\roam\app\pipeline\page_ocr.py", line 90, in ocr_band
+    lines = run_page_ocr(image)
+            ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\preet\OneDrive\Desktop\roam\app\services\ocr.py", line 112, in run_page_ocr
+    result = get_engine().predict(arr)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\site-packages\paddleocr\_pipelines\ocr.py", line 223, in predict
+    return list(
+           ^^^^^
+  File "C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\site-packages\paddlex\inference\pipelines\_parallel.py", line 161, in predict
+    yield from self._pipeline.predict(
+  File "C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\site-packages\paddlex\inference\pipelines\ocr\pipeline.py", line 366, in predict
+    det_results = list(
+                  ^^^^^
+  File "C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\site-packages\paddlex\inference\models\predictors\base_predictor.py", line 117, in __call__
+    yield from self.apply(input, **kwargs)
+  File "C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\site-packages\paddlex\inference\models\predictors\base_predictor.py", line 140, in apply
+    pred = self.process(batch_data, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\site-packages\paddlex\inference\models\text_detection\predictor.py", line 145, in process
+    batch_preds = self.runner(x=x)
+                  ^^^^^^^^^^^^^^^^
+  File "C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\site-packages\paddlex\inference\models\runners\paddle_static\runner.py", line 297, in __call__
+    pred = self.infer(x)
+           ^^^^^^^^^^^^^
+  File "C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\site-packages\paddlex\inference\models\runners\paddle_static\runner.py", line 265, in __call__
+    self.predictor.run()
+RuntimeError: Unknown exception

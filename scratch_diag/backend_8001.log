@@ -1,0 +1,23 @@
+INFO:     Started server process [24656]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8001 (Press CTRL+C to quit)
+INFO:     127.0.0.1:49894 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57799 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54187 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58924 - "GET /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/pages/9/regions/0/crop.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64089 - "OPTIONS /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/confirm-boundary HTTP/1.1" 200 OK
+INFO: Could not find files for the given pattern(s).
+C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:718: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mCreating model: ('PP-LCNet_x1_0_doc_ori', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-LCNet_x1_0_doc_ori`.[0m
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I0928 21:43:32.070604 16944 onednn_context.cc:81] oneDNN v3.6.2
+[32mCreating model: ('PP-LCNet_x1_0_textline_ori', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-LCNet_x1_0_textline_ori`.[0m
+[32mCreating model: ('PP-OCRv5_mobile_det', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-OCRv5_mobile_det`.[0m
+[32mCreating model: ('PP-OCRv5_mobile_rec', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-OCRv5_mobile_rec`.[0m
+INFO:     127.0.0.1:64089 - "POST /documents/6d8534f5-f07a-460d-970f-4ccf5c40a3e4/confirm-boundary HTTP/1.1" 200 OK

@@ -1,0 +1,30 @@
+{
+  "status": "unverified",
+  "scale_ft_per_px": 0.3087168066634449,
+  "rotation_deg": null,
+  "scale_from_area": 0.3087168066634449,
+  "scale_from_edges": 0.3071939880374781,
+  "scale_agreement_pct": 0.49327363884887315,
+  "corroborating_edge_count": 1,
+  "notes": [
+    "2 corroborating edges have bearings but disagree on line orientation by up to 27.4deg (>5.0deg) -- not averaging them.",
+    "no corroborating edge has a printed bearing that agrees closely enough -- rotation unverified.",
+    "gemini association returned 4 edge reading(s)"
+  ],
+  "corroborations": [
+    {
+      "edge_index": 0,
+      "value": 164.41,
+      "azimuth": 257.6588888888889,
+      "source": "gemini_association",
+      "pct_err": 0.64
+    },
+    {
+      "edge_index": 0,
+      "value": 164.66,
+      "azimuth": 202.86555555555555,
+      "source": "gemini_association",
+      "pct_err": 0.49
+    }
+  ]
+}

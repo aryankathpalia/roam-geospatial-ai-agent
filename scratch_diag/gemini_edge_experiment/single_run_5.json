@@ -1,0 +1,67 @@
+{
+  "edges": [
+    {
+      "edge_index": 0,
+      "bearing": "N 61°53'54\" E",
+      "distance": "105.55'",
+      "evidence_location": "just above the edge segment connecting vertex 0 and vertex 1",
+      "confidence": 1.0,
+      "read_or_inferred": "read",
+      "self_report_reasoning": "The text is clearly printed right above this top horizontal boundary line."
+    },
+    {
+      "edge_index": 1,
+      "bearing": "S 44°41'15\" E",
+      "distance": "322.74'",
+      "evidence_location": "just to the right of the long northeastern boundary line connecting vertex 1 and vertex 2",
+      "confidence": 1.0,
+      "read_or_inferred": "read",
+      "self_report_reasoning": "Both the bearing and distance are clearly printed parallel to the long boundary line."
+    },
+    {
+      "edge_index": 2,
+      "bearing": "S 42°26'46\" W",
+      "distance": "66.91'",
+      "evidence_location": "directly below the small segment on the southeastern boundary connecting vertex 2 and vertex 3",
+      "confidence": 1.0,
+      "read_or_inferred": "read",
+      "self_report_reasoning": "The bearing and distance are clearly legible directly adjacent to this angled boundary segment."
+    },
+    {
+      "edge_index": 3,
+      "bearing": "S 77°39'32\" W",
+      "distance": "164.41'",
+      "evidence_location": "just below the lower boundary segment connecting vertex 3 and vertex 4",
+      "confidence": 1.0,
+      "read_or_inferred": "read",
+      "self_report_reasoning": "The text is clearly printed right below this segment near the pavement area."
+    },
+    {
+      "edge_index": 4,
+      "bearing": "N 22°51'56\" W",
+      "distance": "164.66'",
+      "evidence_location": "to the left of the vertical-ish boundary segment connecting vertex 4 and vertex 5",
+      "confidence": 1.0,
+      "read_or_inferred": "read",
+      "self_report_reasoning": "The text is clearly visible to the left of this straight western boundary line."
+    },
+    {
+      "edge_index": 5,
+      "bearing": "N 22°04'05\" W",
+      "distance": "75.09'",
+      "evidence_location": "to the left of the lower western boundary segment connecting vertex 5 and vertex 6",
+      "confidence": 1.0,
+      "read_or_inferred": "read",
+      "self_report_reasoning": "The text is clearly legible to the left of this lower segment."
+    },
+    {
+      "edge_index": 6,
+      "bearing": "N 24°17'47\" W",
+      "distance": "209.92'",
+      "evidence_location": "to the left of the northwestern boundary segment connecting vertex 6 back to vertex 0",
+      "confidence": 1.0,
+      "read_or_inferred": "read",
+      "self_report_reasoning": "The text is clearly printed beside this boundary segment alongside Island Pond Road."
+    }
+  ]
+}

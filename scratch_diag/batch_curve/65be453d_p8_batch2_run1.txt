@@ -1,0 +1,24 @@
+Region 1, Piece 1:
+- PARCEL A:
+- PARCEL B:
+- PARCEL C:
+
+Region 1, Piece 2:
+- Parcel 'B'
+- 19785
+- N 45°34'37"E 1139.00' (appears near Parcel 'B' boundary/road context)
+- N 89°11'45"E 306.05'
+- 690.17'
+Region 1, Piece 1:
+- `N 89°11'10" W  389.26'` — boundary bearing and distance call
+- `N 01°51'34" E  527.32'` — boundary bearing and distance call (along the right side)
+
+Region 1, Piece 2:
+- `N 89°11'45" W` — boundary bearing/segment label
+- `N 87°31'02" W` — boundary bearing/segment label
+- `S 89°41'45" E` — boundary bearing/segment label
+- `30.00'` — dimension/offset near the road area
+- `690.17'` — dimension along road frontage / right-of-way
+- `BASIS OF BEARING: ... NORTH-SOUTH CENTERLINE OF SECTION, BEING NORTH 2°07'34" EAST AS SHOWN ON RECORD OF SURVEY RECORDED IN BOOK 15 OF SURVEYS AT PAGE 16, RECORDS OF SKAGIT COUNTY, WASHINGTON.` — basis-of-bearings / datum statement
+- `Parcel "C"` — parcel/lot label
+- `Asare unit.` — parcel/subdivision/unit label

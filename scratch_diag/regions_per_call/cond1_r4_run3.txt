@@ -1,0 +1,22 @@
+Region 4, Piece 1:
+- PARCEL A
+- PARCEL B
+- PARCEL C
+
+Region 4, Piece 2:
+- Parcel B
+
+Region 4, Piece 3:
+- N 01°51'34" E (bearing on dashed line)
+- 527.32' (distance on dashed line)
+- N 89°11'10" W 399.26' (bearing and distance call)
+- 37.6' (distance call)
+
+Region 4, Piece 4:
+- P19769
+- P19772
+- N 89°11'45" W (bearing call)
+- N 87°31'02" W (bearing call)
+- 30.00' (distance)
+- 100.21' (distance)
+- NORTH-SOUTH CENTERLINE OF SECTION, BEARING NORTH 2°07'34" EAST AS SHOWN ON RECORD OF SURVEY RECORDED IN BOOK 15 OF SURVEYS AT PAGE 14, RECORDS OF SKAGIT COUNTY, WASHINGTON. (basis-of-bearings statement)

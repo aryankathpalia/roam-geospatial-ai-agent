@@ -1,0 +1,15 @@
+C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py:197: UserWarning: Specified provider 'CUDAExecutionProvider' is not in available provider names.Available providers: 'AzureExecutionProvider, CPUExecutionProvider'
+  warnings.warn(
+
+======================================================================
+42f617a1-1d02-4f26-bf05-2a17b23f8fda  (expect: LOT 11 should be gone)
+======================================================================
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+  region 2: label='LOT 12A' calls=4 stated=0.37
+  region 2: label='LOT 16B2' calls=3 stated=0.46
+
+======================================================================
+a1136318-03ef-438d-9f02-8fcdcb5dca30  (expect: ~2 labels (Lot 1, Lot 2))
+======================================================================
+  region 2: label='Lot 1' calls=0 stated=0.73
+  region 2: label='Lot 2' calls=0 stated=0.32

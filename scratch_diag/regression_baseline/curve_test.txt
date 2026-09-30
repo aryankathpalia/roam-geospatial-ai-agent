@@ -1,0 +1,23 @@
+INFO: Could not find files for the given pattern(s).
+C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:718: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-LCNet_x1_0_doc_ori`.[0m
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I0925 11:28:24.867623 21792 onednn_context.cc:81] oneDNN v3.6.2
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+=== RUN 0 ===
+page 10: 0 parcel(s), 0 line calls, 0 curve calls
+page 11: 0 parcel(s), 0 line calls, 0 curve calls
+page 39: 0 parcel(s), 0 line calls, 0 curve calls
+page 103: 2 parcel(s), 4 line calls, 0 curve calls
+  LOT 2: 2 calls (0 curve), precision 1:1.4, valid=False, area_acres=None
+  LOT 3: 2 calls (0 curve), precision 1:1.1, valid=False, area_acres=None
+=== RUN 1 ===
+page 10: 0 parcel(s), 0 line calls, 0 curve calls
+page 11: 0 parcel(s), 0 line calls, 0 curve calls
+page 39: 0 parcel(s), 0 line calls, 0 curve calls
+page 103: 4 parcel(s), 4 line calls, 0 curve calls
+  LOT 25: no traverse (This parcel was identified in the document (it has its own label/description) but no boundary dimensions could be confidently attributed to it specifically -- needs manual review against the source document.)
+  LOT 2: 2 calls (0 curve), precision 1:1.4, valid=False, area_acres=None
+  LOT 12: no traverse (This parcel was identified in the document (it has its own label/description) but no boundary dimensions could be confidently attributed to it specifically -- needs manual review against the source document.)
+  LOT 3: 2 calls (0 curve), precision 1:1.1, valid=False, area_acres=None

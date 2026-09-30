@@ -1,0 +1,22 @@
+Region 1, Piece 1:
+
+- **WASHOE COUNTY CONTROL POINT / Monument Label:** 
+  `WASHOE COUNTY CONTROL POINT` / `N22SM01029 USGLO 2" BRASS CAP S12/7/13/18 1942`
+- **Ground Coordinates (Measured):** 
+  `N: 14928989.71` / `E: 2253610.44`
+- **Ground Coordinates (Record):** 
+  `N: 14928989.62` / `E: 2253610.74`
+- **Ground Coordinates (Parcel Corner):** 
+  `N 14926897.47` / `E 2252502.76`
+- **Boundary Bearing and Distance Call:** 
+  `S0°48'45"W 220.00'`
+- **Prior-Record Citation (in parentheses):** 
+  `(S0°02'31"E 250.00' - R4)`
+- **Tie / Section Line Distance Call (connected to control/section line, not parcel perimeter):** 
+  `N89°11'15"E 1077.91'` -- appears to be a tie or section line distance.
+- **Tie / Section Line Distance Calls (running vertically along the right side next to section/control line):** 
+  - `N0°48'45"E 2637.36'` -- appears to be a TIE to the adjacent control point, not a parcel boundary call.
+  - `(N0°48'59"E 2637.29' - R1)` -- appears to be a prior-record TIE citation.
+  - `(N0°49'02"E 2637.35' - R3)` -- appears to be a prior-record TIE citation.
+- **Parcel / Lot Label & Acreage:** 
+  `PARCEL 1` / `1.78 ACRES`

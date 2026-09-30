@@ -1,0 +1,68 @@
+{
+  "parcel_labels_found": [
+    {
+      "region_index": 1,
+      "label": "PARCEL 1"
+    },
+    {
+      "region_index": 1,
+      "label": "PARCEL 2"
+    }
+  ],
+  "parcels": [
+    {
+      "region_index": 1,
+      "boundary_calls": [
+        {
+          "bearing": "N 56° 02' 43\" E",
+          "distance": "434.26'"
+        },
+        {
+          "bearing": "S 41° 27' 17\" E",
+          "distance": "258.94'"
+        },
+        {
+          "bearing": "S 75° 16' 17\" W",
+          "distance": "481.51'"
+        },
+        {
+          "bearing": "N 70° 29' 46\" E",
+          "distance": "470.71'"
+        }
+      ],
+      "tie_point": null,
+      "basis_of_bearings": "WASHOE COUNTY GPS SYSTEM BETWEEN POINTS V72SM01034 AND V72SM01037 COMPUTED AS N 44° 54' 37\" E 2721.05'",
+      "parcel_label": "PARCEL 1",
+      "stated_area_acres": "1.96",
+      "ambiguous_alternates": [],
+      "curve_calls": []
+    },
+    {
+      "region_index": 1,
+      "boundary_calls": [
+        {
+          "bearing": "S 75° 16' 17\" W",
+          "distance": "481.51'"
+        },
+        {
+          "bearing": "N 70° 29' 46\" E",
+          "distance": "470.71'"
+        },
+        {
+          "bearing": "N 56° 02' 43\" E",
+          "distance": "434.26'"
+        },
+        {
+          "bearing": "S 41° 27' 17\" E",
+          "distance": "258.94'"
+        }
+      ],
+      "tie_point": null,
+      "basis_of_bearings": "WASHOE COUNTY GPS SYSTEM BETWEEN POINTS V72SM01034 AND V72SM01037 COMPUTED AS N 44° 54' 37\" E 2721.05'",
+      "parcel_label": "PARCEL 2",
+      "stated_area_acres": "1.38",
+      "ambiguous_alternates": [],
+      "curve_calls": []
+    }
+  ]
+}

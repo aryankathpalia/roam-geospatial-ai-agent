@@ -1,0 +1,62 @@
+[
+  {
+    "region_index": 1,
+    "boundary_calls": [
+      {
+        "bearing": "N0°48'45\"E",
+        "distance": "220.00'"
+      },
+      {
+        "bearing": "S89°11'15\"E",
+        "distance": "903.15'"
+      },
+      {
+        "bearing": "S0°48'45\"W",
+        "distance": "220.00'"
+      },
+      {
+        "bearing": "N89°11'15\"W",
+        "distance": "903.15'"
+      }
+    ],
+    "tie_point": {
+      "northing": "14926910.28",
+      "easting": "2251599.70",
+      "anchors_corner": "upper-left"
+    },
+    "basis_of_bearings": "THE BASIS OF BEARINGS FOR THIS SURVEY IS NEVADA STATE PLANE, WEST ZONE NAD83(94)",
+    "parcel_label": "PARCEL 2",
+    "stated_area_acres": "2.78",
+    "ambiguous_alternates": []
+  },
+  {
+    "region_index": 1,
+    "boundary_calls": [
+      {
+        "bearing": "S0°48'45\"W",
+        "distance": "220.00'"
+      },
+      {
+        "bearing": "S89°11'17\"E",
+        "distance": "325.30'"
+      },
+      {
+        "bearing": "N0°48'45\"E",
+        "distance": "220.00'"
+      },
+      {
+        "bearing": "N89°11'11\"E",
+        "distance": "1077.91'"
+      }
+    ],
+    "tie_point": {
+      "northing": "14926897.47",
+      "easting": "2252502.76",
+      "anchors_corner": "upper-right"
+    },
+    "basis_of_bearings": "THE BASIS OF BEARINGS FOR THIS SURVEY IS NEVADA STATE PLANE, WEST ZONE NAD83(94)",
+    "parcel_label": "PARCEL 1",
+    "stated_area_acres": "1.78",
+    "ambiguous_alternates": []
+  }
+]

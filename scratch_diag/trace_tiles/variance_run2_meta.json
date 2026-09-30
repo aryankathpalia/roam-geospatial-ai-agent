@@ -1,0 +1,32 @@
+{
+  "model_version": "gemini-3.5-flash-lite",
+  "response_id": "qJKzatHEFfqlqfkPi4b_mAM",
+  "usage_metadata": {
+    "cache_tokens_details": null,
+    "cached_content_token_count": null,
+    "candidates_token_count": 1463,
+    "candidates_tokens_details": null,
+    "prompt_token_count": 7250,
+    "prompt_tokens_details": [
+      {
+        "modality": "IMAGE",
+        "token_count": 6528
+      },
+      {
+        "modality": "TEXT",
+        "token_count": 722
+      }
+    ],
+    "thoughts_token_count": null,
+    "tool_use_prompt_token_count": null,
+    "tool_use_prompt_tokens_details": null,
+    "total_token_count": 8713,
+    "traffic_type": null
+  },
+  "candidates_finish_reason": [
+    "STOP"
+  ],
+  "candidates_avg_logprobs": [
+    null
+  ]
+}

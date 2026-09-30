@@ -1,0 +1,82 @@
+Based on the provided images for Region 1, here are the requested items listed per piece:
+
+### Region 1, Piece 1:
+- **Boundary bearing and distance calls / Record information:**
+  - `N0°48'45"E 220.00'`
+  - `(N0°02'31"W 250.00') (R4)` (in parentheses / prior-record citation)
+- **Road frontage / Right-of-way / Quitclaim / Dedication / Tie calls:**
+  - `S1°39'59"W 30.00' (TIE)` (Tie call)
+  - `S89°11'17"E 336.41'`
+  - `(N89°57'29"E) (R2)` (in parentheses / prior-record citation)
+- **Ground / State-plane coordinates:**
+  - `N 14926910.28`, `E 2251599.70` (labeled as "GROUND COORDINATES")
+- **Parcel/lot label or acreage:**
+  - `PARCEL 2`, `2.78 ACRES`
+
+---
+
+### Region 1, Piece 2:
+- **Boundary bearing and distance calls / Record information:**
+  - `S0°48'45"W 220.00'`
+  - `S89°11'15"E 903.15'`
+  - `(S89°09'41"E) (R3)` (in parentheses / prior-record citation)
+  - `(N89°57'29"E) (R4)` (in parentheses / prior-record citation)
+- **Road frontage / Right-of-way / Quitclaim / Dedication / Tie calls:**
+  - `N89°11'15"W 903.15'`
+  - `(N89°57'29"E) (R4)` (in parentheses / prior-record citation)
+  - `S89°11'17"E 329.80'`
+  - `(N89°57'29"E) (R2)` (in parentheses / prior-record citation)
+- **Parcel/lot label or acreage:**
+  - `PARCEL 2`, `2.78 ACRES`
+  - `PARCEL 1`, `1.78 ACRES`
+
+---
+
+### Region 1, Piece 3:
+- **Boundary bearing and distance calls / Record information:**
+  - `N0°48'45"E 2637.36'`
+  - `(N0°48'59"E 2637.29' - R1)` (in parentheses / prior-record citation)
+  - `(N0°49'02"E 2637.35' - R3)` (in parentheses / prior-record citation)
+  - `S0°48'45"W 220.00'`
+  - `(S0°02'31"W 250.00') (R4)` (in parentheses / prior-record citation)
+- **Road frontage / Right-of-way / Quitclaim / Dedication / Tie calls:**
+  - `N89°11'11"E 1077.91'` — Appears to be a tie or measurement line connecting to the section line/monument outside the parcel boundary.
+  - `S89°11'17"E 325.30'`
+  - `(N89°57'29"E) (R2)` (in parentheses / prior-record citation)
+  - `2107.74'` — Distance call related to the control point tie.
+  - `529.62'` — Distance call along the section line.
+- **Ground / State-plane coordinates:**
+  - `N: 14928989.71`, `E: 2253610.44` (GROUND COORDINATES - MEASURED, next to Washoe County Control Point)
+  - `N: 14928989.62`, `E: 2253610.74` (GROUND COORDINATES - RECORD)
+  - `N 14926897.47`, `E 2252502.76` (GROUND COORDINATES)
+- **Parcel/lot label or acreage:**
+  - `PARCEL 1`, `1.78 ACRES`
+
+---
+
+### Region 1, Piece 4:
+- **Road frontage / Right-of-way / Quitclaim / Dedication / Tie calls:**
+  - `S1°39'59"W 30.00' (TIE)` (Tie call)
+  - `S89°11'17"E 336.41'`
+  - `(N89°57'29"E) (R2)` (in parentheses / prior-record citation)
+  - `30' QUITCLAIM AREA (R6)`
+
+---
+
+### Region 1, Piece 5:
+- **Legend and Notes (Basis of Bearings):**
+  - THE BASIS OF BEARINGS FOR THIS SURVEY IS NEVADA STATE PLANE, WEST ZONE NAD83(94) BASED ON REAL TIME KINEMATIC (RTK) GPS OBSERVATIONS UTILIZING CORRECTIONS FROM THE NORTHERN NEVADA COOPERATIVE REAL TIME NETWORK. COORDINATES AND DISTANCES HEREON ARE AT GROUND LEVEL BASED ON A COMBINED GRID TO GROUND FACTOR OF 1.000197939.
+
+---
+
+### Region 1, Piece 6:
+- **Boundary bearing and distance calls / Record information:**
+  - `S89°11'17"E 325.30'`
+  - `(N89°57'29"E) (R2)` (in parentheses / prior-record citation)
+- **Ground / State-plane coordinates:**
+  - `N: 14926352.62`, `E: 2253573.04` (GROUND COORDINATES - MEASURED at the 1/4 corner)
+  - `N: 14926352.55`, `E: 2253573.13` (GROUND COORDINATES - RECORD)
+- **Parcel/lot label or acreage / Resultant Parcel Areas Table:**
+  - `PARCEL 1` — `77,526` SQ. FT. / `1.78` ACRES
+  - `PARCEL 2` — `121,165` SQ. FT. / `2.78` ACRES
+  - `TOTAL` — `198,691` SQ. FT. / `4.56` ACRES

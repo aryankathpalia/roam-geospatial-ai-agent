@@ -1,0 +1,40 @@
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+
+=== run 1 ===
+  PARCEL 1: 4 calls, closure 0.0 ft, area 1.78 ac (stated 1.78), valid=True
+  PARCEL 2: 4 calls, closure 0.0 ft, area 2.782 ac (stated 2.78), valid=True
+     PARCEL 1: S89°11'15"E 352.40'
+     PARCEL 1: S0°48'45"W 220.00'
+     PARCEL 1: N89°11'15"W 352.40'
+     PARCEL 1: N0°48'45"E 220.00'
+     PARCEL 2: S89°11'15"E 550.75'
+     PARCEL 2: N0°48'45"E 220.00'
+     PARCEL 2: N89°11'15"W 550.75'
+     PARCEL 2: S0°48'45"W 220.00'
+
+=== run 2 ===
+  PARCEL 2: 4 calls, closure 0.0 ft, area 2.782 ac (stated 2.78), valid=True
+  PARCEL 1: 4 calls, closure 0.0 ft, area 1.78 ac (stated 1.78), valid=True
+     PARCEL 2: N0°48'45"E 220.00'
+     PARCEL 2: S89°11'15"E 550.75'
+     PARCEL 2: S0°48'45"W 220.00'
+     PARCEL 2: N89°11'15"W 550.75'
+     PARCEL 1: S0°48'45"W 220.00'
+     PARCEL 1: N89°11'15"W 352.40'
+     PARCEL 1: N0°48'45"E 220.00'
+     PARCEL 1: S89°11'15"E 352.40'
+
+=== run 3 ===
+  PARCEL 2: 4 calls, closure 439.96 ft, area 0.015 ac (stated 2.78), valid=False
+  PARCEL 1: 4 calls, closure 439.96 ft, area 0.015 ac (stated 1.78), valid=False
+     PARCEL 2: N0°48'45"E 220.00'
+     PARCEL 2: S89°11'15"E 550.75'
+     PARCEL 2: N0°48'45"W 220.00'
+     PARCEL 2: N89°11'15"W 550.75'
+     PARCEL 1: N0°48'45"W 220.00'
+     PARCEL 1: S89°11'15"E 352.40'
+     PARCEL 1: N0°48'45"E 220.00'
+     PARCEL 1: N89°11'15"W 352.40'
+
+Selected run 1 of 3 by acreage match then closure: 2/2 parcels match
+Wrote frontend/static/sample-data/sample-result.json

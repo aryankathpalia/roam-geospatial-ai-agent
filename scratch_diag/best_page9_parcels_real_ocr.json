@@ -1,0 +1,173 @@
+[
+  {
+    "vision_geometry": {
+      "boundary_calls": [
+        {
+          "bearing": "N0\u00b048'45\"E",
+          "distance": "220.00'"
+        },
+        {
+          "bearing": "S89\u00b011'15\"E",
+          "distance": "903.15'"
+        },
+        {
+          "bearing": "S0\u00b048'45\"W",
+          "distance": "220.00'"
+        },
+        {
+          "bearing": "N89\u00b011'15\"W",
+          "distance": "903.15'"
+        }
+      ],
+      "tie_point": {
+        "northing": "14926910.28",
+        "easting": "2251599.70",
+        "anchors_corner": "null"
+      },
+      "basis_of_bearings": "NEVADA STATE PLANE, WEST ZONE NAD83(94) BASED ON REAL TIME KINEMATIC (RTK) GPS OBSERVATIONS UTILIZING CORRECTIONS FROM THE NORTHERN NEVADA COOPERATIVE REAL TIME NETWORK",
+      "parcel_label": "PARCEL 2"
+    },
+    "spatial_validation": {
+      "valid": false,
+      "issues": [
+        "Walked area (198,693 sqft) differs from the document's stated area (121,097 sqft) by 64% -- beyond the 15% tolerance."
+      ],
+      "perimeter_ft": 2246.3,
+      "precision_ratio": null,
+      "self_intersects": false,
+      "area_sqft": 198693.0,
+      "area_acres": 4.561,
+      "stated_area_sqft": 121096.79999999999,
+      "area_matches_stated": false
+    },
+    "boundary_geojson_wgs84": {
+      "type": "Feature",
+      "properties": {
+        "closure_error_ft": 0.0,
+        "unparsed_calls": 0,
+        "anchor_lat": 39.6877843,
+        "anchor_lon": -119.9082479,
+        "georeferenced": "approximate"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -119.9082479,
+              39.6877843
+            ],
+            [
+              -119.9082368,
+              39.6883882
+            ],
+            [
+              -119.905028,
+              39.688353
+            ],
+            [
+              -119.9050391,
+              39.6877491
+            ],
+            [
+              -119.9082479,
+              39.6877843
+            ]
+          ]
+        ]
+      }
+    }
+  },
+  {
+    "vision_geometry": {
+      "boundary_calls": [
+        {
+          "bearing": "N0\u00b048'45\"E",
+          "distance": "2637.36'"
+        },
+        {
+          "bearing": "N89\u00b011'15\"E",
+          "distance": "1077.91'"
+        },
+        {
+          "bearing": "S89\u00b011'17\"E",
+          "distance": "336.41'"
+        },
+        {
+          "bearing": "S89\u00b011'17\"E",
+          "distance": "329.80'"
+        },
+        {
+          "bearing": "S89\u00b011'17\"E",
+          "distance": "325.30'"
+        }
+      ],
+      "tie_point": {
+        "northing": "1492989.71",
+        "easting": "2253610.44",
+        "anchors_corner": "null"
+      },
+      "basis_of_bearings": "NEVADA STATE PLANE, WEST ZONE NAD83(94) BASED ON REAL TIME KINEMATIC (RTK) GPS OBSERVATIONS UTILIZING CORRECTIONS FROM THE NORTHERN NEVADA COOPERATIVE REAL TIME NETWORK",
+      "parcel_label": "PARCEL 1"
+    },
+    "spatial_validation": {
+      "valid": false,
+      "issues": [
+        "Weak closure: precision ratio 1:1 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.",
+        "Walked area (2,309,543 sqft) differs from the document's stated area (121,097 sqft) by 1807% -- beyond the 15% tolerance."
+      ],
+      "perimeter_ft": 4706.78,
+      "precision_ratio": 1.4,
+      "self_intersects": false,
+      "area_sqft": 2309543.11,
+      "area_acres": 53.02,
+      "stated_area_sqft": 121096.79999999999,
+      "area_matches_stated": false
+    },
+    "boundary_geojson_wgs84": {
+      "type": "Feature",
+      "properties": {
+        "closure_error_ft": 3376.18,
+        "unparsed_calls": 0,
+        "anchor_lat": 39.6877843,
+        "anchor_lon": -119.9082479,
+        "georeferenced": "approximate"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -119.9082479,
+              39.6877843
+            ],
+            [
+              -119.908115,
+              39.6950237
+            ],
+            [
+              -119.9042849,
+              39.6950656
+            ],
+            [
+              -119.9030896,
+              39.6950525
+            ],
+            [
+              -119.9019177,
+              39.6950396
+            ],
+            [
+              -119.9007619,
+              39.6950269
+            ],
+            [
+              -119.9082479,
+              39.6877843
+            ]
+          ]
+        ]
+      }
+    }
+  }
+]

@@ -1,0 +1,114 @@
+INFO: Could not find files for the given pattern(s).
+C:\Users\preet\OneDrive\Desktop\roam\roam-env\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:718: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mCreating model: ('PP-LCNet_x1_0_doc_ori', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-LCNet_x1_0_doc_ori`.[0m
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I0928 16:10:09.015462 32824 onednn_context.cc:81] oneDNN v3.6.2
+[32mCreating model: ('PP-LCNet_x1_0_textline_ori', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-LCNet_x1_0_textline_ori`.[0m
+[32mCreating model: ('PP-OCRv5_mobile_det', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-OCRv5_mobile_det`.[0m
+[32mCreating model: ('PP-OCRv5_mobile_rec', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\preet\.paddlex\official_models\PP-OCRv5_mobile_rec`.[0m
+
+========================================================================
+nvz_parcel1
+========================================================================
+pixel_area=236768px^2  stated_sqft=77537  scale(sqrt method)=0.5723 ft/px
+cross-check vs known direct scale (0.7051 ft/px): 18.8% error
+printed numbers on page: 39
+  tol=2%: 0 matches across 0/4 edges
+  tol=3%: 0 matches across 0/4 edges
+  tol=5%: 0 matches across 0/4 edges
+  -- explicit rejects check (3% tolerance) --
+    text='2107.74'                           value=2107.74 nearest_edge=0 predicted=437.8 pct_err=381.5% dist_px=54
+    text='68'                                value=68.0 nearest_edge=3 predicted=175.7 pct_err=61.3% dist_px=35
+    text='28.5'                              value=28.5 nearest_edge=0 predicted=437.8 pct_err=93.5% dist_px=56
+    text='1077.91'                           value=1077.91 nearest_edge=1 predicted=178.5 pct_err=503.7% dist_px=51
+    text='41.0'                              value=41.0 nearest_edge=0 predicted=437.8 pct_err=90.6% dist_px=70
+    text='74.7'                              value=74.7 nearest_edge=0 predicted=437.8 pct_err=82.9% dist_px=92
+    text='S0°48\'45"W220.00°'                value=220.0 nearest_edge=1 predicted=178.5 pct_err=23.2% dist_px=106
+    text='5.00'                              value=5.0 nearest_edge=2 predicted=437.8 pct_err=98.9% dist_px=57
+    text='91.3'                              value=91.3 nearest_edge=2 predicted=437.8 pct_err=79.1% dist_px=46
+    text='-5.00'                             value=5.0 nearest_edge=2 predicted=437.8 pct_err=98.9% dist_px=20
+    text='68.0'                              value=68.0 nearest_edge=2 predicted=437.8 pct_err=84.5% dist_px=12
+    text='550.75'                            value=550.75 nearest_edge=2 predicted=437.8 pct_err=25.8% dist_px=355
+    text='N89*11\'15"W 903.15"'              value=903.15 nearest_edge=2 predicted=437.8 pct_err=106.3% dist_px=77
+    text='29629'                             value=29629.0 nearest_edge=1 predicted=178.5 pct_err=16494.7% dist_px=85
+    text='0032168'                           value=32168.0 nearest_edge=2 predicted=437.8 pct_err=7248.0% dist_px=106
+    text='420524'                            value=420524.0 nearest_edge=1 predicted=178.5 pct_err=235428.4% dist_px=719
+
+========================================================================
+nvz_parcel2
+========================================================================
+pixel_area=234850px^2  stated_sqft=121097  scale(sqrt method)=0.7181 ft/px
+printed numbers on page: 39
+  tol=2%: 2 matches across 2/4 edges
+  tol=3%: 2 matches across 2/4 edges
+    edge2 (predicted 552.9ft):
+      text='550.75'                            dist_px=49 pct_err=0.4%
+    edge3 (predicted 219.0ft):
+      text='N0°48\'45"E 220.00*'               dist_px=36 pct_err=0.5%
+  tol=5%: 2 matches across 2/4 edges
+  -- explicit rejects check (3% tolerance) --
+    text='2107.74'                           value=2107.74 nearest_edge=0 predicted=552.9 pct_err=281.2% dist_px=818
+    text='68'                                value=68.0 nearest_edge=0 predicted=552.9 pct_err=87.7% dist_px=22
+    text='1077.91'                           value=1077.91 nearest_edge=1 predicted=219.0 pct_err=392.2% dist_px=714
+    text='5.00'                              value=5.0 nearest_edge=1 predicted=219.0 pct_err=97.7% dist_px=74
+    text='550.75'                            value=550.75 nearest_edge=2 predicted=552.9 pct_err=0.4% dist_px=49
+    text='N89*11\'15"W 903.15"'              value=903.15 nearest_edge=2 predicted=552.9 pct_err=63.3% dist_px=67
+    text='29629'                             value=29629.0 nearest_edge=1 predicted=219.0 pct_err=13428.4% dist_px=816
+    text='30'                                value=30.0 nearest_edge=2 predicted=552.9 pct_err=94.6% dist_px=80
+    text='0032168'                           value=32168.0 nearest_edge=1 predicted=219.0 pct_err=14587.7% dist_px=542
+    text='420524'                            value=420524.0 nearest_edge=1 predicted=219.0 pct_err=191908.3% dist_px=1155
+
+========================================================================
+27211ae5_lot48-3
+========================================================================
+pixel_area=646146px^2  stated_sqft=41382  scale(sqrt method)=0.2531 ft/px
+printed numbers on page: 39
+  tol=2%: 0 matches across 0/10 edges
+  tol=3%: 0 matches across 0/10 edges
+  tol=5%: 0 matches across 0/10 edges
+  -- explicit rejects check (3% tolerance) --
+    text='81072'                             value=81072.0 nearest_edge=0 predicted=66.3 pct_err=122133.4% dist_px=861
+    text='.26602'                            value=26602.0 nearest_edge=0 predicted=66.3 pct_err=40008.2% dist_px=608
+    text='03038'                             value=3038.0 nearest_edge=0 predicted=66.3 pct_err=4480.4% dist_px=670
+    text='03038'                             value=3038.0 nearest_edge=6 predicted=86.1 pct_err=3427.8% dist_px=265
+    text='36607'                             value=36607.0 nearest_edge=7 predicted=194.5 pct_err=18721.5% dist_px=930
+    text='2'                                 value=2.0 nearest_edge=7 predicted=194.5 pct_err=99.0% dist_px=108
+    text='1'                                 value=1.0 nearest_edge=7 predicted=194.5 pct_err=99.5% dist_px=93
+    text='89960'                             value=89960.0 nearest_edge=7 predicted=194.5 pct_err=46152.8% dist_px=1017
+    text='322.74'                            value=322.74 nearest_edge=7 predicted=194.5 pct_err=65.9% dist_px=71
+    text='3013'                              value=3013.0 nearest_edge=7 predicted=194.5 pct_err=1449.1% dist_px=130
+    text='N225156W 9991'                     value=9991.0 nearest_edge=0 predicted=66.3 pct_err=14963.6% dist_px=444
+
+========================================================================
+db54d473_parcel1
+========================================================================
+pixel_area=278090px^2  stated_sqft=85396  scale(sqrt method)=0.5541 ft/px
+printed numbers on page: 21
+  tol=2%: 0 matches across 0/4 edges
+  tol=3%: 0 matches across 0/4 edges
+  tol=5%: 0 matches across 0/4 edges
+  -- explicit rejects check (3% tolerance) --
+    text='1010'                              value=1010.0 nearest_edge=0 predicted=472.3 pct_err=113.8% dist_px=779
+    text='4'                                 value=4.0 nearest_edge=0 predicted=472.3 pct_err=99.2% dist_px=53
+    text='1000.01'                           value=1000.01 nearest_edge=0 predicted=472.3 pct_err=111.7% dist_px=523
+
+-- scale bar OCR check: NVZ --
+    text='GRAPHIC SCALE' bbox=(1965.0, 1241.0, 2072.0, 1258.0)
+    text='1inch = 40 ft.' bbox=(1988.0, 1295.0, 2045.0, 1306.0)
+
+-- scale bar OCR check: Payette --
+    text='SCALE' bbox=(1364.0, 1241.0, 1409.0, 1259.0)
+
+-- scale bar OCR check: db54d473 (has printed SCALE 1"=40') --
+    text='SCALE140' bbox=(1134.0, 417.0, 1286.0, 438.0)
+
+========================================================================
+Corpus ceiling: parcels with a stated acreage already extracted
+========================================================================
+total parcels with any geometry: 117
+parcels with a non-null stated_area_acres: 65 (55.6%)

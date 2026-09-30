@@ -1,0 +1,11 @@
+total digit-adjacent U+FFFD occurrences: 354
+files:
+  scratch_diag\gen_out.txt: 20
+  scratch_diag\gen_out2.txt: 21
+  scratch_diag\gen_out3.txt: 19
+  scratch_diag\gen_out4.txt: 24
+  scratch_diag\gen_out5.txt: 24
+  scratch_diag\generalization_out.txt: 25
+  scratch_diag\generalization_out2.txt: 75
+  scratch_diag\merge_test_output.txt: 138
+  scratch_diag\regex_fix_check.txt: 8

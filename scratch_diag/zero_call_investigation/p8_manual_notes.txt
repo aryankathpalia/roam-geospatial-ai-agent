@@ -1,0 +1,27 @@
+Region 1, Piece 1:
+- PARCEL A: THE SOUTH 30 FEET OF THE WEST 300 FEET OF THE NORTHEAST QUARTER OF THE SOUTHEAST QUARTER, SECTION 5, TOWNSHIP 34 NORTH, RANGE 2 EAST OF THE WILLAMETTE MERIDIAN.
+- PARCEL B: THAT PORTION OF THE SOUTHEAST QUARTER OF THE SOUTHEAST QUARTER OF SECTION 3, TOWNSHIP 34 NORTH, RANGE 2 EAST OF THE WILLAMETTE MERIDIAN, DESCRIBED AS FOLLOWS: BEGINNING AT THE NORTHWEST CORNER OF...
+
+Region 1, Piece 2:
+- N 45 51' 34" E 1139.00' (bearing and distance call)
+- S 44 11' 45" E 300.05' (bearing and distance call)
+- Parcel 'B' (parcel label)
+- N 89 11'45" E 386.05' (appears along the lower boundary line near the hog wire fence)
+
+Region 1, Piece 3:
+- N 89 11'10" W  389.26' (boundary bearing and distance call along the fenced property line)
+- N 01 51'34" E  527.32' (boundary bearing and distance call along the east side of the parcel)
+
+Region 1, Piece 4:
+- N 89 11'45" W (along the 1/16th line)
+- N 87 31'02" W (along the wire fence / section line area)
+- S 89 11'45" W (near the top, with distance 100.27' partially visible)
+- 30.00' (vertical offset/dimension call near the top-left area)
+- 5.3' (offset dimension call near the top)
+- 19769
+- P19772
+- P1978
+- PADILLA HEIGHTS ROAD (road designation)
+- Parcel "C"
+- SOUTHEAST 1/4 SECTION 3-34-2
+- BASIS OF BEARING: NORTH-SOUTH CENTERLINE OF SECTION, BEING NORTH 2 07'34" EAST AS SHOWN ON RECORD OF SURVEY RECORDED IN BOOK 15 OF SURVEYS AT PAGE 16, RECORDS OF SKAGIT COUNTY, WASHINGTON.

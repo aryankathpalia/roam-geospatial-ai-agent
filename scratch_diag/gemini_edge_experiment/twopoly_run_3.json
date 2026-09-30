@@ -1,0 +1,12 @@
+{
+  "shared_edge_calls": [
+    {
+      "distance_value": "322.74'",
+      "bearing": "S 59°41'15\" E",
+      "assigned_to": "blue (Lot 48)",
+      "evidence_location": "Central boundary area running southeast between the blue and red parcel borders.",
+      "confidence": 0.95,
+      "reasoning": "The text '322.74'' along with the bearing 'S 59°41'15\" E' directly aligns with and traces the solid boundary edge of the blue polygon representing Lot 48."
+    }
+  ]
+}

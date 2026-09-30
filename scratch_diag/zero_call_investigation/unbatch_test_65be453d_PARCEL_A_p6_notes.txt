@@ -1,0 +1,64 @@
+Region 1, Piece 1:
+Region 1, Piece 1:
+
+- THE SOUTH 30 FEET OF THE WEST 300 FEET OF THE NORTHEAST QUARTER OF THE SOUTHEAST QUARTER, SECTION 3, TOWNSHIP 34 NORTH, RANGE 2 EAST OF THE WILLAMETTE MERIDIAN.
+- THAT PORTION OF THE SOUTHEAST QUARTER OF THE SOUTHEAST QUARTER OF SECTION 3, TOWNSHIP 34 NORTH, RANGE 2 EAST OF THE WILLAMETTE MERIDIAN, DESCRIBED AS FOLLOWS: BEGINNING AT THE NORTHWEST CORNER OF SAID SOUTHEAST QUARTER OF THE SOUTHEAST QUARTER; THENCE EAST 300 FEET; THENCE SOUTH TO THE NORTH LINE OF THE COUNTY ROAD KNOWN AS STEVENSON ROAD OR PADILLA HEIGHTS ROAD; THENCE WEST ALONG THE NORTH LINE OF SAID COUNTY ROAD TO THE WEST LINE OF SAID SOUTHEAST QUARTER OF THE SOUTHEAST QUARTER; THENCE NORTH TO THE POINT OF BEGINNING.
+- THAT PORTION OF THE SOUTHEAST QUARTER OF SECTION 3, TOWNSHIP 34 NORTH, RANGE 2 EAST OF THE WILLAMETTE MERIDIAN, DESCRIBED AS FOLLOWS: BEGINNING AT THE SOUTHEAST CORNER OF A TRACT OF LAND CONVEYED TO FRANK RILEY, JR., BY DEED RECORDED UNDER AUDITOR'S FILE NO. 396758, RECORDS OF SKAGIT COUNTY, WASHINGTON; SAID POINT BEING ON THE NORTH LINE OF THE COUNTY ROAD KNOWN AS STEVENSON ROAD OR PADILLA HEIGHTS ROAD; THENCE NORTH ALONG THE EAST LINE OF SAID TRACT AND SAW LINE EXTENDED NORTH A DISTANCE OF 693 FEET, MORE OR LESS, TO THE SOUTH LINE OF A TRACT CONVEYED TO CARL A FOSS BY DEED RECORDED UNDER AUDITOR'S FILE NO. 376721; THENCE EAST ALONG THE SOUTH LINE OF SAID FOSS TRACT TO THE EAST LINE OF THE NORTHWEST QUARTER OF THE SOUTHEAST QUARTER; THENCE SOUTH TO THE NORTH LINE OF SAID COUNTY ROAD; THENCE WEST ALONG THE NORTH LINE OF SAID COUNTY ROAD TO THE POINT OF BEGINNING.
+
+Region 1, Piece 2:
+Based on the provided image (Region 1, Piece 1), here are the relevant boundary calls, dimensions, and notes found on this segment of the drawing:
+
+Region 1, Piece 1:
+- `N 01°51'34" E 139.00'` (along a property or fence line adjacent to a gravel road)
+- `S 89°11'45" E 690.15'` (along a property line adjacent to an asphalt area / chain link fence)
+- `S 00°05' E` (bearing call along a fence line / property boundary)
+
+*(Note: Other text visible on this piece includes "OCCUPATIONAL INDICATORS NOTE", "NOTES", a north arrow, a scale bar, and various descriptive labels such as "FOUND ARMY CORP ENG. MONUMENT MARKED 'SW 10 1997' N 15° E, 3.5' FROM SET CORNER", but the above are the only boundary/survey bearing and distance calls present.)*
+
+Region 1, Piece 3:
+Region 1, Piece 1:
+
+Boundary bearings, distances, and annotations appearing on or immediately adjacent to the parcel boundary and reference lines:
+
+* `N 89°11'10" W` (bearing along the shaded strip / boundary line)
+* `389.26'` (distance along the shaded strip / boundary line)
+* `37.5'` (dimension label near the upper left corner)
+* `2.0'` (dimension label near the upper right corner)
+* `527.32'` (distance along the eastern boundary line)
+* `N 01°51'34" E` (bearing along the eastern boundary line)
+* `616.17'` (distance along the western boundary line)
+* `27.0'` (dimension label near the western boundary line)
+
+Tie/Reference lines and adjacent grid dimensions shown in the lower section:
+* `2800.59'`
+* `N 07°34' E`
+* `2607.67'`
+* `S 89°11'45" E`
+* `657.32'`
+* `657.33'`
+* `S 89°11'10" E`
+* `2630.07'`
+* `1315.03'`
+* `1299.81'`
+* `2640.00'`
+* `N 89°44'03" W`
+* `1310.32'`
+* `2631.41'`
+
+Region 1, Piece 4:
+Region 1, Piece 1:
+
+- **Basis of Bearing Statement:**
+  "NORTH - SOUTH CENTERLINE OF SECTION, BEING NORTH 2°07'34" EAST AS SHOWN ON RECORD OF SURVEY RECORDED IN BOOK 15 OF SURVEYS AT PAGE 16, RECORDS OF SKAGIT COUNTY, WASHINGTON."
+
+- **Vicinity Map / Boundary / Tie Bearings and Distances (from the small vicinity map and surrounding linework):**
+  - "N 2°07'34" E 1300.30'" (found on the vicinity map)
+  - "S 89°11'45" E 1310.32'" (found on the vicinity map)
+  - "S 1°57'34" W 1317.03'" (found on the vicinity map)
+  - "S 204°03" W 1340.19'" (found on the vicinity map)
+  - "N 88°25'45" W 1326.93'" (found on the vicinity map)
+  - "N 88°13'24" W 1305.23'" (found on the vicinity map)
+  - "N 01°51'34" W" (found near the upper left of the main drawing)
+  - "N 01°56'24" E" (found near the upper left/center)
+  - "N 89°11'45" W 100.21'" (found near the upper section line)
+  - "N 87°31'02" W" (found along Padilla Heights Road)

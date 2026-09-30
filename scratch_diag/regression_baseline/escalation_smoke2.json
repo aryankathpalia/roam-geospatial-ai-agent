@@ -1,0 +1,85 @@
+{
+  "generated_at": "20260925_124019",
+  "runs_per_document": 1,
+  "documents": {
+    "db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b": {
+      "runs_completed": 1,
+      "runs_errored": 0,
+      "errors": [],
+      "n_regions_by_run": [
+        3
+      ],
+      "n_parcels_by_run": [
+        1
+      ],
+      "mean_valid_rate": 0.0,
+      "valid_rate_by_run": [
+        0.0
+      ],
+      "mean_area_match_rate": 0.0,
+      "issue_totals_across_runs": {
+        "weak_closure": 1,
+        "area_mismatch": 1
+      }
+    }
+  },
+  "labeled": {
+    "overall": {
+      "plat_closed_rate": 0.0,
+      "plat_valid_rate": 0.0,
+      "plat_any_3plus_calls_rate": 0.5,
+      "phantom_parcels": 0,
+      "nonplat_parcels_emitted": 0,
+      "false_valid": 0,
+      "plats_dropped_by_triage": 0,
+      "nonplats_skipped_by_triage": 0,
+      "vision_error_regions": 0,
+      "unlabeled_regions": 0,
+      "raw_counts": {
+        "undimensioned_regions": 1,
+        "undimensioned_parcels": 0,
+        "undimensioned_parcels_3plus_calls": 0,
+        "undimensioned_parcels_valid": 0,
+        "plat_regions": 2,
+        "plat_parcels": 1,
+        "plat_parcels_3plus_calls": 1,
+        "plat_parcels_valid": 0,
+        "closeable_plat_regions": 2,
+        "closeable_plat_regions_any_3plus": 1,
+        "closeable_plat_regions_closed": 0,
+        "closeable_plat_regions_valid": 0
+      }
+    },
+    "runs_per_document": {
+      "db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b": 1
+    },
+    "documents": {
+      "db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b": {
+        "plat_closed_rate": 0.0,
+        "plat_valid_rate": 0.0,
+        "plat_any_3plus_calls_rate": 0.5,
+        "phantom_parcels": 0,
+        "nonplat_parcels_emitted": 0,
+        "false_valid": 0,
+        "plats_dropped_by_triage": 0,
+        "nonplats_skipped_by_triage": 0,
+        "vision_error_regions": 0,
+        "unlabeled_regions": 0,
+        "raw_counts": {
+          "undimensioned_regions": 1,
+          "undimensioned_parcels": 0,
+          "undimensioned_parcels_3plus_calls": 0,
+          "undimensioned_parcels_valid": 0,
+          "plat_regions": 2,
+          "plat_parcels": 1,
+          "plat_parcels_3plus_calls": 1,
+          "plat_parcels_valid": 0,
+          "closeable_plat_regions": 2,
+          "closeable_plat_regions_any_3plus": 1,
+          "closeable_plat_regions_closed": 0,
+          "closeable_plat_regions_valid": 0
+        }
+      }
+    }
+  }
+}

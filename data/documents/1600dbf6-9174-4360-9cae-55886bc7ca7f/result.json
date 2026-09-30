@@ -1,0 +1,2007 @@
+{
+  "document_id": "1600dbf6-9174-4360-9cae-55886bc7ca7f",
+  "inspection": {
+    "filename": "original.pdf",
+    "page_count": 15,
+    "metadata": {
+      "format": "PDF 1.4",
+      "title": "",
+      "author": "",
+      "subject": "",
+      "keywords": "",
+      "creator": "",
+      "producer": "",
+      "creationDate": "D:20190717151527+00'00'",
+      "modDate": "",
+      "trapped": "",
+      "encryption": null
+    },
+    "pages": [
+      {
+        "page_number": 1,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 1
+      },
+      {
+        "page_number": 2,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 1
+      },
+      {
+        "page_number": 3,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 1
+      },
+      {
+        "page_number": 4,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 1
+      },
+      {
+        "page_number": 5,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 1
+      },
+      {
+        "page_number": 6,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 1
+      },
+      {
+        "page_number": 7,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 1
+      },
+      {
+        "page_number": 8,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 1
+      },
+      {
+        "page_number": 9,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 1
+      },
+      {
+        "page_number": 10,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 1
+      },
+      {
+        "page_number": 11,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 1
+      },
+      {
+        "page_number": 12,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 1
+      },
+      {
+        "page_number": 13,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 1
+      },
+      {
+        "page_number": 14,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 1
+      },
+      {
+        "page_number": 15,
+        "width": 612.0,
+        "height": 792.0,
+        "has_text": false,
+        "text_length": 0,
+        "image_count": 1
+      }
+    ]
+  },
+  "pages": [
+    {
+      "page_number": 1,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.983,
+          "bbox": [
+            111.4,
+            1131.6,
+            1437.5,
+            160.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Prior to filing legal proceedings to condemn the needed Right of Way Easement, we are\npresenting a final offer of $11,100.00 in exchange for signing the enclosed Right of Way Easement\nand W-9. Such amount represents more than the fair market value of the land along with avoided\nexpenses of condemnation.",
+          "ocr_confidence": 0.984
+        },
+        {
+          "class": "Text",
+          "confidence": 0.974,
+          "bbox": [
+            130.5,
+            460.8,
+            374.5,
+            162.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Michael I. Hollahan\nHollahan Law Office\n109 E. Washington Street\nPittsfield, Illinois 62363",
+          "ocr_confidence": 0.959
+        },
+        {
+          "class": "Text",
+          "confidence": 0.962,
+          "bbox": [
+            697.6,
+            1589.3,
+            236.8,
+            44.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Sincerely yours,",
+          "ocr_confidence": 0.988
+        },
+        {
+          "class": "Text",
+          "confidence": 0.958,
+          "bbox": [
+            703.3,
+            1720.7,
+            527.4,
+            117.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Tracy Johansson\nPrairie Power, Inc.\nRegulatory & Legal Afairs Manager",
+          "ocr_confidence": 0.977
+        },
+        {
+          "class": "Text",
+          "confidence": 0.954,
+          "bbox": [
+            128.6,
+            882.8,
+            282.7,
+            33.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Dear Mr. Hollahan,",
+          "ocr_confidence": 0.966
+        },
+        {
+          "class": "Text",
+          "confidence": 0.951,
+          "bbox": [
+            208.9,
+            669.2,
+            948.6,
+            159.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Re:\nFinal Offer for Right of Way Purchase\nProject: 201197; Liberty to Pittsfield\nCounty: Pike\nSection: 13; Parcel: 1035; Dan & Marsha Allen",
+          "ocr_confidence": 0.986
+        },
+        {
+          "class": "Picture",
+          "confidence": 0.95,
+          "bbox": [
+            155.1,
+            176.8,
+            449.2,
+            172.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "skipped"
+        },
+        {
+          "class": "Text",
+          "confidence": 0.949,
+          "bbox": [
+            910.9,
+            587.8,
+            618.7,
+            33.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Aso via email: mike@hollahanlaw.com",
+          "ocr_confidence": 0.983
+        },
+        {
+          "class": "Text",
+          "confidence": 0.946,
+          "bbox": [
+            1248.1,
+            228.2,
+            325.9,
+            151.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "3130 Pleasant Run\nSpringfield, IL 62711\nTelephone: 217/245-6161\nwww.ppi.coop",
+          "ocr_confidence": 0.981
+        },
+        {
+          "class": "Text",
+          "confidence": 0.918,
+          "bbox": [
+            761.3,
+            416.3,
+            182.5,
+            38.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "June 7, 2019",
+          "ocr_confidence": 0.963
+        },
+        {
+          "class": "Text",
+          "confidence": 0.675,
+          "bbox": [
+            133.1,
+            1343.2,
+            1408.6,
+            193.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Please let us know within ten (10) days of the date of this letter whether this offer is\nacceptable by having your clients sign (in front of a notary) and return the enclosed documents to\nthe undersigned. A check will be mailed to you after receipt of the signed documents. If you have\nany questions, concerns, or would like to make alternate arrangements for payment or signing,\nplease direct them to me at (217) 331-5624 or tjohansson@ppi.coop.",
+          "ocr_confidence": 0.982
+        },
+        {
+          "class": "Text",
+          "confidence": 0.593,
+          "bbox": [
+            128.2,
+            1875.4,
+            414.9,
+            100.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Enclosures:\nRight of Way Easement with plat\nW-9",
+          "ocr_confidence": 0.986
+        },
+        {
+          "class": "Text",
+          "confidence": 0.523,
+          "bbox": [
+            123.3,
+            1874.7,
+            415.8,
+            101.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "",
+          "ocr_confidence": null
+        },
+        {
+          "class": "Text",
+          "confidence": 0.469,
+          "bbox": [
+            120.6,
+            965.9,
+            1395.8,
+            117.9
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\1600dbf6-9174-4360-9cae-55886bc7ca7f\\review_crops\\page_001_13_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Thank you for calling me back yesterday. As we discussed, PPI is now preparing to initiate\nEminent Domain proceedings to acquire a Right of Way Easement on part of the above-described\nland.",
+          "ocr_confidence": 0.985
+        }
+      ]
+    },
+    {
+      "page_number": 2,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.977,
+          "bbox": [
+            289.5,
+            1248.6,
+            1170.1,
+            556.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "COMMENCING at a point marking the Northeast corner of the Northeast Quarter of the\naforementioned Section 13; thence South 00 Degrees 37 Minutes 56 Seconds West along the East\nline of the Northeast Quarter of said Section 13 a distance of 669.60 feet to the Northeast corner\nof the South Half of the Northeast Quarter of the Northeast Quarter of said Section 13, said point\nalso being the POINT OF BEGINNING; thence continue South 00 Degrees 37 Minutes 56\nSeconds West along said East line a distance of 669.60 feet to the Southeast corner of the\nNortheast Quarter of said Northeast Quarter; thence South 87 Degrees 42 Minutes 05 Seconds\nWest along the South line of the Northeast Quarter of said Northeast Quarter a distance of 75.70\nfeet; thence North 03 Degrees 08 Minutes 59 Seconds East leaving said South line a distance of\n281.53 feet; thence North 00 Degrees 03 Minutes 07 Seconds East a distance of 388.68 feet to a\npoint on the North line of the South Half of the Northeast Quarter of said Northeast Quarter;\nthence North 87 Degrees 36 Minutes 12 Seconds East along said North line a distance of 67.27\nfeet to the POINT OF BEGINNING; CONTAINING 1.03 Acres more or less; the parent tract for\nthe above described is recorded in Book 834 at page 104 as recorded in the Pike County Recorder\nof Deeds office; as per survey during March of 2018 of JEFF C. HART, ILLINOIS\nPROFESSIONAL LAND SURVEYOR #35-3461, as further described in Exhibit A attached\nhereto and incorporated herein.",
+          "ocr_confidence": 0.973
+        },
+        {
+          "class": "Text",
+          "confidence": 0.975,
+          "bbox": [
+            204.2,
+            1851.6,
+            1265.3,
+            156.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "(2) to excavate, place, bury, construct, operate, patrol, inspect, repair, maintain, relocate, and replace on,\nabove, over, in, through, and under said real estate and all streets, roads, or highways abutting said real\nestate an electric system, including, but not limited to, poles, structures, cross-arms, wires, cables,\nconduits, fiber-optic cables and equipment, markers, and other components or appurtenances (collectively\nthe \"electric system\"). To the extent field and safety conditions allow, initial construction of poles will be",
+          "ocr_confidence": 0.98
+        },
+        {
+          "class": "Text",
+          "confidence": 0.968,
+          "bbox": [
+            215.0,
+            832.2,
+            1259.3,
+            172.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "KNOW ALL MEN BY THESE PRESENTS that Daniel J Allen and Marsha L Allen, (together\nwith successors, assigns, and personal representatives hereinafter referred to as \"Grantor(s)\"), for\ngood and valuable consideration, the receipt of which is hereby acknowledged, do hereby grant and\nconvey unto PRAIRIE POWER, INC., an Illinois not-for-profit corporation, and its successors and\nassigns (hereinafter referred to as \"Grantee\"), the right:",
+          "ocr_confidence": 0.974
+        },
+        {
+          "class": "Text",
+          "confidence": 0.968,
+          "bbox": [
+            219.6,
+            635.4,
+            343.2,
+            79.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Recorder of Deeds of\nPike County, Illinois",
+          "ocr_confidence": 0.953
+        },
+        {
+          "class": "Text",
+          "confidence": 0.899,
+          "bbox": [
+            211.5,
+            1108.7,
+            1258.0,
+            97.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "A tract of land lying in and being a part of the Northeast Quarter of Section 13, Township 4 South, Range\n4 West of the Fourth Principal Meridian, PIKE COUNTY, ILLINOIS, and being more fully described as\nfollows:",
+          "ocr_confidence": 0.984
+        },
+        {
+          "class": "Text",
+          "confidence": 0.89,
+          "bbox": [
+            208.3,
+            1042.5,
+            857.2,
+            29.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "(l) to enter upon the real estate of the Grantor(s) described as follows:",
+          "ocr_confidence": 0.975
+        },
+        {
+          "class": "Text",
+          "confidence": 0.774,
+          "bbox": [
+            223.1,
+            291.1,
+            394.5,
+            32.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Right-of-Way Easement",
+          "ocr_confidence": 0.998
+        }
+      ]
+    },
+    {
+      "page_number": 3,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.983,
+          "bbox": [
+            203.8,
+            1000.5,
+            1287.4,
+            291.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "After initial construction and if safety, engineering, service, or reliability constraints dictate, the Grantee\nshall have the right, from time to time, to relocate all or any portion of the above described electric system\nat any one or more locations and install additional poles, structures, lines, and other components or\nappurtenances within the above-described real estate, all at such time and times as the Grantee in its\ndiscretion shall deem appropriate. The expense of such relocation and installation shall be the expense of\nthe Grantee. The Grantee agrees that it shall use reasonable efforts to locate poles and other above-ground\nstructures so as to cause the least possible interference with lawful use of the property, so long as such\nlocations do not materially increase the cost of construction, operation, repair, maintenance, relocation or\nreplacement of the electric system or any portion thereof.",
+          "ocr_confidence": 0.981
+        },
+        {
+          "class": "Text",
+          "confidence": 0.982,
+          "bbox": [
+            193.1,
+            1753.1,
+            1277.5,
+            92.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "The Grantor(s) covenant and agree that no structure, building, or fixture shall be placed over underground\nconduits, wires or lines and no structure, building, or fixture shall be constructed, erected, or maintained\nwithin the above-described real estate.",
+          "ocr_confidence": 0.984
+        },
+        {
+          "class": "Text",
+          "confidence": 0.976,
+          "bbox": [
+            214.0,
+            390.9,
+            1251.9,
+            130.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "(3) to remove, using any means typically used by electric utilities, including, but not limited to,\nmachinery, cutting, trimming or chemical means, trees, shrubbery, brush, or other vegetation to the extent\nnecessary within S0 feet of the centerline of the wires conducting electricity to keep them clear of said\nelectric system;",
+          "ocr_confidence": 0.984
+        },
+        {
+          "class": "Text",
+          "confidence": 0.975,
+          "bbox": [
+            208.1,
+            796.5,
+            1251.1,
+            161.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Nothing contained in this Right-of-Way Easement shall limit the Grantor(s) from using the described real\nestate for any lawful purposes, including, but not by way of limitation, for the grazing thereon by\nlivestock, or other use, so long as any such use shall not in the reasonable opinion of the Grantee\nendanger any part of said electric system, or create a hazardous condition, or interfere with the safe use\nand enjoyment of the said lands for the uses and purposes hereinabove granted to the Grantee.",
+          "ocr_confidence": 0.978
+        },
+        {
+          "class": "Text",
+          "confidence": 0.961,
+          "bbox": [
+            212.3,
+            560.4,
+            1230.3,
+            93.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "(4) to cut down and remove from time to time all dead, weak, leaning, or dangerous trees and other\nobstructions that are tall enough to strike or endanger the electric system, or any of its lines, wires, or\ncomponents; and",
+          "ocr_confidence": 0.982
+        },
+        {
+          "class": "Text",
+          "confidence": 0.939,
+          "bbox": [
+            208.6,
+            1884.7,
+            1249.1,
+            69.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Exceptions or restrictions to the foregoing grant of the easement are as follows: Distribution service will\nbe underbuilt on the transmission facility; no guy wires.",
+          "ocr_confidence": 0.986
+        },
+        {
+          "class": "Text",
+          "confidence": 0.933,
+          "bbox": [
+            198.5,
+            1618.1,
+            1261.9,
+            92.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "The Grantor(s) agree that all poles, structures, cross-arms, wires, cables, conduits, fiber-optic cables and\nequipment, markers, and other components and appurtenances shall remain the property of the Grantee,\nremovable at the option of the Grantee.",
+          "ocr_confidence": 0.986
+        },
+        {
+          "class": "Text",
+          "confidence": 0.924,
+          "bbox": [
+            214.2,
+            286.4,
+            1250.4,
+            67.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "in locations identified in Exhibit B. After final engineering design and construction has been completed,\nGrantee shall record as built drawings showing the Iocation of the installed poles;",
+          "ocr_confidence": 0.979
+        },
+        {
+          "class": "Text",
+          "confidence": 0.918,
+          "bbox": [
+            207.6,
+            1331.3,
+            1276.4,
+            95.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "The Grantee agrees that it shall pay the fair and reasonable amount of any damage caused to crops, fences\nor other property of the Grantor(s) caused by the Grantee during construction, Operation, inspection,\nrepair, maintenance, relocation or replacement of the electric system.",
+          "ocr_confidence": 0.982
+        },
+        {
+          "class": "Text",
+          "confidence": 0.9,
+          "bbox": [
+            213.0,
+            1537.9,
+            313.6,
+            43.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "on (cash)(crop shares) to",
+          "ocr_confidence": 0.943
+        },
+        {
+          "class": "Text",
+          "confidence": 0.754,
+          "bbox": [
+            209.4,
+            694.4,
+            1235.7,
+            64.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "(5) to license, permit, or otherwise agree to the joint use or occupancy of the electric system by any other\nperson, association, corporation, or entity for electrification purposes.",
+          "ocr_confidence": 0.984
+        },
+        {
+          "class": "Text",
+          "confidence": 0.518,
+          "bbox": [
+            203.9,
+            1453.0,
+            1189.3,
+            45.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "",
+          "ocr_confidence": null
+        },
+        {
+          "class": "Text",
+          "confidence": 0.422,
+          "bbox": [
+            183.9,
+            1454.2,
+            1225.9,
+            40.8
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\1600dbf6-9174-4360-9cae-55886bc7ca7f\\review_crops\\page_003_12_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "The Grantor(s) represent that the above-described premises are rented for the period beginning",
+          "ocr_confidence": 0.991
+        }
+      ]
+    },
+    {
+      "page_number": 4,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.964,
+          "bbox": [
+            198.0,
+            1145.0,
+            1282.6,
+            158.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "I, the undersigned, a notary public, in and for said county, in the state aforesaid, do hereby certify that\nDaniel J Allen, who is personally known to me and whose name is subscribed to the foregoing instrument,\nappeared before me this day in person and acknowledged that s/he signed, sealed and delivered said\ninstrument, for and on her/his behalf as her/his free and voluntary act for the uses and purposes therein set\nforth.",
+          "ocr_confidence": 0.982
+        },
+        {
+          "class": "Text",
+          "confidence": 0.938,
+          "bbox": [
+            195.1,
+            523.7,
+            1253.8,
+            95.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "It is further understood that, whenever necessary, words used in this instrument in the singular shall be\nconstrued to read in the plural and words used in this instrument in the masculine gender shall be\nconstrued to read in the feminine gender.",
+          "ocr_confidence": 0.977
+        },
+        {
+          "class": "Text",
+          "confidence": 0.899,
+          "bbox": [
+            979.7,
+            964.6,
+            87.3,
+            42.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Date:",
+          "ocr_confidence": 0.98
+        },
+        {
+          "class": "Text",
+          "confidence": 0.896,
+          "bbox": [
+            975.7,
+            1708.5,
+            86.5,
+            41.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Date:",
+          "ocr_confidence": 0.991
+        },
+        {
+          "class": "Text",
+          "confidence": 0.885,
+          "bbox": [
+            204.0,
+            420.4,
+            1214.0,
+            62.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "The Grantor(s) agree and acknowledge that the rights granted to the Grantee herein shall inure to the\nbenefit of the successors and assigns of Grantee.",
+          "ocr_confidence": 0.982
+        },
+        {
+          "class": "Text",
+          "confidence": 0.877,
+          "bbox": [
+            889.6,
+            794.9,
+            192.4,
+            40.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "GRANTOR(S):",
+          "ocr_confidence": 0.947
+        },
+        {
+          "class": "Text",
+          "confidence": 0.839,
+          "bbox": [
+            204.8,
+            281.6,
+            1238.1,
+            67.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "The Grantor(s) covenant that Grantor(s) are the owners of the above-described real estate, and that the\nabove-described real estate is free of encumbrances and liens of whatsoever character except as follows:",
+          "ocr_confidence": 0.976
+        },
+        {
+          "class": "Text",
+          "confidence": 0.816,
+          "bbox": [
+            807.2,
+            1339.3,
+            85.7,
+            34.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "day of",
+          "ocr_confidence": 0.942
+        },
+        {
+          "class": "Text",
+          "confidence": 0.81,
+          "bbox": [
+            195.5,
+            1890.2,
+            1292.4,
+            97.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "I, the undersigned, a notary public, in and for said county, in the state aforesaid, do hereby certify that and\nMarsha L Allen, who is personally known to me and whose name is subscribed to the foregoing\ninstrunent, appeared before me this day in person and acknowledged that s/he signed, sealed and delivered",
+          "ocr_confidence": 0.978
+        },
+        {
+          "class": "Text",
+          "confidence": 0.809,
+          "bbox": [
+            206.1,
+            1741.1,
+            153.9,
+            48.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "STATE OF",
+          "ocr_confidence": 0.946
+        },
+        {
+          "class": "Text",
+          "confidence": 0.806,
+          "bbox": [
+            984.5,
+            1645.9,
+            211.9,
+            37.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Marsha L Allen",
+          "ocr_confidence": 0.982
+        },
+        {
+          "class": "Text",
+          "confidence": 0.726,
+          "bbox": [
+            197.3,
+            651.9,
+            1094.0,
+            35.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "IN WITNESS WHEREOF, the Grantor(s) have set their hands and seals this\ndayof",
+          "ocr_confidence": 0.979
+        },
+        {
+          "class": "Text",
+          "confidence": 0.612,
+          "bbox": [
+            214.3,
+            1060.4,
+            174.8,
+            51.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "COUNTY OF",
+          "ocr_confidence": 0.942
+        },
+        {
+          "class": "Text",
+          "confidence": 0.609,
+          "bbox": [
+            985.6,
+            899.4,
+            200.1,
+            39.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "",
+          "ocr_confidence": null
+        },
+        {
+          "class": "Text",
+          "confidence": 0.604,
+          "bbox": [
+            210.0,
+            1806.6,
+            172.4,
+            48.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "COUNTY OF",
+          "ocr_confidence": 0.945
+        },
+        {
+          "class": "Text",
+          "confidence": 0.543,
+          "bbox": [
+            986.4,
+            900.2,
+            195.7,
+            38.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Daniel J Allen",
+          "ocr_confidence": 0.933
+        },
+        {
+          "class": "Text",
+          "confidence": 0.539,
+          "bbox": [
+            224.8,
+            1346.0,
+            519.9,
+            27.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Given under my hand and notarial seal this",
+          "ocr_confidence": 0.988
+        },
+        {
+          "class": "Text",
+          "confidence": 0.457,
+          "bbox": [
+            206.6,
+            995.0,
+            155.3,
+            48.5
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\1600dbf6-9174-4360-9cae-55886bc7ca7f\\review_crops\\page_004_17_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "STATE OF",
+          "ocr_confidence": 0.951
+        }
+      ]
+    },
+    {
+      "page_number": 5,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.918,
+          "bbox": [
+            220.3,
+            661.5,
+            370.6,
+            136.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "An instrument of and retum to:\nPrairie Power, Inc.\n3130 Pleasant Run\nSpringfield, IL 62711",
+          "ocr_confidence": 0.98
+        },
+        {
+          "class": "Text",
+          "confidence": 0.833,
+          "bbox": [
+            210.7,
+            290.6,
+            1292.0,
+            66.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "said instrument, for and on her/his behalf as her/his free and voluntary act for the uses and purposes therein\nset forth.",
+          "ocr_confidence": 0.986
+        },
+        {
+          "class": "Text",
+          "confidence": 0.745,
+          "bbox": [
+            818.6,
+            385.7,
+            84.6,
+            37.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "day of",
+          "ocr_confidence": 0.948
+        }
+      ]
+    },
+    {
+      "page_number": 6,
+      "regions": [
+        {
+          "class": "Seal",
+          "confidence": 0.946,
+          "bbox": [
+            1287.2,
+            739.4,
+            202.1,
+            213.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "*\n\n19V001-20\naA\n\nQN\nSIONITH",
+          "ocr_confidence": 0.356
+        },
+        {
+          "class": "ParcelMap",
+          "confidence": 0.931,
+          "bbox": [
+            226.3,
+            91.2,
+            1258.8,
+            1695.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "SCOI\n\n\nSIOU!\nAunoo\n4\nONY\nSE\n\u22201\n\u660e\n\n\n\n\u00a3L\nuo\n\nHOr\naaus\n.00\n=l\n2/520-\u22201\n\npx\n\u521a\nP3P0\nus\n40\n\nou\n\n$00\n81/027\n9\nMVO\nMVO\n\n\n4\npulaurg\n.\n5\n\n\n\n\n\n\n\n\n82\n\n\nM.9SLE000S\n09699\n09699\nM9S.LE.00S\nZT\n\u95e8\n3Z19E0L8N\n29\n-\nMSO.C0L8S\nOL'SL\n\n3100\n\n\nN\nE\nO\n\n\nEN\nE\nE\nEN\n\n\u4e00\n\n-\nMn020E018S\nEOISI\n\n\n\n1268501\n006821\n\nE5182\n8988E320E0000N\n\nL\nNTHLNOS\n28021\nHO\n3N\nZIHLnOS\n\n36S.800E0N\nE\n\n\n\n0\n2\n\n\n()N\n91299\n.91299\n00E\n16292000N\n\n36292000N\nON3531\nOG1\n\n\n\n\n  \n\n\n\n\n\n\n       \n\n\n\n\n\n\n\n\n\n\n\n\n\nETT\n\n\n\n\n\nHLNOSIHSNMOLEINOILOES\n\n\n( \n\n\nS1",
+          "ocr_confidence": 0.254,
+          "needs_vision": true,
+          "category": "boundary_plat",
+          "parcels": [
+            {
+              "vision_geometry": {
+                "boundary_calls": [
+                  {
+                    "bearing": "S87\u00b030'20\"W",
+                    "distance": "1358.92'"
+                  },
+                  {
+                    "bearing": "S00\u00b037'56\"W",
+                    "distance": "669.60'"
+                  },
+                  {
+                    "bearing": "N87\u00b036'12\"E",
+                    "distance": "67.27'"
+                  },
+                  {
+                    "bearing": "S87\u00b042'05\"W",
+                    "distance": "75.70'"
+                  },
+                  {
+                    "bearing": "N03\u00b008'59\"E",
+                    "distance": "281.53'"
+                  },
+                  {
+                    "bearing": "N00\u00b003'07\"E",
+                    "distance": "388.68'"
+                  }
+                ],
+                "tie_point": null,
+                "basis_of_bearings": null,
+                "parcel_label": "Planned Utility Easement",
+                "stated_area_acres": "1.03",
+                "ambiguous_alternates": [],
+                "curve_calls": []
+              },
+              "assembly_notes": [
+                "Reordered lines into walking order; the extracted order crossed itself.",
+                "Left out S87\u00b030'20\"W 1358.92': the remaining lines close and match the stated acreage without it -- check it against the source."
+              ],
+              "resolved_boundary_calls": [
+                {
+                  "bearing": "N00\u00b003'07\"E",
+                  "distance": "388.68'"
+                },
+                {
+                  "bearing": "N03\u00b008'59\"E",
+                  "distance": "281.53'"
+                },
+                {
+                  "bearing": "N87\u00b036'12\"E",
+                  "distance": "67.27'"
+                },
+                {
+                  "bearing": "S00\u00b037'56\"W",
+                  "distance": "669.60'"
+                },
+                {
+                  "bearing": "S87\u00b042'05\"W",
+                  "distance": "75.70'"
+                }
+              ],
+              "boundary_geojson": {
+                "type": "Feature",
+                "properties": {
+                  "closure_error_ft": 0.0,
+                  "unparsed_calls": 0,
+                  "curve_diagnostics": []
+                },
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [
+                        23.68,
+                        297.75
+                      ],
+                      [
+                        13.24,
+                        521.15
+                      ],
+                      [
+                        124.22,
+                        520.46
+                      ],
+                      [
+                        133.95,
+                        296.67
+                      ],
+                      [
+                        23.68,
+                        297.75
+                      ]
+                    ]
+                  ]
+                }
+              },
+              "spatial_validation": {
+                "valid": false,
+                "issues": [
+                  "Walked area (12,393 sqft) differs from the document's stated area (44,867 sqft) by 72% -- beyond the 15% tolerance."
+                ],
+                "perimeter_ft": 558.62,
+                "precision_ratio": null,
+                "self_intersects": false,
+                "area_sqft": 12392.61,
+                "area_acres": 0.284,
+                "stated_area_sqft": 44866.8,
+                "area_matches_stated": false,
+                "area_diff_pct": 72.38,
+                "curve_diagnostics": []
+              },
+              "confirmed_boundary_pixels": {
+                "vertices": [
+                  [
+                    686.6728740113261,
+                    1054.630037980327
+                  ],
+                  [
+                    661.317253267531,
+                    512.0209195353829
+                  ],
+                  [
+                    930.8815771878917,
+                    513.6931698370099
+                  ],
+                  [
+                    954.5145094680303,
+                    1057.2559052335757
+                  ]
+                ],
+                "crop_width": 1460.0,
+                "crop_height": 1922.0
+              },
+              "human_confirmed": true,
+              "boundary_geojson_wgs84": {
+                "type": "Feature",
+                "properties": {
+                  "closure_error_ft": 0.0,
+                  "unparsed_calls": 0,
+                  "anchor_lat": 39.7560104,
+                  "anchor_lon": -89.7259827,
+                  "georeferenced": "from_confirmed_boundary"
+                },
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [
+                        -89.7258985,
+                        39.7568278
+                      ],
+                      [
+                        -89.7259356,
+                        39.7574411
+                      ],
+                      [
+                        -89.7255409,
+                        39.7574392
+                      ],
+                      [
+                        -89.7255063,
+                        39.7568248
+                      ],
+                      [
+                        -89.7258985,
+                        39.7568278
+                      ]
+                    ]
+                  ]
+                }
+              },
+              "boundary_source": "manual_confirmed_uncalibrated",
+              "calibration": {
+                "status": "unverified",
+                "scale_ft_per_px": 0.5545878822056473,
+                "rotation_deg": null,
+                "scale_from_area": 0.5545878822056473,
+                "scale_from_edges": null,
+                "scale_agreement_pct": null,
+                "corroborating_edge_count": 0,
+                "notes": [
+                  "no corroborating edge has a printed bearing that agrees closely enough -- rotation unverified.",
+                  "gemini association returned 4 edge reading(s)"
+                ],
+                "corroborations": []
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page_number": 7,
+      "regions": [
+        {
+          "class": "ParcelMap",
+          "confidence": 0.424,
+          "bbox": [
+            124.2,
+            252.3,
+            1217.9,
+            1005.9
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\1600dbf6-9174-4360-9cae-55886bc7ca7f\\review_crops\\page_007_00_ParcelMap.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "\u53f7\nLat 39.72330Long-90.79963\nParcel#43-006-11\nLat 39.72243 Long-90.79962\nParcel#44-021-06\nLat 39.72151 Long-90.79962\n390th St\nParcel#44-021-07\nLocated in Section 13\nLat 39.72051 Long-90.79961\nTownship 4 S, Range 4 W\nFourth Principal Meridian\nPike County, IL\nLat 39.71951Long-90.79966",
+          "ocr_confidence": 0.904,
+          "needs_vision": true,
+          "category": "undimensioned_drawing",
+          "parcels": [
+            {
+              "vision_geometry": {
+                "boundary_calls": [],
+                "tie_point": null,
+                "basis_of_bearings": null,
+                "parcel_label": "44-021-06",
+                "stated_area_acres": null,
+                "ambiguous_alternates": [],
+                "curve_calls": []
+              },
+              "extraction_note": "This parcel was identified in the document (it has its own label/description) but no boundary dimensions could be confidently attributed to it specifically -- needs manual review against the source document."
+            },
+            {
+              "vision_geometry": {
+                "boundary_calls": [],
+                "tie_point": null,
+                "basis_of_bearings": null,
+                "parcel_label": "44-021-07",
+                "stated_area_acres": null,
+                "ambiguous_alternates": [],
+                "curve_calls": []
+              },
+              "extraction_note": "This parcel was identified in the document (it has its own label/description) but no boundary dimensions could be confidently attributed to it specifically -- needs manual review against the source document."
+            }
+          ],
+          "vision_escalated": true
+        },
+        {
+          "class": "ParcelMap",
+          "confidence": 0.25,
+          "bbox": [
+            70.5,
+            236.5,
+            1329.5,
+            1167.4
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\1600dbf6-9174-4360-9cae-55886bc7ca7f\\review_crops\\page_007_01_ParcelMap.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Parcel#43-020-11\nLat 39.71858 Long-90.79972",
+          "ocr_confidence": 0.985,
+          "needs_vision": true,
+          "category": "undimensioned_drawing",
+          "parcels": [
+            {
+              "vision_geometry": {
+                "boundary_calls": [],
+                "tie_point": null,
+                "basis_of_bearings": null,
+                "parcel_label": "43-006-11",
+                "stated_area_acres": null,
+                "ambiguous_alternates": [],
+                "curve_calls": []
+              },
+              "extraction_note": "This parcel was identified in the document (it has its own label/description) but no boundary dimensions could be confidently attributed to it specifically -- needs manual review against the source document."
+            },
+            {
+              "vision_geometry": {
+                "boundary_calls": [],
+                "tie_point": null,
+                "basis_of_bearings": null,
+                "parcel_label": "44-021-06",
+                "stated_area_acres": null,
+                "ambiguous_alternates": [],
+                "curve_calls": []
+              },
+              "extraction_note": "This parcel was identified in the document (it has its own label/description) but no boundary dimensions could be confidently attributed to it specifically -- needs manual review against the source document."
+            },
+            {
+              "vision_geometry": {
+                "boundary_calls": [],
+                "tie_point": null,
+                "basis_of_bearings": null,
+                "parcel_label": "44-021-07",
+                "stated_area_acres": null,
+                "ambiguous_alternates": [],
+                "curve_calls": []
+              },
+              "extraction_note": "This parcel was identified in the document (it has its own label/description) but no boundary dimensions could be confidently attributed to it specifically -- needs manual review against the source document."
+            }
+          ],
+          "vision_escalated": true
+        }
+      ]
+    },
+    {
+      "page_number": 8,
+      "regions": [
+        {
+          "class": "Picture",
+          "confidence": 0.929,
+          "bbox": [
+            1168.8,
+            57.3,
+            189.8,
+            422.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "skipped"
+        },
+        {
+          "class": "Text",
+          "confidence": 0.588,
+          "bbox": [
+            35.7,
+            886.3,
+            70.8,
+            426.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "6#m",
+          "ocr_confidence": 0.572
+        },
+        {
+          "class": "Picture",
+          "confidence": 0.374,
+          "bbox": [
+            124.9,
+            42.2,
+            1188.9,
+            1760.3
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\1600dbf6-9174-4360-9cae-55886bc7ca7f\\review_crops\\page_008_02_Picture.png",
+          "extraction_status": "skipped"
+        }
+      ]
+    },
+    {
+      "page_number": 9,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.952,
+          "bbox": [
+            387.3,
+            314.0,
+            941.4,
+            202.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "APPRAISALOF\nA20.77\u00b1ACREAGRICULTURALSITE\nINSECTION13, TOWNSHIP4SOUTHRANGE4WEST\nPIKE COUNTY, ILLINOIS",
+          "ocr_confidence": 0.984
+        },
+        {
+          "class": "Text",
+          "confidence": 0.896,
+          "bbox": [
+            829.6,
+            1497.7,
+            61.2,
+            48.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "BY",
+          "ocr_confidence": 0.997
+        },
+        {
+          "class": "ParcelMap",
+          "confidence": 0.777,
+          "bbox": [
+            245.0,
+            713.5,
+            1243.5,
+            672.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "390ihSt\ns4068\nS406",
+          "ocr_confidence": 0.597,
+          "needs_vision": true,
+          "category": "not_a_parcel_drawing",
+          "parcels": [
+            {
+              "vision_geometry": {
+                "boundary_calls": [],
+                "tie_point": null,
+                "basis_of_bearings": null,
+                "parcel_label": "Parcel 4",
+                "stated_area_acres": null,
+                "ambiguous_alternates": [],
+                "curve_calls": []
+              },
+              "extraction_note": "This parcel was identified in the document (it has its own label/description) but no boundary dimensions could be confidently attributed to it specifically -- needs manual review against the source document."
+            }
+          ],
+          "vision_escalated": true
+        },
+        {
+          "class": "Text",
+          "confidence": 0.602,
+          "bbox": [
+            535.6,
+            1607.8,
+            641.3,
+            296.2
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "",
+          "ocr_confidence": null
+        },
+        {
+          "class": "Text",
+          "confidence": 0.256,
+          "bbox": [
+            534.5,
+            1610.2,
+            646.4,
+            293.8
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\1600dbf6-9174-4360-9cae-55886bc7ca7f\\review_crops\\page_009_04_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "CHARLES R. JOHNSON, MAI\nC.RJOHNSON&ASSOCIATES,INC.\n2815OLDJACKSONVILLEROAD\nSPRINGFIELD,ILLINOIS 62704\nPHONE:217-544-2502\nEMAIL: RANDY@CRJNET.NET",
+          "ocr_confidence": 0.97
+        }
+      ]
+    },
+    {
+      "page_number": 10,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.907,
+          "bbox": [
+            651.3,
+            206.7,
+            423.2,
+            45.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "TABLE OF CONTENTS",
+          "ocr_confidence": 0.948
+        },
+        {
+          "class": "Table",
+          "confidence": 0.907,
+          "bbox": [
+            152.9,
+            321.4,
+            1382.4,
+            1711.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "TABLE OF CONTENTS ...\n. .2\nI. INTRODUCTION\n.3\nSUMMARY OF IMPORTANT DATA AND CONCLUSIONS..\nCERTIFICATIONS.\n7\nASSUMPTIONS AND LIMITING CONDITIONS..\nPRIVACYNOTICE..\n15\nQUALIFICATIONS - CHARLES R. JOHNSON, MAI\n16\nSCOPE AND REPORTING PROCESS\n..18\n\uff0c\uff0c\nII.FACTUAL DESCRIPTIONS\nDEFINITION OF MARKETVALUE.\n20\nSALES HISTORY OF SUBJECT PROPERTY..\n.22\nII. ANALYSIS AND OPINIONS OF THE APPRAISER.....\n..23\nNEIGHBORHOOD\n.24\nNEIGHBORHOOD DESCRIPTION..\n.25\nHIGHEST AND BEST USE..\n.26\nGENERAL INFORMATION - SUBJECT PROPERTY\n29\nTHE COST APPROACH..\n.37\nTHE SALES COMPARISON APPROACH.\n.38\nDISCUSSION OF COMPARABLE ADJUSTMENTS\n.59\nTHE INCOME CAPITALIZATION APPROACH\n65\nDAMAGES AND/OR BENEFITS TO THE REMAINDER\n.67\n\nRECONCILIATION AND FINAL CONCLUSION OF VALUE\n.68\nIV. ADDENDUM...\n.71",
+          "ocr_confidence": 0.943
+        }
+      ]
+    },
+    {
+      "page_number": 11,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.948,
+          "bbox": [
+            651.0,
+            766.4,
+            412.2,
+            65.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "I. INTRODUCTION",
+          "ocr_confidence": 0.972
+        }
+      ]
+    },
+    {
+      "page_number": 12,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.984,
+          "bbox": [
+            165.6,
+            987.4,
+            1382.1,
+            588.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "As per your request,I conducted a study of the above captioned property for the purpose of\nestimating the Market Value of the fee simple estate, the value of the part taken, damages and/or\nbenefits to theremainder along withcompensation foranyeasements.The values presented in this\nreport are not complete without reading of the entire report including the certification and limiting\nconditions. Submitted herewith, is a report of my findings and conclusions. It is my intent that the\nappraisal service is to be performed in such a manner that the results of the analysis, opinion, or\nconclusion be that of a disinterested third party. This report is intended to be a Appraisal Report\nas defined in the Uniform Standards of Professional Appraisal Practice. It is my intent that the\nappropriate data deemed pertinent to the solution of the appraisal problem be collected, confirmed,\nand reported in conformity with the Uniform Standards of Professional Appraisal Practice and the\nCode of Ethics of the Appraisal Institute.",
+          "ocr_confidence": 0.948
+        },
+        {
+          "class": "Text",
+          "confidence": 0.983,
+          "bbox": [
+            168.8,
+            1649.6,
+            1401.3,
+            356.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "SPECIAL NOTE: Due to the methods of measuring the subject and the comparables used herein\nthe sizes set forth in various plats vary slightly. For instance the size of the subject in the legal\ndescription(Survey)is slightly different than the size reported by AgriData, Inc, which is slightly\ndifferent thatthe size provided byAcre Value.These three methods are different based of field sizes\nversus measured survey data. In my opinion, these slight differences do not significantly influence\nthe appraised value of the subject property or any of the value conclusions set forth within this\nreport.",
+          "ocr_confidence": 0.966
+        },
+        {
+          "class": "Text",
+          "confidence": 0.983,
+          "bbox": [
+            759.7,
+            428.5,
+            203.9,
+            32.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "June 29, 2018",
+          "ocr_confidence": 0.933
+        },
+        {
+          "class": "Text",
+          "confidence": 0.957,
+          "bbox": [
+            167.5,
+            794.7,
+            1229.4,
+            82.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Re:\nA20.77\u00b1 acre farm located in Section 13, Township 4South Range 4West\nPike County, lllinois",
+          "ocr_confidence": 0.927
+        },
+        {
+          "class": "Text",
+          "confidence": 0.954,
+          "bbox": [
+            171.0,
+            512.5,
+            1052.1,
+            164.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Tracy Johansson, Regulatory & Legal Affairs Manager Prairie Power, Inc.\n3130PleasantRun\nSpringfield, Ilinois 62711\ntjohansson@ppi.coop",
+          "ocr_confidence": 0.97
+        },
+        {
+          "class": "Text",
+          "confidence": 0.951,
+          "bbox": [
+            719.0,
+            260.8,
+            316.1,
+            21.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "2815 Old Jacksonville Road Suite 204",
+          "ocr_confidence": 0.968
+        },
+        {
+          "class": "Picture",
+          "confidence": 0.931,
+          "bbox": [
+            155.9,
+            126.4,
+            199.3,
+            181.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "skipped"
+        },
+        {
+          "class": "Text",
+          "confidence": 0.927,
+          "bbox": [
+            759.8,
+            298.5,
+            225.5,
+            20.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Springfield, Ilinois 62704",
+          "ocr_confidence": 0.976
+        },
+        {
+          "class": "Text",
+          "confidence": 0.879,
+          "bbox": [
+            480.4,
+            120.8,
+            777.9,
+            52.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "C. R. Johnson & Associates, Inc.",
+          "ocr_confidence": 0.959
+        },
+        {
+          "class": "Text",
+          "confidence": 0.809,
+          "bbox": [
+            176.3,
+            928.3,
+            304.9,
+            31.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Dear Ms.Johansson:",
+          "ocr_confidence": 0.96
+        },
+        {
+          "class": "Text",
+          "confidence": 0.805,
+          "bbox": [
+            652.5,
+            214.1,
+            436.5,
+            28.0
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Real Estate Appraisers &x Consultants",
+          "ocr_confidence": 0.956
+        },
+        {
+          "class": "Text",
+          "confidence": 0.543,
+          "bbox": [
+            553.2,
+            333.4,
+            521.6,
+            22.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "",
+          "ocr_confidence": null
+        },
+        {
+          "class": "Text",
+          "confidence": 0.484,
+          "bbox": [
+            762.5,
+            297.6,
+            215.0,
+            22.0
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\1600dbf6-9174-4360-9cae-55886bc7ca7f\\review_crops\\page_012_12_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "",
+          "ocr_confidence": null
+        },
+        {
+          "class": "Text",
+          "confidence": 0.374,
+          "bbox": [
+            836.7,
+            335.0,
+            293.2,
+            21.2
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\1600dbf6-9174-4360-9cae-55886bc7ca7f\\review_crops\\page_012_13_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Ph.(217) 544-2502 Fax (217) 544-2067 Email randy@crjnet.net",
+          "ocr_confidence": 0.952
+        }
+      ]
+    },
+    {
+      "page_number": 13,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.975,
+          "bbox": [
+            165.8,
+            587.7,
+            1375.2,
+            189.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "During the appraisal process I contacted the owner and offered to meet with him and/or discuss the\nproperty with him. He declined my offer. Based on my of site inspection of the property, and as a\nresult of my analysis, it is my opinion that the values pertaining to the subject property as of May\n24, 2018. (The date of my original visit) are as follows:",
+          "ocr_confidence": 0.972
+        },
+        {
+          "class": "Text",
+          "confidence": 0.97,
+          "bbox": [
+            168.2,
+            255.8,
+            1384.1,
+            248.6
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "This appraisal is of the value of the real estate only and does not include personal property, fixtures,\nor intangible items that are not real property. The extent of the work and the size of the report are\nintended to be appropriate in relation to the significance of the appraisal problem. To the best of my\nknowledge, the statements contained in this report are correct. The limiting conditions and\nassumptions are set forth.",
+          "ocr_confidence": 0.978
+        },
+        {
+          "class": "Text",
+          "confidence": 0.956,
+          "bbox": [
+            168.0,
+            1893.9,
+            718.6,
+            110.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Charles R. Johnsor,MAI\nIlinois Certified Real Estate Appraiser,\nIlinois License #553-000146, Expires 9-30-2019",
+          "ocr_confidence": 0.952
+        },
+        {
+          "class": "Text",
+          "confidence": 0.936,
+          "bbox": [
+            174.7,
+            1781.1,
+            331.9,
+            31.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Respectfully Submitted,",
+          "ocr_confidence": 0.958
+        },
+        {
+          "class": "Table",
+          "confidence": 0.918,
+          "bbox": [
+            163.4,
+            852.8,
+            1253.0,
+            894.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Market Value of the Whole Property Before the\nImposition of the Easement\n$78,000\nMarket Value of the Easement Area as it Contributes to the\nRemainder Property Before the Imposition of the Easement\n$3,900\nMarket Value of the Easement Area as it Contributes to the\nRemainder Property After the Imposition of the Easement(s)\n$2,900\nDiminution or Change in Market Value of the Easement Area\n$1,000\nMarket Value of the Remainder Property Outside of the\nEasement Area Before Imposition of the Easement\nMarket Value of the Remainder Property Outside of the\nEasement Area After Imposition of Easement\n$74,100\nDiminution or change of Market Value of the Remainder Property\nOutside the Easement Area Due to Imposition of the Easement\n$0\nTemporary Damages Within The Easement Area\n$275\nTotal Compensation for Easement\n$1,275",
+          "ocr_confidence": 0.972
+        },
+        {
+          "class": "Text",
+          "confidence": 0.349,
+          "bbox": [
+            1235.6,
+            1279.7,
+            154.3,
+            77.6
+          ],
+          "needs_review": true,
+          "review_crop_path": "data\\documents\\1600dbf6-9174-4360-9cae-55886bc7ca7f\\review_crops\\page_013_05_Text.png",
+          "extraction_status": "ocr_complete",
+          "ocr_text": "$74,100",
+          "ocr_confidence": 0.987
+        }
+      ]
+    },
+    {
+      "page_number": 14,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.912,
+          "bbox": [
+            348.8,
+            295.5,
+            1021.8,
+            39.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "SUMMARY OF IMPORTANT DATA AND CONCLUSIONS",
+          "ocr_confidence": 0.9
+        },
+        {
+          "class": "Table",
+          "confidence": 0.808,
+          "bbox": [
+            160.6,
+            385.3,
+            1284.2,
+            1039.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "1. SUBJECT PROPERTY:\nA 20.77\u00b1 ACRE AGRICULTURAL SITE LOCATED\nON 390TH STREET GRIGGSVILLE ILLINOIS IN\nSECTION 13, TOWNSHIP 4 SOUTH RANGE\nWEST OF THE 3R\u00b0 PM. PIKE COUNTY, ILLINOIS\n2. PROPERTY TYPE:\nAGRICULTURAL - RECREATIONAL\n3. APPROXIMATE SIZE:\n20.77\u00b1 ACRES (From the Survey)\n4. OBJECTIVE OF APPRAISAL:\nTO ESTIMATE JUST COMPENSATION FOR THE\nPROPERTY TAKEN, DAMAGES AND/OR BENEFITS TO\nTHE REMAINDER FOR THE PROPOSED EASEMENT.\n6. EFFECTIVE DATE:\nMAY 24, 2018\n7. HIGHEST AND BEST USE:\nAGRICULTURAL - RECREATIONAL\n8. SALES COMPARISON APPROACH:\n$78,000\n9. COST APPROACH:\nNOT CONSIDERED\n10.INCOME APPROACH:\nNOT CONSIDERED\n11. FAIR MARKET VALUE:\n$78,000\n12. JUST COMPENSATION:\n$1,275",
+          "ocr_confidence": 0.968
+        }
+      ]
+    },
+    {
+      "page_number": 15,
+      "regions": [
+        {
+          "class": "Text",
+          "confidence": 0.979,
+          "bbox": [
+            697.6,
+            288.3,
+            320.6,
+            44.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "CERTIFICATIONS",
+          "ocr_confidence": 0.998
+        },
+        {
+          "class": "Text",
+          "confidence": 0.978,
+          "bbox": [
+            320.6,
+            855.7,
+            1168.1,
+            143.9
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "I have no (or the specified) present or prospective interest in the property that is the\nsubject of this report and no (or the specified) personal interest with respect to the\nparties involved.",
+          "ocr_confidence": 0.981
+        },
+        {
+          "class": "Text",
+          "confidence": 0.976,
+          "bbox": [
+            324.0,
+            635.8,
+            1159.1,
+            144.4
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "the reported analyses, opinions, and conclusions are limited only by the reported\nassumptions and limiting conditions and are my personal, impartial, and unbiased\nprofessional analyses, opinions, and conclusions.",
+          "ocr_confidence": 0.977
+        },
+        {
+          "class": "Text",
+          "confidence": 0.965,
+          "bbox": [
+            230.3,
+            410.2,
+            753.6,
+            39.1
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "I certify that to the best of my knowledge and belief:",
+          "ocr_confidence": 0.971
+        },
+        {
+          "class": "Text",
+          "confidence": 0.963,
+          "bbox": [
+            320.9,
+            1072.6,
+            1167.8,
+            95.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "Ihave no bias with respect to the property that is the subiect of this report or to the\nparties involved with this assignment.",
+          "ocr_confidence": 0.957
+        },
+        {
+          "class": "Text",
+          "confidence": 0.961,
+          "bbox": [
+            317.6,
+            1238.5,
+            1173.7,
+            94.7
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "my engagement in this assignment was not contingent upon developing or\nreporting predetermined results.",
+          "ocr_confidence": 0.986
+        },
+        {
+          "class": "Text",
+          "confidence": 0.957,
+          "bbox": [
+            326.4,
+            1741.0,
+            1172.6,
+            142.3
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "my analyses, opinions, and conclusions were developed, and this report has been\nprepared, in conformity with the Uniform Standards of Professional Appraisal\nPractice.",
+          "ocr_confidence": 0.981
+        },
+        {
+          "class": "Text",
+          "confidence": 0.944,
+          "bbox": [
+            329.6,
+            1411.2,
+            1157.2,
+            248.5
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "my compensation for completing this assignment is not contingent upon the\ndevelopment or reporting of a predetermined value or direction in value that favors\nthe cause of the client, the amount of the value opinion, the attainment of a\nstipulated result, or the occurrence of a subsequent event directly related to the\nintended use of this appraisal.",
+          "ocr_confidence": 0.976
+        },
+        {
+          "class": "Text",
+          "confidence": 0.864,
+          "bbox": [
+            302.4,
+            522.7,
+            984.6,
+            37.8
+          ],
+          "needs_review": false,
+          "review_crop_path": null,
+          "extraction_status": "ocr_complete",
+          "ocr_text": "the statements of fact contained in this report are true and correct.",
+          "ocr_confidence": 0.967
+        }
+      ]
+    }
+  ],
+  "pages_needing_review": 8,
+  "anchor_lat": 39.7560104,
+  "anchor_lon": -89.7259827
+}

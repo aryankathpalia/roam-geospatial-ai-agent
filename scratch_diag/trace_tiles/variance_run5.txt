@@ -1,0 +1,79 @@
+Here are the findings from each piece of Region 1, categorized by the requested types of information:
+
+---
+
+### Region 1, Piece 1
+* **Boundary bearing and distance calls:**
+  * `N0°48'45"E 220.00'`
+* **Prior-record citations (in parentheses):**
+  * `(N0°02'31"W 250.00' (R4))`
+* **Ground/state-plane coordinates:**
+  * `N 14926910.28`, `E 2251599.70`
+* **Parcel/lot labels and acreages:**
+  * `PARCEL 2`, `2.78 ACRES`
+
+---
+
+### Region 1, Piece 2
+* **Boundary bearing and distance calls:**
+  * `S89°11'15"E 903.15'`
+  * `N89°11'15"W 903.15'`
+* **Prior-record citations (in parentheses):**
+  * `(S89°09'41"E) (R3)`
+  * `(N89°57'29"E) (R4)`
+  * `(N89°57'29"E) (R4)`
+
+---
+
+### Region 1, Piece 3
+* **Boundary bearing and distance calls:**
+  * `S0°48'45"W 220.00'`
+* **Prior-record citations (in parentheses):**
+  * `(S0°02'31"E 250.00' (R4))`
+* **Ground/state-plane coordinates:**
+  * `N: 14928989.71`, `E: 2253610.44` *(MEASURED)*
+  * `N: 14928989.62`, `E: 2253610.74` *(RECORD)*
+  * `N 14926897.47`, `E 2252502.76`
+* **Tie lines / Off-parcel measurements:**
+  * `N0°48'45"E 2637.36'` *(appears to be a TIE / section line measurement adjacent to the WASHOE COUNTY CONTROL POINT monument, not a parcel boundary call)*
+* **Prior-record citations for ties/section lines (in parentheses):**
+  * `(N0°48'59"E 2637.29' - R1)`
+  * `(N0°49'02"E 2637.35' - R3)`
+* **Parcel/lot labels and acreages:**
+  * `PARCEL 1`, `1.78 ACRES`
+
+---
+
+### Region 1, Piece 4
+* **Prior-record citations (in parentheses):**
+  * `(N89°57'29"E) (R2)`
+* **Road frontage / right-of-way / quitclaim areas:**
+  * `30' QUITCLAIM AREA (R6)`
+
+---
+
+### Region 1, Piece 5
+* **Basis of bearings / datum / coordinate-zone statements:**
+  * `THE BASIS OF BEARINGS FOR THIS SURVEY IS NEVADA STATE PLANE, WEST ZONE NAD83(94) BASED ON REAL TIME KINEMATIC (RTK) GPS OBSERVATIONS UTILIZING CORRECTIONS FROM THE NORTHERN NEVADA COOPERATIVE REAL TIME NETWORK. COORDINATES AND DISTANCES HEREON ARE AT GROUND LEVEL BASED ON A COMBINED GRID TO GROUND FACTOR OF 1.000197939.`
+* **Road frontage / right-of-way / quitclaim areas:**
+  * `PLACERVILLE ROAD (60' WIDE PUBLIC ROW AS SHOWN ON RS 5122)`
+  * `30' QUITCLAIM AREA (R5)`
+  * `S89°11'17"E 329.80'` *(road frontage measurement along Placerville Road)*
+* **Prior-record citations (in parentheses):**
+  * `(N89°57'29"E) (R2)` *(associated with road frontage)*
+
+---
+
+### Region 1, Piece 6
+* **Ground/state-plane coordinates:**
+  * `N: 14926352.62`, `E: 2253573.04` *(MEASURED)*
+  * `N: 14926352.55`, `E: 2253573.13` *(RECORD)*
+* **Road frontage / right-of-way / quitclaim areas:**
+  * `30' QUITCLAIM AREA (R5)`
+  * `S89°11'17"E 325.30'` *(road frontage measurement)*
+* **Prior-record citations (in parentheses):**
+  * `(N89°57'29"E) (R2)` *(associated with road frontage)*
+* **Parcel/lot labels and acreages (from the Resultant Parcel Areas table):**
+  * `PARCEL 1`, `77,526` SQ. FT., `1.78` ACRES
+  * `PARCEL 2`, `121,165` SQ. FT., `2.78` ACRES
+  * `TOTAL`, `198,691` SQ. FT., `4.56` ACRES

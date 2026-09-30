@@ -1,0 +1,8 @@
+p7 REMAINDER PARCEL 17-2-1-4: raw_calls=4 used_calls=4 unparsed=0 closure=7893.82 prec=1:1.3 area=120.305 stated=120.4 valid=False issues=['Weak closure: precision ratio 1:1 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.']
+p7 PARCEL 1: raw_calls=3 used_calls=3 unparsed=0 closure=2942.5 prec=1:1.3 area=19.975 stated=40.00 valid=False issues=['Weak closure: precision ratio 1:1 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.', "Walked area (870,113 sqft) differs from the document's stated area (1,742,400 sqft) by 50% -- beyond the 15% tolerance."]
+p8 17-2-1-1: raw_calls=0 no calls
+p8 17-2-1-2: raw_calls=0 no calls
+p8 PALOMINO VALLEY GENERAL IMPROVEMENT DISTRICT MATERIALS PIT & YARD: raw_calls=0 no calls
+p8 17-2-1-3: raw_calls=0 no calls
+p8 17-2-1-4: raw_calls=0 no calls
+p8 17-2-1-5: raw_calls=0 no calls

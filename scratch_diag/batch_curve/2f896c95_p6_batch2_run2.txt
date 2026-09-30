@@ -1,0 +1,30 @@
+Region 1, Piece 1:
+- N89° 25' 02"W 3946.91' (boundary bearing and distance call, though shown along the horizontal property line)
+
+Region 1, Piece 2:
+- REMAINDER PARCEL (parcel label)
+- 17-2-1-4 (parcel/lot number)
+- [120.4 AC.±] (acreage)
+Region 1, Piece 1:
+- S89° 24’ 39”E 1318.25’ (Boundary bearing and distance call)
+- S0° 48’ 45”W 1320.11’ (Boundary bearing and distance call)
+- S0° 33’ 45”W 1323.32’ (Boundary bearing and distance call)
+- PARCEL 1 (Parcel/lot label)
+- [40.00 AC ±] (Acreage)
+
+Region 1, Piece 2:
+- N0° 57’ 09”E (Boundary bearing call)
+- N89° 33’ (Bearing call, partially visible)
+- DISPLAY MAP FOR APN 077-210-11 (Map title)
+- PATNAUDE (Map title/name)
+- 17-2 (Parcel/lot number, partially visible)
+- [120.4 (Acreage, partially visible)
+Region 1, Piece 1:
+- `17-2-1-4` (Parcel number label at the top left)
+- `120.4 AC.±` (Acreage label for the remainder parcel)
+- `S89° 33' 38"W 3950.22'` (Boundary bearing and distance call along the top left edge)
+
+Region 1, Piece 2:
+- `PARCEL 1` (Parcel label)
+- `40.00 AC.±` (Acreage label for Parcel 1)
+- `S89° 33' 00"E 1318.27'` (Boundary bearing and distance call along the southern edge of Parcel 1)

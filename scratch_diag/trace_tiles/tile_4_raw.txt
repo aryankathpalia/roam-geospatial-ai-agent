@@ -1,0 +1,20 @@
+Based on the provided image (Region 1, Piece 1), here are the extracted items matching your criteria, transcribed exactly as written:
+
+**Region 1, Piece 1:**
+
+*   **Boundary / Prior-Record / Other Calls (with context):**
+    *   `(N89°57'29"E) (R2)` — Appears above a dashed line near the top. (This is a prior-record citation in parentheses).
+    *   `30' QUITCLAIM AREA (R6)` — Labeled pointing to the dashed line area ("30' QUITCLAIM AREA").
+
+*   **Parcel/Lot Label or Ownership Text:**
+    *   `JAMES KRANTZ & LINDA HOUGHTON TRUST`
+    *   `DEED 4286292`
+    *   `APN: 086-250-67`
+
+*   **Basis-of-Bearings / Datum / Coordinate-Zone Statement:**
+    *   `BASIS OF BEARINGS`
+    *   `THE BASIS OF BEARINGS FOR THIS SURVEY IS NEVADA STATE PLANE, WEST ZONE`
+    *   `NAD83(94) BASED ON REAL TIME KINEMATIC (RTK) GPS OBSERVATIONS UTILIZING`
+    *   `CORRECTIONS FROM THE NORTHERN NEVADA COOPERATIVE REAL TIME NETWORK.`
+    *   `COORDINATES AND DISTANCES HEREON ARE AT GROUND LEVEL BASED ON A`
+    *   `COMBINED GRID TO GROUND FACTOR OF 1.000197939.`

@@ -1,0 +1,50 @@
+Based on the provided document images, here are the boundary calls, coordinate data, basis of bearings, and parcel/lot labels extracted from each piece of Region 1:
+
+---
+
+### Region 1, Piece 1
+*(Image 1: Legal Description / text block)*
+* **Parcel/Lot Labels:**
+  * PARCEL A: "THE SOUTH 30 FEET OF THE WEST 300 FEET OF THE NORTHEAST QUARTER OF THE SOUTHEAST QUARTER, SECTION 3, TOWNSHIP 34 NORTH, RANGE 2 EAST OF THE WILLAMETTE MERIDIAN."
+  * PARCEL B: "THAT PORTION OF THE SOUTHEAST QUARTER OF THE SOUTHEAST QUARTER OF THE SOUTHEAST QUARTER... SITUATE IN SKAGIT COUNTY, WASHINGTON."
+  * PARCEL C: "THAT PORTION OF THE SOUTHEAST QUARTER OF SECTION 3, TOWNSHIP 34 NORTH, RANGE 2 EAST OF THE WILLAMETTE MERIDIAN... SITUATE IN SKAGIT COUNTY, WASHINGTON."
+
+---
+
+### Region 1, Piece 2
+*(Image 2: Survey drawing / detail with "Parcel B", gravel road, storm manhole)*
+* **Boundary bearing and distance calls:**
+  * `N 01°34'34" E` (with distance `39.00'`) — Note: Associated with the northern boundary of the depicted segment.
+  * `S 89°11'45" E` (with distance `300.05'`)
+  * `S 01°34'34" W` (with distance `39.00'`)
+  * `N 89°11'45" W` (with distance `690.10'` spanning across the wider section)
+* **Parcel/Lot Labels:**
+  * `Parcel 'B'`
+
+---
+
+### Region 1, Piece 3
+*(Image 3: Top-left detail / handwriting overlays)*
+* **Boundary bearing and distance calls / Ties:**
+  * `N 01°51'34" E` (with distance `527.32'`) along the eastern dashed boundary line.
+  * `N 89°11'10" W` (with distance `399.26'`)
+  * `37.6'` (segment length on the northern boundary)
+* **Parcel/Lot Labels / Handwritten notes:**
+  * Handwritten notations referencing: `P19769` and `P19772`, along with file/recording numbers.
+
+---
+
+### Region 1, Piece 4
+*(Image 4: Bottom survey map with "PADILLA HEIGHTS ROAD" and basis of bearing block)*
+* **Basis-of-Bearings / Coordinate-Zone Statement:**
+  * `BASIS OF BEARING: NORTH-SOUTH CENTERLINE OF SECTION, BEING NORTH 2°07'34" EAST AS SHOWN ON RECORD OF SURVEY RECORDED IN BOOK 15 OF SURVEYS AT PAGE 16, RECORDS OF SKAGIT COUNTY, WASHINGTON.`
+* **Boundary bearing and distance calls:**
+  * `N 89°11'45" W` (with distance `100.21'`)
+  * `N 89°31'02" W` (with distance `399.26'`)
+  * `N 88°53'24" W` (with distance `1305.25'` in the vicinity map insert)
+  * `N 87°25'45" W` (with distance `1329.63'` in the vicinity map insert)
+* **Parcel/Lot Labels:**
+  * `P19769`
+  * `P19772`
+  * `PADILLA HEIGHTS ROAD` (Road frontage / right-of-way labeling)
+  * `Parcel "C"`

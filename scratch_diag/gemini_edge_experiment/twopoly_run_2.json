@@ -1,0 +1,12 @@
+{
+  "shared_edge_calls": [
+    {
+      "distance_value": "322.74'",
+      "bearing": "S 59°41'15\" E",
+      "assigned_to": "blue (Lot 48)",
+      "evidence_location": "Central boundary area running southeast along the 3-4' wire fence.",
+      "confidence": 0.95,
+      "reasoning": "The text 322.74' is situated directly along the boundary edge defining the blue polygon's eastern side, tracing the 3-4' wire fence between the blue vertices."
+    }
+  ]
+}

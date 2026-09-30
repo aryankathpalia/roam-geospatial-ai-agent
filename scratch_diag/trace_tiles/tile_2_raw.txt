@@ -1,0 +1,14 @@
+Region 1, Piece 1:
+
+* **Parcel/lot label or acreage:**
+  * `STEVEN D & CORINA B. POKRAJAC`
+  * `PARCEL 2B RS 6231 (R3)`
+  * `APN: 086-260-22`
+
+* **Boundary bearing and distance calls (and prior-record citations):**
+  * `S89°11'15"E 903.15'` (Top boundary)
+  * `(S89°09'41"E) (R3)` (Prior-record citation above top boundary)
+  * `(N89°57'29"E) (R4)` (Prior-record citation above top boundary)
+  * `N89°11'15"W 903.15'` (Bottom boundary)
+  * `(N89°57'29"E) (R4)` (Prior-record citation below bottom boundary)
+  * `S0°48'45"W` (Interior/dividing line vertical bearing)

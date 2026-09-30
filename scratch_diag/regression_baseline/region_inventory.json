@@ -1,0 +1,1586 @@
+[
+ {
+  "doc": "2f896c95-b0f3-4a49-a447-4b3ca6129c27",
+  "page": 6,
+  "bbox": [
+   54.6,
+   89.2,
+   2064.8,
+   1344.2
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "2f896c95-b0f3-4a49-a447-4b3ca6129c27",
+  "page": 7,
+  "bbox": [
+   5443.7,
+   448.6,
+   1095.1,
+   744.5
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "2f896c95-b0f3-4a49-a447-4b3ca6129c27",
+  "page": 7,
+  "bbox": [
+   2272.2,
+   972.9,
+   3641.8,
+   3482.3
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "2f896c95-b0f3-4a49-a447-4b3ca6129c27",
+  "page": 8,
+  "bbox": [
+   877.8,
+   268.0,
+   5329.8,
+   3402.8
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "27211ae5-0099-4b0d-8176-f1483897b766",
+  "page": 2,
+  "bbox": [
+   494.2,
+   535.0,
+   672.7,
+   786.4
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "27211ae5-0099-4b0d-8176-f1483897b766",
+  "page": 13,
+  "bbox": [
+   2502.6,
+   122.5,
+   697.1,
+   469.5
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "27211ae5-0099-4b0d-8176-f1483897b766",
+  "page": 13,
+  "bbox": [
+   125.4,
+   117.3,
+   2716.6,
+   1592.1
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "27211ae5-0099-4b0d-8176-f1483897b766",
+  "page": 13,
+  "bbox": [
+   134.1,
+   116.1,
+   2546.7,
+   1573.8
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "3affa529-5b4f-42d7-b336-596315433572",
+  "page": 6,
+  "bbox": [
+   226.3,
+   91.2,
+   1258.8,
+   1695.5
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "3affa529-5b4f-42d7-b336-596315433572",
+  "page": 7,
+  "bbox": [
+   124.2,
+   252.3,
+   1217.9,
+   1005.9
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "3affa529-5b4f-42d7-b336-596315433572",
+  "page": 7,
+  "bbox": [
+   70.5,
+   236.5,
+   1329.5,
+   1167.4
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "3affa529-5b4f-42d7-b336-596315433572",
+  "page": 9,
+  "bbox": [
+   245.0,
+   713.5,
+   1243.5,
+   672.9
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "65be453d-f014-4024-84d6-60a2d0052aeb",
+  "page": 2,
+  "bbox": [
+   92.4,
+   -16.5,
+   1303.4,
+   1701.7
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "65be453d-f014-4024-84d6-60a2d0052aeb",
+  "page": 3,
+  "bbox": [
+   0.2,
+   -3.1,
+   1536.2,
+   1822.8
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "65be453d-f014-4024-84d6-60a2d0052aeb",
+  "page": 6,
+  "bbox": [
+   60.0,
+   104.6,
+   1386.1,
+   1744.5
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "65be453d-f014-4024-84d6-60a2d0052aeb",
+  "page": 7,
+  "bbox": [
+   59.2,
+   100.4,
+   1391.6,
+   1696.3
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "65be453d-f014-4024-84d6-60a2d0052aeb",
+  "page": 8,
+  "bbox": [
+   59.6,
+   73.3,
+   1402.8,
+   1740.3
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "a1136318-03ef-438d-9f02-8fcdcb5dca30",
+  "page": 5,
+  "bbox": [
+   1732.1,
+   195.8,
+   379.1,
+   275.7
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "a1136318-03ef-438d-9f02-8fcdcb5dca30",
+  "page": 5,
+  "bbox": [
+   109.7,
+   189.0,
+   1741.1,
+   1417.2
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b",
+  "page": 13,
+  "bbox": [
+   239.9,
+   151.8,
+   1654.8,
+   1132.2
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b",
+  "page": 14,
+  "bbox": [
+   -4.5,
+   51.3,
+   1787.2,
+   1343.5
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b",
+  "page": 15,
+  "bbox": [
+   654.2,
+   187.3,
+   4636.6,
+   3614.9
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "798850fc-1be3-4bc6-9f53-1441c39cbd04",
+  "page": 28,
+  "bbox": [
+   133.3,
+   288.1,
+   1502.1,
+   1206.9
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "83ab22d0-b950-4f5d-ad33-5f0fd6105dbe",
+  "page": 11,
+  "bbox": [
+   93.9,
+   -12.8,
+   1953.3,
+   1398.6
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 7,
+  "bbox": [
+   195.1,
+   348.5,
+   1404.4,
+   947.9
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 8,
+  "bbox": [
+   190.2,
+   399.7,
+   1329.1,
+   1061.3
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 9,
+  "bbox": [
+   110.4,
+   438.4,
+   1411.5,
+   984.7
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 10,
+  "bbox": [
+   182.3,
+   397.7,
+   1380.4,
+   926.2
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 11,
+  "bbox": [
+   186.9,
+   432.9,
+   1398.1,
+   830.9
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 12,
+  "bbox": [
+   1170.4,
+   415.4,
+   204.0,
+   188.8
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 12,
+  "bbox": [
+   195.2,
+   401.3,
+   1263.6,
+   874.6
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 13,
+  "bbox": [
+   100.9,
+   445.8,
+   1544.0,
+   1095.9
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 14,
+  "bbox": [
+   107.3,
+   411.9,
+   1462.1,
+   1345.5
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 14,
+  "bbox": [
+   1253.7,
+   443.7,
+   235.0,
+   223.4
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 17,
+  "bbox": [
+   193.6,
+   343.7,
+   1465.9,
+   1072.3
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 18,
+  "bbox": [
+   110.1,
+   364.6,
+   1349.0,
+   1561.6
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 22,
+  "bbox": [
+   223.4,
+   313.5,
+   1720.5,
+   1314.1
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 23,
+  "bbox": [
+   277.2,
+   296.9,
+   1614.1,
+   1361.1
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 24,
+  "bbox": [
+   162.7,
+   132.8,
+   1731.2,
+   1214.8
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 24,
+  "bbox": [
+   140.4,
+   143.7,
+   1848.9,
+   1243.1
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 25,
+  "bbox": [
+   1554.0,
+   211.5,
+   286.1,
+   296.6
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 25,
+  "bbox": [
+   153.5,
+   176.4,
+   1789.6,
+   1368.4
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 26,
+  "bbox": [
+   1480.3,
+   195.4,
+   245.7,
+   224.2
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 26,
+  "bbox": [
+   293.7,
+   160.6,
+   1540.2,
+   1375.3
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 29,
+  "bbox": [
+   524.8,
+   284.6,
+   1130.6,
+   1331.2
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 30,
+  "bbox": [
+   297.8,
+   1181.9,
+   1089.1,
+   806.5
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 31,
+  "bbox": [
+   868.3,
+   581.2,
+   623.7,
+   656.1
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 36,
+  "bbox": [
+   184.5,
+   156.7,
+   1610.9,
+   1165.7
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 37,
+  "bbox": [
+   703.9,
+   546.4,
+   1200.1,
+   939.8
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 37,
+  "bbox": [
+   20.8,
+   136.5,
+   841.4,
+   780.5
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 38,
+  "bbox": [
+   119.0,
+   158.9,
+   1743.5,
+   1207.8
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 39,
+  "bbox": [
+   149.7,
+   227.8,
+   1595.1,
+   1042.5
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 40,
+  "bbox": [
+   231.4,
+   48.4,
+   1412.3,
+   1128.2
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 41,
+  "bbox": [
+   79.4,
+   204.4,
+   1757.4,
+   1141.7
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 42,
+  "bbox": [
+   63.5,
+   -14.0,
+   1826.1,
+   1317.1
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 43,
+  "bbox": [
+   14.0,
+   72.1,
+   1857.7,
+   1332.2
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 43,
+  "bbox": [
+   28.7,
+   74.2,
+   1869.2,
+   1323.6
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 73,
+  "bbox": [
+   125.9,
+   1133.4,
+   1401.7,
+   869.2
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 75,
+  "bbox": [
+   1381.0,
+   241.0,
+   5233.3,
+   3739.4
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 75,
+  "bbox": [
+   1746.4,
+   410.1,
+   995.2,
+   744.7
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 76,
+  "bbox": [
+   1936.9,
+   426.2,
+   2864.8,
+   579.7
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 76,
+  "bbox": [
+   1840.2,
+   1265.9,
+   3077.1,
+   587.0
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 76,
+  "bbox": [
+   2551.5,
+   3498.9,
+   1778.7,
+   662.0
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 76,
+  "bbox": [
+   438.3,
+   3441.0,
+   1778.0,
+   720.3
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 76,
+  "bbox": [
+   958.0,
+   2112.6,
+   4592.9,
+   958.6
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 76,
+  "bbox": [
+   4610.1,
+   3420.9,
+   1760.6,
+   740.7
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 78,
+  "bbox": [
+   88.9,
+   199.5,
+   1735.9,
+   1151.1
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 79,
+  "bbox": [
+   520.1,
+   272.6,
+   265.4,
+   193.0
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 79,
+  "bbox": [
+   397.2,
+   219.7,
+   1420.4,
+   1128.2
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 79,
+  "bbox": [
+   119.5,
+   247.7,
+   909.0,
+   1063.2
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 80,
+  "bbox": [
+   162.7,
+   1070.0,
+   480.0,
+   212.4
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 80,
+  "bbox": [
+   532.5,
+   501.0,
+   834.0,
+   175.1
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 80,
+  "bbox": [
+   289.6,
+   723.1,
+   1241.5,
+   262.9
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 80,
+  "bbox": [
+   556.9,
+   272.6,
+   785.5,
+   182.2
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 80,
+  "bbox": [
+   1266.0,
+   1059.6,
+   477.0,
+   225.5
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 80,
+  "bbox": [
+   727.9,
+   1068.8,
+   481.6,
+   212.7
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 81,
+  "bbox": [
+   180.7,
+   1095.5,
+   1262.3,
+   912.2
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 83,
+  "bbox": [
+   682.9,
+   168.4,
+   6179.0,
+   3944.9
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 83,
+  "bbox": [
+   391.7,
+   197.7,
+   5692.6,
+   3938.3
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 83,
+  "bbox": [
+   341.2,
+   176.9,
+   1027.4,
+   1288.0
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 85,
+  "bbox": [
+   128.0,
+   179.4,
+   1685.0,
+   1196.7
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 86,
+  "bbox": [
+   131.6,
+   203.3,
+   275.4,
+   355.9
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 86,
+  "bbox": [
+   217.6,
+   201.1,
+   1645.6,
+   1114.4
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 86,
+  "bbox": [
+   110.4,
+   203.9,
+   1626.8,
+   1161.0
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 86,
+  "bbox": [
+   276.3,
+   200.1,
+   1586.9,
+   1122.5
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 87,
+  "bbox": [
+   71.7,
+   195.9,
+   280.5,
+   370.4
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 87,
+  "bbox": [
+   210.5,
+   193.1,
+   1659.2,
+   1106.6
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 87,
+  "bbox": [
+   72.1,
+   199.5,
+   1655.8,
+   1139.4
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 88,
+  "bbox": [
+   159.3,
+   1107.2,
+   1403.8,
+   886.2
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 90,
+  "bbox": [
+   197.1,
+   137.9,
+   6020.9,
+   3702.4
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 90,
+  "bbox": [
+   5723.5,
+   152.4,
+   948.4,
+   754.1
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 91,
+  "bbox": [
+   1155.0,
+   877.6,
+   1690.5,
+   328.1
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 91,
+  "bbox": [
+   3842.9,
+   827.0,
+   2286.3,
+   484.3
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 91,
+  "bbox": [
+   2274.9,
+   2172.7,
+   2494.0,
+   458.5
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 93,
+  "bbox": [
+   80.7,
+   196.6,
+   1761.3,
+   1183.8
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 94,
+  "bbox": [
+   49.8,
+   217.5,
+   1648.7,
+   1148.4
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 94,
+  "bbox": [
+   75.5,
+   212.3,
+   1515.4,
+   1161.8
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 94,
+  "bbox": [
+   1557.8,
+   234.2,
+   256.7,
+   209.1
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 96,
+  "bbox": [
+   163.7,
+   1103.6,
+   1346.3,
+   907.6
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 98,
+  "bbox": [
+   5692.7,
+   151.0,
+   981.0,
+   806.6
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 98,
+  "bbox": [
+   154.1,
+   187.8,
+   6311.3,
+   3773.3
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 100,
+  "bbox": [
+   98.0,
+   210.3,
+   1714.3,
+   1147.8
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 101,
+  "bbox": [
+   1539.0,
+   202.1,
+   269.3,
+   214.4
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 101,
+  "bbox": [
+   44.9,
+   206.2,
+   1761.2,
+   1183.3
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "8d75d3ed-d9e7-4bfb-874a-0b52063883eb",
+  "page": 103,
+  "bbox": [
+   233.2,
+   180.4,
+   6501.7,
+   2864.8
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 24,
+  "bbox": [
+   273.4,
+   145.8,
+   1675.5,
+   1387.3
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 25,
+  "bbox": [
+   53.8,
+   137.3,
+   1986.3,
+   1423.2
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 26,
+  "bbox": [
+   119.5,
+   78.8,
+   2467.3,
+   1848.9
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 27,
+  "bbox": [
+   42.3,
+   135.0,
+   2044.6,
+   1432.5
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 28,
+  "bbox": [
+   48.8,
+   136.7,
+   2105.6,
+   1488.5
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 40,
+  "bbox": [
+   262.1,
+   -38.2,
+   1322.7,
+   2435.4
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 41,
+  "bbox": [
+   22.9,
+   410.2,
+   1349.9,
+   2190.4
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 41,
+  "bbox": [
+   18.0,
+   397.2,
+   1340.3,
+   2043.0
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 57,
+  "bbox": [
+   296.0,
+   101.5,
+   5582.0,
+   3383.9
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 57,
+  "bbox": [
+   267.5,
+   98.7,
+   5890.4,
+   3463.1
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 93,
+  "bbox": [
+   94.7,
+   113.4,
+   2044.6,
+   1471.6
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 98,
+  "bbox": [
+   481.6,
+   83.5,
+   2864.6,
+   1630.3
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 105,
+  "bbox": [
+   1272.2,
+   4346.5,
+   982.4,
+   439.2
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 105,
+  "bbox": [
+   792.4,
+   2194.4,
+   2726.6,
+   2153.5
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 106,
+  "bbox": [
+   184.6,
+   106.0,
+   8059.1,
+   3356.7
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 107,
+  "bbox": [
+   6241.9,
+   4416.3,
+   1844.7,
+   873.6
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 108,
+  "bbox": [
+   6232.8,
+   4421.1,
+   1835.9,
+   871.5
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 108,
+  "bbox": [
+   469.3,
+   113.5,
+   7022.7,
+   5170.5
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 109,
+  "bbox": [
+   6226.0,
+   4416.0,
+   1908.8,
+   871.0
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 110,
+  "bbox": [
+   6237.1,
+   4427.6,
+   1838.8,
+   859.0
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 110,
+  "bbox": [
+   489.7,
+   115.5,
+   6967.4,
+   5360.7
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 162,
+  "bbox": [
+   169.6,
+   74.7,
+   432.7,
+   296.6
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 162,
+  "bbox": [
+   114.3,
+   353.6,
+   1401.1,
+   1763.5
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 162,
+  "bbox": [
+   736.2,
+   77.4,
+   445.1,
+   303.2
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 163,
+  "bbox": [
+   77.3,
+   79.2,
+   3277.1,
+   1879.3
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 173,
+  "bbox": [
+   300.9,
+   443.0,
+   1037.3,
+   1058.6
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ },
+ {
+  "doc": "510ea60f-f577-420d-b1e0-f2d3e0352661",
+  "page": 173,
+  "bbox": [
+   293.1,
+   441.6,
+   1059.3,
+   1037.0
+  ],
+  "class": "ParcelMap",
+  "needs_vision": true
+ }
+]

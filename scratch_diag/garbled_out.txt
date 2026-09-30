@@ -1,0 +1,15 @@
+C:\Users\preet\AppData\Local\Programs\Python\Python312\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py:197: UserWarning: Specified provider 'CUDAExecutionProvider' is not in available provider names.Available providers: 'AzureExecutionProvider, CPUExecutionProvider'
+  warnings.warn(
+
+--- run 1 ---
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+  label='0.31 ACRES' calls=5
+  label='PARCEL 1' calls=5
+
+--- run 2 ---
+  label='LOT 1 BLOCK 2 RODEO SUBDIVISION' calls=1
+  label='LOT 1, BLOCK 1 RODEO SUBDIVISION' calls=0
+
+--- run 3 ---
+  label='LOT 1 BLOCK 2 RODEO SUBDIVISION' calls=4
+  label='LOT 1, BLOCK 1 RODEO SUBDIVISION' calls=0

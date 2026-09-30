@@ -1,0 +1,49 @@
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+region1_QUANTUM_p2: 4 tiles
+region2_LOT12_p3: 6 tiles
+region3_PARCELA_p6: 4 tiles
+region4_PARCELA_p7: 4 tiles
+region5_PARCELA_p8: 4 tiles
+
+======================================================================
+CONDITION: 1 region/call
+======================================================================
+  run 1, region1_QUANTUM_p2: 0 matches
+  run 1, region2_LOT12_p3: 0 matches
+  run 1, region3_PARCELA_p6: 9 matches
+  run 1, region4_PARCELA_p7: 4 matches
+  run 1, region5_PARCELA_p8: 5 matches
+  run 2, region1_QUANTUM_p2: 0 matches
+  run 2, region2_LOT12_p3: 0 matches
+  run 2, region3_PARCELA_p6: 5 matches
+  run 2, region4_PARCELA_p7: 4 matches
+  run 2, region5_PARCELA_p8: 7 matches
+  run 3, region1_QUANTUM_p2: 0 matches
+  run 3, region2_LOT12_p3: 0 matches
+  run 3, region3_PARCELA_p6: 5 matches
+  run 3, region4_PARCELA_p7: 4 matches
+  run 3, region5_PARCELA_p8: 6 matches
+
+======================================================================
+CONDITION: 3 regions/call (1-3 together, 4-5 together)
+======================================================================
+  run 1: {1: 0, 2: 0, 3: 13, 4: 7, 5: 6}
+  run 2: {1: 0, 2: 0, 3: 13, 4: 3, 5: 3}
+  run 3: {1: 0, 2: 0, 3: 9, 4: 1, 5: 1}
+
+======================================================================
+CONDITION: 5 regions/call (matches original production condition)
+======================================================================
+  run 1: {1: 0, 2: 0, 3: 14, 4: 0, 5: 0}
+  run 2: {1: 0, 2: 0, 3: 13, 4: 6, 5: 6}
+  run 3: {1: 0, 2: 0, 3: 13, 4: 6, 5: 6}
+
+======================================================================
+SUMMARY (avg bearing-like matches per region, by regions/call)
+======================================================================
+region                        1/call     3/call     5/call
+region1_QUANTUM_p2               0.0        0.0        0.0
+region2_LOT12_p3                 0.0        0.0        0.0
+region3_PARCELA_p6               6.3       11.7       13.3
+region4_PARCELA_p7               4.0        3.7        4.0
+region5_PARCELA_p8               6.0        3.3        4.0

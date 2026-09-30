@@ -1,0 +1,693 @@
+[
+  {
+    "doc": "27211ae5-0099-4b0d-8176-f1483897b766",
+    "page": 2,
+    "region": 1,
+    "label": "MAP 7 LOT 48",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "27211ae5-0099-4b0d-8176-f1483897b766",
+    "page": 2,
+    "region": 1,
+    "label": "MAP 7 LOT 48-3",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "27211ae5-0099-4b0d-8176-f1483897b766",
+    "page": 13,
+    "region": 3,
+    "label": "MAP 7 LOT 48",
+    "stated_ac": "0.95",
+    "raw_calls": 5,
+    "alternates": [],
+    "used_calls": [
+      "N 24\u00b011'47\" W 209.92'",
+      "N 66\u00b004'20\" E 11.63'",
+      "N 61\u00b053'54\" E 105.55'",
+      "S 55\u00b014'15\" E 322.74'",
+      "S 54\u00b045'01\" E 209.93'"
+    ],
+    "closure_ft": 458.12,
+    "precision": 1.9,
+    "area_ac": 1.067,
+    "area_match": true,
+    "self_intersects": false,
+    "valid": false,
+    "issues": [
+      "Weak closure: precision ratio 1:2 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise."
+    ]
+  },
+  {
+    "doc": "27211ae5-0099-4b0d-8176-f1483897b766",
+    "page": 13,
+    "region": 3,
+    "label": "MAP 7 LOT 48-3",
+    "stated_ac": "1.72",
+    "raw_calls": 4,
+    "alternates": [],
+    "used_calls": [
+      "N 22\u00b051'56\" W 164.66'",
+      "S 77\u00b039'32\" W 164.41'",
+      "S 42\u00b026'48\" W 66.91'",
+      "S 03\u00b023'08\" E 32.24'"
+    ],
+    "closure_ft": 270.13,
+    "precision": 1.6,
+    "area_ac": 0.493,
+    "area_match": false,
+    "self_intersects": false,
+    "valid": false,
+    "issues": [
+      "Weak closure: precision ratio 1:2 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.",
+      "Walked area (21,485 sqft) differs from the document's stated area (74,923 sqft) by 71% -- beyond the 15% tolerance."
+    ]
+  },
+  {
+    "doc": "27211ae5-0099-4b0d-8176-f1483897b766",
+    "page": 13,
+    "region": 4,
+    "label": "MAP 7 LOT 48",
+    "stated_ac": "0.95",
+    "raw_calls": 5,
+    "alternates": [],
+    "used_calls": [
+      "N 24\u00b011'47\" W 209.92'",
+      "N 66\u00b004'20\" E 11.63'",
+      "N 61\u00b053'54\" E 105.55'",
+      "S 55\u00b014'15\" E 322.74'",
+      "S 54\u00b045'01\" E 209.93'"
+    ],
+    "closure_ft": 458.12,
+    "precision": 1.9,
+    "area_ac": 1.067,
+    "area_match": true,
+    "self_intersects": false,
+    "valid": false,
+    "issues": [
+      "Weak closure: precision ratio 1:2 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise."
+    ]
+  },
+  {
+    "doc": "27211ae5-0099-4b0d-8176-f1483897b766",
+    "page": 13,
+    "region": 4,
+    "label": "MAP 7 LOT 48-3",
+    "stated_ac": "1.72",
+    "raw_calls": 4,
+    "alternates": [],
+    "used_calls": [
+      "N 22\u00b051'56\" W 164.66'",
+      "S 77\u00b039'32\" W 164.41'",
+      "S 42\u00b026'48\" W 66.91'",
+      "S 03\u00b023'08\" E 32.24'"
+    ],
+    "closure_ft": 270.13,
+    "precision": 1.6,
+    "area_ac": 0.493,
+    "area_match": false,
+    "self_intersects": false,
+    "valid": false,
+    "issues": [
+      "Weak closure: precision ratio 1:2 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.",
+      "Walked area (21,485 sqft) differs from the document's stated area (74,923 sqft) by 71% -- beyond the 15% tolerance."
+    ]
+  },
+  {
+    "doc": "3affa529-5b4f-42d7-b336-596315433572",
+    "page": 6,
+    "region": 1,
+    "label": "PARCEL 1035",
+    "stated_ac": "1.03",
+    "raw_calls": 7,
+    "alternates": [
+      "1278.52'"
+    ],
+    "used_calls": [
+      "S87\u00b030'20\"W 1278.52'",
+      "S00\u00b037'56\"W 669.60'",
+      "N87\u00b036'12\"E 67.27'",
+      "S87\u00b042'05\"W 75.70'",
+      "N03\u00b008'59\"E 281.53'",
+      "N00\u00b003'07\"E 388.68'",
+      "N00\u00b026'29\"E 667.16'"
+    ],
+    "closure_ft": 1411.5,
+    "precision": 2.4,
+    "area_ac": 0.003,
+    "area_match": false,
+    "self_intersects": true,
+    "valid": false,
+    "issues": [
+      "Weak closure: precision ratio 1:2 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.",
+      "Traverse self-intersects -- the walked boundary crosses itself, which isn't a valid parcel shape regardless of closure error.",
+      "Walked area (141 sqft) differs from the document's stated area (44,867 sqft) by 100% -- beyond the 15% tolerance."
+    ]
+  },
+  {
+    "doc": "3affa529-5b4f-42d7-b336-596315433572",
+    "page": 7,
+    "region": 2,
+    "label": "44-021-06",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "3affa529-5b4f-42d7-b336-596315433572",
+    "page": 7,
+    "region": 2,
+    "label": "44-021-07",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "3affa529-5b4f-42d7-b336-596315433572",
+    "page": 7,
+    "region": 2,
+    "label": "43-006-11",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "3affa529-5b4f-42d7-b336-596315433572",
+    "page": 7,
+    "region": 3,
+    "label": "44-021-06",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "3affa529-5b4f-42d7-b336-596315433572",
+    "page": 7,
+    "region": 3,
+    "label": "43-006-11",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "3affa529-5b4f-42d7-b336-596315433572",
+    "page": 7,
+    "region": 3,
+    "label": "44-021-07",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b",
+    "page": 15,
+    "region": 3,
+    "label": "PARCEL 1",
+    "stated_ac": "1.96",
+    "raw_calls": 3,
+    "alternates": [],
+    "used_calls": [
+      "N 56\u00b002'43\" E 434.26'",
+      "S 41\u00b027'17\" E 258.94'",
+      "N 70\u00b029'46\" E 470.71'"
+    ],
+    "closure_ft": 996.78,
+    "precision": 1.2,
+    "area_ac": 1.28,
+    "area_match": false,
+    "self_intersects": false,
+    "valid": false,
+    "issues": [
+      "Weak closure: precision ratio 1:1 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.",
+      "Walked area (55,743 sqft) differs from the document's stated area (85,378 sqft) by 35% -- beyond the 15% tolerance."
+    ]
+  },
+  {
+    "doc": "db54d473-c7ab-4bec-bbf4-8ff9a1e3bd9b",
+    "page": 15,
+    "region": 3,
+    "label": "PARCEL 2",
+    "stated_ac": "1.39",
+    "raw_calls": 2,
+    "alternates": [
+      "158.00'"
+    ],
+    "used_calls": [
+      "S 41\u00b027'17\" E 158.00'",
+      "S 75\u00b016'17\" W 481.51'"
+    ],
+    "closure_ft": 434.04,
+    "precision": 1.5,
+    "area_ac": null,
+    "area_match": null,
+    "self_intersects": false,
+    "valid": false,
+    "issues": [
+      "Weak closure: precision ratio 1:2 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.",
+      "Only 2 boundary call(s) parsed -- too few to form a closed shape (need at least 3)."
+    ]
+  },
+  {
+    "doc": "42f617a1-1d02-4f26-bf05-2a17b23f8fda",
+    "page": 1,
+    "region": 2,
+    "label": "LOT 12A",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "42f617a1-1d02-4f26-bf05-2a17b23f8fda",
+    "page": 1,
+    "region": 2,
+    "label": "LOT 16B2",
+    "stated_ac": null,
+    "raw_calls": 3,
+    "alternates": [],
+    "used_calls": [
+      "S52\u00b052'00\"E 148.83'",
+      "N37\u00b008'00\"E 88.60'",
+      "S76\u00b058'30\"E 135.81'"
+    ],
+    "closure_ft": 308.5,
+    "precision": 1.2,
+    "area_ac": 0.151,
+    "area_match": null,
+    "self_intersects": false,
+    "valid": false,
+    "issues": [
+      "Weak closure: precision ratio 1:1 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise."
+    ]
+  },
+  {
+    "doc": "42f617a1-1d02-4f26-bf05-2a17b23f8fda",
+    "page": 1,
+    "region": 2,
+    "label": "LOT 15D",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "42f617a1-1d02-4f26-bf05-2a17b23f8fda",
+    "page": 1,
+    "region": 2,
+    "label": "LOT 16A",
+    "stated_ac": null,
+    "raw_calls": 1,
+    "alternates": [],
+    "used_calls": [
+      "S10\u00b036'49\"W 170.29'"
+    ],
+    "closure_ft": 170.29,
+    "precision": 1.0,
+    "area_ac": null,
+    "area_match": null,
+    "self_intersects": false,
+    "valid": false,
+    "issues": [
+      "Weak closure: precision ratio 1:1 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.",
+      "Only 1 boundary call(s) parsed -- too few to form a closed shape (need at least 3)."
+    ]
+  },
+  {
+    "doc": "42f617a1-1d02-4f26-bf05-2a17b23f8fda",
+    "page": 1,
+    "region": 2,
+    "label": "LOT 11",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "42f617a1-1d02-4f26-bf05-2a17b23f8fda",
+    "page": 1,
+    "region": 2,
+    "label": "LOT 17A",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "a1136318-03ef-438d-9f02-8fcdcb5dca30",
+    "page": 5,
+    "region": 2,
+    "label": "Lot 1",
+    "stated_ac": "0.73",
+    "raw_calls": 10,
+    "alternates": [],
+    "used_calls": [
+      "N21\u00b0 13' 27\"W 159.18'",
+      "S21\u00b0 13' 27\"E 193.20'",
+      "N65\u00b0 22' 13\"E 5.32'",
+      "S62\u00b0 00' 09\"E 11.31'",
+      "N63\u00b0 37' 29\"E 6.89'",
+      "S27\u00b0 04' 12\"E 32.43'",
+      "N68\u00b0 38' 43\"E 24.60'",
+      "N06\u00b0 53' 43\"E 22.70'",
+      "S69\u00b0 05' 58\"W 124.76'"
+    ],
+    "closure_ft": 85.19,
+    "precision": 6.8,
+    "area_ac": 0.043,
+    "area_match": false,
+    "self_intersects": false,
+    "valid": false,
+    "issues": [
+      "Weak closure: precision ratio 1:7 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.",
+      "Walked area (1,874 sqft) differs from the document's stated area (31,799 sqft) by 94% -- beyond the 15% tolerance."
+    ]
+  },
+  {
+    "doc": "a1136318-03ef-438d-9f02-8fcdcb5dca30",
+    "page": 5,
+    "region": 2,
+    "label": "Lot 2",
+    "stated_ac": "0.32",
+    "raw_calls": 8,
+    "alternates": [],
+    "used_calls": [
+      "N68\u00b0 38' 43\"E 26.96'",
+      "S21\u00b0 13' 27\"E 20.00'",
+      "N68\u00b0 38' 43\"E 68.53'",
+      "S20\u00b0 54' 02\"E 83.98'",
+      "S17\u00b0 37' 02\"E 64.85'",
+      "S69\u00b0 05' 58\"W 91.89'"
+    ],
+    "closure_ft": 167.97,
+    "precision": 2.1,
+    "area_ac": 0.158,
+    "area_match": false,
+    "self_intersects": false,
+    "valid": false,
+    "issues": [
+      "Weak closure: precision ratio 1:2 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.",
+      "Walked area (6,885 sqft) differs from the document's stated area (13,939 sqft) by 51% -- beyond the 15% tolerance."
+    ]
+  },
+  {
+    "doc": "2f896c95-b0f3-4a49-a447-4b3ca6129c27",
+    "page": 6,
+    "region": 1,
+    "label": "PARCEL 1",
+    "stated_ac": "40.00",
+    "raw_calls": 4,
+    "alternates": [],
+    "used_calls": [
+      "S89\u00b0 33\u2019 38\u201dW 3950.22\u2019",
+      "N0\u00b0 57\u2019 09\u201dE 1333.30\u2019",
+      "S89\u00b0 33\u2019 00\u201dE 1318.27\u2019",
+      "S0\u00b0 48\u2019 45\u201dW 1320.11\u2019"
+    ],
+    "closure_ft": 0.0,
+    "precision": null,
+    "area_ac": null,
+    "area_match": null,
+    "self_intersects": false,
+    "valid": false,
+    "issues": [
+      "Only 1 boundary call(s) parsed -- too few to form a closed shape (need at least 3)."
+    ]
+  },
+  {
+    "doc": "2f896c95-b0f3-4a49-a447-4b3ca6129c27",
+    "page": 6,
+    "region": 1,
+    "label": "REMAINDER PARCEL",
+    "stated_ac": "120.4",
+    "raw_calls": 1,
+    "alternates": [],
+    "used_calls": [
+      "S89\u00b0 25\u2019 02\u201dW 3946.91\u2019"
+    ],
+    "closure_ft": 0.0,
+    "precision": null,
+    "area_ac": null,
+    "area_match": null,
+    "self_intersects": false,
+    "valid": false,
+    "issues": [
+      "Only 1 boundary call(s) parsed -- too few to form a closed shape (need at least 3)."
+    ]
+  },
+  {
+    "doc": "2f896c95-b0f3-4a49-a447-4b3ca6129c27",
+    "page": 7,
+    "region": 3,
+    "label": "PARCEL 1",
+    "stated_ac": "40.00",
+    "raw_calls": 5,
+    "alternates": [],
+    "used_calls": [
+      "S89\u00b0 24\u2019 39\u201dE 1318.25\u2019",
+      "S0\u00b0 48\u2019 45\u201dW 1320.11\u2019",
+      "S89\u00b0 33\u2019 00\u201dE 1318.27\u2019",
+      "N89\u00b0 33\u2019 38\u201dW 3950.22\u2019",
+      "N0\u00b0 57\u2019 09\u201dE 1333.30\u2019"
+    ],
+    "closure_ft": 0.0,
+    "precision": null,
+    "area_ac": null,
+    "area_match": null,
+    "self_intersects": false,
+    "valid": false,
+    "issues": [
+      "Only 1 boundary call(s) parsed -- too few to form a closed shape (need at least 3)."
+    ]
+  },
+  {
+    "doc": "2f896c95-b0f3-4a49-a447-4b3ca6129c27",
+    "page": 7,
+    "region": 3,
+    "label": "REMAINDER PARCEL",
+    "stated_ac": "120.4",
+    "raw_calls": 2,
+    "alternates": [],
+    "used_calls": [
+      "N89\u00b0 25\u2019 02\u201dW 3946.91\u2019",
+      "S89\u00b0 33\u2019 38\u201dW 3950.22\u2019"
+    ],
+    "closure_ft": 0.0,
+    "precision": null,
+    "area_ac": null,
+    "area_match": null,
+    "self_intersects": false,
+    "valid": false,
+    "issues": [
+      "Only 1 boundary call(s) parsed -- too few to form a closed shape (need at least 3)."
+    ]
+  },
+  {
+    "doc": "65be453d-f014-4024-84d6-60a2d0052aeb",
+    "page": 6,
+    "region": 3,
+    "label": "PARCEL A",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "65be453d-f014-4024-84d6-60a2d0052aeb",
+    "page": 6,
+    "region": 3,
+    "label": "PARCEL B",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "65be453d-f014-4024-84d6-60a2d0052aeb",
+    "page": 6,
+    "region": 3,
+    "label": "PARCEL C",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "65be453d-f014-4024-84d6-60a2d0052aeb",
+    "page": 7,
+    "region": 4,
+    "label": "PARCEL A",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "65be453d-f014-4024-84d6-60a2d0052aeb",
+    "page": 7,
+    "region": 4,
+    "label": "PARCEL B",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "65be453d-f014-4024-84d6-60a2d0052aeb",
+    "page": 7,
+    "region": 4,
+    "label": "PARCEL C",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "65be453d-f014-4024-84d6-60a2d0052aeb",
+    "page": 8,
+    "region": 5,
+    "label": "PARCEL A",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "65be453d-f014-4024-84d6-60a2d0052aeb",
+    "page": 8,
+    "region": 5,
+    "label": "PARCEL B",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "65be453d-f014-4024-84d6-60a2d0052aeb",
+    "page": 8,
+    "region": 5,
+    "label": "PARCEL C",
+    "stated_ac": null,
+    "raw_calls": 0,
+    "alternates": [],
+    "used_calls": [],
+    "valid": null,
+    "issues": [
+      "no attributable boundary calls (extraction_note)"
+    ]
+  },
+  {
+    "doc": "83ab22d0-b950-4f5d-ad33-5f0fd6105dbe",
+    "page": 11,
+    "region": 1,
+    "label": "LOT 1 BLOCK 2 RODEO SUBDIVISION",
+    "stated_ac": null,
+    "raw_calls": 2,
+    "alternates": [],
+    "used_calls": [
+      "N 89\u00b041'50\" W 144.55'",
+      "N 89\u00b041'50\" W 227.84'"
+    ],
+    "closure_ft": 372.39,
+    "precision": 1.0,
+    "area_ac": null,
+    "area_match": null,
+    "self_intersects": false,
+    "valid": false,
+    "issues": [
+      "Weak closure: precision ratio 1:1 is below the 1:2000 conservative minimum -- the extracted boundary calls are likely incomplete or include noise.",
+      "Only 2 boundary call(s) parsed -- too few to form a closed shape (need at least 3)."
+    ]
+  }
+]

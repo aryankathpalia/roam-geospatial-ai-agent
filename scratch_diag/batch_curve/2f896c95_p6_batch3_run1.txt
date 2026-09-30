@@ -1,0 +1,32 @@
+Region 1, Piece 1:
+- N89° 25' 02"W  3946.91'
+- REMAINDER PARCEL
+- 17-2-1-4
+- [120.4 AC.±]
+
+Region 1, Piece 2:
+- nothing relevant
+
+Region 1, Piece 3:
+- S89° 24' 39"E  1318.25'
+- PARCEL 1
+- [40.00 AC.±]
+Region 1, Piece 1:
+- REMAINDER PARCEL 17-2-1-4 [120.4 AC.±]
+- N0° 57’ 09” E
+- N89° 33’ 38”W 3950.22’
+- DISPLAY MAP FOR APN 077-210-11
+- PATNAUDE
+
+Region 1, Piece 2:
+- REMAINDER PARCEL 17-2-1-4 [120.4 AC.±] (partially visible)
+- N89° 33’ 38”W 3950.22’
+- EXISTING DIRT ROAD
+- PROPOSED 30-FEET WIDE ACCESS EASEMENT
+
+Region 1, Piece 3:
+- PARCEL 1 [40.00 AC.±]
+- S0° 48’ 45” W
+- S0° 48’ 45” W
+- S89° 33’ 00”E 1318.27’
+- PROPOSED 30-FEET WIDE ACCESS EASEMENT

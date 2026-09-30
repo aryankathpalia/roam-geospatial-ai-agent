@@ -1,0 +1,28 @@
+[
+  {
+    "region_index": 1,
+    "boundary_calls": [
+      {
+        "bearing": "N 89°41'50\" W",
+        "distance": "70.00'"
+      },
+      {
+        "bearing": "S 89°41'50\" E",
+        "distance": "46.45'"
+      },
+      {
+        "bearing": "N 89°41'50\" W",
+        "distance": "48.16'"
+      },
+      {
+        "bearing": "N 34°41'50\" W",
+        "distance": "50.41'"
+      }
+    ],
+    "tie_point": null,
+    "basis_of_bearings": null,
+    "parcel_label": null,
+    "stated_area_acres": "0.31",
+    "ambiguous_alternates": []
+  }
+]

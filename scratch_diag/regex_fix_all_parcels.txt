@@ -1,0 +1,4 @@
+page=6 label='PARCEL 1' raw=4 unparsed=0 closure=2628.57 prec=1:3.0 area=79.683 stated=40.00 match=False valid=False
+page=6 label='REMAINDER PARCEL' raw=1 unparsed=0 closure=3946.91 prec=1:1.0 area=None stated=120.4 match=None valid=False
+page=7 label='PARCEL 1' raw=5 unparsed=0 closure=1310.4 prec=1:7.1 area=59.974 stated=40.00 match=False valid=False
+page=7 label='REMAINDER PARCEL' raw=2 unparsed=0 closure=7896.82 prec=1:1.0 area=None stated=120.4 match=None valid=False
