@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import { boundaryRefs, groupCandidates, type BoundaryRef } from '$lib/boundaryCandidates';
 
   // Boundary confirmation step of the main flow: /workspace links here
@@ -108,6 +108,7 @@
       } else if (parcelRefs.length > 0) {
         selectParcel(parcelRefs[0]);
       }
+      if (result?.processing?.complete === false) startReadingPoll();
     } catch (err: any) {
       loadError = err?.message ?? 'Failed to load document';
     } finally {
@@ -120,12 +121,40 @@
   // $lib/boundaryCandidates). Vision triage only affects sheet order -- it
   // never hides a parcel.
   function flattenParcels(res: any): ParcelRef[] {
-    const all = boundaryRefs(res);
+    const all = boundaryRefs(res, selectedKey?.endsWith('-r') ? selectedKey : null);
     excludedParcels = all.filter((r) => r.excludedReason);
     return groupCandidates(all).flatMap((g) => g.refs);
   }
 
   $: parcelGroups = groupCandidates(parcelRefs);
+  $: reading = result?.processing?.complete === false;
+
+  // The pipeline keeps reading the document (OCR, anchor, parcel extraction) while
+  // the user draws. Refresh the list underneath them; their drawing (`vertices`)
+  // and the map item they are drawing on (pinned) are never reset.
+  let readingTimer: ReturnType<typeof setInterval> | null = null;
+  function startReadingPoll() {
+    if (readingTimer) return;
+    readingTimer = setInterval(refreshDocument, 3000);
+  }
+  function stopReadingPoll() {
+    if (readingTimer) clearInterval(readingTimer);
+    readingTimer = null;
+  }
+  onDestroy(stopReadingPoll);
+
+  async function refreshDocument() {
+    try {
+      const res = await fetch(`${API_BASE}/documents/${documentId.trim()}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      result = data.result;
+      parcelRefs = flattenParcels(result);
+      if (data.status === 'processed') stopReadingPoll();
+    } catch {
+      // transient -- next tick
+    }
+  }
 
   let excludedParcels: ParcelRef[] = [];
 
@@ -213,6 +242,15 @@
       const sx = cropWidth / (confirmed.crop_width || cropWidth);
       const sy = cropHeight / (confirmed.crop_height || cropHeight);
       vertices = confirmed.vertices.map(([x, y]: [number, number]) => [x * sx, y * sy]);
+      seedSource = 'confirmed';
+      return;
+    }
+
+    const pending = ref.pendingPolygon;
+    if (pending?.vertices?.length >= 3) {
+      const sx = cropWidth / (pending.crop_width || cropWidth);
+      const sy = cropHeight / (pending.crop_height || cropHeight);
+      vertices = pending.vertices.map(([x, y]: [number, number]) => [x * sx, y * sy]);
       seedSource = 'confirmed';
       return;
     }
@@ -385,7 +423,7 @@
         body: JSON.stringify({
           page_number: selected.pageNumber,
           region_index: selected.regionIndex,
-          parcel_index: selected.parcelIndex,
+          parcel_index: selected.isRegion ? null : selected.parcelIndex,
           vertices,
           crop_width: cropWidth,
           crop_height: cropHeight,
@@ -400,16 +438,20 @@
       // whole updated parcel back, not just the pixel-shape fields, so
       // this screen's own state stays consistent with what /workspace
       // will now render for the same document.
-      Object.assign(selected.parcel, data.parcel);
+      if (data.parcel) Object.assign(selected.parcel, data.parcel);
+      if (selected.isRegion) selected.parcel.human_confirmed = true;
       parcelRefs = parcelRefs; // reassign to trigger reactivity (confirmedCount, badges)
       saveStatus = 'saved';
-      georeferenced = !!data.parcel.boundary_geojson_wgs84 && data.georeferenced_from_confirmation;
+      savedState = data.state ?? 'bound';
+      georeferenced = !!data.parcel?.boundary_geojson_wgs84 && data.georeferenced_from_confirmation;
+      if (savedState !== 'waiting_for_document') await refreshDocument();
     } catch (err) {
       saveStatus = 'error';
     }
   }
 
   let georeferenced = false;
+  let savedState: 'bound' | 'waiting_for_document' | 'needs_parcel' = 'bound';
 
   function polygonPoints(pts: [number, number][]): string {
     return pts.map(([x, y]) => `${x},${y}`).join(' ');
@@ -461,7 +503,14 @@
     <div class="body">
       <aside>
         <h2>Parcels</h2>
-        {#each parcelGroups as group}
+        {#if reading}
+          <p class="hint reading-note">ROAM is still reading the document in the background — you can start drawing now.</p>
+        {/if}
+        {#each parcelGroups as group, gi}
+          {#if !group.primary && (gi === 0 || parcelGroups[gi - 1].primary)}
+            <h2 class="other-heading">Other maps</h2>
+            <p class="hint sheet-note">Not usually the target (reference surveys, undimensioned or non-plat drawings) — still selectable.</p>
+          {/if}
           <h3 class="sheet-heading">
             Page {group.pageNumber}
             {#if group.referencedNote}<span class="ref-badge" title={group.referencedNote}>referenced survey</span>{/if}
@@ -525,7 +574,15 @@
               Confirm boundary
             </button>
             {#if saveStatus === 'saving'}<span>saving…</span>{/if}
-            {#if saveStatus === 'saved' && georeferenced}
+            {#if saveStatus === 'saved' && savedState === 'waiting_for_document'}
+              <span class="ok">saved ✓ — ROAM is still reading the document; your outline is placed on the
+                map automatically when it finishes. <a href={`/workspace?doc=${encodeURIComponent(documentId.trim())}`}>Continue to map →</a></span
+              >
+            {:else if saveStatus === 'saved' && savedState === 'needs_parcel'}
+              <span class="ok">saved ✓ — this map holds more than one parcel. Pick the parcel this outline
+                belongs to in the list, then press Confirm boundary.</span
+              >
+            {:else if saveStatus === 'saved' && georeferenced}
               <span class="ok">saved ✓ — placed on the map.
                 <a href={`/workspace?doc=${encodeURIComponent(documentId.trim())}`}>View on map →</a></span
               >
@@ -534,6 +591,13 @@
             {/if}
             {#if saveStatus === 'error'}<span class="error">save failed</span>{/if}
           </div>
+
+          {#if selected.pendingPolygon}
+            <p class="hint pending-note">
+              You drew this outline on the map before ROAM read its parcels. If it outlines
+              <strong>{selected.label}</strong>, press Confirm boundary; otherwise pick another parcel.
+            </p>
+          {/if}
 
           <div class="stage">
             <img bind:this={cropImgEl} src={cropSrc} alt="source crop" on:load={onCropLoad} />
@@ -714,6 +778,15 @@
     letter-spacing: 0;
     background: #ecebe4;
     color: #6b6a63;
+  }
+  .other-heading {
+    margin: 1.1rem 0 0.2rem;
+    font-size: 0.9rem;
+  }
+  .reading-note,
+  .pending-note {
+    margin: 0.2rem 0 0.5rem;
+    font-size: 0.78rem;
   }
   .sheet-note {
     margin: 0 0 0.3rem;

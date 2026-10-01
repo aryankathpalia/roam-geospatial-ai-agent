@@ -60,6 +60,7 @@ from app.pipeline.page_ocr import (
     ocr_band,
     page_needs_ocr,
     split_page_into_bands,
+    VISION_CLASSES,
 )
 
 DOCUMENT_ROOT = Path("data/documents")
@@ -89,7 +90,9 @@ DEFAULT_OCR_DISPATCHER: OcrDispatcher = _default_ocr_dispatcher
 
 
 async def process_document(
-    document_id: str, ocr_dispatcher: OcrDispatcher | None = None
+    document_id: str,
+    ocr_dispatcher: OcrDispatcher | None = None,
+    on_checkpoint: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     if ocr_dispatcher is None:
         ocr_dispatcher = DEFAULT_OCR_DISPATCHER
@@ -161,6 +164,43 @@ async def process_document(
         document_id,
         "layout_detection",
         f"{total_regions} regions detected, {parcelmap_regions} parcel map(s)",
+    )
+
+    # ---------------------------------------------------------
+    # Candidate triage + early checkpoint. The boundary the user confirms is
+    # an INPUT to everything below, so it is asked for as soon as ROAM knows
+    # which regions are genuine parcel maps -- one batched Gemini call over
+    # the ParcelMap crops (see run_triage_stage) -- not after OCR, geocoding
+    # and vision extraction have all finished. Those stages keep running in
+    # this same task while the user draws; process_document's caller joins
+    # the confirmed polygon with their results (see
+    # app/routes/documents.py::_finalize_and_bind).
+    # ---------------------------------------------------------
+
+    progress_tracker.update(
+        document_id, "triage", f"classifying {parcelmap_regions} parcel map region(s)" if parcelmap_regions else "no parcel map regions"
+    )
+    await run_triage_stage(page_entries)
+    if on_checkpoint is not None:
+        on_checkpoint(
+            {
+                "document_id": document_id,
+                "inspection": inspection,
+                "pages": [{"page_number": e["page_number"], "regions": e["regions"]} for e in page_entries],
+                "pages_needing_review": 0,
+                "anchor_lat": None,
+                "anchor_lon": None,
+                "anchor": None,
+                "processing": {"complete": False},
+            }
+        )
+    candidates = sum(
+        1 for e in page_entries for r in e["regions"] if r["class"] in VISION_CLASSES and r.get("category") in (None, "boundary_plat")
+    )
+    progress_tracker.update(
+        document_id,
+        "candidates_ready",
+        f"{candidates} parcel map candidate(s) ready for boundary confirmation" if candidates else "no parcel map candidates found",
     )
 
     # ---------------------------------------------------------
@@ -338,6 +378,7 @@ async def process_document(
         "anchor_lat": anchor_lat,
         "anchor_lon": anchor_lon,
         "anchor": anchor,
+        "processing": {"complete": True},
     }
 
 
@@ -803,6 +844,51 @@ def recompute_parcel_from_calls(
     return parcel_result
 
 
+async def _classify_into_regions(targets: list[tuple[dict, dict]], crops: list[Image.Image]) -> None:
+    """
+    classify_regions is a DISPLAY LABEL / ordering hint only, never a gate --
+    measured on the regression corpus, it drops 9 real-plat region-runs out of
+    23 (one page missed in all 3 runs), which fails the bar for silently
+    skipping extraction. Every ParcelMap region still goes to extraction
+    regardless of what this returns; the review UI uses region["category"] to
+    separate likely target sheets from other maps, with the rest always one
+    click away, never hidden.
+    """
+
+    loop = asyncio.get_running_loop()
+    try:
+        categories = await loop.run_in_executor(None, classify_regions, crops)
+        for (entry, region), category in zip(targets, categories):
+            region["category"] = category
+    except Exception as exc:  # noqa: BLE001 -- display-only, never fatal
+        logger.warning("Region classification failed, leaving uncategorized: %s", exc)
+
+
+async def run_triage_stage(page_entries: list[dict[str, Any]]) -> None:
+    """
+    One batched triage pass (classify_regions: <=12 ParcelMap-class crops per
+    Gemini call, one thumbnail each) over every region the layout model
+    called ParcelMap -- which includes aerials, vicinity maps and attached
+    reference surveys. Needs only the rendered pages and layout boxes, so it
+    can run before OCR.
+    """
+
+    targets = [
+        (entry, region)
+        for entry in page_entries
+        for region in entry["regions"]
+        if region["class"] in VISION_CLASSES
+    ]
+    if not targets:
+        return
+    crops = []
+    for entry, region in targets:
+        x, y, w, h = region["bbox"]
+        with Image.open(entry["path"]) as page_image:
+            crops.append(page_image.convert("RGB").crop((x, y, x + w, y + h)))
+    await _classify_into_regions(targets, crops)
+
+
 async def run_vision_stage(
     page_entries: list[dict[str, Any]],
     anchor_lat: float | None = None,
@@ -824,27 +910,18 @@ async def run_vision_stage(
         if region.get("needs_vision")
     ]
 
+    crops = []
     if vision_targets:
-        crops = []
         for entry, region in vision_targets:
             x, y, w, h = region["bbox"]
             with Image.open(entry["path"]) as page_image:
                 crops.append(page_image.convert("RGB").crop((x, y, x + w, y + h)))
 
-        # classify_regions is wired in as a DISPLAY LABEL only, never a
-        # gate -- measured on the regression corpus, it drops 9 real-plat
-        # region-runs out of 23 (one page missed in all 3 runs), which
-        # fails the bar for silently skipping extraction. Every
-        # needs_vision region still goes to extraction regardless of what
-        # this returns; the review UI uses region["category"] to sort/
-        # filter which regions a human sees first, with the rest always
-        # one click away, never hidden.
-        try:
-            categories = await loop.run_in_executor(None, classify_regions, crops)
-            for (entry, region), category in zip(vision_targets, categories):
-                region["category"] = category
-        except Exception as exc:  # noqa: BLE001 -- display-only, never fatal
-            logger.warning("Region classification failed, leaving uncategorized: %s", exc)
+        # Triage normally already ran right after layout detection
+        # (run_triage_stage); this only covers callers that start from stored
+        # layout/OCR output (the regression harness) with no categories yet.
+        if any(region.get("category") is None for _, region in vision_targets):
+            await _classify_into_regions(vision_targets, crops)
 
     if vision_targets:
         try:

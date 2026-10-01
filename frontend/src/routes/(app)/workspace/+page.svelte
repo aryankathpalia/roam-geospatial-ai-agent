@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
+  import { goto } from '$app/navigation';
   import { boundaryRefs, primaryCandidates } from '$lib/boundaryCandidates';
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
@@ -12,10 +13,12 @@
   // "detail" starts null and fills in with a real count once that
   // stage's work is actually done -- rendered as an em-dash
   // placeholder until then, never a fake/simulated number.
-  const STAGE_ORDER = ['rendering', 'layout_detection', 'ocr', 'georeferencing', 'vision_extraction'] as const;
+  const STAGE_ORDER = ['rendering', 'layout_detection', 'triage', 'candidates_ready', 'ocr', 'georeferencing', 'vision_extraction'] as const;
   const STAGE_LABELS: Record<string, string> = {
     rendering: 'Rendering document pages',
     layout_detection: 'Detecting layout & document structure',
+    triage: 'Sorting parcel maps from other maps',
+    candidates_ready: 'Parcel maps ready for boundary confirmation',
     ocr: 'Reading document text',
     georeferencing: 'Locating document on the map',
     vision_extraction: 'Extracting parcel boundary geometry'
@@ -99,8 +102,20 @@
   // Manual boundary confirmation (/boundary-review) is a step of the main
   // flow, offered only for the parcels ROAM's ParcelMap selection picked --
   // see $lib/boundaryCandidates.
-  $: boundaryCandidates = !usingSample && result ? primaryCandidates(boundaryRefs(result)) : [];
+  // Likely-target parcels when there are any; otherwise every extracted parcel -- the
+  // user must always have a way to confirm, even when triage ranked every sheet as an
+  // "other map" (it can be wrong; see $lib/boundaryCandidates).
+  $: boundaryCandidates = (() => {
+    if (usingSample || !result) return [];
+    const refs = boundaryRefs(result);
+    const primary = primaryCandidates(refs);
+    return primary.length ? primary : refs.filter((r) => !r.isRegion && !r.excludedReason);
+  })();
   $: boundaryConfirmedCount = boundaryCandidates.filter((r) => r.parcel.human_confirmed).length;
+  // Outlines drawn on a map holding several parcels, waiting for the user to say which one.
+  $: outlinesNeedingParcel = !usingSample && result
+    ? boundaryRefs(result).filter((r) => !r.isRegion && r.pendingPolygon).map((r) => r.regionIndex + '-' + r.pageNumber).filter((v, i, a) => a.indexOf(v) === i).length
+    : 0;
 
   function boundaryReviewHref(parcelKey?: string): string {
     const q = new URLSearchParams({ doc: documentId ?? '' });
@@ -129,9 +144,17 @@
         throw new Error(`${res.status}: ${body.slice(0, 200)}`);
       }
       const data = await res.json();
-      result = data.result;
       rememberDocumentId(data.document_id ?? lastDocumentId);
       usingSample = false;
+      if (data.status === 'processing') {
+        // Only the candidate maps exist so far; wait for the finished result.
+        processingDocId = data.document_id ?? lastDocumentId;
+        processingStartedAt = Date.now();
+        phase = 'processing';
+        startPolling();
+        return;
+      }
+      result = data.result;
       phase = 'done';
       queueMicrotask(renderMap);
     } catch (err: any) {
@@ -247,6 +270,9 @@
     for (const entryItem of parcelRegions) {
       const { page, i, parcel } = entryItem;
       if (!parcel.boundary_geojson_wgs84) continue; // nothing to draw -- see card for why
+      // The vision-extracted outline is evidence, not a result: only a boundary the
+      // user confirmed is drawn.
+      if (!parcel.human_confirmed) continue;
 
       const shapeOk = parcel.spatial_validation?.valid;
       const locationPrecision = parcelLocationPrecision(parcel);
@@ -517,7 +543,8 @@
     const locationOk = parcel.human_confirmed
       ? confirmedPlacementOk(parcel)
       : locationPrecision === 'surveyed' || locationPrecision === 'manual';
-    if (!parcel.spatial_validation) return { cls: 'high', label: 'No geometry' };
+    if (!parcel.human_confirmed) return { cls: 'moderate', label: 'Boundary not confirmed' };
+    if (!parcel.spatial_validation) return { cls: 'moderate', label: 'Outline saved · not placed on the map' };
     const gate = calibrationGate(parcel);
     if (gate === 'pending') return { cls: 'moderate', label: 'Verifying placement…' };
     if (gate === 'unconfirmed') {
@@ -848,6 +875,7 @@
       rememberDocumentId(data.document_id ?? null);
       processingDocId = data.document_id ?? null;
       processingStartedAt = Date.now();
+      autoOpenReview = true;
       phase = 'processing';
       startPolling();
     } catch (err: any) {
@@ -858,6 +886,11 @@
       phase = 'error';
     }
   }
+
+  // Set only for a document uploaded in THIS session: it goes straight to boundary
+  // confirmation once ROAM has named the parcel maps. A resumed document that is
+  // still processing just waits for the finished result.
+  let autoOpenReview = false;
 
   function stopPolling() {
     if (pollTimer) {
@@ -884,6 +917,17 @@
         stopPolling();
         errorMessage = `Processing failed: ${state.error}`;
         phase = 'error';
+        return;
+      }
+
+      // The boundary the user confirms is an early INPUT to the pipeline: open the
+      // review as soon as ROAM has named the candidate parcel maps. OCR, anchoring
+      // and parcel extraction keep running in the background meanwhile.
+      const ready = state.history?.find((h) => h.stage === 'candidates_ready');
+      if (autoOpenReview && ready && !(ready.detail ?? '').startsWith('no ')) {
+        stopPolling();
+        autoOpenReview = false;
+        await goto(`/boundary-review?doc=${encodeURIComponent(processingDocId)}`);
         return;
       }
 
@@ -1075,8 +1119,8 @@
       {#if boundaryCandidates.length > 0 && documentId}
         <div class="location-banner panel" class:ok={boundaryConfirmedCount === boundaryCandidates.length}>
           <strong>Boundary confirmation:</strong>
-          {boundaryConfirmedCount} of {boundaryCandidates.length} candidate parcel{boundaryCandidates.length === 1 ? '' : 's'} confirmed
-          <span class="location-source">— parcels on ROAM's ParcelMap sheets, leaving out surveys cited only as references. Confirm the target parcel's outline on the drawing to calibrate and place it.</span>
+          {boundaryConfirmedCount} of {boundaryCandidates.length} candidate parcel{boundaryCandidates.length === 1 ? '' : 's'} confirmed{#if outlinesNeedingParcel > 0} · {outlinesNeedingParcel} outline{outlinesNeedingParcel === 1 ? '' : 's'} waiting for you to pick the parcel{/if}
+          <span class="location-source">— the target parcel's outline is what ROAM places on the map. Confirm it on the drawing to calibrate and place it.</span>
           <a class="btn btn-ghost btn-sm" href={boundaryReviewHref()}>Confirm boundaries →</a>
         </div>
       {/if}

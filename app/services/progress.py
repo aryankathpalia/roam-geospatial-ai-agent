@@ -18,6 +18,8 @@ import time
 STAGES = [
     "rendering",
     "layout_detection",
+    "triage",
+    "candidates_ready",
     "ocr",
     "georeferencing",
     "vision_extraction",
