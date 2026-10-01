@@ -33,6 +33,31 @@ PARCELMAP_CROP_MARGIN_FRAC = 0.08
 PARCELMAP_CROP_MARGIN_MIN_PX = 40
 
 
+def padded_crop_box(
+    bbox: tuple[float, float, float, float], page_w: float, page_h: float, region_class: str = "ParcelMap"
+) -> tuple[float, float, float, float]:
+    """
+    The (x1, y1, x2, y2) page-pixel box actually served as a region's crop image
+    (GET .../regions/{i}/crop.png) -- the layout box plus the ParcelMap margin,
+    clipped to the page. The review canvas, a roster parcel's `point`, and a
+    confirmed polygon are all in THIS frame, so anything that must line up with
+    them has to crop with this function.
+    """
+
+    x, y, w, h = bbox
+    if region_class == "ParcelMap":
+        margin_x = max(PARCELMAP_CROP_MARGIN_MIN_PX, w * PARCELMAP_CROP_MARGIN_FRAC)
+        margin_y = max(PARCELMAP_CROP_MARGIN_MIN_PX, h * PARCELMAP_CROP_MARGIN_FRAC)
+    else:
+        margin_x = margin_y = 0
+    return (
+        max(0, x - margin_x),
+        max(0, y - margin_y),
+        min(page_w, x + w + margin_x),
+        min(page_h, y + h + margin_y),
+    )
+
+
 @dataclass
 class RegionCrop:
     roam_class: str

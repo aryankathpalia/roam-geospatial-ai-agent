@@ -106,7 +106,7 @@
       if (preferred) {
         selectParcel(preferred);
       } else if (parcelRefs.length > 0) {
-        selectParcel(parcelRefs[0]);
+        selectParcel(parcelRefs.find((r) => r.kind !== 'reading') ?? parcelRefs[0]);
       }
       if (result?.processing?.complete === false) startReadingPoll();
     } catch (err: any) {
@@ -116,12 +116,11 @@
     }
   }
 
-  // Candidates are every parcel on a ParcelMap region except vicinity-inset
-  // duplicates, grouped by sheet with the most likely target sheet first (see
-  // $lib/boundaryCandidates). Vision triage only affects sheet order -- it
-  // never hides a parcel.
+  // The list is SHEETS with their PARCELS nested (see $lib/boundaryCandidates): the parcels are
+  // what you confirm, the sheet is the shared drawing canvas. Sheets are ordered most likely
+  // target first; nothing is hidden.
   function flattenParcels(res: any): ParcelRef[] {
-    const all = boundaryRefs(res, selectedKey?.endsWith('-r') ? selectedKey : null);
+    const all = boundaryRefs(res);
     excludedParcels = all.filter((r) => r.excludedReason);
     return groupCandidates(all).flatMap((g) => g.refs);
   }
@@ -149,7 +148,13 @@
       if (!res.ok) return;
       const data = await res.json();
       result = data.result;
+      const wasReading = selected?.kind === 'reading';
       parcelRefs = flattenParcels(result);
+      if (wasReading && !parcelRefs.some((r) => r.key === selectedKey)) {
+        // The parcel labels arrived while the map was showing: move to the first real parcel.
+        const first = parcelRefs.find((r) => r.pageNumber === (selected?.pageNumber ?? -1) && r.kind !== 'reading');
+        if (first) selectParcel(first);
+      }
       if (data.status === 'processed') stopReadingPoll();
     } catch {
       // transient -- next tick
@@ -165,8 +170,11 @@
 
   let cropLoadToken = 0;
 
+  let manualName = '';
+
   async function selectParcel(ref: ParcelRef) {
     selectedKey = ref.key;
+    manualName = '';
     saveStatus = 'idle';
     selectedVertexIdx = null;
     const src = `${API_BASE}/documents/${documentId.trim()}/pages/${ref.pageNumber}/regions/${ref.regionIndex}/crop.png`;
@@ -235,7 +243,16 @@
     localTransform =
       ring && ring.length >= 3 ? computeLocalTransform(ring, cropWidth, cropHeight) : null;
 
-    const confirmed = ref.parcel.confirmed_boundary_pixels;
+    // Waiting for the parcel labels: the map shows, but there is nothing to outline yet.
+    if (ref.kind === 'reading') {
+      vertices = [];
+      seedSource = 'none';
+      return;
+    }
+
+    // This parcel's OWN outline: the entity's polygon (kept even before extraction has produced
+    // a record for it), else what was applied to its extracted record.
+    const confirmed = ref.entity?.confirmed_polygon ?? ref.parcel.confirmed_boundary_pixels;
     if (confirmed?.vertices?.length >= 3) {
       // Re-scale a previously confirmed shape if the crop size differs
       // (shouldn't normally happen, but keeps this robust).
@@ -246,18 +263,25 @@
       return;
     }
 
-    const pending = ref.pendingPolygon;
-    if (pending?.vertices?.length >= 3) {
-      const sx = cropWidth / (pending.crop_width || cropWidth);
-      const sy = cropHeight / (pending.crop_height || cropHeight);
-      vertices = pending.vertices.map(([x, y]: [number, number]) => [x * sx, y * sy]);
-      seedSource = 'confirmed';
-      return;
-    }
-
     if (ring && ring.length >= 3 && localTransform) {
       vertices = applyLocalTransform(ring, localTransform);
       seedSource = 'traverse';
+      return;
+    }
+
+    // The roster's point inside this parcel: a small square there, to drag onto its boundary.
+    if (ref.point) {
+      const hw = cropWidth * 0.07;
+      const hh = cropHeight * 0.07;
+      const cx = Math.min(Math.max(ref.point[0] * cropWidth, hw), cropWidth - hw);
+      const cy = Math.min(Math.max(ref.point[1] * cropHeight, hh), cropHeight - hh);
+      vertices = [
+        [cx - hw, cy - hh],
+        [cx + hw, cy - hh],
+        [cx + hw, cy + hh],
+        [cx - hw, cy + hh]
+      ];
+      seedSource = 'none';
       return;
     }
 
@@ -423,7 +447,11 @@
         body: JSON.stringify({
           page_number: selected.pageNumber,
           region_index: selected.regionIndex,
-          parcel_index: selected.isRegion ? null : selected.parcelIndex,
+          // THE PARCEL being confirmed (a sheet entity); a parcel named by hand sends its name instead
+          parcel_id: selected.parcelId,
+          label: selected.kind === 'manual_new' ? manualName.trim() : null,
+          // legacy documents (no parcel entities): the extracted parcel's index
+          parcel_index: selected.parcelId || selected.kind === 'manual_new' ? null : selected.parcelIndex,
           vertices,
           crop_width: cropWidth,
           crop_height: cropHeight,
@@ -439,25 +467,34 @@
       // this screen's own state stays consistent with what /workspace
       // will now render for the same document.
       if (data.parcel) Object.assign(selected.parcel, data.parcel);
-      if (selected.isRegion) selected.parcel.human_confirmed = true;
-      parcelRefs = parcelRefs; // reassign to trigger reactivity (confirmedCount, badges)
       saveStatus = 'saved';
       savedState = data.state ?? 'bound';
       georeferenced = !!data.parcel?.boundary_geojson_wgs84 && data.georeferenced_from_confirmation;
-      if (savedState !== 'waiting_for_document') await refreshDocument();
+      const named = selected.kind === 'manual_new' ? data.entity : null;
+      await refreshDocument();
+      // A parcel just named by hand now exists as an entity: stay on it.
+      if (named) selectedKey = `${selected?.pageNumber ?? ''}-${named.id}`.replace(/^-/, '');
+      else parcelRefs = parcelRefs; // reassign to trigger reactivity (confirmedCount, badges)
     } catch (err) {
       saveStatus = 'error';
     }
   }
 
   let georeferenced = false;
-  let savedState: 'bound' | 'waiting_for_document' | 'needs_parcel' = 'bound';
+  let savedState: 'bound' | 'waiting_for_document' = 'bound';
 
   function polygonPoints(pts: [number, number][]): string {
     return pts.map(([x, y]) => `${x},${y}`).join(' ');
   }
 
-  $: confirmedCount = parcelRefs.filter((r) => r.parcel.human_confirmed).length;
+  // Where ROAM read each parcel on this canvas (the roster's points), so you can see which is which.
+  $: markers = selected
+    ? parcelRefs
+        .filter((r) => r.kind === 'parcel' && r.point && r.pageNumber === selected.pageNumber && r.regionIndex === selected.regionIndex)
+        .map((r) => ({ x: r.point![0] * cropWidth, y: r.point![1] * cropHeight, label: r.label, active: r.key === selectedKey }))
+    : [];
+  $: realParcels = parcelRefs.filter((r) => r.kind === 'parcel');
+  $: confirmedCount = realParcels.filter((r) => r.parcel.human_confirmed).length;
 
 </script>
 
@@ -488,7 +525,7 @@
     {#if loadError}<span class="error">{loadError}</span>{/if}
     {#if parcelRefs.length > 0}
       <span class="spacer" />
-      <span class="confirmed-count">{confirmedCount} / {parcelRefs.length} confirmed</span>
+      <span class="confirmed-count">{confirmedCount} / {realParcels.length} confirmed</span>
       <a
         class="primary-link"
         class:disabled={confirmedCount === 0}
@@ -519,9 +556,15 @@
           <ul>
             {#each group.refs as ref}
               <li>
-                <button class:active={ref.key === selectedKey} on:click={() => selectParcel(ref)}>
-                  {ref.label}
+                <button
+                  class:active={ref.key === selectedKey}
+                  class:muted-row={ref.kind !== 'parcel'}
+                  on:click={() => selectParcel(ref)}
+                >
+                  <span class="parcel-name">{ref.label}</span>
                   {#if ref.parcel.human_confirmed}<span class="badge">confirmed</span>{/if}
+                  {#if ref.manual}<span class="ref-badge" title="You named this parcel; ROAM did not detect its identity.">manually named</span>{/if}
+                  {#if ref.meta}<span class="parcel-meta">{ref.meta}</span>{/if}
                 </button>
               </li>
             {/each}
@@ -556,9 +599,9 @@
               {:else if seedSource === 'none'}
                 (no automatic shape available — draw from scratch)
               {/if}
-              {#if !localTransform}
-                <span class="warn">— no original traverse ring on this parcel, so confirming here
-                  cannot be projected to real-world coordinates; it will only save the pixel shape.</span
+              {#if !localTransform && !reading && selected.kind === 'parcel'}
+                <span class="warn">— no survey calls were extracted for this parcel, so the outline is saved
+                  but cannot be placed on the map.</span
                 >
               {/if}
             </span>
@@ -570,17 +613,16 @@
             >
               Delete selected vertex
             </button>
-            <button on:click={confirmBoundary} disabled={vertices.length < 3}>
+            <button
+              on:click={confirmBoundary}
+              disabled={vertices.length < 3 || selected.kind === 'reading' || (selected.kind === 'manual_new' && !manualName.trim())}
+            >
               Confirm boundary
             </button>
             {#if saveStatus === 'saving'}<span>saving…</span>{/if}
             {#if saveStatus === 'saved' && savedState === 'waiting_for_document'}
               <span class="ok">saved ✓ — ROAM is still reading the document; your outline is placed on the
                 map automatically when it finishes. <a href={`/workspace?doc=${encodeURIComponent(documentId.trim())}`}>Continue to map →</a></span
-              >
-            {:else if saveStatus === 'saved' && savedState === 'needs_parcel'}
-              <span class="ok">saved ✓ — this map holds more than one parcel. Pick the parcel this outline
-                belongs to in the list, then press Confirm boundary.</span
               >
             {:else if saveStatus === 'saved' && georeferenced}
               <span class="ok">saved ✓ — placed on the map.
@@ -592,11 +634,20 @@
             {#if saveStatus === 'error'}<span class="error">save failed</span>{/if}
           </div>
 
-          {#if selected.pendingPolygon}
+          {#if selected.kind === 'reading'}
             <p class="hint pending-note">
-              You drew this outline on the map before ROAM read its parcels. If it outlines
-              <strong>{selected.label}</strong>, press Confirm boundary; otherwise pick another parcel.
+              Reading parcel labels from this map… you can outline a parcel as soon as the names appear.
             </p>
+          {:else if selected.kind === 'manual_new'}
+            <div class="manual-name">
+              <label>
+                Parcel name
+                <input type="text" bind:value={manualName} placeholder="e.g. Parcel 1" />
+              </label>
+              <span class="hint">
+                You are naming this parcel yourself — ROAM did not detect its identity, and no parcel ID is inferred.
+              </span>
+            </div>
           {/if}
 
           <div class="stage">
@@ -609,6 +660,10 @@
                 on:pointerup={onSvgUp}
                 on:pointerleave={onSvgUp}
               >
+                {#each markers as m}
+                  <circle cx={m.x} cy={m.y} r={cropWidth * 0.0045} class="roster-dot" class:active={m.active} />
+                  <text x={m.x + cropWidth * 0.009} y={m.y + cropWidth * 0.004} class="roster-label" class:active={m.active} style={`font-size:${cropWidth * 0.013}px`}>{m.label}</text>
+                {/each}
                 <polygon points={polygonPoints(vertices)} class="boundary-poly" />
                 {#each vertices as [x, y], i}
                   <line
@@ -778,6 +833,52 @@
     letter-spacing: 0;
     background: #ecebe4;
     color: #6b6a63;
+  }
+  .parcel-name {
+    display: block;
+    font-weight: 600;
+  }
+  .parcel-meta {
+    display: block;
+    margin-top: 0.1rem;
+    font-size: 0.72rem;
+    color: #6b6a63;
+  }
+  aside button.muted-row {
+    color: #77756c;
+    font-style: italic;
+  }
+  .manual-name {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0.3rem 0 0.5rem;
+    font-size: 0.85rem;
+  }
+  .manual-name input {
+    margin-left: 0.4rem;
+    padding: 0.25rem 0.5rem;
+  }
+  .roster-dot {
+    fill: #1f6f4a;
+    stroke: #fff;
+    stroke-width: 2;
+    pointer-events: none;
+  }
+  .roster-dot.active {
+    fill: #3477eb;
+  }
+  .roster-label {
+    fill: #1f6f4a;
+    paint-order: stroke;
+    stroke: #fff;
+    stroke-width: 4px;
+    font-weight: 600;
+    pointer-events: none;
+  }
+  .roster-label.active {
+    fill: #1d4fb0;
   }
   .other-heading {
     margin: 1.1rem 0 0.2rem;

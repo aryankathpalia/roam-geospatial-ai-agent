@@ -52,8 +52,15 @@ from app.services.ocr import OCRLine
 from app.services.pdf_inspector import inspect_pdf
 from app.services import progress as progress_tracker
 from app.services.pdf_renderer import render_page
-from app.services.region_cropper import extract_region_crops
-from app.services.vision import ESCALATION_MODEL, classify_regions, classify_sheets, extract_parcel_geometries_batch
+from app.services.region_cropper import extract_region_crops, padded_crop_box
+from app.services import parcel_roster
+from app.services.vision import (
+    ESCALATION_MODEL,
+    classify_regions,
+    classify_sheets,
+    extract_parcel_geometries_batch,
+    read_parcel_roster,
+)
 from app.pipeline.page_ocr import (
     band_count_for,
     match_lines_to_regions,
@@ -207,6 +214,32 @@ async def process_document(
     )
 
     # ---------------------------------------------------------
+    # Parcel roster. The review screen is already open (it opened at candidates_ready); this
+    # reads WHICH parcels each target sheet shows -- one small request, one image per sheet,
+    # no tiling -- so the user can pick and outline "Parcel 1" or "Remainder Parcel" by name
+    # while OCR and the tiled extraction run below. Saved as a second checkpoint.
+    # ---------------------------------------------------------
+    if candidates:
+        progress_tracker.update(document_id, "roster", f"reading parcel labels on {candidates} sheet(s)")
+    await run_roster_stage(page_entries)
+    if on_checkpoint is not None and candidates:
+        on_checkpoint(
+            {
+                "document_id": document_id,
+                "inspection": inspection,
+                "pages": [
+                    {"page_number": e["page_number"], "regions": e["regions"], "sheet": e.get("sheet")}
+                    for e in page_entries
+                ],
+                "pages_needing_review": 0,
+                "anchor_lat": None,
+                "anchor_lon": None,
+                "anchor": None,
+                "processing": {"complete": False},
+            }
+        )
+
+    # ---------------------------------------------------------
     # Split every OCR-eligible page into bands, and flatten ALL bands
     # from the WHOLE document into one fan-out -- so a dense page's own
     # bands run alongside other pages' bands, not just alongside other
@@ -345,6 +378,7 @@ async def process_document(
     await run_vision_stage(page_entries, anchor_lat, anchor_lon)
     apply_legal_descriptions(page_entries, anchor_lat, anchor_lon)
     flag_spurious_duplicate_parcelmap_regions(page_entries)
+    join_roster_evidence(page_entries)
 
     pages_result = [
         {"page_number": e["page_number"], "regions": e["regions"], "sheet": e.get("sheet")}
@@ -948,6 +982,66 @@ async def run_triage_stage(page_entries: list[dict[str, Any]]) -> None:
             if region["class"] not in VISION_CLASSES:
                 continue
             region["category"] = "not_a_parcel_drawing" if i in sheet["inset_regions"] else category
+
+
+async def run_roster_stage(page_entries: list[dict[str, Any]]) -> None:
+    """
+    Read the parcels of every TARGET (or not-yet-judged) sheet into entry["sheet"]["parcels"],
+    one image per sheet: its main drawing, cropped exactly as the review canvas is, so each
+    parcel's `point` lines up with the canvas. Other sheets are not read here (their parcels
+    appear when the extraction finishes). entry["sheet"]["roster"]["status"] is one of
+    skipped | ready | empty | failed -- the UI offers a hand-named outline when nothing was read.
+    """
+
+    sheeted = [e for e in page_entries if e.get("sheet")]
+    targets = [e for e in sheeted if e["sheet"]["role"] in (None, "target_parcel_map")]
+    for entry in sheeted:
+        entry["sheet"]["parcels"] = []
+        entry["sheet"]["roster"] = {"status": "pending" if entry in targets else "skipped"}
+    if not targets:
+        return
+    images = []
+    for entry in targets:
+        region = entry["regions"][entry["sheet"]["main_region"]]
+        with Image.open(entry["path"]) as page_image:
+            box = padded_crop_box(region["bbox"], *page_image.size, region["class"])
+            images.append(page_image.convert("RGB").crop(tuple(int(round(v)) for v in box)))
+    loop = asyncio.get_running_loop()
+    try:
+        answers = await loop.run_in_executor(None, read_parcel_roster, images)
+    except Exception as exc:  # noqa: BLE001 -- the user can still name an outline by hand
+        logger.warning("Parcel roster failed, leaving it empty: %s", exc)
+        for entry in targets:
+            entry["sheet"]["roster"] = {"status": "failed"}
+        return
+    for entry, parcels in zip(targets, answers):
+        sheet = entry["sheet"]
+        for item in parcels:
+            sheet["parcels"].append(
+                parcel_roster.new_entity(
+                    entry["page_number"], sheet["parcels"], label=item["label"], region_index=sheet["main_region"],
+                    source="roster", printed_id=item["printed_id"], stated_area=item["stated_area"], point=item["point"],
+                )
+            )
+        sheet["roster"] = {"status": "ready" if sheet["parcels"] else "empty"}
+
+
+def join_roster_evidence(page_entries: list[dict[str, Any]]) -> None:
+    """
+    EVIDENCE JOIN. Once OCR and the tiled extraction are done, attach the extracted parcels
+    (calls, stated area) to the roster entities they match -- by label, then stated area -- and
+    turn every extracted parcel nothing matched into an entity of its own. A printed id the
+    sheet's own text does not contain is dropped first. A user's polygons are not touched here:
+    they live on the entities and are carried over by id when the result is saved.
+    """
+
+    for entry in page_entries:
+        sheet = entry.get("sheet")
+        if not sheet:
+            continue
+        text = "\n".join(entry["regions"][i].get("ocr_text") or "" for i in sheet.get("regions", []))
+        parcel_roster.verify_printed_ids(sheet.get("parcels", []), text)
+        parcel_roster.join_evidence(entry["page_number"], sheet, entry["regions"])
 
 
 async def run_vision_stage(

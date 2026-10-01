@@ -901,6 +901,112 @@ def parse_sheet_roles(payload: list, count: int) -> dict[int, dict]:
     return found
 
 
+_ROSTER_IMAGE_PX = 2400
+_ROSTER_BATCH_SIZE = 3
+_ROSTER_PROMPT = """You are looking at {count} parcel-map sheets from ONE land-use / land-record packet.
+Each image is the main drawing of one sheet. They are numbered 1 to {count} in the order given.
+
+For EACH sheet list the TARGET PARCELS it shows: the parcels or lots that this map is ABOUT --
+the ones it creates, divides, adjusts or depicts as its subject, outlined and labeled on the
+drawing (for example "PARCEL 1", "REMAINDER PARCEL", "LOT 48", "Parcel A").
+
+Do NOT list: adjoining or neighboring properties (usually labeled with an OWNER name and an APN),
+the parent parcel named only in a title or note, roads, easements, or the vicinity map.
+
+For each target parcel return:
+- label: the parcel's name exactly as printed on the drawing (e.g. "REMAINDER PARCEL", "PARCEL 1").
+- printed_id: an identifier (APN, lot or parcel number such as 17-2-1-4) ONLY if it is printed
+  inside or directly beside THAT parcel on THIS drawing. Never take an id from a title, a notes
+  list, a reference to another survey, or another parcel. If the parcel has no printed id, null.
+- stated_area: the area printed for it (e.g. "40.00 AC.±"), exactly as printed, or null.
+- point_x, point_y: a point INSIDE that parcel, as fractions of the image width and height
+  (0,0 = top-left, 1,1 = bottom-right).
+
+If a sheet shows no target parcel, return an empty list for it. Never invent a parcel or an id."""
+_ROSTER_SCHEMA = {
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "image_number": {"type": "integer"},
+            "parcels": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "label": {"type": "string"},
+                        "printed_id": {"type": "string", "nullable": True},
+                        "stated_area": {"type": "string", "nullable": True},
+                        "point_x": {"type": "number"},
+                        "point_y": {"type": "number"},
+                    },
+                    "required": ["label"],
+                },
+            },
+        },
+        "required": ["image_number", "parcels"],
+    },
+}
+
+
+def read_parcel_roster(images: list[Image.Image]) -> list[list[dict]]:
+    """
+    The parcels each sheet shows, read EARLY: one small request per few sheets, one image per
+    sheet (its main drawing, the same padded crop the review canvas shows, so `point` lines up
+    with it), no tiling -- far cheaper than the full tiled extraction, which stays in the
+    background and later attaches survey evidence to these parcels. Returns, per image in input
+    order, [{label, printed_id, stated_area, point}] (see parcel_roster.sanitize_roster); an
+    image the model does not answer for gets [].
+    """
+
+    if not images:
+        return []
+    client = _get_client()
+    out: list[list[dict]] = [[] for _ in images]
+    for start in range(0, len(images), _ROSTER_BATCH_SIZE):
+        batch = images[start : start + _ROSTER_BATCH_SIZE]
+        for idx, parcels in _read_roster_batch(client, batch).items():
+            out[start + idx] = parcels
+    return out
+
+
+def _read_roster_batch(client: genai.Client, images: list[Image.Image]) -> dict[int, list[dict]]:
+    parts: list = []
+    tokens = 0
+    for image in images:
+        thumb = image.copy()
+        thumb.thumbnail((_ROSTER_IMAGE_PX, _ROSTER_IMAGE_PX))
+        tokens += _estimate_image_tokens(thumb)
+        buffer = io.BytesIO()
+        thumb.convert("RGB").save(buffer, format="PNG")
+        parts.append(types.Part.from_bytes(data=buffer.getvalue(), mime_type="image/png"))
+    prompt = _ROSTER_PROMPT.format(count=len(images))
+
+    _wait_for_rate_limit()
+    _wait_for_token_budget(tokens + _estimate_text_tokens(prompt))
+    response = _generate_with_fallback(
+        client,
+        contents=parts + [prompt],
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json", response_schema=_ROSTER_SCHEMA, temperature=0,
+        ),
+    )
+    return parse_roster(json.loads(response.text), len(images))
+
+
+def parse_roster(payload: list, count: int) -> dict[int, list[dict]]:
+    from app.services.parcel_roster import sanitize_roster
+
+    found: dict[int, list[dict]] = {}
+    for item in payload if isinstance(payload, list) else []:
+        if not isinstance(item, dict):
+            continue
+        idx = (item.get("image_number") or 0) - 1
+        if 0 <= idx < count:
+            found[idx] = sanitize_roster(item.get("parcels"))
+    return found
+
+
 def extract_parcel_geometries_batch(
     images: list[Image.Image], model: str | None = None
 ) -> list[list[dict] | Exception]:

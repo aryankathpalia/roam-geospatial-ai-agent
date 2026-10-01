@@ -2,11 +2,19 @@
 //
 //   REGION -> SHEET -> PARCEL(S)
 //
-// A ParcelMap is a SHEET (a page), not a region: the layout model may box one page several
+// A ParcelMap is a SHEET (a page), not a region, and a PARCEL is not a map: the layout model may box one page several
 // times (the main drawing, a vicinity inset, a detail), and a sheet may hold several parcels
 // (a lot and its remainder). So the unit offered to the user is the sheet -- ONE candidate
 // per page that holds a parcel map -- with its parcels nested under it, and the boundary is
 // drawn on the sheet's main drawing and then assigned to one of those parcels.
+//
+// What the user confirms is a PARCEL -- "Parcel 1", "Remainder Parcel" -- a first-class entity
+// owned by the sheet (page.sheet.parcels[]), read early by the roster call and holding its own
+// confirmed polygon. The sheet is only the shared drawing canvas. Entities exist from the
+// roster on; before that the sheet shows "Reading parcel labels…", and if the roster is empty
+// or failed the user can outline a parcel and NAME it by hand (marked as manually named).
+// Documents processed before entities existed (no sheet.parcels) fall back to the extracted
+// region.parcels.
 //
 // The backend builds the sheet (app/pipeline/document_pipeline.py::build_sheets: largest
 // ParcelMap region = main drawing, regions >= 20% of it are sibling drawings, smaller ones
@@ -47,16 +55,26 @@ export type SheetInfo = {
 export type BoundaryRef = {
   key: string;
   pageNumber: number;
+  // The region (crop) the outline is drawn on.
   regionIndex: number;
-  // -1 for the sheet's MAP item: the user can draw on it before ROAM has finished reading
-  // which parcels it holds (the polygon is saved on the region and bound to a parcel when
-  // extraction completes).
+  // THE PARCEL's stable id (a sheet entity); null for legacy extracted parcels and for the
+  // "name it by hand" row.
+  parcelId: string | null;
+  // Legacy: index into region.parcels (-1 for entities that have no extracted parcel yet).
   parcelIndex: number;
-  isRegion: boolean;
-  // An outline drawn on this region's map before its parcels existed, still waiting for the
-  // user to say which parcel it belongs to.
-  pendingPolygon: any | null;
+  // parcel: a real, selectable parcel | reading: the roster is still being read (not selectable) |
+  // manual_new: no parcel was read -- draw an outline and name it.
+  kind: 'parcel' | 'reading' | 'manual_new';
   label: string;
+  // "17-2-1-4 · 120.4 AC.±": only what the sheet prints.
+  meta: string | null;
+  // True when the user named it: identity was not detected automatically.
+  manual: boolean;
+  // An approximate point inside the parcel, as fractions of its region's crop (canvas).
+  point: [number, number] | null;
+  // The sheet entity (null for legacy parcels).
+  entity: any | null;
+  // The extracted/derived parcel record (geometry, calibration, placement), or a stub.
   parcel: any;
   role: string | null;
   sheetReason: string | null;
@@ -105,8 +123,7 @@ export function sheetOf(page: any): SheetInfo | null {
   };
 }
 
-export function boundaryRefs(result: any, pinnedKey: string | null = null): BoundaryRef[] {
-  const reading = result?.processing?.complete === false;
+export function boundaryRefs(result: any): BoundaryRef[] {
   const out: BoundaryRef[] = [];
   for (const page of result?.pages ?? []) {
     const sheet = sheetOf(page);
@@ -120,54 +137,88 @@ export function boundaryRefs(result: any, pinnedKey: string | null = null): Boun
       sheetReason: sheet.reason,
       regionArea: bbox[2] * bbox[3]
     };
+    const entities: any[] | undefined = page.sheet?.parcels;
+    const rosterStatus: string | undefined = page.sheet?.roster?.status;
+    const meta = (e: any) =>
+      [e.printed_id, e.stated_area].filter(Boolean).join(' · ') || null;
+    const before = out.length;
 
-    const parcelItem = (regionIndex: number, parcelIndex: number, excludedReason: string | null): BoundaryRef => {
-      const region = regions[regionIndex];
-      const parcel = region.parcels[parcelIndex];
-      const poly = region.confirmed_polygon ?? null;
-      return {
-        ...common,
-        regionIndex,
-        key: `${page.page_number}-${regionIndex}-${parcelIndex}`,
-        parcelIndex,
-        isRegion: false,
-        pendingPolygon: poly && poly.needs_parcel ? poly : null,
-        label: parcel?.vision_geometry?.parcel_label || `Region ${regionIndex} · Parcel ${parcelIndex + 1}`,
-        parcel,
-        excludedReason:
-          excludedReason ??
-          (parcel?.likely_duplicate_region
-            ? (parcel.duplicate_note ?? 'Likely a vicinity/locus-map duplicate of a parcel drawn elsewhere.')
-            : null)
+    if (entities) {
+      for (const e of entities) {
+        const ref = e.evidence_ref;
+        const evidence = ref ? regions[ref.region]?.parcels?.[ref.parcel] : null;
+        const poly = e.confirmed_polygon ?? null;
+        const regionIndex = ref ? ref.region : (e.region_index ?? sheet.mainRegion);
+        out.push({
+          ...common,
+          key: `${page.page_number}-${e.id}`,
+          regionIndex,
+          parcelId: e.id,
+          parcelIndex: ref ? ref.parcel : -1,
+          kind: 'parcel',
+          label: e.label,
+          meta: meta(e),
+          manual: !!e.manual,
+          point: e.point ?? null,
+          entity: e,
+          // The record the rest of the app uses; a stub until extraction has produced one.
+          parcel: evidence ?? {
+            vision_geometry: { parcel_label: e.label },
+            human_confirmed: !!poly,
+            confirmed_boundary_pixels: poly
+          },
+          excludedReason: e.excluded_reason ?? null
+        });
+      }
+    } else {
+      // Documents processed before parcel entities existed: the extracted parcels, as before.
+      const parcelItem = (regionIndex: number, parcelIndex: number, excluded: string | null): BoundaryRef => {
+        const parcel = regions[regionIndex].parcels[parcelIndex];
+        return {
+          ...common,
+          key: `${page.page_number}-${regionIndex}-${parcelIndex}`,
+          regionIndex,
+          parcelId: null,
+          parcelIndex,
+          kind: 'parcel',
+          label: parcel?.vision_geometry?.parcel_label || `Region ${regionIndex} · Parcel ${parcelIndex + 1}`,
+          meta: null,
+          manual: false,
+          point: null,
+          entity: null,
+          parcel,
+          excludedReason:
+            excluded ??
+            (parcel?.likely_duplicate_region
+              ? (parcel.duplicate_note ?? 'Likely a vicinity/locus-map duplicate of a parcel drawn elsewhere.')
+              : null)
+        };
       };
-    };
+      for (const ri of sheet.regions) (regions[ri]?.parcels ?? []).forEach((_: any, pi: number) => out.push(parcelItem(ri, pi, null)));
+      for (const ri of sheet.insetRegions)
+        (regions[ri]?.parcels ?? []).forEach((_: any, pi: number) =>
+          out.push(parcelItem(ri, pi, 'Read from a small inset of this sheet (likely a vicinity or detail map), not its main drawing.'))
+        );
+    }
 
-    const sheetParcels = sheet.regions.reduce((n, ri) => n + (regions[ri]?.parcels ?? []).length, 0);
-    const regionKey = `${page.page_number}-${sheet.mainRegion}-r`;
-    // The sheet's map is an item until its parcels are read -- and stays one while the user
-    // is working on it, so a list that refreshes underneath a drawing never silently
-    // re-targets it at a parcel.
-    if (!sheetParcels || regionKey === pinnedKey) {
-      const poly = main?.confirmed_polygon ?? null;
+    // Nothing to pick yet: say so, or offer the hand-named outline. Never a generic "map" item.
+    if (out.length === before) {
+      const reading = result?.processing?.complete === false && (!entities || rosterStatus === 'pending' || rosterStatus === undefined);
       out.push({
         ...common,
+        key: `${page.page_number}-${reading ? 'reading' : 'new'}`,
         regionIndex: sheet.mainRegion,
-        key: regionKey,
+        parcelId: null,
         parcelIndex: -1,
-        isRegion: true,
-        pendingPolygon: null,
-        label: reading && !sheetParcels ? 'Parcel map · reading parcels…' : 'Parcel map',
-        parcel: poly ? { human_confirmed: true, confirmed_boundary_pixels: poly, vision_geometry: {} } : { vision_geometry: {} },
+        kind: reading ? 'reading' : 'manual_new',
+        label: reading ? 'Reading parcel labels…' : 'Draw an outline and name it',
+        meta: reading ? null : 'no parcel was detected on this sheet',
+        manual: false,
+        point: null,
+        entity: null,
+        parcel: { vision_geometry: {} },
         excludedReason: null
       });
-    }
-    for (const ri of sheet.regions) {
-      (regions[ri]?.parcels ?? []).forEach((_: any, pi: number) => out.push(parcelItem(ri, pi, null)));
-    }
-    for (const ri of sheet.insetRegions) {
-      (regions[ri]?.parcels ?? []).forEach((_: any, pi: number) =>
-        out.push(parcelItem(ri, pi, 'Read from a small inset of this sheet (likely a vicinity or detail map), not its main drawing.'))
-      );
     }
   }
   return out;
@@ -207,5 +258,5 @@ export function primaryCandidates(refs: BoundaryRef[]): BoundaryRef[] {
   return groupCandidates(refs)
     .filter((g) => g.primary)
     .flatMap((g) => g.refs)
-    .filter((r) => !r.isRegion);
+    .filter((r) => r.kind === 'parcel');
 }

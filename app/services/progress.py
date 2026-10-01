@@ -20,6 +20,7 @@ STAGES = [
     "layout_detection",
     "triage",
     "candidates_ready",
+    "roster",
     "ocr",
     "georeferencing",
     "vision_extraction",

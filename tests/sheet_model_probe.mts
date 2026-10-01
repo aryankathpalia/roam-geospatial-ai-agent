@@ -7,7 +7,7 @@ console.log(JSON.stringify({
   sheets: Object.fromEntries((result.pages ?? []).map((p: any) => [p.page_number, sheetOf(p)]).filter(([, s]: any) => s)),
   groups: groupCandidates(refs).map((g) => ({
     page: g.pageNumber, primary: g.primary, badge: g.badge, note: g.note,
-    items: g.refs.map((r) => ({ label: r.label, isRegion: r.isRegion, region: r.regionIndex }))
+    items: g.refs.map((r) => ({ label: r.label, kind: r.kind, region: r.regionIndex }))
   })),
   excluded: refs.filter((r) => r.excludedReason).map((r) => ({ page: r.pageNumber, label: r.label })),
   primaryParcels: primaryCandidates(refs).length
