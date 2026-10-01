@@ -22,7 +22,14 @@ export type BoundaryRef = {
   key: string;
   pageNumber: number;
   regionIndex: number;
+  // -1 for a parcel MAP item: the user can draw on it before ROAM has finished
+  // reading which parcels it holds (the polygon is saved on the region and bound
+  // to a parcel when extraction completes).
   parcelIndex: number;
+  isRegion: boolean;
+  // An outline drawn on this region's map before its parcels existed, still
+  // waiting for the user to say which parcel it belongs to.
+  pendingPolygon: any | null;
   label: string;
   parcel: any;
   category: string | null;
@@ -33,7 +40,9 @@ export type BoundaryRef = {
   referencedNote: string | null;
 };
 
-export type BoundaryGroup = { pageNumber: number; referencedNote: string | null; refs: BoundaryRef[] };
+// primary: a sheet ROAM considers a likely target (triaged as a dimensioned plat, not a
+// cited reference). Everything else is grouped under "Other maps" -- listed, never hidden.
+export type BoundaryGroup = { pageNumber: number; referencedNote: string | null; primary: boolean; refs: BoundaryRef[] };
 
 // Same-line matches only ([ \t], never \s): OCR line order is not reading
 // order, so a title's last word and the next line's scale ("1"=400'") must
@@ -73,28 +82,55 @@ export function referencedSheets(result: any): Map<number, string> {
   return out;
 }
 
-export function boundaryRefs(result: any): BoundaryRef[] {
+export function boundaryRefs(result: any, pinnedKey: string | null = null): BoundaryRef[] {
   const referenced = referencedSheets(result);
+  const reading = result?.processing?.complete === false;
   const out: BoundaryRef[] = [];
   for (const page of result?.pages ?? []) {
     (page.regions ?? []).forEach((region: any, regionIndex: number) => {
+      if (region.class !== 'ParcelMap' && !(region.parcels ?? []).length) return;
       const bbox = region.bbox ?? [0, 0, 0, 0];
-      (region.parcels ?? []).forEach((parcel: any, parcelIndex: number) => {
+      const common = {
+        pageNumber: page.page_number,
+        regionIndex,
+        category: region.category ?? null,
+        regionArea: bbox[2] * bbox[3],
+        referencedNote: referenced.get(page.page_number) ?? null
+      };
+      const poly = region.confirmed_polygon ?? null;
+      const parcels: any[] = region.parcels ?? [];
+      const regionKey = `${page.page_number}-${regionIndex}-r`;
+      // The map itself is an item until its parcels are read -- and stays one while
+      // the user is working on it, so a list that refreshes underneath a drawing
+      // never silently re-targets it at a parcel.
+      if (!parcels.length || regionKey === pinnedKey) {
         out.push({
+          ...common,
+          key: regionKey,
+          parcelIndex: -1,
+          isRegion: true,
+          pendingPolygon: null,
+          label: reading && !parcels.length ? 'Parcel map · reading parcels…' : 'Parcel map',
+          parcel: poly
+            ? { human_confirmed: true, confirmed_boundary_pixels: poly, vision_geometry: {} }
+            : { vision_geometry: {} },
+          excludedReason: null
+        });
+      }
+      parcels.forEach((parcel: any, parcelIndex: number) => {
+        out.push({
+          ...common,
           key: `${page.page_number}-${regionIndex}-${parcelIndex}`,
-          pageNumber: page.page_number,
-          regionIndex,
           parcelIndex,
+          isRegion: false,
+          pendingPolygon: poly && poly.needs_parcel ? poly : null,
           label:
             parcel?.vision_geometry?.parcel_label ||
             `Region ${regionIndex} · Parcel ${parcelIndex + 1}`,
           parcel,
-          category: region.category ?? null,
-          regionArea: bbox[2] * bbox[3],
           excludedReason: parcel?.likely_duplicate_region
             ? (parcel.duplicate_note ?? 'Likely a vicinity/locus-map duplicate of a parcel drawn elsewhere.')
-            : null,
-          referencedNote: referenced.get(page.page_number) ?? null
+            : null
         });
       });
     });
@@ -109,12 +145,15 @@ export function groupCandidates(refs: BoundaryRef[]): BoundaryGroup[] {
   const groups = new Map<number, BoundaryGroup>();
   for (const r of refs) {
     if (r.excludedReason) continue;
-    if (!groups.has(r.pageNumber)) groups.set(r.pageNumber, { pageNumber: r.pageNumber, referencedNote: r.referencedNote, refs: [] });
+    if (!groups.has(r.pageNumber)) {
+      const primary = !r.referencedNote && (r.category === null || r.category === 'boundary_plat');
+      groups.set(r.pageNumber, { pageNumber: r.pageNumber, referencedNote: r.referencedNote, primary, refs: [] });
+    }
     groups.get(r.pageNumber)!.refs.push(r);
   }
   const rank = (g: BoundaryGroup) => {
     const first = g.refs[0];
-    return [g.referencedNote ? 1 : 0, first.category === 'boundary_plat' || first.category === null ? 0 : 1, -first.regionArea, g.pageNumber];
+    return [g.primary ? 0 : 1, g.referencedNote ? 1 : 0, -first.regionArea, g.pageNumber];
   };
   return [...groups.values()].sort((a, b) => {
     const ra = rank(a), rb = rank(b);
@@ -123,7 +162,10 @@ export function groupCandidates(refs: BoundaryRef[]): BoundaryGroup[] {
   });
 }
 
-// What the workspace banner counts: parcels on sheets not cited as references.
+// What the workspace banner counts: parcels on likely-target sheets (not "Other maps").
 export function primaryCandidates(refs: BoundaryRef[]): BoundaryRef[] {
-  return refs.filter((r) => !r.excludedReason && !r.referencedNote);
+  return groupCandidates(refs)
+    .filter((g) => g.primary)
+    .flatMap((g) => g.refs)
+    .filter((r) => !r.isRegion);
 }

@@ -605,3 +605,35 @@ Two independent causes, both fixed, neither from the confirm-boundary work:
 Still true for this packet: no printed survey coordinate, so placement is "approximate" (street
 or city level). Better anchors that the sheet does state: PLSS (T22N R21E Sec. 17, M.D.M.) and
 APN 077-210-11 (county parcel GIS) -- not built.
+
+## Boundary confirmation is an early input to the pipeline (2026-10-01)
+
+Order is now: render -> layout -> **triage** (the existing `classify_regions`: every
+ParcelMap-class crop as a 1024px thumbnail, <=12 per Gemini call, one structured request,
+`boundary_plat` | `undimensioned_drawing` | `not_a_parcel_drawing`, default `boundary_plat`) ->
+**partial `result.json` saved + `candidates_ready`** -> OCR -> anchor geocode -> parcel
+extraction. The upload screen opens `/boundary-review` at `candidates_ready` while the rest
+keeps running in the same task; the user draws on a "Parcel map" item (parcels are not read
+yet) and `/confirm-boundary` with `parcel_index: null` stores the polygon on the REGION
+(`region.confirmed_polygon`). When extraction finishes, `_finalize_and_bind` carries it over
+(the pipeline owns pages/regions/parcels, the user owns `confirmed_polygon`) and binds it:
+one parcel -> that parcel; none -> a parcel is created from the outline; two or more -> it waits
+(`needs_parcel`) and the review screen seeds each parcel from it so the user picks one.
+Calibration/placement then run in the background exactly as before. Vision-extracted geometry
+is no longer drawn on the map until the user confirms ("Boundary not confirmed" pill).
+
+Triage is used only to SEPARATE likely target sheets from an "Other maps" heading -- never
+to hide: the pipeline's own measurement is that as a gate it drops 9 of 23 real plats.
+
+Known limits:
+- Tested end to end on the real Patnaude PDF with real rendering/OCR/UI but STUBBED layout,
+  both Gemini calls and the geocoder (the cloud has no layout weights, key or network).
+  Real layout boxes, real triage output and real extraction are untested in this flow.
+- "Referenced survey" demotion needs OCR text in some layout region; it cannot apply on the
+  early screen (before OCR) and misses a cited record number whose text falls in no region.
+- An outline drawn on a region whose parcels carry no extracted calls is saved but cannot be
+  placed (no ring to pivot on) -- the parcel says so.
+- If the server restarts mid-processing the partial result stays `processing` forever and
+  the review screen keeps polling; there is no resume of the background pipeline.
+- Documents processed before this change and never confirmed now show no polygons on the
+  map until a boundary is confirmed.
