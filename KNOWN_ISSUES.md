@@ -637,3 +637,36 @@ Known limits:
   the review screen keeps polling; there is no resume of the background pipeline.
 - Documents processed before this change and never confirmed now show no polygons on the
   map until a boundary is confirmed.
+
+
+## Candidates are SHEETS, not regions: REGION -> SHEET -> PARCEL(S) (2026-10-01)
+
+The first early-confirmation build offered one "Parcel map" item per ParcelMap-class REGION, so a
+page the layout model boxed twice (main drawing + vicinity inset) appeared twice, aerials and
+reference surveys looked like peers of the real map, and triage -- a per-crop "does it carry
+bearings?" test -- ranked a sparsely dimensioned application map below the fully dimensioned
+older survey it cites. Now:
+- `build_sheets` (document_pipeline.py) groups ParcelMap-class regions by page: the largest is
+  the sheet's main drawing, regions >= 20% of it (the pipeline's existing inset threshold) are
+  sibling drawings whose parcels nest under the same sheet, smaller ones are folded in as insets.
+  Stored as `page.sheet = {main_region, regions, inset_regions, role, reason}`.
+- `classify_sheets` (vision.py) is the early triage: ONE batched request over whole-page
+  thumbnails (<= 12 sheets), asking each sheet's ROLE in its packet -- `target_parcel_map |
+  reference_survey | other_parcel_drawing | location_or_aerial_map | not_a_map` -- with a one-line
+  reason. Sheets are judged against each other. A sheet it does not answer for, or a failed call,
+  leaves the role unset and the sheet stays a candidate. The role is mirrored to each region's
+  legacy `category` for the vision stage's duplicate suppression and the workspace filter.
+- The review screen lists SHEETS: primary = target (or unjudged); every other role is under
+  "Other maps" with the model's reason. Parcels nest under their sheet; before extraction the sheet
+  is one "Parcel map" item you draw on.
+
+Removed: the OCR "cited as a reference" demotion. On the real NVZ packet it marked BOTH true parcel
+sheets (pages 9 and 11, whose own notes say "as shown on RS 5122") as referenced surveys and left
+no primary sheet -- it cannot tell "is survey N" from "mentions survey N". (It was live between
+079bdf5 and this change; the NVZ sidebar showed it and I did not catch it.)
+
+Not verified: real Gemini sheet roles. The cloud has no key, so the prompt's judgements -- notably
+telling a new, sparsely dimensioned application map from an older cited survey -- are untested; the
+tests stub the model's answers. Sheet grouping itself IS tested on the five real stored documents
+(real layout output), including that the TypeScript and Python builds agree and that multi-parcel
+sheets stay one candidate (MAP 7, Ada, NVZ, the Easement's two-region page).

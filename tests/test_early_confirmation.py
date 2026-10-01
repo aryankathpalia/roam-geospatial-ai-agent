@@ -167,22 +167,36 @@ def test_region_with_no_extracted_parcels_still_keeps_the_users_outline(env):
 # ---------------------------------------------------------------- pipeline ordering
 
 def test_checkpoint_and_candidates_come_before_ocr_geocoding_and_vision(tmp_path, monkeypatch):
-    import fitz  # noqa: F401 -- pymupdf, a project dependency
-
     root = tmp_path / "documents"
     doc = root / "t1"
     doc.mkdir(parents=True)
     pdf = __import__("pymupdf").open()
-    for _ in range(2):
+    for _ in range(3):
         pdf.new_page(width=300, height=200).insert_text((20, 40), "sheet")
     pdf.save(doc / "original.pdf")
 
     order = []
     monkeypatch.setattr(pipe, "DOCUMENT_ROOT", root)
     monkeypatch.setattr(pipe, "detect_page_layout", lambda path: [])
-    monkeypatch.setattr(pipe, "extract_region_crops", lambda path, det, save_dir, save_only_needs_review: [
-        SimpleNamespace(roam_class="ParcelMap", confidence=0.9, bbox=(10, 10, 200, 120), needs_review=False, saved_path=None)])
-    monkeypatch.setattr(pipe, "classify_regions", lambda crops: order.append("triage") or ["boundary_plat", "not_a_parcel_drawing"][: len(crops)])
+
+    def fake_crops(path, det, save_dir, save_only_needs_review):
+        n = int(path[-7:-4])
+        box = lambda b, c="ParcelMap": SimpleNamespace(roam_class=c, confidence=0.9, bbox=b, needs_review=False, saved_path=None)  # noqa: E731
+        return {1: [box((10, 10, 200, 120))],
+                2: [box((10, 10, 220, 150)), box((240, 10, 40, 30))],   # main map + a small inset on the SAME sheet
+                3: [box((10, 10, 200, 100), "Text")]}[n]
+
+    monkeypatch.setattr(pipe, "extract_region_crops", fake_crops)
+    sheet_calls = []
+
+    def fake_sheets(images):
+        order.append("triage")
+        sheet_calls.append([im.size for im in images])
+        return [{"role": "target_parcel_map", "reason": "Titled for the owner."},
+                {"role": "reference_survey", "reason": "Older recorded survey cited as a reference."}][: len(images)]
+
+    monkeypatch.setattr(pipe, "classify_sheets", fake_sheets)
+    monkeypatch.setattr(pipe, "classify_regions", lambda crops: pytest.fail("region-level triage must not run again"))
 
     async def fake_ocr(jobs):
         order.append("ocr")
@@ -207,10 +221,31 @@ def test_checkpoint_and_candidates_come_before_ocr_geocoding_and_vision(tmp_path
     result = asyncio.run(pipe.process_document("t1", ocr_dispatcher=fake_ocr, on_checkpoint=checkpoint))
 
     assert order[:2] == ["triage", "checkpoint"] and order.index("checkpoint") < order.index("ocr") < order.index("vision")
-    assert order.count("triage") == 1  # not re-run inside the vision stage: the categories already exist
+    assert order.count("triage") == 1  # one batched sheet call, not re-run inside the vision stage
+    # ONE image per SHEET (3 regions on 2 pages), each the whole page -- not a region crop
+    assert len(sheet_calls) == 1 and len(sheet_calls[0]) == 2 and all(size[0] > 100 for size in sheet_calls[0])
     early = snapshots[0]
     assert early["processing"] == {"complete": False} and "parcels" not in early["pages"][0]["regions"][0]
-    assert [r["category"] for p in early["pages"] for r in p["regions"]] == ["boundary_plat", "not_a_parcel_drawing"]
+    p1, p2, p3 = early["pages"]
+    assert p1["sheet"] == {"main_region": 0, "regions": [0], "inset_regions": [], "role": "target_parcel_map", "reason": "Titled for the owner."}
+    assert p2["sheet"]["main_region"] == 0 and p2["sheet"]["regions"] == [0] and p2["sheet"]["inset_regions"] == [1]  # folded into the sheet
+    assert p2["sheet"]["role"] == "reference_survey" and p3["sheet"] is None  # a text page is not a sheet
+    assert [r.get("category") for r in p2["regions"]] == ["boundary_plat", "not_a_parcel_drawing"]
+    assert result["pages"][1]["sheet"]["inset_regions"] == [1]  # the final result keeps the structure
     stages = [h["stage"] for h in progress.get("t1")["history"]]
     assert stages.index("candidates_ready") < stages.index("ocr") < stages.index("vision_extraction") < stages.index("done")
     assert result["processing"] == {"complete": True}
+
+
+def test_sheet_without_a_role_is_still_a_candidate_when_triage_fails(tmp_path, monkeypatch):
+    entries = [{"page_number": 1, "path": None, "regions": [{"class": "ParcelMap", "bbox": [0, 0, 100, 100]}]}]
+    pipe.build_sheets(entries)
+    assert entries[0]["sheet"]["role"] is None and entries[0]["sheet"]["main_region"] == 0
+
+
+def test_comparable_regions_on_one_page_are_one_sheet_with_both_drawings():
+    entries = [{"page_number": 7, "regions": [
+        {"class": "ParcelMap", "bbox": [0, 0, 900, 700]}, {"class": "ParcelMap", "bbox": [0, 800, 800, 600]},
+        {"class": "ParcelMap", "bbox": [950, 0, 100, 80]}, {"class": "Text", "bbox": [0, 0, 5000, 5000]}]}]
+    pipe.build_sheets(entries)
+    assert entries[0]["sheet"] == {"main_region": 0, "regions": [0, 1], "inset_regions": [2], "role": None, "reason": None}

@@ -1,165 +1,205 @@
-// Which parcels get offered for manual boundary confirmation, and in what order.
+// Which sheets and parcels get offered for manual boundary confirmation, and in what order.
 //
-// The manual step comes AFTER ROAM's own ParcelMap selection and never
-// replaces it: parcels only exist on regions the layout model classed
-// ParcelMap (the only class sent to vision, see app/pipeline/page_ocr.py).
+//   REGION -> SHEET -> PARCEL(S)
 //
-// Nothing here GATES on vision triage (region.category). The pipeline's own
-// comment (document_pipeline.py, classify_regions) records that triage drops
-// 9 of 23 real plats when used as a gate, and confirmed on a real
-// application packet (WTDLP22-0003) that it hid the packet's own map. The
-// category is only a sort key (never shown as a warning). The only exclusion is the
-// pre-existing vicinity-inset duplicate flag (likely_duplicate_region).
+// A ParcelMap is a SHEET (a page), not a region: the layout model may box one page several
+// times (the main drawing, a vicinity inset, a detail), and a sheet may hold several parcels
+// (a lot and its remainder). So the unit offered to the user is the sheet -- ONE candidate
+// per page that holds a parcel map -- with its parcels nested under it, and the boundary is
+// drawn on the sheet's main drawing and then assigned to one of those parcels.
 //
-// Application packets attach older recorded surveys they cite as references.
-// Those are real ParcelMap sheets with real parcels, but they are not the
-// target map. A sheet is marked "referenced" when another sheet cites its
-// record number ("RECORD OF SURVEY MAP 966") and the sheet does not cite
-// that number itself. That is a demotion (sorted last, badged), never a
-// removal -- a text heuristic, checked on ONE document.
+// The backend builds the sheet (app/pipeline/document_pipeline.py::build_sheets: largest
+// ParcelMap region = main drawing, regions >= 20% of it are sibling drawings, smaller ones
+// are insets folded into the sheet) and asks Gemini for the sheet's ROLE in its packet
+// (target_parcel_map | reference_survey | other_parcel_drawing | location_or_aerial_map |
+// not_a_map). Documents processed before sheets existed have no `page.sheet`; the same rule
+// is re-derived here, with no role.
+//
+// Nothing GATES on the role. A target sheet is a "likely target"; every other role is
+// listed under "Other maps" with the model's reason -- never hidden (the pipeline's own
+// measurement is that triage used as a gate drops 9 of 23 real plats). A sheet the model
+// could not judge has no role and counts as a candidate. The only exclusions are the
+// pre-existing duplicate-inset flag (likely_duplicate_region) and parcels read off a small
+// inset region of a sheet.
+//
+// (An earlier OCR heuristic -- "this sheet's record number is cited on another sheet, so it is a
+// reference survey" -- was removed: on the real NVZ packet it demoted the true parcel sheets,
+// whose own notes cite the same records ("as shown on RS 5122"). Telling "is survey N" from
+// "mentions survey N" takes a look at the sheet, which is what the role does.)
+
+export const SHEET_INSET_AREA_FRACTION = 0.2;
+
+export const ROLE_LABELS: Record<string, string> = {
+  reference_survey: 'reference survey',
+  other_parcel_drawing: 'other drawing',
+  location_or_aerial_map: 'location / aerial map',
+  not_a_map: 'not a map'
+};
+
+export type SheetInfo = {
+  role: string | null;
+  reason: string | null;
+  mainRegion: number;
+  regions: number[]; // drawing regions of the sheet (main first in order of index)
+  insetRegions: number[];
+};
 
 export type BoundaryRef = {
   key: string;
   pageNumber: number;
   regionIndex: number;
-  // -1 for a parcel MAP item: the user can draw on it before ROAM has finished
-  // reading which parcels it holds (the polygon is saved on the region and bound
-  // to a parcel when extraction completes).
+  // -1 for the sheet's MAP item: the user can draw on it before ROAM has finished reading
+  // which parcels it holds (the polygon is saved on the region and bound to a parcel when
+  // extraction completes).
   parcelIndex: number;
   isRegion: boolean;
-  // An outline drawn on this region's map before its parcels existed, still
-  // waiting for the user to say which parcel it belongs to.
+  // An outline drawn on this region's map before its parcels existed, still waiting for the
+  // user to say which parcel it belongs to.
   pendingPolygon: any | null;
   label: string;
   parcel: any;
-  category: string | null;
+  role: string | null;
+  sheetReason: string | null;
   regionArea: number;
   // Why this parcel is excluded from the default list, or null.
   excludedReason: string | null;
-  // Set when this parcel's sheet is a survey cited by another sheet.
-  referencedNote: string | null;
 };
 
-// primary: a sheet ROAM considers a likely target (triaged as a dimensioned plat, not a
-// cited reference). Everything else is grouped under "Other maps" -- listed, never hidden.
-export type BoundaryGroup = { pageNumber: number; referencedNote: string | null; primary: boolean; refs: BoundaryRef[] };
+// One sheet: its parcels (or its map item, before they are read) nested under one heading.
+// primary: a likely target (role target_parcel_map, or not judged).
+export type BoundaryGroup = {
+  pageNumber: number;
+  role: string | null;
+  primary: boolean;
+  badge: string | null;
+  note: string | null;
+  refs: BoundaryRef[];
+};
 
-// Same-line matches only ([ \t], never \s): OCR line order is not reading
-// order, so a title's last word and the next line's scale ("1"=400'") must
-// not join. A number followed by a foot/inch mark is a measurement.
-const CITE_RE =
-  /(?:RECORD[ \t]+OF[ \t]+SURVEY|SURVEY[ \t]+MAP|PARCEL[ \t]+MAP)[ \t]*(?:MAP[ \t]*)?(?:NO\.?[ \t]*|#[ \t]*)?(\d{3,7})\b(?!['"′″.]?\d)(?!['"′″])/gi;
-
-function pageText(page: any): string {
-  return (page.regions ?? []).map((r: any) => r.ocr_text ?? '').join('\n');
+// The page's sheet: from the backend when present, else re-derived from its regions.
+export function sheetOf(page: any): SheetInfo | null {
+  const regions: any[] = page.regions ?? [];
+  const given = page.sheet;
+  if (given) {
+    return {
+      role: given.role ?? null,
+      reason: given.reason ?? null,
+      mainRegion: given.main_region,
+      regions: given.regions ?? [given.main_region],
+      insetRegions: given.inset_regions ?? []
+    };
+  }
+  const maps = regions
+    .map((r, i) => ({ r, i, area: (r.bbox?.[2] ?? 0) * (r.bbox?.[3] ?? 0) }))
+    .filter(({ r }) => r.class === 'ParcelMap' || (r.parcels ?? []).length);
+  if (!maps.length) return null;
+  const main = maps.reduce((best, m) => (m.area > best.area ? m : best));
+  const drawings = maps.filter((m) => m.i === main.i || m.area >= SHEET_INSET_AREA_FRACTION * main.area).map((m) => m.i);
+  const legacy = main.r.category;
+  return {
+    role: legacy === 'not_a_parcel_drawing' ? 'location_or_aerial_map' : legacy === 'undimensioned_drawing' ? 'other_parcel_drawing' : null,
+    reason: null,
+    mainRegion: main.i,
+    regions: drawings.sort((a, b) => a - b),
+    insetRegions: maps.filter((m) => !drawings.includes(m.i)).map((m) => m.i)
+  };
 }
 
-function citedRecordNumbers(text: string): Set<string> {
-  const out = new Set<string>();
-  for (const m of text.matchAll(CITE_RE)) out.add(m[1]);
-  return out;
-}
+export function boundaryRefs(result: any, pinnedKey: string | null = null): BoundaryRef[] {
+  const reading = result?.processing?.complete === false;
+  const out: BoundaryRef[] = [];
+  for (const page of result?.pages ?? []) {
+    const sheet = sheetOf(page);
+    if (!sheet) continue;
+    const regions: any[] = page.regions ?? [];
+    const main = regions[sheet.mainRegion];
+    const bbox = main?.bbox ?? [0, 0, 0, 0];
+    const common = {
+      pageNumber: page.page_number,
+      role: sheet.role,
+      sheetReason: sheet.reason,
+      regionArea: bbox[2] * bbox[3]
+    };
 
-// page number -> note, for sheets that other sheets cite as references.
-export function referencedSheets(result: any): Map<number, string> {
-  const pages: any[] = result?.pages ?? [];
-  const texts = new Map<number, string>(pages.map((p) => [p.page_number, pageText(p)]));
-  const cites = new Map<number, Set<string>>(pages.map((p) => [p.page_number, citedRecordNumbers(texts.get(p.page_number)!)]));
-  const out = new Map<number, string>();
-  for (const a of pages) {
-    const textA = texts.get(a.page_number)!;
-    if (!/SURVEY/i.test(textA)) continue;
-    for (const b of pages) {
-      if (b.page_number === a.page_number) continue;
-      for (const n of cites.get(b.page_number)!) {
-        if (cites.get(a.page_number)!.has(n)) continue; // a cites it too: not a pure reference
-        if (new RegExp(`(^|[^\\d])${n}([^\\d]|$)`).test(textA)) {
-          out.set(a.page_number, `Looks like the survey (No. ${n}) cited as a reference on page ${b.page_number}, not the target map.`);
-        }
-      }
+    const parcelItem = (regionIndex: number, parcelIndex: number, excludedReason: string | null): BoundaryRef => {
+      const region = regions[regionIndex];
+      const parcel = region.parcels[parcelIndex];
+      const poly = region.confirmed_polygon ?? null;
+      return {
+        ...common,
+        regionIndex,
+        key: `${page.page_number}-${regionIndex}-${parcelIndex}`,
+        parcelIndex,
+        isRegion: false,
+        pendingPolygon: poly && poly.needs_parcel ? poly : null,
+        label: parcel?.vision_geometry?.parcel_label || `Region ${regionIndex} · Parcel ${parcelIndex + 1}`,
+        parcel,
+        excludedReason:
+          excludedReason ??
+          (parcel?.likely_duplicate_region
+            ? (parcel.duplicate_note ?? 'Likely a vicinity/locus-map duplicate of a parcel drawn elsewhere.')
+            : null)
+      };
+    };
+
+    const sheetParcels = sheet.regions.reduce((n, ri) => n + (regions[ri]?.parcels ?? []).length, 0);
+    const regionKey = `${page.page_number}-${sheet.mainRegion}-r`;
+    // The sheet's map is an item until its parcels are read -- and stays one while the user
+    // is working on it, so a list that refreshes underneath a drawing never silently
+    // re-targets it at a parcel.
+    if (!sheetParcels || regionKey === pinnedKey) {
+      const poly = main?.confirmed_polygon ?? null;
+      out.push({
+        ...common,
+        regionIndex: sheet.mainRegion,
+        key: regionKey,
+        parcelIndex: -1,
+        isRegion: true,
+        pendingPolygon: null,
+        label: reading && !sheetParcels ? 'Parcel map · reading parcels…' : 'Parcel map',
+        parcel: poly ? { human_confirmed: true, confirmed_boundary_pixels: poly, vision_geometry: {} } : { vision_geometry: {} },
+        excludedReason: null
+      });
+    }
+    for (const ri of sheet.regions) {
+      (regions[ri]?.parcels ?? []).forEach((_: any, pi: number) => out.push(parcelItem(ri, pi, null)));
+    }
+    for (const ri of sheet.insetRegions) {
+      (regions[ri]?.parcels ?? []).forEach((_: any, pi: number) =>
+        out.push(parcelItem(ri, pi, 'Read from a small inset of this sheet (likely a vicinity or detail map), not its main drawing.'))
+      );
     }
   }
   return out;
 }
 
-export function boundaryRefs(result: any, pinnedKey: string | null = null): BoundaryRef[] {
-  const referenced = referencedSheets(result);
-  const reading = result?.processing?.complete === false;
-  const out: BoundaryRef[] = [];
-  for (const page of result?.pages ?? []) {
-    (page.regions ?? []).forEach((region: any, regionIndex: number) => {
-      if (region.class !== 'ParcelMap' && !(region.parcels ?? []).length) return;
-      const bbox = region.bbox ?? [0, 0, 0, 0];
-      const common = {
-        pageNumber: page.page_number,
-        regionIndex,
-        category: region.category ?? null,
-        regionArea: bbox[2] * bbox[3],
-        referencedNote: referenced.get(page.page_number) ?? null
-      };
-      const poly = region.confirmed_polygon ?? null;
-      const parcels: any[] = region.parcels ?? [];
-      const regionKey = `${page.page_number}-${regionIndex}-r`;
-      // The map itself is an item until its parcels are read -- and stays one while
-      // the user is working on it, so a list that refreshes underneath a drawing
-      // never silently re-targets it at a parcel.
-      if (!parcels.length || regionKey === pinnedKey) {
-        out.push({
-          ...common,
-          key: regionKey,
-          parcelIndex: -1,
-          isRegion: true,
-          pendingPolygon: null,
-          label: reading && !parcels.length ? 'Parcel map · reading parcels…' : 'Parcel map',
-          parcel: poly
-            ? { human_confirmed: true, confirmed_boundary_pixels: poly, vision_geometry: {} }
-            : { vision_geometry: {} },
-          excludedReason: null
-        });
-      }
-      parcels.forEach((parcel: any, parcelIndex: number) => {
-        out.push({
-          ...common,
-          key: `${page.page_number}-${regionIndex}-${parcelIndex}`,
-          parcelIndex,
-          isRegion: false,
-          pendingPolygon: poly && poly.needs_parcel ? poly : null,
-          label:
-            parcel?.vision_geometry?.parcel_label ||
-            `Region ${regionIndex} · Parcel ${parcelIndex + 1}`,
-          parcel,
-          excludedReason: parcel?.likely_duplicate_region
-            ? (parcel.duplicate_note ?? 'Likely a vicinity/locus-map duplicate of a parcel drawn elsewhere.')
-            : null
-        });
-      });
-    });
-  }
-  return out;
-}
-
-// Candidates grouped by sheet, most likely target first: sheets not cited as
-// references, then sheets vision triage called a dimensioned plat, then
-// larger drawings. Order only -- every group stays selectable.
+// Candidate SHEETS, most likely target first (target or not-yet-judged sheets, then every
+// other role), larger drawings first. Order only -- every sheet stays selectable, and a sheet
+// with several parcels is still ONE group.
 export function groupCandidates(refs: BoundaryRef[]): BoundaryGroup[] {
   const groups = new Map<number, BoundaryGroup>();
   for (const r of refs) {
     if (r.excludedReason) continue;
     if (!groups.has(r.pageNumber)) {
-      const primary = !r.referencedNote && (r.category === null || r.category === 'boundary_plat');
-      groups.set(r.pageNumber, { pageNumber: r.pageNumber, referencedNote: r.referencedNote, primary, refs: [] });
+      const primary = r.role === null || r.role === 'target_parcel_map';
+      groups.set(r.pageNumber, {
+        pageNumber: r.pageNumber,
+        role: r.role,
+        primary,
+        badge: primary ? null : (ROLE_LABELS[r.role!] ?? 'other map'),
+        note: primary ? null : r.sheetReason,
+        refs: []
+      });
     }
     groups.get(r.pageNumber)!.refs.push(r);
   }
-  const rank = (g: BoundaryGroup) => {
-    const first = g.refs[0];
-    return [g.primary ? 0 : 1, g.referencedNote ? 1 : 0, -first.regionArea, g.pageNumber];
-  };
-  return [...groups.values()].sort((a, b) => {
-    const ra = rank(a), rb = rank(b);
-    for (let i = 0; i < ra.length; i++) if (ra[i] !== rb[i]) return ra[i] - rb[i];
-    return 0;
-  });
+  const area = new Map(refs.map((r) => [r.pageNumber, r.regionArea]));
+  return [...groups.values()].sort(
+    (a, b) =>
+      Number(!a.primary) - Number(!b.primary) ||
+      (area.get(b.pageNumber) ?? 0) - (area.get(a.pageNumber) ?? 0) ||
+      a.pageNumber - b.pageNumber
+  );
 }
 
 // What the workspace banner counts: parcels on likely-target sheets (not "Other maps").

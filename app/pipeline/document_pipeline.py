@@ -53,7 +53,7 @@ from app.services.pdf_inspector import inspect_pdf
 from app.services import progress as progress_tracker
 from app.services.pdf_renderer import render_page
 from app.services.region_cropper import extract_region_crops
-from app.services.vision import ESCALATION_MODEL, classify_regions, extract_parcel_geometries_batch
+from app.services.vision import ESCALATION_MODEL, classify_regions, classify_sheets, extract_parcel_geometries_batch
 from app.pipeline.page_ocr import (
     band_count_for,
     match_lines_to_regions,
@@ -178,7 +178,7 @@ async def process_document(
     # ---------------------------------------------------------
 
     progress_tracker.update(
-        document_id, "triage", f"classifying {parcelmap_regions} parcel map region(s)" if parcelmap_regions else "no parcel map regions"
+        document_id, "triage", f"judging the role of {parcelmap_regions} map region(s) by sheet" if parcelmap_regions else "no parcel map regions"
     )
     await run_triage_stage(page_entries)
     if on_checkpoint is not None:
@@ -186,7 +186,10 @@ async def process_document(
             {
                 "document_id": document_id,
                 "inspection": inspection,
-                "pages": [{"page_number": e["page_number"], "regions": e["regions"]} for e in page_entries],
+                "pages": [
+                    {"page_number": e["page_number"], "regions": e["regions"], "sheet": e.get("sheet")}
+                    for e in page_entries
+                ],
                 "pages_needing_review": 0,
                 "anchor_lat": None,
                 "anchor_lon": None,
@@ -195,12 +198,12 @@ async def process_document(
             }
         )
     candidates = sum(
-        1 for e in page_entries for r in e["regions"] if r["class"] in VISION_CLASSES and r.get("category") in (None, "boundary_plat")
+        1 for e in page_entries if e.get("sheet") and e["sheet"]["role"] in (None, "target_parcel_map")
     )
     progress_tracker.update(
         document_id,
         "candidates_ready",
-        f"{candidates} parcel map candidate(s) ready for boundary confirmation" if candidates else "no parcel map candidates found",
+        f"{candidates} parcel map sheet(s) ready for boundary confirmation" if candidates else "no parcel map candidates found",
     )
 
     # ---------------------------------------------------------
@@ -344,7 +347,7 @@ async def process_document(
     flag_spurious_duplicate_parcelmap_regions(page_entries)
 
     pages_result = [
-        {"page_number": e["page_number"], "regions": e["regions"]}
+        {"page_number": e["page_number"], "regions": e["regions"], "sheet": e.get("sheet")}
         for e in page_entries
     ]
 
@@ -429,7 +432,7 @@ def flag_spurious_duplicate_parcelmap_regions(page_entries: list[dict]) -> None:
             # similar-sized ParcelMap regions sharing a label (e.g. a
             # real cross-page duplicate) should stay a normal, visible
             # review item, not get silently downgraded here.
-            if largest_area > 0 and area < largest_area * 0.2:
+            if largest_area > 0 and area < largest_area * SHEET_INSET_AREA_FRACTION:
                 parcel["likely_duplicate_region"] = True
                 parcel["duplicate_note"] = (
                     f"Same parcel_label also found in a ~{largest_area / area:.0f}x larger "
@@ -864,29 +867,87 @@ async def _classify_into_regions(targets: list[tuple[dict, dict]], crops: list[I
         logger.warning("Region classification failed, leaving uncategorized: %s", exc)
 
 
-async def run_triage_stage(page_entries: list[dict[str, Any]]) -> None:
+# A ParcelMap-class region smaller than this fraction of the page's largest one is an
+# INSET of that sheet (vicinity map, detail, key map), not a map of its own. Same
+# threshold flag_spurious_duplicate_parcelmap_regions uses for duplicate insets.
+SHEET_INSET_AREA_FRACTION = 0.2
+
+# What the sheet-level role means for the older per-region `category` label, which the
+# vision stage's duplicate suppression and the workspace's "show all regions" filter
+# still read: a target or reference survey is a plat; everything else is not.
+_ROLE_TO_CATEGORY = {
+    "target_parcel_map": "boundary_plat",
+    "reference_survey": "boundary_plat",
+    "other_parcel_drawing": "undimensioned_drawing",
+    "location_or_aerial_map": "not_a_parcel_drawing",
+    "not_a_map": "not_a_parcel_drawing",
+}
+
+
+def build_sheets(page_entries: list[dict[str, Any]]) -> None:
     """
-    One batched triage pass (classify_regions: <=12 ParcelMap-class crops per
-    Gemini call, one thumbnail each) over every region the layout model
-    called ParcelMap -- which includes aerials, vicinity maps and attached
-    reference surveys. Needs only the rendered pages and layout boxes, so it
-    can run before OCR.
+    REGION -> SHEET. A sheet is a page that holds ParcelMap-class regions; it is ONE
+    candidate however many such regions the layout model found on it. Its drawing
+    region is the largest one; others at least SHEET_INSET_AREA_FRACTION of that size
+    are sibling drawings of the same sheet (parcels on them nest under the sheet);
+    smaller ones are insets and are folded in. Written to entry["sheet"]:
+    {main_region, regions, inset_regions, role, reason} -- role/reason are filled in by
+    the sheet-level triage.
     """
 
-    targets = [
-        (entry, region)
-        for entry in page_entries
-        for region in entry["regions"]
-        if region["class"] in VISION_CLASSES
-    ]
-    if not targets:
+    for entry in page_entries:
+        entry.pop("sheet", None)
+        maps = [(i, r) for i, r in enumerate(entry["regions"]) if r["class"] in VISION_CLASSES]
+        if not maps:
+            continue
+        area = lambda r: r["bbox"][2] * r["bbox"][3]  # noqa: E731
+        main_i, main = max(maps, key=lambda ir: area(ir[1]))
+        drawings = [i for i, r in maps if i == main_i or area(r) >= SHEET_INSET_AREA_FRACTION * area(main)]
+        entry["sheet"] = {
+            "main_region": main_i,
+            "regions": sorted(drawings),
+            "inset_regions": sorted(i for i, _ in maps if i not in drawings),
+            "role": None,
+            "reason": None,
+        }
+
+
+async def run_triage_stage(page_entries: list[dict[str, Any]]) -> None:
+    """
+    Sheet-level triage: group ParcelMap-class regions into sheets (build_sheets),
+    then ask Gemini ONE question per sheet -- its ROLE in the packet (the packet's
+    own parcel map, a cited reference survey, another drawing, a location/aerial map,
+    not a map) -- over whole-page thumbnails in a single batched request, so the
+    sheets are judged against each other. Needs only the rendered pages and layout
+    boxes, so it runs before OCR. The role is stored on entry["sheet"] and mirrored
+    to each region's legacy `category`; a failed call leaves the roles unset, which
+    the UI treats as "candidate" -- never hidden.
+    """
+
+    build_sheets(page_entries)
+    sheeted = [e for e in page_entries if e.get("sheet")]
+    if not sheeted:
         return
-    crops = []
-    for entry, region in targets:
-        x, y, w, h = region["bbox"]
+    images = []
+    for entry in sheeted:
         with Image.open(entry["path"]) as page_image:
-            crops.append(page_image.convert("RGB").crop((x, y, x + w, y + h)))
-    await _classify_into_regions(targets, crops)
+            thumb = page_image.convert("RGB")
+        thumb.thumbnail((1400, 1400))
+        images.append(thumb)
+    loop = asyncio.get_running_loop()
+    try:
+        answers = await loop.run_in_executor(None, classify_sheets, images)
+    except Exception as exc:  # noqa: BLE001 -- ordering aid only, never fatal
+        logger.warning("Sheet classification failed, leaving sheets unclassified: %s", exc)
+        return
+    for entry, answer in zip(sheeted, answers):
+        sheet = entry["sheet"]
+        sheet["role"], sheet["reason"] = answer["role"], answer["reason"]
+        category = _ROLE_TO_CATEGORY.get(answer["role"])
+        for i, region in enumerate(entry["regions"]):
+            if region["class"] not in VISION_CLASSES:
+                continue
+            region["category"] = "not_a_parcel_drawing" if i in sheet["inset_regions"] else category
 
 
 async def run_vision_stage(

@@ -509,13 +509,13 @@
         {#each parcelGroups as group, gi}
           {#if !group.primary && (gi === 0 || parcelGroups[gi - 1].primary)}
             <h2 class="other-heading">Other maps</h2>
-            <p class="hint sheet-note">Not usually the target (reference surveys, undimensioned or non-plat drawings) — still selectable.</p>
+            <p class="hint sheet-note">Sheets that are probably not this packet's own parcel map (reference surveys, aerial or location maps, other drawings) — still selectable.</p>
           {/if}
           <h3 class="sheet-heading">
-            Page {group.pageNumber}
-            {#if group.referencedNote}<span class="ref-badge" title={group.referencedNote}>referenced survey</span>{/if}
+            Page {group.pageNumber} · parcel map
+            {#if group.badge}<span class="ref-badge" title={group.note ?? ''}>{group.badge}</span>{/if}
           </h3>
-          {#if group.referencedNote}<p class="hint sheet-note">{group.referencedNote}</p>{/if}
+          {#if group.note}<p class="hint sheet-note">{group.note}</p>{/if}
           <ul>
             {#each group.refs as ref}
               <li>
