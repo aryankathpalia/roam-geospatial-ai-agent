@@ -787,6 +787,120 @@ def _classify_batch(client: genai.Client, images: list[Image.Image]) -> dict[int
     return found
 
 
+_SHEET_THUMBNAIL_PX = 1400
+_SHEET_BATCH_SIZE = 12
+SHEET_ROLES = [
+    "target_parcel_map",
+    "reference_survey",
+    "other_parcel_drawing",
+    "location_or_aerial_map",
+    "not_a_map",
+]
+_SHEET_PROMPT = """You are looking at {count} sheets from ONE land-use / land-record document packet
+(for example a development application with attached exhibits, a deed packet, or a recorded
+survey). Each image is a whole page that contains at least one map-like drawing. They are
+numbered 1 to {count} in the order given.
+
+For EACH sheet decide its ROLE in the packet:
+
+- target_parcel_map: the parcel / lot / boundary map that is the SUBJECT of this packet -- the
+  plat, parcel map, survey or exhibit drawing of the property this application, deed or record
+  is about, usually titled for it (e.g. "Parcel Map for <owner>", "Division into Large
+  Parcels", "Lot Line Adjustment"). It is often a new or preliminary drawing; having few
+  printed bearings or distances does NOT stop a sheet being the target.
+- reference_survey: an OLDER or separate recorded survey, plat, deed map or record of survey
+  that is attached or cited as a reference / prior record / adjoining property -- not this
+  packet's own subject. Typical signs: a recorder's stamp and filing date, a different
+  surveyor or owner, or being cited in the target map's REFERENCES list.
+- other_parcel_drawing: shows parcels or lots but is not a survey of the packet's subject:
+  assessor/tax parcel maps, site plans, grading/utility plans, zoning or planning exhibits.
+- location_or_aerial_map: vicinity / location / locus maps, aerial or satellite photo
+  exhibits (even with parcel lines drawn on them), road or route maps, flood or topographic maps.
+- not_a_map: forms, letters, certificates, text pages, tables, cross-sections.
+
+Give a one-sentence reason naming what distinguishes the sheet (its title, stamp, date, or
+what it shows). A packet normally has one to three target_parcel_map sheets. If you are
+unsure whether a sheet is the packet's own parcel map, choose target_parcel_map."""
+_SHEET_SCHEMA = {
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "image_number": {"type": "integer"},
+            "role": {"type": "string", "enum": SHEET_ROLES},
+            "reason": {"type": "string"},
+        },
+        "required": ["image_number", "role"],
+    },
+}
+
+
+def classify_sheets(images: list[Image.Image]) -> list[dict]:
+    """
+    Semantic ROLE of each candidate map SHEET (a whole page, not a region
+    crop) within its packet: the packet's own parcel map, an attached or
+    cited reference survey, some other parcel drawing, a location/aerial
+    map, or not a map at all. This is the question that decides which
+    sheets the user is asked to draw a boundary on -- "does the crop carry
+    bearings?" (classify_regions) cannot tell a new, sparsely dimensioned
+    application map from the older, fully dimensioned survey it cites.
+
+    All sheets of a packet go in ONE request (up to _SHEET_BATCH_SIZE) so
+    the model can judge them against each other. A sheet the model does not
+    answer for is `target_parcel_map` with no reason -- uncertainty
+    promotes a sheet, it never hides one. Returns [{"role", "reason"}] in
+    input order.
+    """
+
+    if not images:
+        return []
+    client = _get_client()
+    out = [{"role": "target_parcel_map", "reason": None} for _ in images]
+    for start in range(0, len(images), _SHEET_BATCH_SIZE):
+        batch = images[start : start + _SHEET_BATCH_SIZE]
+        for idx, answer in _classify_sheet_batch(client, batch).items():
+            out[start + idx] = answer
+    return out
+
+
+def _classify_sheet_batch(client: genai.Client, images: list[Image.Image]) -> dict[int, dict]:
+    parts: list = []
+    tokens = 0
+    for image in images:
+        thumb = image.copy()
+        thumb.thumbnail((_SHEET_THUMBNAIL_PX, _SHEET_THUMBNAIL_PX))
+        tokens += _estimate_image_tokens(thumb)
+        buffer = io.BytesIO()
+        thumb.convert("RGB").save(buffer, format="PNG")
+        parts.append(types.Part.from_bytes(data=buffer.getvalue(), mime_type="image/png"))
+    prompt = _SHEET_PROMPT.format(count=len(images))
+
+    _wait_for_rate_limit()
+    _wait_for_token_budget(tokens + _estimate_text_tokens(prompt))
+    response = _generate_with_fallback(
+        client,
+        contents=parts + [prompt],
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_schema=_SHEET_SCHEMA,
+            temperature=0,
+        ),
+    )
+    return parse_sheet_roles(json.loads(response.text), len(images))
+
+
+def parse_sheet_roles(payload: list, count: int) -> dict[int, dict]:
+    found: dict[int, dict] = {}
+    for item in payload:
+        if not isinstance(item, dict):
+            continue
+        idx = (item.get("image_number") or 0) - 1
+        if 0 <= idx < count and item.get("role") in SHEET_ROLES:
+            reason = item.get("reason")
+            found[idx] = {"role": item["role"], "reason": reason.strip() if isinstance(reason, str) and reason.strip() else None}
+    return found
+
+
 def extract_parcel_geometries_batch(
     images: list[Image.Image], model: str | None = None
 ) -> list[list[dict] | Exception]:

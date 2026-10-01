@@ -17,7 +17,7 @@
   const STAGE_LABELS: Record<string, string> = {
     rendering: 'Rendering document pages',
     layout_detection: 'Detecting layout & document structure',
-    triage: 'Sorting parcel maps from other maps',
+    triage: 'Judging the role of each map sheet',
     candidates_ready: 'Parcel maps ready for boundary confirmation',
     ocr: 'Reading document text',
     georeferencing: 'Locating document on the map',
