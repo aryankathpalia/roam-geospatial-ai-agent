@@ -41,12 +41,12 @@ def test_one_candidate_per_sheet_and_parcels_nest_under_it(path):
         sheet = probe["sheets"].get(str(page["page_number"]))
         if group is None:
             continue
-        nested = [i["label"] for i in group["items"] if not i["isRegion"]]
+        nested = [i["label"] for i in group["items"] if i["kind"] == "parcel"]
         expected = [pc["vision_geometry"].get("parcel_label") for ri in sheet["regions"]
                     for pc in page["regions"][ri].get("parcels") or [] if not pc.get("likely_duplicate_region")]
         assert nested == [e or n for e, n in zip(expected, nested)] and len(nested) == len(expected)
         # a sheet with parcels has no placeholder map item next to them
-        assert all(not i["isRegion"] for i in group["items"]) if nested else len(group["items"]) == 1
+        assert all(i["kind"] == "parcel" for i in group["items"]) if nested else len(group["items"]) == 1
 
 
 @pytest.mark.parametrize("path", DOCS, ids=[p.parent.name[:8] for p in DOCS])

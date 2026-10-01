@@ -21,9 +21,10 @@ from app.pipeline.document_pipeline import (
 from app.services import progress as progress_tracker
 from app.services.pre_annotation import generate_pre_annotations
 from app.services.geometry import TraverseResult, traverse_to_geojson, walk_traverse
-from app.services.region_cropper import PARCELMAP_CROP_MARGIN_FRAC, PARCELMAP_CROP_MARGIN_MIN_PX
+from app.services.region_cropper import PARCELMAP_CROP_MARGIN_FRAC, PARCELMAP_CROP_MARGIN_MIN_PX, padded_crop_box
 from app.services.ocr import run_parcelmap_ocr
 from app.services import calibration as calibration_service
+from app.services import parcel_roster
 from app.services import gemini_edge_association
 from app.services import placement as placement_service
 from app.services.georeference import georeference_traverse_to_geojson
@@ -122,10 +123,15 @@ async def upload_document(file: UploadFile = File(...)):
 
 async def _process_and_save(document_id: str) -> None:
     def checkpoint(partial: dict) -> None:
-        # Right after layout + triage: persist the candidate regions so the
-        # review UI can open and the user can start drawing while OCR,
-        # geocoding and vision extraction keep running below.
+        # Persist the candidate sheets (after triage) and then their parcel roster, so the
+        # review UI can open and the user can start outlining parcels while OCR, geocoding
+        # and vision extraction keep running below. The user's polygons are carried over:
+        # a pipeline save must never discard what was drawn since the last one.
         with _RESULT_LOCK:
+            try:
+                parcel_roster.carry_over_user_data(_load_result(document_id), partial)
+            except HTTPException:
+                pass  # first checkpoint: nothing stored yet
             _save_result(document_id, partial)
 
     try:
@@ -142,30 +148,26 @@ async def _process_and_save(document_id: str) -> None:
 
 async def _finalize_and_bind(document_id: str, final: dict) -> None:
     """
-    Joins the pipeline's finished output with whatever the user did while it
-    ran: polygons drawn on a region before its parcels were read are carried
-    over (the pipeline owns pages/regions/parcels, the user owns
-    region["confirmed_polygon"]) and bound to a parcel; each bound polygon
-    then gets calibration + placement in the background.
+    Joins the pipeline's finished output with whatever the user did while it ran. The pipeline
+    already attached its extracted parcels to the roster (process_document's evidence join); here
+    the user's side is added: every entity's OWN confirmed polygon is carried over by id, parcels
+    they named by hand are joined by label too, and each confirmed entity is then bound to its
+    evidence parcel and given calibration + placement in the background -- independently.
     """
 
     to_verify: list[tuple[ConfirmBoundaryRequest, str]] = []
     with _RESULT_LOCK:
         try:
-            stored = _load_result(document_id)
+            parcel_roster.carry_over_user_data(_load_result(document_id), final)
         except HTTPException:
-            stored = None
-        if stored:
-            for st_page in stored.get("pages", []):
-                fin_page = next((p for p in final["pages"] if p["page_number"] == st_page["page_number"]), None)
-                if fin_page is None:
-                    continue
-                for ri, st_region in enumerate(st_page.get("regions", [])):
-                    if st_region.get("confirmed_polygon") and ri < len(fin_page["regions"]):
-                        fin_page["regions"][ri]["confirmed_polygon"] = st_region["confirmed_polygon"]
+            pass
         for page in final["pages"]:
-            for ri, region in enumerate(page["regions"]):
-                pending = _bind_region_polygon(document_id, final, page["page_number"], ri, region)
+            sheet = page.get("sheet")
+            if not sheet:
+                continue
+            parcel_roster.join_evidence(page["page_number"], sheet, page["regions"])
+            for entity in sheet.get("parcels", []):
+                pending = _bind_entity(document_id, final, page["page_number"], entity)
                 if pending:
                     to_verify.append(pending)
         _save_result(document_id, final)
@@ -263,16 +265,7 @@ def get_region_crop(document_id: str, page_number: int, region_index: int):
     with Image.open(page_path) as page_image:
         page_image = page_image.convert("RGB")
         page_w, page_h = page_image.size
-        if region.get("class") == "ParcelMap":
-            margin_x = max(PARCELMAP_CROP_MARGIN_MIN_PX, w * PARCELMAP_CROP_MARGIN_FRAC)
-            margin_y = max(PARCELMAP_CROP_MARGIN_MIN_PX, h * PARCELMAP_CROP_MARGIN_FRAC)
-        else:
-            margin_x = margin_y = 0
-        x1 = max(0, x - margin_x)
-        y1 = max(0, y - margin_y)
-        x2 = min(page_w, x + w + margin_x)
-        y2 = min(page_h, y + h + margin_y)
-        crop = page_image.crop((x1, y1, x2, y2))
+        crop = page_image.crop(padded_crop_box(region["bbox"], page_w, page_h, region.get("class")))
 
     buffer = io.BytesIO()
     crop.save(buffer, format="PNG")
@@ -361,10 +354,16 @@ def recompute_parcel(document_id: str, body: RecomputeRequest):
 
 class ConfirmBoundaryRequest(BaseModel):
     page_number: int
+    # The region (crop) the outline is drawn on: the sheet's main drawing, or the region an
+    # extracted parcel was read from.
     region_index: int
-    # None = the user drew this on the parcel MAP (region) before ROAM finished
-    # reading which parcels it holds; the polygon waits on the region and is bound
-    # to a parcel when extraction completes (see _bind_region_polygon).
+    # THE PARCEL being confirmed: a sheet entity id (page.sheet.parcels[].id). Each parcel keeps its
+    # own polygon, so outlining one can never overwrite another.
+    parcel_id: str | None = None
+    # A name for a parcel the user is adding by hand (no parcel_id): identity is NOT detected
+    # automatically and is marked as such.
+    label: str | None = None
+    # Legacy: index into region.parcels, for documents processed before parcel entities existed.
     parcel_index: int | None = None
     # Vertices in the SAME pixel space as the region crop image
     # (GET .../regions/{region_index}/crop.png), e.g. [[x, y], ...],
@@ -772,41 +771,70 @@ def _apply_confirmation(document_id: str, result: dict, body, wait: bool) -> tup
     return parcel, placed, confirmation_id
 
 
-def _bind_region_polygon(document_id: str, result: dict, page_number: int, region_index: int, region: dict):
+def _page(result: dict, page_number: int) -> dict:
+    return next(p for p in result["pages"] if p["page_number"] == page_number)
+
+
+def _ensure_evidence(result: dict, page_number: int, entity: dict) -> None:
     """
-    Binds a polygon drawn on a region (before its parcels were read) to a
-    parcel, once extraction is done: one parcel -> that parcel; none -> a parcel
-    is created from the polygon; two or more -> left on the region for the user
-    to choose (the review screen asks). Returns (body, confirmation_id) to
-    verify in the background, or None. Caller holds _RESULT_LOCK and saves.
+    An entity the user outlined that no extracted parcel matched still needs a record the rest
+    of the app can show: a parcel is created from it (it carries the roster's printed area), with
+    no survey calls, so the outline is kept but cannot be placed on the map.
     """
 
-    poly = region.get("confirmed_polygon")
-    if not poly:
+    if entity.get("evidence_ref"):
+        return
+    region = _page(result, page_number)["regions"][entity["region_index"]]
+    parcels = region.setdefault("parcels", [])
+    area = parcel_roster.parse_acres(entity.get("stated_area"))
+    parcels.append({
+        "vision_geometry": {"parcel_label": entity["label"], "stated_area_acres": str(area) if area else None},
+        "resolved_boundary_calls": [],
+        "created_from_confirmed_boundary": True,
+        "roster_id": entity["id"],
+    })
+    entity["evidence_ref"] = {"region": entity["region_index"], "parcel": len(parcels) - 1}
+
+
+def _bind_entity(document_id: str, result: dict, page_number: int, entity: dict):
+    """
+    Applies ONE entity's confirmed polygon to its evidence parcel (provisional placement now,
+    calibration/placement in the background). Returns (body, confirmation_id) to verify, or None.
+    Only once the pipeline has finished -- before that there is no evidence to attach to.
+    """
+
+    poly = entity.get("confirmed_polygon")
+    if not poly or not (result.get("processing") or {}).get("complete", True):
         return None
-    parcels = region.get("parcels") or []
-    index = poly.get("parcel_index")
-    if index is None:
-        if len(parcels) == 1:
-            index = 0
-        elif not parcels:
-            region["parcels"] = parcels = [{
-                "vision_geometry": {"parcel_label": poly.get("label") or "Parcel"},
-                "resolved_boundary_calls": [],
-                "created_from_confirmed_boundary": True,
-            }]
-            index = 0
-        else:
-            poly["needs_parcel"] = True
-            return None
+    _ensure_evidence(result, page_number, entity)
+    ref = entity["evidence_ref"]
     body = ConfirmBoundaryRequest(
-        page_number=page_number, region_index=region_index, parcel_index=index,
+        page_number=page_number, region_index=ref["region"], parcel_index=ref["parcel"],
         vertices=poly["vertices"], crop_width=poly["crop_width"], crop_height=poly["crop_height"],
         local_vertices=poly.get("local_vertices"),
     )
-    _, placed, confirmation_id = _apply_confirmation(document_id, result, body, wait=False)
-    region.pop("confirmed_polygon", None)
+    if (poly.get("region_index") is not None) and poly["region_index"] != ref["region"]:
+        # drawn on the sheet's main drawing, but the extracted parcel was read from another region:
+        # the pixel frame differs, so the outline is kept but not projected through that region's ring.
+        body.local_vertices = None
+    parcel, placed, confirmation_id = _apply_confirmation(document_id, result, body, wait=False)
+    poly["applied_id"] = confirmation_id
     return (body, confirmation_id) if placed else None
+
+
+def _sheet_and_entity(result: dict, body) -> tuple[dict, dict | None]:
+    page = next((p for p in result["pages"] if p["page_number"] == body.page_number), None)
+    if page is None or not (0 <= body.region_index < len(page["regions"])):
+        raise HTTPException(status_code=404, detail="Page or region index out of range")
+    sheet = page.get("sheet")
+    if not sheet:
+        raise HTTPException(status_code=400, detail="This page has no parcel-map sheet to attach a parcel to")
+    entity = None
+    if body.parcel_id:
+        entity = next((e for e in sheet.get("parcels", []) if e["id"] == body.parcel_id), None)
+        if entity is None:
+            raise HTTPException(status_code=404, detail=f"No parcel {body.parcel_id} on page {body.page_number}")
+    return sheet, entity
 
 
 @router.post("/{document_id}/confirm-boundary")
@@ -814,68 +842,67 @@ def confirm_boundary(
     document_id: str, body: ConfirmBoundaryRequest, background_tasks: BackgroundTasks, wait: bool = False
 ):
     """
-    Confirm-and-edit boundary review: stores a human-confirmed/
-    corrected polygon (in region-crop pixel space) and places it on the map
-    right away at the document anchor -- replacing boundary_geojson/
-    boundary_geojson_wgs84/spatial_validation with ones built from the
-    confirmed contour. The confirmed polygon is the authoritative geometry;
-    the vision-extracted traverse is only evidence for scale/orientation.
+    Confirm-and-edit boundary review: stores a human-confirmed/corrected polygon (in the pixel
+    frame of its region's crop image) and places it on the map right away at the document
+    anchor. The confirmed polygon is the authoritative geometry; the vision-extracted traverse is
+    only evidence for scale/orientation.
 
-    Saving never waits on verification: calibration and absolute placement run
-    afterwards in the background (calibration.status/placement.status are
-    "pending" until then; `wait=true` runs them inline for diagnostics).
-
-    With parcel_index null the polygon is saved on the REGION: the user drew it
-    as soon as ROAM named the candidate maps, before OCR, anchoring and parcel
-    extraction finished. It is joined with those results (and bound to a
-    parcel) when they complete -- or immediately if they already have.
+    The outline belongs to ONE PARCEL, addressed by `parcel_id` (a sheet entity: Parcel 1,
+    Remainder Parcel, ...) -- or, with `label` and no id, to a parcel the user is naming by hand.
+    Each entity holds its own polygon: confirming one never touches another. If the pipeline has
+    finished, the outline is bound to that parcel's extracted evidence now; if not, it is kept on
+    the entity and bound when extraction completes (the evidence join). Saving never waits on
+    verification: calibration and absolute placement run afterwards in the background
+    (calibration.status/placement.status are "pending" until then; `wait=true` runs them inline,
+    for diagnostics). `parcel_index` alone is the legacy path for documents with no entities.
     """
 
     with _RESULT_LOCK:
         result = _load_result(document_id)
 
-        if body.parcel_index is None:
-            page = next((p for p in result["pages"] if p["page_number"] == body.page_number), None)
-            if page is None or not (0 <= body.region_index < len(page["regions"])):
-                raise HTTPException(status_code=404, detail="Page or region index out of range")
-            if len(body.vertices) < 3:
-                raise HTTPException(status_code=400, detail="A boundary needs at least 3 vertices")
-            region = page["regions"][body.region_index]
-            region["confirmed_polygon"] = {
-                "vertices": body.vertices, "crop_width": body.crop_width, "crop_height": body.crop_height,
-                "local_vertices": body.local_vertices, "id": uuid4().hex,
-            }
-            state = "waiting_for_document"
-            parcel = None
-            if (result.get("processing") or {}).get("complete", True):
-                pending = _bind_region_polygon(document_id, result, body.page_number, body.region_index, region)
-                if pending:
-                    background_tasks.add_task(_verify_confirmation, document_id, *pending)
-                    state = "bound"
-                    parcel = (region.get("parcels") or [None])[pending[0].parcel_index]
-                elif region.get("confirmed_polygon", {}).get("needs_parcel"):
-                    state = "needs_parcel"
-                else:
-                    state = "bound"
+        if body.parcel_id is None and not (body.label or "").strip():
+            # legacy: a parcel addressed by index into region.parcels
+            if body.parcel_index is None:
+                raise HTTPException(status_code=400, detail="parcel_id, label or parcel_index is required")
+            parcel, placed, confirmation_id = _apply_confirmation(document_id, result, body, wait)
+            if placed and not wait:
+                background_tasks.add_task(_verify_confirmation, document_id, body, confirmation_id)
             _save_result(document_id, result)
-            return {"document_id": document_id, "state": state, "parcel": parcel,
-                    "georeferenced_from_confirmation": parcel is not None}
+            return {"document_id": document_id, "state": "bound", "parcel": parcel,
+                    "georeferenced_from_confirmation": placed}
 
-        parcel, placed, confirmation_id = _apply_confirmation(document_id, result, body, wait)
-        # A region-level drawing for this region is superseded by an explicit parcel choice.
-        located = _locate_parcel(result, body)
-        if located:
-            located[0].pop("confirmed_polygon", None)
-        if placed and not wait:
-            background_tasks.add_task(_verify_confirmation, document_id, body, confirmation_id)
+        if len(body.vertices) < 3:
+            raise HTTPException(status_code=400, detail="A boundary needs at least 3 vertices")
+        sheet, entity = _sheet_and_entity(result, body)
+        if entity is None:  # a parcel the user is naming by hand
+            entities = sheet.setdefault("parcels", [])
+            entity = parcel_roster.new_entity(
+                body.page_number, entities, label=body.label.strip(), region_index=body.region_index,
+                source="manual", manual=True,
+            )
+            entities.append(entity)
+        entity["confirmed_polygon"] = {
+            "vertices": body.vertices, "crop_width": body.crop_width, "crop_height": body.crop_height,
+            "local_vertices": body.local_vertices, "region_index": body.region_index, "id": uuid4().hex,
+        }
+        pending = None
+        if (result.get("processing") or {}).get("complete", True):
+            if not entity.get("evidence_ref"):  # e.g. a parcel just named by hand: join it by label
+                parcel_roster.join_evidence(body.page_number, sheet, _page(result, body.page_number)["regions"])
+            pending = _bind_entity(document_id, result, body.page_number, entity)
+            if pending and not wait:
+                background_tasks.add_task(_verify_confirmation, document_id, *pending)
         _save_result(document_id, result)
 
-    return {
-        "document_id": document_id,
-        "state": "bound",
-        "parcel": parcel,
-        "georeferenced_from_confirmation": placed,
-    }
+        state = "waiting_for_document" if not (result.get("processing") or {}).get("complete", True) else "bound"
+        ref = entity.get("evidence_ref")
+        parcel = (
+            _page(result, body.page_number)["regions"][ref["region"]]["parcels"][ref["parcel"]]
+            if ref and state == "bound" else None
+        )
+
+    return {"document_id": document_id, "state": state, "entity": entity, "parcel": parcel,
+            "georeferenced_from_confirmation": bool(parcel and parcel.get("boundary_geojson_wgs84"))}
 
 
 @router.post("/{document_id}/annotate")

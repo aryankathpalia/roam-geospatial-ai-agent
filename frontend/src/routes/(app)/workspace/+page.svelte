@@ -13,12 +13,13 @@
   // "detail" starts null and fills in with a real count once that
   // stage's work is actually done -- rendered as an em-dash
   // placeholder until then, never a fake/simulated number.
-  const STAGE_ORDER = ['rendering', 'layout_detection', 'triage', 'candidates_ready', 'ocr', 'georeferencing', 'vision_extraction'] as const;
+  const STAGE_ORDER = ['rendering', 'layout_detection', 'triage', 'candidates_ready', 'roster', 'ocr', 'georeferencing', 'vision_extraction'] as const;
   const STAGE_LABELS: Record<string, string> = {
     rendering: 'Rendering document pages',
     layout_detection: 'Detecting layout & document structure',
     triage: 'Judging the role of each map sheet',
     candidates_ready: 'Parcel maps ready for boundary confirmation',
+    roster: 'Reading parcel labels',
     ocr: 'Reading document text',
     georeferencing: 'Locating document on the map',
     vision_extraction: 'Extracting parcel boundary geometry'
@@ -109,13 +110,9 @@
     if (usingSample || !result) return [];
     const refs = boundaryRefs(result);
     const primary = primaryCandidates(refs);
-    return primary.length ? primary : refs.filter((r) => !r.isRegion && !r.excludedReason);
+    return primary.length ? primary : refs.filter((r) => r.kind === 'parcel' && !r.excludedReason);
   })();
   $: boundaryConfirmedCount = boundaryCandidates.filter((r) => r.parcel.human_confirmed).length;
-  // Outlines drawn on a map holding several parcels, waiting for the user to say which one.
-  $: outlinesNeedingParcel = !usingSample && result
-    ? boundaryRefs(result).filter((r) => !r.isRegion && r.pendingPolygon).map((r) => r.regionIndex + '-' + r.pageNumber).filter((v, i, a) => a.indexOf(v) === i).length
-    : 0;
 
   function boundaryReviewHref(parcelKey?: string): string {
     const q = new URLSearchParams({ doc: documentId ?? '' });
@@ -1119,7 +1116,7 @@
       {#if boundaryCandidates.length > 0 && documentId}
         <div class="location-banner panel" class:ok={boundaryConfirmedCount === boundaryCandidates.length}>
           <strong>Boundary confirmation:</strong>
-          {boundaryConfirmedCount} of {boundaryCandidates.length} candidate parcel{boundaryCandidates.length === 1 ? '' : 's'} confirmed{#if outlinesNeedingParcel > 0} · {outlinesNeedingParcel} outline{outlinesNeedingParcel === 1 ? '' : 's'} waiting for you to pick the parcel{/if}
+          {boundaryConfirmedCount} of {boundaryCandidates.length} candidate parcel{boundaryCandidates.length === 1 ? '' : 's'} confirmed
           <span class="location-source">— the target parcel's outline is what ROAM places on the map. Confirm it on the drawing to calibrate and place it.</span>
           <a class="btn btn-ghost btn-sm" href={boundaryReviewHref()}>Confirm boundaries →</a>
         </div>
@@ -1301,7 +1298,7 @@
                     <button class="btn btn-ghost btn-sm" on:click={() => openViewer(entry)}>
                       Open source drawing
                     </button>
-                    <a class="btn btn-ghost btn-sm" href={boundaryReviewHref(`${entry.page}-${entry.i}`)}>
+                    <a class="btn btn-ghost btn-sm" href={boundaryReviewHref(parcel.roster_id ? `${entry.page}-${parcel.roster_id}` : `${entry.page}-${entry.i}`)}>
                       {parcel.human_confirmed ? 'Re-confirm boundary' : 'Confirm boundary'}
                     </a>
                   </div>
