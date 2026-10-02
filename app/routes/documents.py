@@ -177,6 +177,35 @@ async def _finalize_and_bind(document_id: str, final: dict) -> None:
         await loop.run_in_executor(None, _verify_confirmation, document_id, body, confirmation_id)
 
 
+@router.post("/{document_id}/reprocess")
+def reprocess_document(document_id: str, background_tasks: BackgroundTasks):
+    """
+    Re-runs the pipeline for a document whose original.pdf is already on
+    disk, from scratch.
+
+    Processing is kicked off as a plain in-memory asyncio task (see
+    /upload) with no persisted queue or resume point -- if the backend
+    process running it restarts or dies (a dev-server reload, a crash,
+    anything) while a document is mid-pipeline, that task is simply gone.
+    The document is left stuck forever at processing.complete=False with
+    whatever partial checkpoint it last saved (confirmed in practice: a
+    document can sit with sheets detected but zero parcels in the roster,
+    indistinguishable in the UI from "still reading" -- GET .../progress
+    404s because the NEW process's progress tracker never heard of it).
+    This is a manual recovery action for exactly that state: there is no
+    way to tell from the document's own saved state alone that it is
+    orphaned rather than genuinely still running, so this never fires on
+    its own -- the user (or the review UI, once it detects a long-stuck
+    "still reading" state) has to ask for it.
+    """
+
+    pdf_path = DOCUMENT_ROOT / document_id / "original.pdf"
+    if not pdf_path.exists():
+        raise HTTPException(status_code=404, detail=f"No original.pdf saved for document {document_id}")
+    background_tasks.add_task(_process_and_save, document_id)
+    return {"document_id": document_id, "status": "processing"}
+
+
 @router.get("/{document_id}/progress")
 def get_progress(document_id: str):
     """
@@ -352,6 +381,107 @@ def recompute_parcel(document_id: str, body: RecomputeRequest):
     return {"document_id": document_id, "parcel": parcel}
 
 
+class UpdateAnchorRequest(BaseModel):
+    page_number: int
+    region_index: int
+    parcel_index: int
+    anchor_lat: float
+    anchor_lon: float
+
+
+@router.post("/{document_id}/update-anchor")
+def update_anchor(document_id: str, body: UpdateAnchorRequest):
+    """
+    Re-georeference an ALREADY-CONFIRMED parcel's full polygon against a
+    new anchor -- geographic placement only, nothing about the shape
+    itself changes.
+
+    Deliberately separate from /recompute (which rebuilds geometry from
+    a human-edited boundary_calls list -- the editable call table).
+    /recompute has no concept of confirmed_boundary_pixels at all: every
+    call to it unconditionally discards boundary_geojson/_wgs84 and
+    rebuilds from whatever calls it's given, which silently destroyed a
+    manually confirmed polygon's inferred (uncorroborated) vertices the
+    moment a reviewer only wanted to move the anchor -- a 4-vertex
+    confirmed rectangle with just 3 edges independently verified became
+    a 3-call triangle, because the call table it read from
+    (resolved_boundary_calls) was never the confirmed polygon's source
+    of truth in the first place.
+
+    This endpoint never looks at resolved_boundary_calls or
+    confirmed_boundary_pixels' pixel coordinates at all -- it doesn't
+    need to. parcel["boundary_geojson"] (set by _derive_confirmed_geometry,
+    see app/routes/documents.py) already holds the confirmed polygon's
+    LOCAL (anchor-independent, feet-from-origin) ring -- every vertex,
+    corroborated or not, in the exact topology the human confirmed.
+    Georeferencing is a pure function of that local ring plus the
+    anchor (georeference_traverse_to_geojson, app/services/georeference.py);
+    re-running it against a new anchor cannot change vertex count,
+    topology, calibration, or evidence -- only where the shape sits on
+    the real map.
+    """
+
+    result = _load_result(document_id)
+    page = next((p for p in result["pages"] if p["page_number"] == body.page_number), None)
+    if page is None:
+        raise HTTPException(status_code=404, detail=f"No page {body.page_number}")
+    if not (0 <= body.region_index < len(page["regions"])):
+        raise HTTPException(status_code=404, detail="Region index out of range")
+    region = page["regions"][body.region_index]
+    parcels = region.get("parcels") or []
+    if not (0 <= body.parcel_index < len(parcels)):
+        raise HTTPException(status_code=404, detail="Parcel index out of range")
+    parcel = parcels[body.parcel_index]
+
+    # Never silently fall back to the calls-based path for a parcel that
+    # was never confirmed by drawing -- that parcel's geometry source of
+    # truth IS resolved_boundary_calls, and this endpoint isn't it.
+    if not parcel.get("confirmed_boundary_pixels"):
+        raise HTTPException(
+            status_code=400,
+            detail="This parcel has no confirmed polygon to re-georeference -- use /recompute instead.",
+        )
+
+    local_geojson = parcel.get("boundary_geojson")
+    coords = (local_geojson or {}).get("geometry", {}).get("coordinates") or []
+    ring = coords[0] if coords else []
+    points = [(float(x), float(y)) for x, y in (ring[:-1] if ring and ring[0] == ring[-1] else ring)]
+    if len(points) < 3:
+        # Explicit, clear failure -- never downgrade a confirmed polygon
+        # to a call-table reconstruction just because this endpoint
+        # can't do its one job right now (e.g. verification hasn't run
+        # yet, so no local ring has been computed at all).
+        raise HTTPException(
+            status_code=422,
+            detail="No usable local geometry stored for this parcel yet (verification may still be running) -- cannot re-georeference without it.",
+        )
+
+    # Compute the replacement BEFORE touching the parcel at all -- if
+    # georeferencing fails for any reason, the stored parcel must be
+    # completely untouched, not left with its old geometry popped and
+    # nothing to replace it.
+    traverse = TraverseResult(
+        points=points,
+        closure_error_ft=(local_geojson["properties"].get("closure_error_ft") or 0.0),
+        unparsed_calls=(local_geojson["properties"].get("unparsed_calls") or 0),
+    )
+    new_wgs84 = georeference_traverse_to_geojson(traverse, body.anchor_lat, body.anchor_lon)
+    new_wgs84["properties"]["georeferenced"] = "from_confirmed_boundary"
+
+    # Only the fields that genuinely depend on the anchor change.
+    # confirmed_boundary_pixels, boundary_geojson (local), boundary_source,
+    # calibration (corroborations, independent_bearing_edges, ...), and
+    # placement are left exactly as they were -- this operation re-places
+    # the existing confirmed shape, it doesn't re-derive or re-verify it.
+    parcel["boundary_geojson_wgs84"] = new_wgs84
+    parcel["anchor_override"] = {"lat": body.anchor_lat, "lon": body.anchor_lon}
+    parcel.pop("georeference_error", None)
+
+    _save_result(document_id, result)
+
+    return {"document_id": document_id, "parcel": parcel}
+
+
 class ConfirmBoundaryRequest(BaseModel):
     page_number: int
     # The region (crop) the outline is drawn on: the sheet's main drawing, or the region an
@@ -425,7 +555,14 @@ def _derive_confirmed_geometry(
     _verify_confirmation) does the calibration and absolute placement.
     """
 
-    old_local_points = [(float(x), float(y)) for x, y in body.local_vertices]
+    # None for a parcel with no prior extraction to seed a position from
+    # (e.g. a hand-confirmed "remainder parcel") -- the confirmed polygon's
+    # own pixel vertices are still the geometric source of truth in that
+    # case; only the 180deg-disambiguation reference and the uncalibrated
+    # fallback placement lose their anchor, both handled below.
+    old_local_points = (
+        [(float(x), float(y)) for x, y in body.local_vertices] if body.local_vertices else None
+    )
     calibration_info = None
     calibration_ocr_lines = None
     polygon_page_px = None
@@ -508,6 +645,33 @@ def _derive_confirmed_geometry(
                         local_pivot = ((min(rxs) + max(rxs)) / 2, (min(rys) + max(rys)) / 2)
                     except Exception:  # noqa: BLE001 -- fall through to "no pivot" below
                         local_pivot = None
+                if local_pivot is None:
+                    # No prior extraction to stay translation-consistent
+                    # with (e.g. a hand-confirmed "remainder parcel" with
+                    # zero resolved_boundary_calls) -- the only reference
+                    # left is the document anchor itself. Pin it at the
+                    # REGION'S crop-center page_pivot (set above, same
+                    # value for every parcel confirmed out of this same
+                    # ParcelMap region) rather than this parcel's OWN
+                    # pixel bbox center.
+                    #
+                    # This used to re-pin page_pivot to each parcel's own
+                    # bbox center, which independently placed EVERY such
+                    # parcel's own center at the exact same document
+                    # anchor lat/lon -- fine for a single parcel, but for
+                    # two sibling parcels sharing one region/sheet (e.g.
+                    # the Patnaude packet's "Remainder Parcel" and
+                    # "Parcel 1", both with zero extracted calls) it threw
+                    # away their true relative pixel offset entirely, so
+                    # confirming one right after the other put each one's
+                    # centroid on top of the SAME real-world point instead
+                    # of leaving them correctly adjacent on the ground.
+                    # Keeping the shared crop-center pivot means both
+                    # parcels get projected through the same page-pixel
+                    # -> feet -> geodesic transform, so their real,
+                    # pixel-accurate relative position (and any shared
+                    # edge) survives georeferencing.
+                    local_pivot = (0.0, 0.0)
 
             stated_sqft = None
             stated_acres_str = parcel.get("vision_geometry", {}).get("stated_area_acres")
@@ -573,6 +737,36 @@ def _derive_confirmed_geometry(
             )
         if calibration_info.status == "unverified" and not calibration_info.notes:
             calibration_info.notes.append("no calibration evidence found; using inherited scale/rotation from the original seed.")
+
+    if points is None:
+        # No prior extraction to seed a fallback position from (e.g. a
+        # hand-confirmed "remainder parcel"), AND -- only reachable when
+        # verify=True -- no stated acreage either, so even the area-based
+        # scale fallback above had nothing to reproject with. Nothing to
+        # place -- the confirmed outline is kept, not discarded, but
+        # cannot be put on the map. verify=True means Gemini + OCR both
+        # genuinely ran first (see calibration_info.notes for what they
+        # found); verify=False just means the fast path hasn't attempted
+        # verification yet, same "pending" state as the normal case.
+        parcel["boundary_source"] = boundary_source
+        parcel["placement"] = {
+            "status": placement_service.PLACEMENT_APPROXIMATE if verify else "pending",
+            "notes": (
+                ["no scale evidence found (no stated acreage, no prior extraction) -- outline saved but cannot be placed on the map"]
+                if verify else ["placement verification is running in the background"]
+            ),
+        }
+        parcel["calibration"] = {
+            "status": calibration_info.status, "scale_ft_per_px": calibration_info.scale_ft_per_px,
+            "rotation_deg": calibration_info.rotation_deg, "scale_from_area": calibration_info.scale_from_area,
+            "scale_from_edges": calibration_info.scale_from_edges, "scale_agreement_pct": calibration_info.scale_agreement_pct,
+            "corroborating_edge_count": calibration_info.corroborating_edge_count, "notes": calibration_info.notes,
+            "corroborations": calibration_info.corroborations,
+            "independent_bearing_edges": calibration_info.independent_bearing_edges,
+            "quadrant_resolved_edges": calibration_info.quadrant_resolved_edges,
+        }
+        parcel.pop("georeference_error", None)
+        return
 
     # The confirmed ring is already closed by construction (it's a
     # human-drawn shape, not a directional walk) -- closure_error_ft
@@ -697,7 +891,125 @@ def _verify_confirmation(document_id: str, body, confirmation_id: str) -> None:
                 if key in scratch:
                     parcel[key] = scratch[key]
             parcel.pop("georeference_error", None)
+        _fit_sheet_to_aliquot(result, body.page_number)
         _save_result(document_id, result)
+
+
+# The confirmed parcels' combined area must match the aliquot part's to
+# within this before they're fitted onto it -- otherwise they evidently
+# don't make up that whole aliquot part and a group fit would be a guess.
+_ALIQUOT_FIT_AREA_TOL = 0.03
+# Stricter bar for calling the fitted placement CONFIRMED rather than just
+# better: combined area AND both outer extents within this percent of the
+# BLM aliquot part (Patnaude: 0.2% area).
+_ALIQUOT_CORROBORATED_PCT = 2.0
+
+
+def _fit_sheet_to_aliquot(result: dict, page_number: int) -> None:
+    """
+    Places a sheet's confirmed parcels, as a GROUP, onto the aliquot part of
+    a section the plat's legal description names ("N 1/2 of S 1/2 of Section
+    17"), resolved from BLM's own section corners (result["anchor"]["aliquot"],
+    see plss._resolve_aliquot).
+
+    Why: a parcel with no extracted calls is placed by pinning the document
+    anchor to the CENTRE of its drawing crop, not to the corner the anchor
+    monument actually marks. On the Patnaude packet that left the confirmed
+    parcels ~1 km west of the land the description names, though the anchor
+    itself (the W 1/4 corner of Sec 17) was exactly right.
+
+    Gated on corroboration: only when the confirmed parcels' combined area
+    matches the aliquot part's area within _ALIQUOT_FIT_AREA_TOL (Patnaude:
+    160.4 ac confirmed vs 160.08 ac from BLM). Translation only -- shapes and
+    their relative positions (including shared edges) are untouched. Parcels
+    the user pinned by hand (anchor_override) are left alone. Recomputed from
+    each parcel's unfitted placement every time, so re-verifying one parcel
+    can't compound or desync the fit.
+    """
+
+    aliquot = (result.get("anchor") or {}).get("aliquot")
+    page = next((p for p in result.get("pages", []) if p["page_number"] == page_number), None)
+    if not aliquot or page is None:
+        return
+
+    members = []
+    for region in page.get("regions", []):
+        for parcel in region.get("parcels") or []:
+            if not parcel.get("human_confirmed") or not parcel.get("boundary_geojson_wgs84"):
+                continue
+            if parcel.get("anchor_override"):
+                continue
+            placement = parcel.get("placement") or {}
+            if placement.get("status") == "pending":
+                return  # wait until every confirmed parcel on the sheet is verified
+            # verification rewrites `placement`, so a missing marker means the
+            # current geometry is fresh (unfitted); otherwise use the saved original
+            if placement.get("aliquot_fit") and parcel.get("boundary_geojson_wgs84_unfitted"):
+                unfitted = parcel["boundary_geojson_wgs84_unfitted"]
+            else:
+                unfitted = copy.deepcopy(parcel["boundary_geojson_wgs84"])
+            members.append((parcel, unfitted))
+    if not members:
+        return
+
+    total_acres = sum((p.get("spatial_validation") or {}).get("area_acres") or 0 for p, _ in members)
+    target_acres = aliquot["acres"]
+    if not target_acres or abs(total_acres - target_acres) / target_acres > _ALIQUOT_FIT_AREA_TOL:
+        for parcel, unfitted in members:  # undo any earlier fit that no longer holds
+            if (parcel.get("placement") or {}).pop("aliquot_fit", None):
+                parcel["boundary_geojson_wgs84"] = unfitted
+                parcel.pop("boundary_geojson_wgs84_unfitted", None)
+        return
+
+    from pyproj import Geod
+    geod = Geod(ellps="WGS84")
+    pts = [pt for _, u in members for pt in u["geometry"]["coordinates"][0]]
+    cur = ((min(p[0] for p in pts) + max(p[0] for p in pts)) / 2, (min(p[1] for p in pts) + max(p[1] for p in pts)) / 2)
+    poly = aliquot["polygon"]
+    tgt = (sum(p[0] for p in poly) / len(poly), sum(p[1] for p in poly) / len(poly))
+    azimuth, _, shift_m = geod.inv(cur[0], cur[1], tgt[0], tgt[1])
+
+    # How well the group's outer extents match the aliquot part's, east-west
+    # and north-south. Area alone can agree for a wrong shape (or a rotated /
+    # mis-scaled one); matching both extents too is what makes this
+    # independent corroboration of scale, orientation AND position.
+    def extents_m(points: list) -> tuple[float, float]:
+        lons, lats = [p[0] for p in points], [p[1] for p in points]
+        mid_lat, mid_lon = (min(lats) + max(lats)) / 2, (min(lons) + max(lons)) / 2
+        ew = geod.inv(min(lons), mid_lat, max(lons), mid_lat)[2]
+        ns = geod.inv(mid_lon, min(lats), mid_lon, max(lats))[2]
+        return ew, ns
+    group_ew, group_ns = extents_m(pts)
+    aliq_ew, aliq_ns = extents_m(poly)
+    area_err_pct = abs(total_acres - target_acres) / target_acres * 100
+    # Relative to the aliquot part's LONG side: hand-drawn outlines land a few
+    # tens of feet off, which on the short side of a long strip (Patnaude: 38 ft
+    # of a 1,345 ft N-S extent) would read as several percent though it's under
+    # 1% of the parcel. A genuinely wrong shape is off by thousands of feet.
+    extent_err_pct = max(abs(group_ew - aliq_ew), abs(group_ns - aliq_ns)) / max(aliq_ew, aliq_ns) * 100
+    corroborated = area_err_pct <= _ALIQUOT_CORROBORATED_PCT and extent_err_pct <= _ALIQUOT_CORROBORATED_PCT
+
+    for parcel, unfitted in members:
+        fitted = copy.deepcopy(unfitted)
+        fitted["geometry"]["coordinates"] = [
+            [list(geod.fwd(lon, lat, azimuth, shift_m)[:2]) for lon, lat in ring]
+            for ring in unfitted["geometry"]["coordinates"]
+        ]
+        fitted["properties"]["georeferenced"] = "fitted_to_aliquot_part"
+        parcel["boundary_geojson_wgs84_unfitted"] = unfitted
+        parcel["boundary_geojson_wgs84"] = fitted
+        placement = parcel.setdefault("placement", {"status": "approximate", "notes": []})
+        placement["aliquot_fit"] = {
+            "description": aliquot["description"], "shift_m": round(shift_m, 1),
+            "confirmed_acres": round(total_acres, 2), "aliquot_acres": round(target_acres, 2),
+            "area_error_pct": round(area_err_pct, 2), "extent_error_pct": round(extent_err_pct, 2),
+            "corroborated": corroborated,
+        }
+        note = (
+            f"fitted with the sheet's other confirmed parcels onto the {aliquot['description']} "
+            f"(BLM section corners): combined {total_acres:.2f} ac vs {target_acres:.2f} ac; moved {shift_m:.0f} m"
+        )
+        placement["notes"] = [n for n in placement.get("notes", []) if not n.startswith("fitted with")] + [note]
 
 
 def _seed_local_vertices(parcel: dict, body) -> list[list[float]] | None:
@@ -756,7 +1068,16 @@ def _apply_confirmation(document_id: str, result: dict, body, wait: bool) -> tup
         body.local_vertices = _seed_local_vertices(parcel, body)
     anchor_lat, anchor_lon = _anchor_for(result, parcel)
     placed = False
-    if body.local_vertices and len(body.local_vertices) >= 3 and anchor_lat is not None and anchor_lon is not None:
+    # A manually confirmed polygon is sufficient on its own to enter
+    # verification (Gemini edge-association + OCR) -- body.local_vertices
+    # is no longer required here. It used to gate this entirely, which
+    # meant a parcel with zero resolved_boundary_calls (nothing for
+    # _seed_local_vertices to build a seed from -- exactly a hand-confirmed
+    # "remainder parcel") never reached Gemini at all, even though the
+    # confirmed polygon's own pixel vertices are a perfectly good starting
+    # point. local_vertices (possibly None) still flows into
+    # _derive_confirmed_geometry, which now handles that case explicitly.
+    if len(body.vertices) >= 3 and anchor_lat is not None and anchor_lon is not None:
         _derive_confirmed_geometry(
             document_id, body, result, region, parcels, parcel, anchor_lat, anchor_lon, verify=wait
         )
@@ -765,7 +1086,7 @@ def _apply_confirmation(document_id: str, result: dict, body, wait: bool) -> tup
         parcel["calibration"] = {
             "status": "unverified", "scale_ft_per_px": None, "rotation_deg": None,
             "corroborating_edge_count": 0, "corroborations": [],
-            "notes": ["no extracted survey calls or document anchor for this parcel, so the outline is saved but cannot be placed on the map"],
+            "notes": ["no document anchor for this parcel, so the outline is saved but cannot be placed on the map"],
         }
         parcel["placement"] = {"status": "approximate", "notes": parcel["calibration"]["notes"]}
     return parcel, placed, confirmation_id
@@ -903,6 +1224,43 @@ def confirm_boundary(
 
     return {"document_id": document_id, "state": state, "entity": entity, "parcel": parcel,
             "georeferenced_from_confirmation": bool(parcel and parcel.get("boundary_geojson_wgs84"))}
+
+
+@router.delete("/{document_id}/pages/{page_number}/parcels/{parcel_id}")
+def delete_parcel_entity(document_id: str, page_number: int, parcel_id: str):
+    """
+    Removes one sheet-owned parcel entity (a roster entry or an unmatched
+    extraction fragment) that the user has identified as spurious -- e.g. a
+    scattered extraction fragment or a duplicate from a secondary sheet that
+    slipped past the automatic exclusion heuristics (see parcel_roster's
+    excluded_reason gate). A manual escape hatch for whatever that heuristic
+    misses, since it can only catch the failure signatures it already knows
+    about.
+
+    Refuses to delete a parcel the user has already confirmed
+    (entity["confirmed_polygon"] set) -- that is real, hand-drawn work, not
+    a spurious candidate, and removing it needs a deliberate "unconfirm"
+    action this endpoint does not perform.
+    """
+
+    with _RESULT_LOCK:
+        result = _load_result(document_id)
+        page = next((p for p in result["pages"] if p["page_number"] == page_number), None)
+        if page is None or not page.get("sheet"):
+            raise HTTPException(status_code=404, detail="Page or sheet not found")
+        entities = page["sheet"].get("parcels") or []
+        entity = next((e for e in entities if e["id"] == parcel_id), None)
+        if entity is None:
+            raise HTTPException(status_code=404, detail=f"No parcel {parcel_id} on page {page_number}")
+        if entity.get("confirmed_polygon"):
+            raise HTTPException(
+                status_code=400,
+                detail="This parcel has already been confirmed and cannot be deleted this way.",
+            )
+        entities.remove(entity)
+        _save_result(document_id, result)
+
+    return {"document_id": document_id, "deleted": parcel_id}
 
 
 @router.post("/{document_id}/annotate")

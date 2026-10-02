@@ -77,9 +77,22 @@
 
   // Verification runs in the background after a boundary is confirmed
   // (calibration.status === 'pending'); refresh the document until it lands.
-  $: hasPendingVerification = (result?.pages ?? []).some((pg: any) =>
-    (pg.regions ?? []).some((r: any) => (r.parcels ?? []).some((pc: any) => pc.calibration?.status === 'pending'))
-  );
+  // Also keep refreshing while the pipeline is still running, or while a parcel the user
+  // outlined (sheet entity with a confirmed_polygon) hasn't been bound to its extracted parcel
+  // yet -- an outline drawn before processing finished is only attached at the end, so a
+  // snapshot taken in between shows the parcel as unconfirmed with no geometry.
+  $: hasPendingVerification =
+    result?.processing?.complete === false ||
+    (result?.pages ?? []).some(
+      (pg: any) =>
+        (pg.regions ?? []).some((r: any) => (r.parcels ?? []).some((pc: any) => pc.calibration?.status === 'pending')) ||
+        (pg.sheet?.parcels ?? []).some((e: any) => {
+          if (!e.confirmed_polygon) return false;
+          const ref = e.evidence_ref;
+          if (!ref) return false; // nothing to bind to once processing is done -- don't poll forever
+          return !pg.regions?.[ref.region]?.parcels?.[ref.parcel]?.human_confirmed;
+        })
+    );
   let pendingTimer: ReturnType<typeof setInterval> | null = null;
   $: if (hasPendingVerification && documentId && !usingSample) {
     if (!pendingTimer) pendingTimer = setInterval(refreshPending, 4000);
@@ -211,11 +224,35 @@
   // default (it was the majority, 72/132, of noise in the labeled
   // corpus) but always one click away via showAllCategories, so a
   // misclassification costs a click, never a lost parcel.
-  $: parcelRegions = showAllCategories
-    ? allParcelRegions
-    : allParcelRegions.filter((r: any) => r.category !== 'not_a_parcel_drawing');
+  // A parcel read off a non-target sheet (aerial/location map, reference survey) whose label matches
+  // one on the target parcel map is the SAME land drawn twice -- e.g. the Patnaude packet's page-6
+  // display map repeats page 7's "Remainder Parcel 17-2-1-4" and "Parcel 1". Listing it as its own
+  // card (with "Boundary not confirmed") reads as extra parcels, so it is never listed. Matched by
+  // word set, so "REMAINDER PARCEL" matches "REMAINDER PARCEL 17-2-1-4" but "PARCEL 1" never
+  // matches "PARCEL 10".
+  const labelWords = (s: string | null | undefined) =>
+    new Set((s ?? '').toUpperCase().replace(/[^A-Z0-9\s-]/g, ' ').split(/\s+/).filter(Boolean));
+  $: targetLabelSets = (result?.pages ?? [])
+    .filter((p: any) => p.sheet?.role === 'target_parcel_map')
+    .flatMap((p: any) => (p.regions ?? []).flatMap((r: any) => (r.parcels ?? []).map((pc: any) => labelWords(pc.vision_geometry?.parcel_label))))
+    .filter((s: Set<string>) => s.size > 0);
+  function isOtherSheetCopy(entry: any): boolean {
+    const page = (result?.pages ?? []).find((p: any) => p.page_number === entry.page);
+    const role = page?.sheet?.role;
+    if (!role || role === 'target_parcel_map') return false;
+    const words = labelWords(entry.parcel.vision_geometry?.parcel_label);
+    return targetLabelSets.some((t: Set<string>) => {
+      const [small, big] = t.size <= words.size ? [t, words] : [words, t];
+      return [...small].every((w) => big.has(w));
+    });
+  }
 
-  $: hiddenCount = allParcelRegions.length - parcelRegions.length;
+  $: parcelRegions = (showAllCategories
+    ? allParcelRegions
+    : allParcelRegions.filter((r: any) => r.category !== 'not_a_parcel_drawing')
+  ).filter((r: any) => !isOtherSheetCopy(r));
+
+  $: hiddenCount = allParcelRegions.filter((r: any) => r.category === 'not_a_parcel_drawing' && !isOtherSheetCopy(r)).length;
 
   // Parcels vision found no attributable boundary calls for ("No
   // geometry" cards) are real, useful info -- but a document can have a
@@ -223,8 +260,11 @@
   // the reviewer actually came to look at. Collapsed by default, one
   // click away, same pattern as the category filter above.
   let showNoGeometry = false;
-  $: geometryRegions = parcelRegions.filter((e: any) => e.parcel.spatial_validation);
-  $: noGeometryRegions = parcelRegions.filter((e: any) => !e.parcel.spatial_validation);
+  // A confirmed parcel still being calibrated/placed has no spatial_validation yet, but it is a
+  // real parcel mid-processing, not a "no geometry" region -- keep it (with its spinner) in the
+  // main list instead of the collapsed group.
+  $: geometryRegions = parcelRegions.filter((e: any) => e.parcel.spatial_validation || verdict(e.parcel).busy);
+  $: noGeometryRegions = parcelRegions.filter((e: any) => !e.parcel.spatial_validation && !verdict(e.parcel).busy);
 
   async function ensureLeaflet() {
     if (!L) {
@@ -479,6 +519,13 @@
   // pass -- a perfect shape in the wrong spot is not a correct result.
   const LOCATION_LABELS: Record<string, string> = {
     surveyed: 'Surveyed coordinates',
+    // A PLSS section-corner monument the document names, resolved against
+    // BLM's own data -- real, but not yet "surveyed"-grade confidence
+    // here because nothing else on the sheet corroborated it (see
+    // app/services/plss.py). Corroborated PLSS resolutions are reported
+    // as plain 'surveyed', same as any other fully-trusted source.
+    plss_single_source: 'PLSS monument (uncorroborated)',
+    aliquot: 'Matches PLSS legal description (BLM)',
     street: 'Street address (approx.)',
     city: 'City / ZIP only (coarse)',
     manual: 'Manually pinned',
@@ -489,14 +536,23 @@
     ? 'none'
     : result.anchor?.precision ?? (result.anchor_lat != null ? 'street' : 'none');
   $: anchorSource = result?.anchor?.source ?? null;
+  $: aliquotFit = (result?.pages ?? [])
+    .flatMap((p: any) => (p.regions ?? []).flatMap((r: any) => r.parcels ?? []))
+    .map((pc: any) => pc.placement?.aliquot_fit)
+    .find((f: any) => f?.corroborated) ?? null;
 
   // A reviewer can pin one parcel's anchor by hand (below the call
   // editor) rather than trust the document-wide geocoded/state-plane
   // guess -- that override is per-parcel, so its location check has to
   // be evaluated per-parcel too, not from the shared anchorPrecision.
   function parcelLocationPrecision(parcel: any): string {
-    return parcel.anchor_override ? 'manual' : anchorPrecision;
+    if (parcel.anchor_override) return 'manual';
+    // Fitted onto the BLM aliquot part the legal description names, with combined area and both
+    // outer extents agreeing within 2% (app/routes/documents.py::_fit_sheet_to_aliquot).
+    if (parcel.placement?.aliquot_fit?.corroborated) return 'aliquot';
+    return anchorPrecision;
   }
+  const locationConfirmed = (precision: string) => precision === 'surveyed' || precision === 'manual' || precision === 'aliquot';
 
   // A confirmed boundary's SHAPE can close and match the stated area
   // (spatial_validation.valid) while its real-world scale/rotation were
@@ -516,6 +572,9 @@
     const status = parcel.calibration?.status;
     if (status === 'pending') return 'pending';
     if (status === 'cross_validated' || status === 'single_source') return 'placeable';
+    // Rotation/scale unverified from printed bearings, but the outline's area AND extents match the
+    // BLM aliquot part within 2% -- that independently corroborates scale and orientation too.
+    if (parcel.placement?.aliquot_fit?.corroborated) return 'placeable';
     // status === 'unverified', or calibration missing entirely despite
     // human_confirmed (no anchor to calibrate against) -- both mean the
     // same thing to a viewer: this placement was never corroborated.
@@ -531,19 +590,31 @@
   // ~2,600 ft off -- so it must not stand in for a confirmed parcel's own
   // placement.
   function confirmedPlacementOk(parcel: any): boolean {
-    return !!parcel.anchor_override || parcel.placement?.status === 'surveyed_corner';
+    return !!parcel.anchor_override || parcel.placement?.status === 'surveyed_corner' || !!parcel.placement?.aliquot_fit?.corroborated;
   }
 
-  function verdict(parcel: any) {
+  // The user drew an outline for this parcel (its sheet entity holds a confirmed_polygon) but it
+  // hasn't been bound to this extracted parcel yet -- that happens when processing finishes.
+  function outlineAwaitingBind(parcel: any): boolean {
+    if (parcel.human_confirmed || !parcel.roster_id) return false;
+    return (result?.pages ?? []).some((pg: any) =>
+      (pg.sheet?.parcels ?? []).some((e: any) => e.id === parcel.roster_id && e.confirmed_polygon)
+    );
+  }
+
+  function verdict(parcel: any): { cls: string; label: string; busy?: boolean } {
     const shapeOk = !!parcel.spatial_validation?.valid;
     const locationPrecision = parcelLocationPrecision(parcel);
     const locationOk = parcel.human_confirmed
       ? confirmedPlacementOk(parcel)
       : locationPrecision === 'surveyed' || locationPrecision === 'manual';
+    if (outlineAwaitingBind(parcel)) return { cls: 'busy', label: 'Confirming boundary…', busy: true };
     if (!parcel.human_confirmed) return { cls: 'moderate', label: 'Boundary not confirmed' };
-    if (!parcel.spatial_validation) return { cls: 'moderate', label: 'Outline saved · not placed on the map' };
     const gate = calibrationGate(parcel);
-    if (gate === 'pending') return { cls: 'moderate', label: 'Verifying placement…' };
+    if (gate === 'pending' || (parcel.placement?.status === 'pending')) {
+      return { cls: 'busy', label: 'Calibrating & placing…', busy: true };
+    }
+    if (!parcel.spatial_validation) return { cls: 'moderate', label: 'Outline saved · not placed on the map' };
     if (gate === 'unconfirmed') {
       return {
         cls: 'unconfirmed',
@@ -785,8 +856,73 @@
     pasteText = '';
   }
 
+  // A manually confirmed polygon's geometry source of truth is its
+  // confirmed pixel vertices (see calibration.py / _derive_confirmed_geometry),
+  // NOT resolved_boundary_calls -- the call table this editor shows for
+  // such a parcel is disconnected evidence, not its shape. Routing an
+  // anchor-only change through the calls-based /recompute silently
+  // discarded any uncorroborated vertex (a 4-vertex confirmed rectangle
+  // with 3 verified edges became a 3-call triangle the moment the anchor
+  // was touched). /update-anchor re-georeferences the EXISTING confirmed
+  // polygon instead of rebuilding it -- vertex count/topology/calibration
+  // are untouched, only the map position changes.
+  async function submitAnchorUpdate(entry: any, keepOpen: boolean = false) {
+    if (!documentId) return;
+    const lat = Number(editAnchorLat);
+    const lon = Number(editAnchorLon);
+    if (!editAnchorLat.trim() || !editAnchorLon.trim() || Number.isNaN(lat) || Number.isNaN(lon)) {
+      recomputeError = 'Enter a valid anchor latitude and longitude first.';
+      return;
+    }
+    recomputing = true;
+    recomputeError = '';
+    try {
+      const res = await fetch(`${API_BASE}/documents/${documentId}/update-anchor`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          page_number: entry.page,
+          region_index: entry.regionIndex,
+          parcel_index: entry.parcelIndex,
+          anchor_lat: lat,
+          anchor_lon: lon
+        })
+      });
+      if (!res.ok) {
+        const body = await res.text();
+        throw new Error(`${res.status}: ${body.slice(0, 200)}`);
+      }
+      const data = await res.json();
+      Object.assign(entry.parcel, data.parcel);
+      result = result;
+      if (keepOpen) {
+        if (entry.parcel.anchor_override) {
+          editAnchorLat = String(entry.parcel.anchor_override.lat);
+          editAnchorLon = String(entry.parcel.anchor_override.lon);
+        }
+      } else {
+        editingKey = null;
+      }
+      queueMicrotask(renderMap);
+    } catch (err: any) {
+      recomputeError = `Updating position failed: ${err.message}`;
+    } finally {
+      recomputing = false;
+    }
+  }
+
   async function submitRecompute(entry: any, autoFix: boolean = false, keepOpen: boolean = false) {
     if (!documentId) return;
+    // "Edit calls -> Recompute/Auto-fix" intentionally rebuilds geometry
+    // from the edited call table -- the correct, unchanged path for a
+    // parcel whose calls ARE its geometry source of truth. "Change
+    // anchor -> Recompute" on an already manually confirmed polygon
+    // means reposition the existing shape, not rebuild it -- see
+    // submitAnchorUpdate's docstring. Auto-fix never redirects: it's
+    // explicitly a calls operation.
+    if (!autoFix && entry.parcel.human_confirmed) {
+      return submitAnchorUpdate(entry, keepOpen);
+    }
     recomputing = true;
     recomputeError = '';
     try {
@@ -1105,10 +1241,16 @@
         </div>
       </div>
 
-      <div class="location-banner panel" class:ok={anchorPrecision === 'surveyed'}>
+      <div class="location-banner panel" class:ok={anchorPrecision === 'surveyed' || aliquotFit}>
         <strong>Location:</strong> {LOCATION_LABELS[anchorPrecision]}
         {#if anchorSource}<span class="location-source">— {anchorSource}</span>{/if}
-        {#if anchorPrecision !== 'surveyed'}
+        {#if aliquotFit}
+          <span class="location-source">
+            Confirmed parcels fitted onto the {aliquotFit.description} from BLM survey data: combined area
+            {aliquotFit.confirmed_acres} ac vs {aliquotFit.aliquot_acres} ac ({aliquotFit.area_error_pct}% off),
+            outer dimensions within {aliquotFit.extent_error_pct}%.
+          </span>
+        {:else if anchorPrecision !== 'surveyed'}
           <span class="location-source">Shapes are exact, but where they sit on the map is approximate, so no parcel on this document can be marked Verified.</span>
         {/if}
       </div>
@@ -1222,11 +1364,14 @@
                     {parcel.vision_geometry?.parcel_label || `Page ${entry.page} parcel`}
                     {#if parcel.human_edited}<span class="edited-badge">edited</span>{/if}
                   </span>
-                  {#if v || parcel.extraction_note || parcel.georeference_error}
+                  {#if v || parcel.extraction_note || parcel.georeference_error || verdict(parcel).busy}
                     {@const verdictInfo = verdict(parcel)}
-                    <span class="pill {verdictInfo.cls}">{verdictInfo.label}</span>
+                    <span class="pill {verdictInfo.cls}">{#if verdictInfo.busy}<span class="spinner" aria-hidden="true"></span>{/if}{verdictInfo.label}</span>
                   {/if}
                 </div>
+                {#if verdict(parcel).busy}
+                  <p class="busy-note">Checking scale and orientation against the drawing, then placing it on the map. This card updates by itself.</p>
+                {/if}
 
                 {#if v}
                   {@const locationPrecision = parcelLocationPrecision(parcel)}
@@ -1234,8 +1379,8 @@
                     <span class="check" class:ok={v.valid}>
                       {v.valid ? '✓' : '✗'} Shape
                     </span>
-                    <span class="check" class:ok={locationPrecision === 'surveyed' || locationPrecision === 'manual'}>
-                      {locationPrecision === 'surveyed' || locationPrecision === 'manual' ? '✓' : '✗'} Location · {LOCATION_LABELS[locationPrecision]}
+                    <span class="check" class:ok={locationConfirmed(locationPrecision)}>
+                      {locationConfirmed(locationPrecision) ? '✓' : '✗'} Location · {LOCATION_LABELS[locationPrecision]}
                     </span>
                   </div>
                 {/if}
@@ -1992,6 +2137,11 @@ h1 {
   justify-content: space-between;
   gap: 10px;
   margin-bottom: 10px;
+}
+.busy-note {
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  color: #3b6cc5;
 }
 
 .region-title {

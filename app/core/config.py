@@ -19,6 +19,15 @@ class Settings(BaseSettings):
     OPENROUTER_MODEL: str = "openrouter/free"
     MISTRAL_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
+    # .env holds two rotation keys instead of a plain GEMINI_API_KEY; a
+    # plain `uvicorn app.main:app` launch must still find one, or every
+    # Gemini stage (sheet triage, parcel roster, extraction) silently fails.
+    GEMINI_API_KEY_1: str = ""
+    GEMINI_API_KEY_2: str = ""
+
+    def model_post_init(self, __context) -> None:
+        if not self.GEMINI_API_KEY:
+            self.GEMINI_API_KEY = self.GEMINI_API_KEY_1 or self.GEMINI_API_KEY_2
     # Not flagship "gemini-3.5-flash": that model's free tier is capped
     # at 20 requests/day (confirmed via a real 429 from this exact
     # account), and separately, dense-image detail-extraction calls to

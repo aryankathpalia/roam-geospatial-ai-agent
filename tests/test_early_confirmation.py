@@ -177,7 +177,19 @@ def test_confirming_after_the_pipeline_finished_binds_that_parcel_only(env):
 
 
 @needs_nvz
-def test_roster_parcel_with_no_extracted_evidence_keeps_its_outline_and_gets_a_record(env):
+def test_roster_parcel_with_no_extracted_evidence_still_reaches_verification(env):
+    """
+    A roster parcel nothing matched (no resolved_boundary_calls at all --
+    e.g. a hand-confirmed "remainder parcel") used to never attempt
+    calibration/Gemini verification: _apply_confirmation's gate required
+    body.local_vertices, which _seed_local_vertices can only build FROM
+    resolved_boundary_calls, so a parcel with none always fell through to
+    a hardcoded "cannot be placed" skip before verification ever ran. The
+    confirmed polygon's own pixel vertices are sufficient on their own --
+    this is the exact real-document regression for that fix: verification
+    now runs on the real NVZ page/OCR fixture and produces a genuine
+    scale/placement result, not the old skip message.
+    """
     partial, final = _partial_and_final()
     _region(final)["parcels"] = []
     for e in _sheet(final)["parcels"]:
@@ -190,7 +202,12 @@ def test_roster_parcel_with_no_extracted_evidence_keeps_its_outline_and_gets_a_r
     parcel = _evidence(done, "PARCEL 1")
     assert parcel["created_from_confirmed_boundary"] and parcel["human_confirmed"]
     assert parcel["confirmed_boundary_pixels"]["vertices"] == _body(1)["vertices"]
-    assert "cannot be placed" in " ".join(parcel["calibration"]["notes"])
+    assert not parcel.get("resolved_boundary_calls")   # genuinely zero prior extraction -- the case under test
+    notes = " ".join(parcel["calibration"]["notes"])
+    assert "cannot be placed" not in notes   # the old bug: verification never even attempted
+    assert parcel["calibration"]["status"] in ("cross_validated", "single_source", "unverified")
+    assert parcel["boundary_source"] in ("manual_confirmed_calibrated", "manual_confirmed_uncalibrated")
+    assert parcel["boundary_geojson_wgs84"]["geometry"]["coordinates"][0]   # a real shape was actually placed
     assert _entity(done, "PARCEL 2")["evidence_ref"] is None and _entity(done, "PARCEL 2")["confirmed_polygon"] is None
 
 

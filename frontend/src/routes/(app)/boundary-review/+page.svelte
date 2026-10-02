@@ -132,15 +132,50 @@
   // the user draws. Refresh the list underneath them; their drawing (`vertices`)
   // and the map item they are drawing on (pinned) are never reset.
   let readingTimer: ReturnType<typeof setInterval> | null = null;
+  let readingStartedAt: number | null = null;
+  // "Still reading" can mean exactly that, OR it can mean the backend
+  // process that was running this document's pipeline is gone (a dev-
+  // server restart, a crash) and nothing will ever finish it -- the two
+  // look identical from here (GET .../progress 404s either way; see
+  // documents.py's reprocess_document docstring for how this was
+  // confirmed on a real stuck document). There's no reliable way to tell
+  // them apart from the saved state alone, so after a while just offer
+  // the escape hatch rather than pretend everything is fine.
+  const STUCK_HINT_AFTER_MS = 90_000;
+  let showReprocessHint = false;
   function startReadingPoll() {
     if (readingTimer) return;
-    readingTimer = setInterval(refreshDocument, 3000);
+    readingStartedAt = Date.now();
+    showReprocessHint = false;
+    readingTimer = setInterval(() => {
+      refreshDocument();
+      if (readingStartedAt && Date.now() - readingStartedAt > STUCK_HINT_AFTER_MS) {
+        showReprocessHint = true;
+      }
+    }, 3000);
   }
   function stopReadingPoll() {
     if (readingTimer) clearInterval(readingTimer);
     readingTimer = null;
+    readingStartedAt = null;
+    showReprocessHint = false;
   }
   onDestroy(stopReadingPoll);
+
+  let reprocessing = false;
+  async function reprocessDocument() {
+    reprocessing = true;
+    try {
+      const res = await fetch(`${API_BASE}/documents/${documentId.trim()}/reprocess`, { method: 'POST' });
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      readingStartedAt = Date.now();
+      showReprocessHint = false;
+    } catch (err) {
+      loadError = err instanceof Error ? err.message : 'Failed to restart processing.';
+    } finally {
+      reprocessing = false;
+    }
+  }
 
   async function refreshDocument() {
     try {
@@ -166,6 +201,34 @@
   function restoreExcludedParcel(ref: ParcelRef) {
     excludedParcels = excludedParcels.filter((r) => r.key !== ref.key);
     parcelRefs = [...parcelRefs, ref];
+  }
+
+  let deleteError = '';
+
+  // Removes a spurious, never-confirmed sheet entity (a scattered extraction
+  // fragment, a duplicate from another sheet, or anything else the
+  // excluded_reason heuristic didn't catch). The backend refuses this for a
+  // parcel that already has a confirmed_polygon, so real work can't be lost
+  // through this button.
+  async function deleteParcelEntity(ref: ParcelRef) {
+    if (!ref.parcelId) return;
+    if (!confirm(`Delete "${ref.label}" from page ${ref.pageNumber}? This cannot be undone.`)) return;
+    deleteError = '';
+    try {
+      const res = await fetch(
+        `${API_BASE}/documents/${documentId.trim()}/pages/${ref.pageNumber}/parcels/${ref.parcelId}`,
+        { method: 'DELETE' }
+      );
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.detail ?? `${res.status} ${res.statusText}`);
+      }
+      excludedParcels = excludedParcels.filter((r) => r.key !== ref.key);
+      parcelRefs = parcelRefs.filter((r) => r.key !== ref.key);
+      if (selectedKey === ref.key) selectedKey = null;
+    } catch (err) {
+      deleteError = err instanceof Error ? err.message : 'Failed to delete parcel.';
+    }
   }
 
   let cropLoadToken = 0;
@@ -542,6 +605,15 @@
         <h2>Parcels</h2>
         {#if reading}
           <p class="hint reading-note">ROAM is still reading the document in the background — you can start drawing now.</p>
+          {#if showReprocessHint}
+            <p class="hint reading-note stuck-hint">
+              Taking longer than usual — if this doesn't finish, the process reading it may have
+              been interrupted.
+              <button class="restore-btn" disabled={reprocessing} on:click={reprocessDocument}>
+                {reprocessing ? 'Restarting…' : 'Restart processing'}
+              </button>
+            </p>
+          {/if}
         {/if}
         {#each parcelGroups as group, gi}
           {#if !group.primary && (gi === 0 || parcelGroups[gi - 1].primary)}
@@ -555,7 +627,7 @@
           {#if group.note}<p class="hint sheet-note">{group.note}</p>{/if}
           <ul>
             {#each group.refs as ref}
-              <li>
+              <li class="parcel-row">
                 <button
                   class:active={ref.key === selectedKey}
                   class:muted-row={ref.kind !== 'parcel'}
@@ -566,22 +638,34 @@
                   {#if ref.manual}<span class="ref-badge" title="You named this parcel; ROAM did not detect its identity.">manually named</span>{/if}
                   {#if ref.meta}<span class="parcel-meta">{ref.meta}</span>{/if}
                 </button>
+                {#if ref.parcelId && !ref.parcel.human_confirmed}
+                  <button
+                    class="delete-btn"
+                    title="Delete this parcel entity (only possible before it's confirmed)"
+                    on:click={() => deleteParcelEntity(ref)}
+                  >✕</button>
+                {/if}
               </li>
             {/each}
           </ul>
         {/each}
 
+        {#if deleteError}<p class="hint error-hint">{deleteError}</p>{/if}
+
         {#if excludedParcels.length > 0}
           <h2 class="excluded-heading">Not offered by default ({excludedParcels.length})</h2>
           <p class="hint excluded-hint">
-            Flagged as likely vicinity/locus-map duplicates of a parcel drawn elsewhere. Restore
-            if this looks wrong.
+            Flagged as likely vicinity/locus-map duplicates, scattered fragments, or otherwise
+            under-evidenced. Restore if this looks wrong, or delete it for good.
           </p>
           <ul>
             {#each excludedParcels as ref}
               <li class="excluded-item">
                 <span class="excluded-label" title={ref.excludedReason ?? ''}>Page {ref.pageNumber} · {ref.label}</span>
                 <button class="restore-btn" on:click={() => restoreExcludedParcel(ref)}>Restore</button>
+                {#if ref.parcelId}
+                  <button class="delete-btn" title="Delete for good" on:click={() => deleteParcelEntity(ref)}>✕</button>
+                {/if}
               </li>
             {/each}
           </ul>
@@ -901,6 +985,33 @@
     border-radius: 4px;
     background: #fafafa;
     cursor: pointer;
+  }
+  .parcel-row {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .parcel-row button:first-child {
+    flex: 1;
+  }
+  .delete-btn {
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    line-height: 1;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fafafa;
+    color: #a33;
+    cursor: pointer;
+  }
+  .delete-btn:hover {
+    background: #fdeaea;
+    border-color: #a33;
+  }
+  .error-hint {
+    color: #a33;
   }
   .badge {
     margin-left: 0.4rem;

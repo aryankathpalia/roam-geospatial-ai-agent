@@ -638,6 +638,88 @@ def find_likely_outlier_call(calls: list[dict]) -> dict | None:
     }
 
 
+def _segment_bearing_distance(p1: tuple[float, float], p2: tuple[float, float]) -> tuple[float, float]:
+    dx, dy = p2[0] - p1[0], p2[1] - p1[1]
+    return math.degrees(math.atan2(dx, dy)) % 360, math.hypot(dx, dy)
+
+
+# Two independently-read distances for the SAME physical line will rarely
+# match to the foot -- 2% is generous enough to absorb normal OCR/rounding
+# noise on a plat's printed distances without accepting an unrelated
+# segment that merely happens to be a similar length.
+_SHARED_EDGE_DISTANCE_TOL_FRAC = 0.02
+_SHARED_EDGE_BEARING_TOL_DEG = 3.0
+
+
+def find_shared_edge(
+    points_a: list[tuple[float, float]],
+    points_b: list[tuple[float, float]],
+    distance_tol_frac: float = _SHARED_EDGE_DISTANCE_TOL_FRAC,
+    bearing_tol_deg: float = _SHARED_EDGE_BEARING_TOL_DEG,
+) -> tuple[int, int] | None:
+    """
+    Looks for one segment in each OPEN traverse (walk_traverse's own
+    .points -- N+1 points for N calls) that is the SAME physical boundary
+    line walked in opposite directions: matching length (within
+    distance_tol_frac) and a bearing reversed from the other's (within
+    bearing_tol_deg) -- the signature of two adjoining parcels each
+    describing their shared line from their own side, the common case on
+    a division/subdivision map (confirmed on a real document: two sibling
+    parcels' own printed bearings for their shared line, read
+    independently by vision, differed by under a degree and under half a
+    percent in distance).
+
+    Returns the (segment_index_a, segment_index_b) pair with the smallest
+    combined length/bearing residual, or None if nothing in the two
+    traverses matches closely enough -- most parcel pairs on a sheet
+    don't share an edge at all, and this must stay silent for them rather
+    than force a false match.
+    """
+
+    segs_a = [(_segment_bearing_distance(points_a[i], points_a[i + 1]), i) for i in range(len(points_a) - 1)]
+    segs_b = [(_segment_bearing_distance(points_b[i], points_b[i + 1]), i) for i in range(len(points_b) - 1)]
+
+    best: tuple[int, int, float] | None = None
+    for (az_a, dist_a), ia in segs_a:
+        if dist_a <= 0:
+            continue
+        for (az_b, dist_b), ib in segs_b:
+            if dist_b <= 0:
+                continue
+            if abs(dist_a - dist_b) > distance_tol_frac * max(dist_a, dist_b):
+                continue
+            delta = abs((az_a - az_b + 180) % 360)
+            delta = min(delta, 360 - delta)
+            if delta > bearing_tol_deg:
+                continue
+            residual = abs(dist_a - dist_b) + delta
+            if best is None or residual < best[2]:
+                best = (ia, ib, residual)
+    return (best[0], best[1]) if best else None
+
+
+def align_to_shared_edge(
+    points_a: list[tuple[float, float]], points_b: list[tuple[float, float]], seg_a: int, seg_b: int
+) -> list[tuple[float, float]]:
+    """
+    Translates (never rotates or scales) points_b so its matched segment
+    coincides with points_a's matched segment -- each parcel's own
+    independently walked SHAPE is left exactly as is; only parcel b's
+    PLACEMENT relative to parcel a shifts. The two segments are walked in
+    opposite directions (the shared line described from each side), so
+    points_a[seg_a] lines up with points_b[seg_b + 1] and
+    points_a[seg_a + 1] with points_b[seg_b] -- both pairs' implied
+    translations are averaged for a little extra robustness against the
+    two sides' independently-read distances not matching to the foot.
+    """
+
+    a1, a2 = points_a[seg_a], points_a[seg_a + 1]
+    b1, b2 = points_b[seg_b], points_b[seg_b + 1]
+    tx = ((a1[0] - b2[0]) + (a2[0] - b1[0])) / 2
+    ty = ((a1[1] - b2[1]) + (a2[1] - b1[1])) / 2
+    return [(x + tx, y + ty) for x, y in points_b]
+
+
 _ASSEMBLY_MIN_PRECISION = 2_000
 _ASSEMBLY_MAX_CALLS = 16
 _ASSEMBLY_MAX_DROPS = 2

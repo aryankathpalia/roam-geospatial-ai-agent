@@ -78,11 +78,42 @@ def test_a_conflicting_area_blocks_a_label_only_match_from_being_trusted():
 def test_unmatched_extraction_becomes_its_own_entity_and_unmatched_roster_keeps_its_outline():
     sheet = {"regions": [0], "inset_regions": [1], "parcels": _entities()}
     regions = [_region(("OUTLOT Z", "3.0")), _region(("VICINITY BLOB", None))]
+    # OUTLOT Z needs a real traverse (3+ calls) to represent a genuinely
+    # well-evidenced, legitimately-unflagged extraction -- see the
+    # too-few-calls exclusion test below for the under-evidenced case.
+    regions[0]["parcels"][0]["vision_geometry"]["boundary_calls"] = [
+        {"bearing": "N 0 E", "distance": "100'"}, {"bearing": "S 90 E", "distance": "100'"},
+        {"bearing": "S 0 W", "distance": "100'"},
+    ]
     pr.join_evidence(7, sheet, regions)
     assert all(e["evidence_ref"] is None for e in sheet["parcels"][:2])             # roster entities untouched
     extra = sheet["parcels"][2:]
     assert [e["label"] for e in extra] == ["OUTLOT Z", "VICINITY BLOB"] and all(e["source"] == "extraction" for e in extra)
     assert "excluded_reason" not in extra[0] and "inset" in extra[1]["excluded_reason"]
+
+
+def test_extraction_with_too_few_calls_to_close_is_flagged_not_promoted():
+    """
+    Regression for a real production bug (Patnaude packet, page 7): three
+    scattered fragments (1, 1, and 0 boundary calls -- nowhere near
+    enough to close a polygon) surfaced as full, unflagged, equally-
+    weighted confirmable entities right alongside the two real target
+    parcels the roster had already correctly identified. One of them was
+    actually a garbled duplicate of the real REMAINDER PARCEL. These must
+    be flagged (excluded_reason), not promoted as if they were as
+    trustworthy as a real, independently matched parcel.
+    """
+    sheet = {"regions": [0], "inset_regions": [], "parcels": _entities()}
+    regions = [_region(("17-2-1-2", "54.24"), ("17-2-1-3", "160.35"))]
+    regions[0]["parcels"][0]["vision_geometry"]["boundary_calls"] = [{"bearing": "N 0 E", "distance": "100'"}]
+    regions[0]["parcels"][1]["vision_geometry"]["boundary_calls"] = []
+    pr.join_evidence(7, sheet, regions)
+    extra = sheet["parcels"][2:]
+    assert [e["label"] for e in extra] == ["17-2-1-2", "17-2-1-3"]
+    for e in extra:
+        assert "excluded_reason" in e and "boundary call" in e["excluded_reason"]
+        assert e["source"] == "extraction" and e["evidence_ref"] is not None  # still kept, just flagged
+        assert e["stated_area"]  # the label/area are still surfaced -- a reviewer can still check it
 
 
 def test_manually_named_parcel_joins_by_label_and_stays_marked_manual():

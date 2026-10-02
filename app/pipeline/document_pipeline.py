@@ -31,10 +31,13 @@ from app.services.georeference import (
     find_surveyed_coordinates,
     georeference_traverse_to_geojson,
 )
+from app.services.plss import resolve_plss_anchor
 from app.services.geometry import (
+    align_to_shared_edge,
     assemble_traverse,
     borrow_sibling_call,
     drop_conflicting_axis_duplicates,
+    find_shared_edge,
     merge_curve_calls,
     resolve_ambiguous_calls,
     traverse_to_geojson,
@@ -341,6 +344,41 @@ async def process_document(
                         "precision": ANCHOR_SURVEYED,
                         "source": "state-plane coordinate printed on the document",
                     }
+                else:
+                    # Still only a geocoded address -- no printed lat/long,
+                    # no printed state-plane tie. Last precise option: a US
+                    # PLSS (Public Land Survey System) section-corner
+                    # monument the document names relative to a township/
+                    # range/meridian ("...BEING THE 1/4 CORNER OF SECTIONS
+                    # 18 AND 17, TOWNSHIP 22 NORTH, RANGE 21 EAST, M.D.M.").
+                    # Resolved against BLM's own public PLSS data, never
+                    # guessed -- see plss.py's docstring for the geometry
+                    # and the many ways it refuses rather than guesses.
+                    # Gated the same way state-plane is: only engages once
+                    # a coarser geocode already identified the state, and
+                    # only replaces the geocode, never something already
+                    # better (the explicit-coordinate branch above, or the
+                    # state-plane branch just checked).
+                    try:
+                        plss_anchor = resolve_plss_anchor(
+                            [{"regions": e["regions"]} for e in page_entries],
+                            geocoded[0].region,
+                        )
+                    except Exception:  # noqa: BLE001 -- a network/service hiccup; keep the geocode
+                        plss_anchor = None
+                    if plss_anchor:
+                        anchor_lat, anchor_lon = plss_anchor.lat, plss_anchor.lon
+                        anchor = {
+                            # Full-confidence only once a SECOND monument on
+                            # the sheet independently resolves and agrees --
+                            # same single-source/cross-validated discipline
+                            # every other evidence type in this pipeline
+                            # already uses (OCR, Gemini, calibration).
+                            "precision": ANCHOR_SURVEYED if plss_anchor.corroborated else "plss_single_source",
+                            "source": f"PLSS monument printed on the document ({plss_anchor.description})",
+                            "notes": plss_anchor.notes,
+                            "aliquot": plss_anchor.aliquot,
+                        }
             progress_tracker.update(
                 document_id, "georeferencing", f"anchored near {geocoded[0].name}"
             )
@@ -722,6 +760,46 @@ def walk_region_parcels(
         if warning and "spatial_validation" in parcel_result:
             parcel_result["spatial_validation"]["issues"].append(warning)
             parcel_result["spatial_validation"]["valid"] = False
+
+    # Shared-edge alignment: siblings drawn on the SAME sheet that
+    # describe a literal common boundary line (printed once, each read
+    # independently from its own side -- same length, reversed bearing)
+    # must be placed so that line actually coincides on the map, not each
+    # independently re-centered on the document's single anchor point.
+    # Confirmed real bug: two correctly-shaped, correctly-closing
+    # siblings on the Patnaude packet ("Remainder Parcel" and "Parcel 1")
+    # landed with a visible gap between them and no shared edge, because
+    # each is walked from its own point of beginning and (see
+    # georeference_traverse_to_geojson) georeferenced as if THAT were the
+    # anchor. Only ever TRANSLATES a later sibling onto the first one
+    # that already has a usable traverse -- every parcel's own shape,
+    # scale and rotation are untouched; a region with no literal shared
+    # edge in its data (most of them) is untouched entirely.
+    anchor_idx = next(
+        (i for i, p in enumerate(parcel_results) if p.get("resolved_boundary_calls")), None
+    )
+    if anchor_idx is not None and anchor_lat is not None and anchor_lon is not None:
+        anchor_points = walk_traverse(parcel_results[anchor_idx]["resolved_boundary_calls"]).points
+        for i, parcel_result in enumerate(parcel_results):
+            if i == anchor_idx:
+                continue
+            calls = parcel_result.get("resolved_boundary_calls")
+            if not calls:
+                continue
+            own_traverse = walk_traverse(calls)
+            match = find_shared_edge(anchor_points, own_traverse.points)
+            if match is None:
+                continue
+            seg_a, seg_b = match
+            own_traverse.points = align_to_shared_edge(anchor_points, own_traverse.points, seg_a, seg_b)
+            parcel_result["boundary_geojson_wgs84"] = georeference_traverse_to_geojson(
+                own_traverse, anchor_lat, anchor_lon
+            )
+            anchor_label = parcel_results[anchor_idx]["vision_geometry"].get("parcel_label") or "a sibling parcel"
+            parcel_result.setdefault("assembly_notes", []).append(
+                f"placement aligned to share a common boundary with {anchor_label}"
+            )
+
     return parcel_results
 
 

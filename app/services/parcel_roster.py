@@ -245,10 +245,32 @@ def join_evidence(page_number: int, sheet: dict, regions: list[dict]) -> None:
         e = new_entity(page_number, entities, label=label, region_index=c["region"], source="extraction")
         e["stated_area"] = (c["ref"].get("vision_geometry") or {}).get("stated_area_acres")
         e["evidence_ref"] = {"region": c["region"], "parcel": c["parcel"]}
+        n_calls = len((c["ref"].get("vision_geometry") or {}).get("boundary_calls") or [])
         if c["inset"]:
             e["excluded_reason"] = "Read from a small inset of this sheet (likely a vicinity or detail map), not its main drawing."
         elif c["ref"].get("likely_duplicate_region"):
             e["excluded_reason"] = c["ref"].get("duplicate_note") or "Likely a duplicate of a parcel drawn elsewhere."
+        elif n_calls < 3:
+            # Fewer than 3 calls can't even close a polygon (same bar
+            # assemble_traverse itself requires, geometry.py) -- a label
+            # that surfaced with only a stray edge or two is far more
+            # likely a scattered fragment or an adjoiner/reference
+            # citation on a dense multi-parcel sheet than a real,
+            # independently confirmable parcel. Confirmed on a real
+            # document (Patnaude packet, page 7): three such fragments
+            # (1, 1, and 0 calls) appeared as full, unflagged, equally-
+            # weighted confirmable entities alongside the two real
+            # target parcels the roster had already correctly found --
+            # one of them ("17-2-1-4", 145.40 ac, 1 call) was actually a
+            # garbled duplicate of the real REMAINDER PARCEL (120.4 ac,
+            # matched separately via the roster). Flagged, not dropped:
+            # the label and stated area are still real signal a reviewer
+            # may want to check against the source.
+            e["excluded_reason"] = (
+                f"Only {n_calls} boundary call(s) were extracted for this label -- not enough to form a "
+                "shape. Likely a scattered fragment or an adjoiner/reference citation on this sheet, not "
+                "an independently confirmable parcel; check it against the source if it looks real."
+            )
         c["ref"]["roster_id"] = e["id"]
         entities.append(e)
 
