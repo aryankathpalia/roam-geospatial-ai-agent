@@ -122,10 +122,23 @@
   function flattenParcels(res: any): ParcelRef[] {
     const all = boundaryRefs(res);
     excludedParcels = all.filter((r) => r.excludedReason);
-    return groupCandidates(all).flatMap((g) => g.refs);
+    return groupCandidates(all).flatMap((g) => [...g.refs, ...g.duplicates.flatMap((d) => d.refs)]);
   }
 
+  // Sheets that repeat another sheet's parcels are folded under it (see $lib/boundaryCandidates);
+  // "show" lists them again, marked as copies.
+  let expandedCopies = new Set<number>();
+  function toggleCopies(page: number) {
+    const next = new Set(expandedCopies);
+    if (next.has(page)) next.delete(page);
+    else next.add(page);
+    expandedCopies = next;
+  }
   $: parcelGroups = groupCandidates(parcelRefs);
+  $: displayGroups = parcelGroups.flatMap((g) => [
+    { ...g, copyOf: null as number | null },
+    ...(expandedCopies.has(g.pageNumber) ? g.duplicates.map((d) => ({ ...d, copyOf: g.pageNumber as number | null })) : [])
+  ]);
   $: reading = result?.processing?.complete === false;
 
   // The pipeline keeps reading the document (OCR, anchor, parcel extraction) while
@@ -615,15 +628,25 @@
             </p>
           {/if}
         {/if}
-        {#each parcelGroups as group, gi}
-          {#if !group.primary && (gi === 0 || parcelGroups[gi - 1].primary)}
+        {#each displayGroups as group, gi}
+          {#if !group.primary && !group.copyOf && (gi === 0 || displayGroups.slice(0, gi).every((g) => g.primary || g.copyOf))}
             <h2 class="other-heading">Other maps</h2>
             <p class="hint sheet-note">Sheets that are probably not this packet's own parcel map (reference surveys, aerial or location maps, other drawings) — still selectable.</p>
           {/if}
           <h3 class="sheet-heading">
             Page {group.pageNumber} · parcel map
             {#if group.badge}<span class="ref-badge" title={group.note ?? ''}>{group.badge}</span>{/if}
+            {#if group.copyOf}<span class="ref-badge" title="Shows the same parcels as that page">copy of page {group.copyOf}</span>{/if}
           </h3>
+          {#if group.duplicates.length > 0 && !group.copyOf}
+            <p class="hint sheet-note">
+              The same {group.refs.length === 1 ? 'parcel' : 'parcels'} also appear{group.duplicates.length === 1 ? 's' : ''} on page{group.duplicates.length === 1 ? '' : 's'}
+              {group.duplicates.map((d) => d.pageNumber).join(', ')} — folded away.
+              <button class="restore-btn" on:click={() => toggleCopies(group.pageNumber)}>
+                {expandedCopies.has(group.pageNumber) ? 'Hide' : 'Show'}
+              </button>
+            </p>
+          {/if}
           {#if group.note}<p class="hint sheet-note">{group.note}</p>{/if}
           <ul>
             {#each group.refs as ref}
@@ -745,8 +768,8 @@
                 on:pointerleave={onSvgUp}
               >
                 {#each markers as m}
-                  <circle cx={m.x} cy={m.y} r={cropWidth * 0.0045} class="roster-dot" class:active={m.active} />
-                  <text x={m.x + cropWidth * 0.009} y={m.y + cropWidth * 0.004} class="roster-label" class:active={m.active} style={`font-size:${cropWidth * 0.013}px`}>{m.label}</text>
+                  <circle cx={m.x} cy={m.y} r={cropWidth * 0.0028} class="roster-dot" class:active={m.active} />
+                  <text x={m.x + cropWidth * 0.009} y={m.y + cropWidth * 0.004} class="roster-label" class:active={m.active} style={`font-size:${cropWidth * 0.011}px`}>{m.label}</text>
                 {/each}
                 <polygon points={polygonPoints(vertices)} class="boundary-poly" />
                 {#each vertices as [x, y], i}
@@ -760,14 +783,9 @@
                   />
                 {/each}
                 {#each vertices as [x, y], i}
-                  <circle
-                    cx={x}
-                    cy={y}
-                    r={cropWidth / 220 + 3}
-                    class="vertex"
-                    class:selected={i === selectedVertexIdx}
-                    on:pointerdown={(e) => onVertexDown(i, e)}
-                  />
+                  <!-- small visible dot for precision; a larger invisible circle keeps it easy to grab -->
+                  <circle cx={x} cy={y} r={cropWidth / 700 + 1} class="vertex" class:selected={i === selectedVertexIdx} />
+                  <circle cx={x} cy={y} r={cropWidth / 220 + 3} class="vertex-hit" on:pointerdown={(e) => onVertexDown(i, e)} />
                 {/each}
               </svg>
             {/if}
@@ -947,7 +965,7 @@
   .roster-dot {
     fill: #1f6f4a;
     stroke: #fff;
-    stroke-width: 2;
+    stroke-width: 1;
     pointer-events: none;
   }
   .roster-dot.active {
@@ -1048,9 +1066,9 @@
     touch-action: none;
   }
   .boundary-poly {
-    fill: rgba(52, 119, 235, 0.15);
+    fill: rgba(52, 119, 235, 0.12);
     stroke: #3477eb;
-    stroke-width: 2;
+    stroke-width: 1;
     vector-effect: non-scaling-stroke;
     pointer-events: none;
   }
@@ -1063,8 +1081,12 @@
   .vertex {
     fill: #fff;
     stroke: #3477eb;
-    stroke-width: 2;
+    stroke-width: 1;
     vector-effect: non-scaling-stroke;
+    pointer-events: none;
+  }
+  .vertex-hit {
+    fill: transparent;
     cursor: grab;
   }
   .vertex.selected {

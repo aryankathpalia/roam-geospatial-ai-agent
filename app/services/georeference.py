@@ -226,6 +226,16 @@ _STATE_HINT_RE = re.compile(r",\s*[A-Z]{2}\b|\bCounty\b", re.IGNORECASE)
 _ADDRESS_LABEL_RE = re.compile(
     r"\b(?:project|site|property|subject)\s+address\b", re.IGNORECASE
 )
+# A house number + street name + street type: a STREET-level address, which pins a parcel to its
+# own block (Imperial County plat: "2205 Cross Road, El Centro, CA 92243" geocodes to the house;
+# the plat's bare "El Centro, CA, 92243" line lands ~2.5 km away at the city centroid).
+_STREET_ADDRESS_RE = re.compile(
+    r"^\s*\d+[A-Za-z]?(?:\s*,\s*\d+)*\s+(?:[NSEW]\.?\s+)?[\w.' -]+?\s+"
+    r"(?:road|rd|street|st|avenue|ave|boulevard|blvd|drive|dr|lane|ln|way|highway|hwy|court|ct|circle|cir|place|pl|trail)\b",
+    re.IGNORECASE,
+)
+# A phone number on the same line marks letterhead / an agency's office, not the parcel.
+_PHONE_RE = re.compile(r"\(?\b\d{3}\)?[\s.-]*\d{3}[\s.-]\d{4}\b")
 # US land-record documents routinely phrase a place as "City of X" /
 # "Town of X" / "Village of X" -- confirmed empirically that Nominatim
 # returns zero results for "City of Payette, Idaho" but resolves
@@ -275,7 +285,11 @@ def _clean_candidate(line: str) -> str:
     # to the geocoder -- neither is part of a real place name Nominatim
     # can match against (see the two regexes' docstrings above).
     cleaned = _ADDRESS_LABEL_RE.sub("", line).lstrip(": ").strip()
-    return _MUNICIPAL_PREFIX_RE.sub("", cleaned).strip()
+    cleaned = _MUNICIPAL_PREFIX_RE.sub("", cleaned).strip()
+    # OCR reads the Spanish article "El" with a capital I all the time ("EI Centro", "EI Paso"); "EI"
+    # is not a word anywhere else in an address, and Nominatim matches a different place for it
+    # (a Venezuelan "El Centro" on the Imperial County plat).
+    return re.sub(r"\bEI\b(?=\s+[A-Z])", "El", cleaned)
 
 
 def find_anchor_candidates(pages_result: list[dict], limit: int = 3) -> list[str]:
@@ -333,12 +347,24 @@ def find_anchor_candidates(pages_result: list[dict], limit: int = 3) -> list[str
                         score += 2
                     if _STATE_HINT_RE.search(line):
                         score += 1
-                    if _OFFICE_HINT_RE.search(line):
+                    if _OFFICE_HINT_RE.search(line) or _PHONE_RE.search(line):
                         score -= 3
+                    elif score >= MIN_CANDIDATE_SCORE and _STREET_ADDRESS_RE.search(line):
+                        score += 1  # a street address outranks an equally-qualified city-only line
                     if score >= MIN_CANDIDATE_SCORE:
                         scored.append((score, line))
 
-    scored.sort(key=lambda pair: pair[0], reverse=True)
+    # Among equally-scored lines, the state most of them name is the document's own: an owner's
+    # out-of-state mailing address (Imperial County plat: a Queen Creek, AZ line among four El
+    # Centro, CA ones) must not lead.
+    states = [m.group(1).upper() for _, line in scored for m in [re.search(r",\s*([A-Z]{2})\b", line)] if m]
+    majority = max(set(states), key=states.count) if states else None
+
+    def _agrees(line: str) -> int:
+        m = re.search(r",\s*([A-Z]{2})\b", line)
+        return 0 if (majority is None or not m or m.group(1).upper() == majority) else 1
+
+    scored.sort(key=lambda pair: (-pair[0], _agrees(pair[1])))
 
     candidates: list[str] = []
     seen: set[str] = set()

@@ -53,3 +53,36 @@ def test_no_state_bearing_candidate_changes_nothing(monkeypatch):
 def test_state_qualified_first_candidate_is_not_second_guessed(monkeypatch):
     (results, query), calls = _run({"Reno, NV 89512-2845": [RENO]}, candidates=["Reno, NV 89512-2845", "0 Ironwood Road"], monkeypatch=monkeypatch)
     assert query == "Reno, NV 89512-2845" and calls == ["Reno, NV 89512-2845"]
+
+
+# ---- Imperial County plat: "EI Centro, CA" geocoded to Venezuela; the parcel's own street address was never used
+
+VENEZUELA = Location(name="El Centro, Venezuela", latitude=10.47, longitude=-68.01, region="Carabobo", country="Venezuela", source="nominatim")
+EL_CENTRO_CA = Location(name="El Centro", latitude=32.792, longitude=-115.563, region="California", country="United States", source="nominatim")
+CROSS_RD = Location(name="2201 Cross Road", latitude=32.811, longitude=-115.5529, region="California", country="United States", source="nominatim")
+
+
+def test_a_result_that_contradicts_the_states_the_query_names_is_rejected(monkeypatch):
+    (results, query), calls = _run(
+        {"El Centro, CA, 92243": [VENEZUELA], "El Centro, CA 92243": [EL_CENTRO_CA]},
+        candidates=["El Centro, CA, 92243", "El Centro, CA 92243"], monkeypatch=monkeypatch,
+    )
+    assert results == [EL_CENTRO_CA] and query == "El Centro, CA 92243"   # never South America
+    assert geocoding._consistent_with_query(VENEZUELA, "El Centro, CA, 92243") is False
+    assert geocoding._consistent_with_query(EL_CENTRO_CA, "El Centro, CA, 92243") is True
+    assert geocoding._consistent_with_query(VENEZUELA, "Payette 83661") is True   # no state stated: not judged
+
+
+def test_ocr_ei_is_read_as_el_street_addresses_lead_and_letterhead_and_foreign_mailing_lines_do_not():
+    from app.services import georeference as geo
+
+    text = "\n".join([
+        "Project Report", "EI Centro, CA, 92243", "801 MAIN STREET, EL CENTRO, CA, 92243 (442) 265-1736",
+        "2201 Cross Road EI Centro, CA 92243", "2205 Cross Road EI Centro, CA 92243",
+        "17533 East Starflower Court Queen Creek, AZ 85142",
+    ])
+    out = geo.find_anchor_candidates([{"regions": [{"ocr_text": text, "class": "Text"}]}], limit=6)
+    assert out[0] == "2201 Cross Road El Centro, CA 92243"          # street-level, "EI" repaired
+    assert not any("801 MAIN" in c for c in out)                      # phone number: an agency's office
+    assert out.index("2205 Cross Road El Centro, CA 92243") < out.index("17533 East Starflower Court Queen Creek, AZ 85142")
+    assert out.index("2205 Cross Road El Centro, CA 92243") < out.index("El Centro, CA, 92243")

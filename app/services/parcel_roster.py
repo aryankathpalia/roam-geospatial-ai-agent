@@ -215,8 +215,8 @@ def join_evidence(page_number: int, sheet: dict, regions: list[dict]) -> None:
     cands: list[dict] = []
     for ri in list(sheet.get("regions", [])) + list(sheet.get("inset_regions", [])):
         for pi, parcel in enumerate(regions[ri].get("parcels") or []):
-            if parcel.get("roster_id"):
-                continue  # already linked: joining twice (pipeline, then hand-named parcels) is safe
+            if parcel.get("roster_id") or parcel.get("deleted"):
+                continue  # already linked (joining twice is safe), or removed by the user: never resurrect it
             vg = parcel.get("vision_geometry") or {}
             cands.append(
                 {

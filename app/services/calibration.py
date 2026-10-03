@@ -74,6 +74,10 @@ class CalibrationResult:
     # rotation.
     independent_bearing_edges: list[int] = field(default_factory=list)
     quadrant_resolved_edges: list[int] = field(default_factory=list)
+    # When rotation is known up to a 180deg direction ambiguity, BOTH
+    # candidates (unchosen). Evidence for a later stage that can break the
+    # tie from a different source (e.g. printed control points).
+    rotation_ambiguous_candidates_deg: list[float] = field(default_factory=list)
 
 
 def _polygon_area(poly: list[tuple[float, float]]) -> float:
@@ -437,6 +441,7 @@ def calibrate(
 
     corroborating_edges = sorted(set(corroborating_edges))
     rotation_deg = None
+    ambiguous_candidates: list[float] = []
     if rotation_candidates:
         # A printed bearing describes ONE specific walk direction along
         # a physical line -- but the confirmed polygon's edge (v_i ->
@@ -499,6 +504,7 @@ def calibrate(
                 # one of two 180deg-apart placements, since that choice
                 # determines which side of the anchor the whole parcel
                 # ends up on. Flag rather than guess.
+                ambiguous_candidates = [round(candidate_a, 3), round(candidate_b, 3)]
                 notes.append(
                     "rotation solved up to a 180deg direction ambiguity (a printed bearing can describe "
                     "either walk direction along a line) and no prior placement was available to "
@@ -517,6 +523,7 @@ def calibrate(
             scale_from_area=scale_from_area, scale_from_edges=scale_from_edges,
             scale_agreement_pct=scale_agreement_pct, corroborating_edge_count=len(corroborating_edges),
             notes=notes, corroborations=corroborations,
+            rotation_ambiguous_candidates_deg=ambiguous_candidates,
         )
 
     # Rotation is cross-validated only when 2+ DISTINCT edges independently

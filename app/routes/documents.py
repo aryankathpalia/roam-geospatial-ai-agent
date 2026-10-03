@@ -2,7 +2,9 @@ import asyncio
 import copy
 import json
 import logging
+import math
 import threading
+import time
 from uuid import uuid4
 from pathlib import Path
 
@@ -24,6 +26,7 @@ from app.services.geometry import TraverseResult, traverse_to_geojson, walk_trav
 from app.services.region_cropper import PARCELMAP_CROP_MARGIN_FRAC, PARCELMAP_CROP_MARGIN_MIN_PX, padded_crop_box
 from app.services.ocr import run_parcelmap_ocr
 from app.services import calibration as calibration_service
+from app.services import control_points
 from app.services import parcel_roster
 from app.services import gemini_edge_association
 from app.services import placement as placement_service
@@ -764,6 +767,7 @@ def _derive_confirmed_geometry(
             "corroborations": calibration_info.corroborations,
             "independent_bearing_edges": calibration_info.independent_bearing_edges,
             "quadrant_resolved_edges": calibration_info.quadrant_resolved_edges,
+            "rotation_ambiguous_candidates_deg": calibration_info.rotation_ambiguous_candidates_deg,
         }
         parcel.pop("georeference_error", None)
         return
@@ -837,6 +841,7 @@ def _derive_confirmed_geometry(
         "corroborations": calibration_info.corroborations,
         "independent_bearing_edges": calibration_info.independent_bearing_edges,
         "quadrant_resolved_edges": calibration_info.quadrant_resolved_edges,
+            "rotation_ambiguous_candidates_deg": calibration_info.rotation_ambiguous_candidates_deg,
     }
     parcel.pop("georeference_error", None)
 
@@ -891,8 +896,12 @@ def _verify_confirmation(document_id: str, body, confirmation_id: str) -> None:
                 if key in scratch:
                     parcel[key] = scratch[key]
             parcel.pop("georeference_error", None)
+            _reapply_manual_position(parcel)
+        _unify_sheet_frame(result, body.page_number)
         _fit_sheet_to_aliquot(result, body.page_number)
+        _fit_sheet_to_control_points(result, body.page_number)
         _save_result(document_id, result)
+    _ensure_control_points(document_id, body.page_number)
 
 
 # The confirmed parcels' combined area must match the aliquot part's to
@@ -903,6 +912,58 @@ _ALIQUOT_FIT_AREA_TOL = 0.03
 # better: combined area AND both outer extents within this percent of the
 # BLM aliquot part (Patnaude: 0.2% area).
 _ALIQUOT_CORROBORATED_PCT = 2.0
+
+
+def _contain_in_aliquot(members: list, aliquot: dict, total_acres: float) -> bool:
+    """
+    Shifts the sheet's confirmed parcels, as a group and by the smallest amount, so they lie
+    inside the aliquot part the legal description says they are a portion of. Position stays
+    "approximate": nothing here confirms WHERE inside it they sit, only that the placement from
+    the document anchor must not put them outside land the survey itself names. A group larger
+    than the aliquot part is left alone (it cannot be contained). Returns True when it handled
+    the sheet (shifted, or already inside).
+    """
+
+    from pyproj import Geod
+
+    geod = Geod(ellps="WGS84")
+    pts = [pt for _, u in members for pt in u["geometry"]["coordinates"][0]]
+    poly = aliquot["polygon"]
+    g_w, g_e = min(p[0] for p in pts), max(p[0] for p in pts)
+    g_s, g_n = min(p[1] for p in pts), max(p[1] for p in pts)
+    a_w, a_e = min(p[0] for p in poly), max(p[0] for p in poly)
+    a_s, a_n = min(p[1] for p in poly), max(p[1] for p in poly)
+    if g_e - g_w > a_e - a_w or g_n - g_s > a_n - a_s:
+        return False
+    dx = (a_w - g_w) if g_w < a_w else (a_e - g_e) if g_e > a_e else 0.0
+    dy = (a_s - g_s) if g_s < a_s else (a_n - g_n) if g_n > a_n else 0.0
+    shift_m = geod.inv(g_w, g_s, g_w + dx, g_s + dy)[2]
+    for parcel, unfitted in members:
+        placement = parcel.setdefault("placement", {"status": "approximate", "notes": []})
+        placement["notes"] = [n for n in placement.get("notes", []) if not n.startswith("constrained to lie within")]
+        if shift_m < 0.5:  # already inside: nothing to change (and undo any earlier shift)
+            if placement.pop("aliquot_fit", None):
+                parcel["boundary_geojson_wgs84"] = unfitted
+                parcel.pop("boundary_geojson_wgs84_unfitted", None)
+            continue
+        moved = copy.deepcopy(unfitted)
+        moved["geometry"]["coordinates"] = [
+            [[lon + dx, lat + dy] for lon, lat in ring] for ring in unfitted["geometry"]["coordinates"]
+        ]
+        moved["properties"]["georeferenced"] = "contained_in_aliquot_part"
+        parcel["boundary_geojson_wgs84_unfitted"] = unfitted
+        parcel["boundary_geojson_wgs84"] = moved
+        placement["aliquot_fit"] = {
+            "mode": "containment", "corroborated": False, "description": aliquot["description"],
+            "shift_m": round(shift_m, 1), "confirmed_acres": round(total_acres, 2),
+            "aliquot_acres": round(aliquot["acres"], 2),
+        }
+        placement["notes"].append(
+            f"constrained to lie within the {aliquot['description']} (BLM section corners) the legal description "
+            f"says these parcels are a portion of: moved {shift_m:.0f} m from the anchor-based position. "
+            "Where inside it they sit is not confirmed."
+        )
+    return True
 
 
 def _fit_sheet_to_aliquot(result: dict, page_number: int) -> None:
@@ -937,9 +998,11 @@ def _fit_sheet_to_aliquot(result: dict, page_number: int) -> None:
         for parcel in region.get("parcels") or []:
             if not parcel.get("human_confirmed") or not parcel.get("boundary_geojson_wgs84"):
                 continue
-            if parcel.get("anchor_override"):
+            if parcel.get("anchor_override") or parcel.get("manual_position"):
                 continue
             placement = parcel.get("placement") or {}
+            if (placement.get("control_fit") or {}).get("validated"):
+                continue  # placed from printed control points -- the stronger evidence
             if placement.get("status") == "pending":
                 return  # wait until every confirmed parcel on the sheet is verified
             # verification rewrites `placement`, so a missing marker means the
@@ -955,6 +1018,10 @@ def _fit_sheet_to_aliquot(result: dict, page_number: int) -> None:
     total_acres = sum((p.get("spatial_validation") or {}).get("area_acres") or 0 for p, _ in members)
     target_acres = aliquot["acres"]
     if not target_acres or abs(total_acres - target_acres) / target_acres > _ALIQUOT_FIT_AREA_TOL:
+        # The parcels are only a PART of the described land ("a portion of the W1/2 of the NE1/4"):
+        # no scale/extent check is possible, but they must lie inside it.
+        if aliquot.get("portion_of") and _contain_in_aliquot(members, aliquot, total_acres):
+            return
         for parcel, unfitted in members:  # undo any earlier fit that no longer holds
             if (parcel.get("placement") or {}).pop("aliquot_fit", None):
                 parcel["boundary_geojson_wgs84"] = unfitted
@@ -1010,6 +1077,423 @@ def _fit_sheet_to_aliquot(result: dict, page_number: int) -> None:
             f"(BLM section corners): combined {total_acres:.2f} ac vs {target_acres:.2f} ac; moved {shift_m:.0f} m"
         )
         placement["notes"] = [n for n in placement.get("notes", []) if not n.startswith("fitted with")] + [note]
+
+
+def _unify_sheet_frame(result: dict, page_number: int) -> bool:
+    """
+    Parcels outlined on the SAME drawing share its scale and rotation, but each is calibrated on
+    its own evidence and pinned by its own pivot -- so two parcels that share a boundary line can
+    land apart and rotated differently (Payette ROS: Parcel 1 verified at 1.7 deg, Parcel 2
+    unverified at 0 deg, ~120 m apart though they share a 490 ft line).
+
+    The best-calibrated parcel keeps its placement; every other confirmed parcel on the sheet is
+    re-expressed from the same pixel frame with that parcel's scale and rotation. Only
+    translation/rotation of the group changes -- each outline's own shape and vertex count are
+    untouched. Skips regions where the existing trusted placement already placed a parcel, and
+    parcels with no placed geometry (the control-point fallback handles those).
+    """
+
+    page = next((p for p in result.get("pages", []) if p["page_number"] == page_number), None)
+    if page is None:
+        return False
+    from pyproj import Geod
+
+    geod = Geod(ellps="WGS84")
+    changed = False
+    for region in page.get("regions", []):
+        members = _control_fit_members(region)
+        if not members:
+            continue
+        scaled = [
+            p for p in members
+            if (p.get("calibration") or {}).get("scale_ft_per_px") and p.get("boundary_geojson_wgs84")
+            and not (p.get("placement") or {}).get("control_fit", {}).get("validated")
+        ]
+        if len(scaled) < 2:
+            continue
+
+        def verified(p):
+            c = p["calibration"]
+            return c.get("status") in ("cross_validated", "single_source") and c.get("rotation_deg") is not None
+
+        pool = [p for p in scaled if verified(p)] or scaled
+        best = min(pool, key=lambda p: p["calibration"].get("scale_agreement_pct") if p["calibration"].get("scale_agreement_pct") is not None else 1e9)
+        scale = best["calibration"]["scale_ft_per_px"]
+        rotation = best["calibration"]["rotation_deg"] if verified(best) else 0.0
+
+        def working(p):
+            return p.get("boundary_geojson_wgs84_unfitted") or p["boundary_geojson_wgs84"]
+
+        ref_px = tuple(best["confirmed_boundary_pixels"]["vertices"][0])
+        ref_ll = working(best)["geometry"]["coordinates"][0][0]
+        for p in scaled:
+            ring = []
+            for x, y in p["confirmed_boundary_pixels"]["vertices"]:
+                dx, dy = (x - ref_px[0]) * scale, -(y - ref_px[1]) * scale
+                az = (math.degrees(math.atan2(dx, dy)) + rotation) % 360
+                lon, lat = geod.fwd(ref_ll[0], ref_ll[1], az, math.hypot(dx, dy) * 0.3048)[:2]
+                ring.append([lon, lat])
+            ring.append(list(ring[0]))
+            geo = working(p)
+            old = geo["geometry"]["coordinates"][0]
+            if len(old) == len(ring) and max(geod.inv(a[0], a[1], b[0], b[1])[2] for a, b in zip(old, ring)) < 0.3:
+                continue  # already in this frame
+            geo["geometry"] = {"type": "Polygon", "coordinates": [ring]}
+            geo.setdefault("properties", {})["georeferenced"] = "sheet_common_frame"
+            placement = p.setdefault("placement", {"status": "approximate", "notes": []})
+            placement["common_frame"] = {
+                "from": (best.get("vision_geometry") or {}).get("parcel_label"),
+                "rotation_deg": round(rotation, 3), "scale_ft_per_px": scale,
+            }
+            changed = True
+    return changed
+
+
+def _shift_feature(feature: dict, east_m: float, north_m: float) -> dict:
+    """The same GeoJSON polygon translated by (east, north) metres: every vertex moves by the same vector."""
+
+    from pyproj import Geod
+
+    geod = Geod(ellps="WGS84")
+    az = math.degrees(math.atan2(east_m, north_m)) % 360
+    dist = math.hypot(east_m, north_m)
+    out = copy.deepcopy(feature)
+    if dist == 0:
+        return out
+    out["geometry"]["coordinates"] = [
+        [list(geod.fwd(lon, lat, az, dist)[:2]) for lon, lat in ring] for ring in feature["geometry"]["coordinates"]
+    ]
+    return out
+
+
+def _reapply_manual_position(parcel: dict) -> None:
+    """
+    A user's move is stored as an offset from the COMPUTED position, so a re-verification (which
+    recomputes that position) keeps it. A move made against an outline that has since been
+    re-confirmed with different vertices no longer applies and is dropped.
+    """
+
+    manual = parcel.get("manual_position")
+    if not manual:
+        return
+    if manual.get("confirmation_id") != (parcel.get("confirmed_boundary_pixels") or {}).get("id"):
+        parcel.pop("manual_position", None)
+        parcel.pop("boundary_geojson_wgs84_computed", None)
+        return
+    if not parcel.get("boundary_geojson_wgs84"):
+        return
+    parcel["boundary_geojson_wgs84_computed"] = copy.deepcopy(parcel["boundary_geojson_wgs84"])
+    parcel["boundary_geojson_wgs84"] = _shift_feature(
+        parcel["boundary_geojson_wgs84_computed"], manual["east_m"], manual["north_m"]
+    )
+    parcel["boundary_geojson_wgs84"].setdefault("properties", {})["georeferenced"] = "manually_placed"
+
+
+class MoveParcelsRequest(BaseModel):
+    page_number: int
+    region_index: int
+    parcel_indexes: list[int]
+    east_m: float
+    north_m: float
+
+
+class ResetPositionRequest(BaseModel):
+    page_number: int
+    region_index: int
+    parcel_indexes: list[int]
+
+
+def _parcels_for(result: dict, page_number: int, region_index: int, indexes: list[int]) -> list[dict]:
+    page = next((p for p in result["pages"] if p["page_number"] == page_number), None)
+    if page is None or not (0 <= region_index < len(page["regions"])):
+        raise HTTPException(status_code=404, detail="Page or region index out of range")
+    parcels = page["regions"][region_index].get("parcels") or []
+    out = []
+    for i in indexes:
+        if not (0 <= i < len(parcels)):
+            raise HTTPException(status_code=404, detail="Parcel index out of range")
+        out.append(parcels[i])
+    return out
+
+
+@router.post("/{document_id}/move-parcels")
+def move_parcels(document_id: str, body: MoveParcelsRequest):
+    """
+    Drag-to-move: translates the given confirmed parcels (the whole sheet's group, or one) by
+    (east_m, north_m). Shape, scale and rotation are untouched, so shared edges stay shared; only
+    where the outline sits changes. The total move is stored on each parcel as an offset from its
+    computed position (`manual_position`), which later verification re-applies and the automatic
+    fits (common frame, aliquot, control points) leave alone. Reset restores the computed position.
+    """
+
+    if not (math.isfinite(body.east_m) and math.isfinite(body.north_m)) or math.hypot(body.east_m, body.north_m) > 50_000:
+        raise HTTPException(status_code=400, detail="Move distance is not valid")
+    with _RESULT_LOCK:
+        result = _load_result(document_id)
+        parcels = _parcels_for(result, body.page_number, body.region_index, body.parcel_indexes)
+        for parcel in parcels:
+            if not parcel.get("human_confirmed") or not parcel.get("boundary_geojson_wgs84"):
+                raise HTTPException(status_code=400, detail="Only a confirmed, placed parcel can be moved")
+        for parcel in parcels:
+            manual = parcel.get("manual_position")
+            conf_id = (parcel.get("confirmed_boundary_pixels") or {}).get("id")
+            if not manual or manual.get("confirmation_id") != conf_id:
+                parcel["boundary_geojson_wgs84_computed"] = copy.deepcopy(parcel["boundary_geojson_wgs84"])
+                manual = {"confirmation_id": conf_id, "east_m": 0.0, "north_m": 0.0}
+            manual["east_m"] = round(manual["east_m"] + body.east_m, 3)
+            manual["north_m"] = round(manual["north_m"] + body.north_m, 3)
+            parcel["manual_position"] = manual
+            parcel["boundary_geojson_wgs84"] = _shift_feature(
+                parcel["boundary_geojson_wgs84_computed"], manual["east_m"], manual["north_m"]
+            )
+            parcel["boundary_geojson_wgs84"].setdefault("properties", {})["georeferenced"] = "manually_placed"
+            placement = parcel.setdefault("placement", {"status": "approximate", "notes": []})
+            placement["notes"] = [n for n in placement.get("notes", []) if not n.startswith("moved by hand")] + [
+                f"moved by hand {math.hypot(manual['east_m'], manual['north_m']):.1f} m from the computed position "
+                f"({manual['east_m']:+.1f} m east, {manual['north_m']:+.1f} m north)"
+            ]
+        _save_result(document_id, result)
+        return {"document_id": document_id, "parcels": parcels}
+
+
+@router.post("/{document_id}/reset-position")
+def reset_position(document_id: str, body: ResetPositionRequest):
+    """Puts the given parcels back at their computed position (undoes drag-to-move)."""
+
+    with _RESULT_LOCK:
+        result = _load_result(document_id)
+        parcels = _parcels_for(result, body.page_number, body.region_index, body.parcel_indexes)
+        for parcel in parcels:
+            computed = parcel.pop("boundary_geojson_wgs84_computed", None)
+            if parcel.pop("manual_position", None) and computed:
+                parcel["boundary_geojson_wgs84"] = computed
+            placement = parcel.get("placement") or {}
+            placement["notes"] = [n for n in placement.get("notes", []) if not n.startswith("moved by hand")]
+        _save_result(document_id, result)
+        return {"document_id": document_id, "parcels": parcels}
+
+
+def _control_fit_members(region: dict) -> list[dict] | None:
+    """
+    Confirmed parcels of one region the control-point fallback may place, or None when the
+    region must be left alone: a parcel is still verifying, or the existing trusted placement
+    (a vertex bound to a printed parcel corner, a corroborated aliquot fit, a hand-pinned
+    anchor) already placed it.
+    """
+
+    members = []
+    for p in region.get("parcels") or []:
+        if not p.get("human_confirmed") or not (p.get("confirmed_boundary_pixels") or {}).get("vertices"):
+            continue
+        placement = p.get("placement") or {}
+        if placement.get("status") == "pending":
+            return None
+        reliable = (
+            p.get("anchor_override")
+            or p.get("manual_position")
+            or (placement.get("status") == "surveyed_corner" and not placement.get("control_fit"))
+            or (placement.get("aliquot_fit") or {}).get("corroborated")
+        )
+        if reliable:
+            return None
+        members.append(p)
+    return members or None
+
+
+def _control_fit_applicable(result: dict) -> bool:
+    # The zone can only be identified when the document anchor is itself a printed state-plane pair.
+    return "state-plane" in ((result.get("anchor") or {}).get("source") or "")
+
+
+# A "reading" marker older than this is a read that died with its process (e.g. a dev-server
+# reload): it must neither block a retry nor keep the UI showing "refining" forever.
+_CONTROL_READ_STALE_S = 900
+
+
+def _control_read_fresh(page: dict) -> bool:
+    cp = page.get("control_points") or {}
+    return cp.get("status") == "reading" and time.time() - cp.get("started_at", 0) < _CONTROL_READ_STALE_S
+
+
+def _region_page_origin(region: dict) -> tuple[float, float]:
+    bx, by, bw, bh = region["bbox"]
+    if region.get("class") == "ParcelMap":
+        mx = max(PARCELMAP_CROP_MARGIN_MIN_PX, bw * PARCELMAP_CROP_MARGIN_FRAC)
+        my = max(PARCELMAP_CROP_MARGIN_MIN_PX, bh * PARCELMAP_CROP_MARGIN_FRAC)
+    else:
+        mx = my = 0
+    return max(0, bx - mx), max(0, by - my)
+
+
+def _ensure_control_points(document_id: str, page_number: int) -> None:
+    """
+    Reads and caches the page's printed control points (slow: OCR) when the fallback might need
+    them, then runs the fit. The heavy OCR runs with no lock held; a "reading" marker on the page
+    tells the UI the placement is still being refined.
+    """
+
+    with _RESULT_LOCK:
+        try:
+            result = _load_result(document_id)
+        except HTTPException:
+            return
+        page = next((p for p in result.get("pages", []) if p["page_number"] == page_number), None)
+        if page is None or not _control_fit_applicable(result):
+            return
+        existing = page.get("control_points")
+        if existing is not None and (existing.get("status") != "reading" or _control_read_fresh(page)):
+            return
+        focus = []
+        eligible = False
+        for region in page.get("regions", []):
+            members = _control_fit_members(region)
+            if members:
+                eligible = True
+                ox, oy = _region_page_origin(region)
+                focus += [(ox + v[0], oy + v[1]) for p in members for v in p["confirmed_boundary_pixels"]["vertices"]]
+        if not eligible:
+            return
+        page["control_points"] = {"status": "reading", "started_at": time.time()}
+        _save_result(document_id, result)
+    try:
+        with Image.open(DOCUMENT_ROOT / document_id / "pages" / f"page_{page_number:03d}.png") as img:
+            img.load()
+            first_lines, _ = run_parcelmap_ocr(img)
+            first = control_points.extract_control_points(first_lines, "ocr", positions_trusted=False)
+            # Labels sit beside the corners they name: read the tiles around the confirmed polygon
+            # first, and the rest of the page only if that did not find two complete pairs.
+            origins = control_points.tile_origins(*img.size)
+            near = control_points.tiles_near(origins, focus, radius=450)
+            tile_lines = control_points.recover_control_points(img, run_parcelmap_ocr, only_tiles=near)
+            if len(control_points.extract_control_points(tile_lines, "ocr_recovered", True)) < 2 and len(near) < len(origins):
+                rest = [o for o in origins if o not in set(near)]
+                tile_lines += control_points.recover_control_points(img, run_parcelmap_ocr, only_tiles=rest)
+    except Exception as exc:  # noqa: BLE001 -- best-effort; the existing placement stands
+        logging.getLogger(__name__).warning("control point read failed for %s: %s", document_id, exc)
+        with _RESULT_LOCK:
+            try:
+                result = _load_result(document_id)
+                pg = next(p for p in result["pages"] if p["page_number"] == page_number)
+                pg.pop("control_points", None)  # not a result: let a later verification retry
+                _save_result(document_id, result)
+            except (HTTPException, StopIteration):
+                pass
+        return
+    tiled = control_points.extract_control_points(tile_lines, "ocr_recovered", positions_trusted=True)
+    near_pt = lambda a, b: math.hypot(a.northing - b.northing, a.easting - b.easting) <= 0.5  # noqa: E731
+    for t in tiled:
+        if any(near_pt(f, t) for f in first):
+            t.source = "ocr"  # the first pass already saw this pair; only its position is new
+    merged = tiled + [f for f in first if not any(near_pt(f, t) for t in tiled)]
+    with _RESULT_LOCK:
+        try:
+            result = _load_result(document_id)
+        except HTTPException:
+            return
+        page = next((p for p in result.get("pages", []) if p["page_number"] == page_number), None)
+        if page is None:
+            return
+        page["control_points"] = {"status": "done", "points": [c.to_dict() for c in merged], "tile_pass": True}
+        _fit_sheet_to_control_points(result, page_number)
+        _save_result(document_id, result)
+
+
+def _fit_sheet_to_control_points(result: dict, page_number: int) -> bool:
+    """
+    Fallback placement from TWO printed surveyed coordinates (see services/control_points.py).
+    Runs only where the existing trusted placement did not place a region's confirmed parcels,
+    never changes a polygon's own vertices, and applies one transform to every confirmed parcel
+    of the region -- so parcels sharing an edge keep sharing it, from the same survey framework.
+    """
+
+    page = next((p for p in result.get("pages", []) if p["page_number"] == page_number), None)
+    cache = (page or {}).get("control_points")
+    if not cache or not cache.get("points") or not _control_fit_applicable(result) or result.get("anchor_lat") is None:
+        return False
+    points = [control_points.ControlPoint.from_dict(d) for d in cache["points"]]
+    if len(points) < 2:
+        return False
+    epsg = control_points.resolve_crs_from_anchor(points, result["anchor_lat"], result["anchor_lon"])
+
+    from pyproj import Transformer
+
+    applied = False
+    for region in page.get("regions", []):
+        members = _control_fit_members(region)
+        if not members:
+            continue
+        if epsg is None:
+            outcome = control_points.ControlSolution(
+                "unverified", "no state-plane zone converts a printed coordinate onto the document anchor"
+            )
+        else:
+            vertices = [tuple(v) for p in members for v in p["confirmed_boundary_pixels"]["vertices"]]
+            scaled = [p for p in members if (p.get("calibration") or {}).get("scale_ft_per_px")]
+            best = min(
+                scaled or members,
+                key=lambda p: (p.get("calibration") or {}).get("scale_agreement_pct")
+                if (p.get("calibration") or {}).get("scale_agreement_pct") is not None else 1e9,
+            )
+            cal = best.get("calibration") or {}
+            known = cal.get("rotation_deg") if cal.get("status") in ("cross_validated", "single_source") else None
+            outcome = control_points.solve_control_points(
+                points, vertices, cal.get("scale_ft_per_px"),
+                rotation_candidates_deg=cal.get("rotation_ambiguous_candidates_deg") or None,
+                known_rotation_deg=known,
+            )
+        if outcome.status != "validated":
+            for p in members:
+                placement = p.setdefault("placement", {"status": "approximate", "notes": []})
+                if not (placement.get("control_fit") or {}).get("validated"):
+                    placement["control_fit"] = {"validated": False, "status": outcome.status, "reason": outcome.reason}
+            continue
+        to_wgs84 = Transformer.from_crs(epsg, 4326, always_xy=True)
+        a, b = points[outcome.anchor_index], points[outcome.other_index]
+        for parcel in members:
+            verts = [tuple(v) for v in parcel["confirmed_boundary_pixels"]["vertices"]]
+            ring = [list(to_wgs84.transform(e, n)) for e, n in control_points.place_vertices(outcome, verts)]
+            ring.append(list(ring[0]))
+            borrowed_scale = not (parcel.get("calibration") or {}).get("scale_ft_per_px")
+            geo = parcel.get("boundary_geojson_wgs84") or {"type": "Feature", "properties": {}}
+            geo["geometry"] = {"type": "Polygon", "coordinates": [ring]}
+            geo.setdefault("properties", {})["georeferenced"] = "fitted_to_control_points"
+            parcel["boundary_geojson_wgs84"] = geo
+            parcel.pop("boundary_geojson_wgs84_unfitted", None)
+            if not parcel.get("spatial_validation"):
+                # Shape checks for a parcel whose own calibration produced no geometry: the placed ring
+                # in ground feet, measured the same way as every other confirmed parcel.
+                en = control_points.place_vertices(outcome, verts)
+                local = [(e - outcome.anchor_en[0], n - outcome.anchor_en[1]) for e, n in en]
+                traverse = TraverseResult(points=local + [local[0]], closure_error_ft=0.0, unparsed_calls=0)
+                parcel["boundary_geojson"] = traverse_to_geojson(traverse)
+                parcel["spatial_validation"] = validate_traverse(
+                    traverse, "", stated_area_acres=(parcel.get("vision_geometry") or {}).get("stated_area_acres"),
+                    calls=parcel.get("resolved_boundary_calls"),
+                )
+            placement = parcel.setdefault("placement", {"status": "approximate", "notes": []})
+            placement.pop("aliquot_fit", None)
+            placement["status"] = "surveyed_corner"
+            placement["control_fit"] = {
+                "validated": True, "method": "two_control_points", "epsg": epsg,
+                "residual_ft": outcome.residual_ft, "tolerance_ft": outcome.tolerance_ft,
+                "separation_ft": outcome.separation_ft, "rotation_deg": round(outcome.rotation_deg, 2),
+                "rotation_source": outcome.rotation_source, "scale_ft_per_px": outcome.scale_ft_per_px,
+                "anchor_control_point": a.to_dict(), "check_control_point": b.to_dict(),
+                "candidate_correspondences": outcome.details.get("candidate_correspondences"),
+                "scale_borrowed_from_sheet": borrowed_scale,
+            }
+            stale = ("two printed control points", "position comes from the document-level anchor", "scale/rotation not calibrated")
+            placement["notes"] = [
+                n for n in placement.get("notes", [])
+                if not n.startswith(stale) and "cannot be placed" not in n
+            ] + [
+                f"two printed control points (N {a.northing} E {a.easting} and N {b.northing} E {b.easting}) matched one "
+                f"vertex pair {outcome.separation_ft:.1f} ft apart; rotation {outcome.rotation_deg:.1f} deg from "
+                f"{outcome.rotation_source}; the second point was predicted within {outcome.residual_ft:.1f} ft "
+                f"(tolerance {outcome.tolerance_ft:.1f} ft)"
+            ]
+        applied = True
+    return applied
 
 
 def _seed_local_vertices(parcel: dict, body) -> list[list[float]] | None:
@@ -1258,6 +1742,14 @@ def delete_parcel_entity(document_id: str, page_number: int, parcel_id: str):
                 detail="This parcel has already been confirmed and cannot be deleted this way.",
             )
         entities.remove(entity)
+        # The extracted parcel it was bound to is what the workspace lists: mark it removed too, or the
+        # same parcel keeps appearing there (and the next evidence join would recreate the entity).
+        ref = entity.get("evidence_ref")
+        if ref:
+            try:
+                page["regions"][ref["region"]]["parcels"][ref["parcel"]]["deleted"] = True
+            except (IndexError, KeyError):
+                pass
         _save_result(document_id, result)
 
     return {"document_id": document_id, "deleted": parcel_id}

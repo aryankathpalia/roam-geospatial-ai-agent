@@ -349,3 +349,16 @@ def test_unverified_rotation_still_uses_the_corroborated_scale(client, monkeypat
     assert p["placement"]["status"] == "approximate"
     assert abs(p["spatial_validation"]["area_acres"] - 1.78) < 0.05
     assert any("north-up" in n for n in p["calibration"]["notes"])
+
+
+def test_deleting_a_parcel_also_removes_it_from_the_extracted_list_and_it_is_never_recreated(patnaude_client):
+    from app.services import parcel_roster
+
+    c, root = patnaude_client
+    assert c.delete(f"/documents/{PATNAUDE}/pages/7/parcels/p7-x1").status_code == 200
+    r = json.loads((root / PATNAUDE / "result.json").read_text())
+    pg7 = next(p for p in r["pages"] if p["page_number"] == 7)
+    assert pg7["regions"][3]["parcels"][0]["deleted"] is True          # what the workspace lists
+    parcel_roster.join_evidence(7, pg7["sheet"], pg7["regions"])      # the next evidence join (finalize / reprocess)
+    assert not any(e.get("evidence_ref") == {"region": 3, "parcel": 0} for e in pg7["sheet"]["parcels"])
+    assert "p7-x1" not in {e["id"] for e in pg7["sheet"]["parcels"]}

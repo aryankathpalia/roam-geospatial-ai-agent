@@ -92,6 +92,9 @@ export type BoundaryGroup = {
   badge: string | null;
   note: string | null;
   refs: BoundaryRef[];
+  // Sheets that show the SAME parcels as this one (same labels, same stated areas) -- collapsed under
+  // it instead of listed as separate maps; see collapseDuplicateSheets.
+  duplicates: BoundaryGroup[];
 };
 
 // The page's sheet: from the backend when present, else re-derived from its regions.
@@ -239,18 +242,82 @@ export function groupCandidates(refs: BoundaryRef[]): BoundaryGroup[] {
         primary,
         badge: primary ? null : (ROLE_LABELS[r.role!] ?? 'other map'),
         note: primary ? null : r.sheetReason,
-        refs: []
+        refs: [],
+        duplicates: []
       });
     }
     groups.get(r.pageNumber)!.refs.push(r);
   }
   const area = new Map(refs.map((r) => [r.pageNumber, r.regionArea]));
-  return [...groups.values()].sort(
+  const ordered = [...groups.values()].sort(
     (a, b) =>
       Number(!a.primary) - Number(!b.primary) ||
       (area.get(b.pageNumber) ?? 0) - (area.get(a.pageNumber) ?? 0) ||
       a.pageNumber - b.pageNumber
   );
+  return collapseDuplicateSheets(ordered, area);
+}
+
+// ---- the same map on several pages ----
+//
+// A packet often repeats one exhibit (a site plan, a lot line adjustment sheet) on several pages --
+// Imperial County: Parcels A, B and C on pages 9, 21, 23 and 25, twelve rows for three parcels. A
+// sheet whose parcels are ALL the same parcels as another sheet's (label words contained in each
+// other; stated acreage within 8% when both state one) is a duplicate of it and is folded under
+// that sheet. Folded, never dropped: it stays one click away and selectable. A sheet with any parcel
+// the other lacks is a different map and stays separate.
+
+const words = (s: string | null | undefined) =>
+  new Set((s ?? '').toUpperCase().replace(/[^A-Z0-9\s-]/g, ' ').split(/\s+/).filter(Boolean));
+
+function acresOf(r: BoundaryRef): number | null {
+  const raw = r.entity?.stated_area ?? r.parcel?.vision_geometry?.stated_area_acres ?? null;
+  const m = String(raw ?? '').match(/\d+(?:\.\d+)?/);
+  return m ? parseFloat(m[0]) : null;
+}
+
+function sameParcelRef(a: BoundaryRef, b: BoundaryRef): boolean {
+  const wa = words(a.label);
+  const wb = words(b.label);
+  if (!wa.size || !wb.size) return false;
+  const [small, big] = wa.size <= wb.size ? [wa, wb] : [wb, wa];
+  if (![...small].every((w) => big.has(w))) return false;
+  const aa = acresOf(a);
+  const ab = acresOf(b);
+  return aa === null || ab === null || Math.abs(aa - ab) <= 0.08 * Math.max(aa, ab);
+}
+
+const realParcels = (g: BoundaryGroup) => g.refs.filter((r) => r.kind === 'parcel');
+
+function isDuplicateOf(g: BoundaryGroup, of: BoundaryGroup): boolean {
+  const mine = realParcels(g);
+  const theirs = realParcels(of);
+  return mine.length > 0 && mine.every((m) => theirs.some((t) => sameParcelRef(m, t)));
+}
+
+export function collapseDuplicateSheets(groups: BoundaryGroup[], area: Map<number, number>): BoundaryGroup[] {
+  // The sheet worth keeping: one the user already worked on, then likely targets, more parcels,
+  // the larger drawing, the earlier page.
+  const rank = (g: BoundaryGroup) => [
+    realParcels(g).some((r) => r.parcel?.human_confirmed) ? 0 : 1,
+    g.primary ? 0 : 1,
+    -realParcels(g).length,
+    -(area.get(g.pageNumber) ?? 0),
+    g.pageNumber
+  ];
+  const cmp = (a: BoundaryGroup, b: BoundaryGroup) => {
+    const ra = rank(a);
+    const rb = rank(b);
+    for (let i = 0; i < ra.length; i++) if (ra[i] !== rb[i]) return ra[i] - rb[i];
+    return 0;
+  };
+  const kept: BoundaryGroup[] = [];
+  for (const g of [...groups].sort(cmp)) {
+    const host = kept.find((k) => isDuplicateOf(g, k));
+    if (host) host.duplicates.push(g);
+    else kept.push(g);
+  }
+  return groups.filter((g) => kept.includes(g));
 }
 
 // What the workspace banner counts: parcels on likely-target sheets (not "Other maps").

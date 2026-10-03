@@ -85,6 +85,7 @@
     result?.processing?.complete === false ||
     (result?.pages ?? []).some(
       (pg: any) =>
+        controlReadInProgress(pg) ||
         (pg.regions ?? []).some((r: any) => (r.parcels ?? []).some((pc: any) => pc.calibration?.status === 'pending')) ||
         (pg.sheet?.parcels ?? []).some((e: any) => {
           if (!e.confirmed_polygon) return false;
@@ -183,6 +184,33 @@
 
   let selectedKey: string | null = null;
 
+  // Outline colour palette, per document page ('*' = every page), remembered in this browser.
+  const PALETTE = ['#ff1f3d', '#12b53b', '#1c7ed6', '#ffd43b', '#d100d1', '#15c5d6', '#ff8c00', '#ffffff', '#000000'];
+  let outlineColors: Record<string, string> = {};
+  const colorsKey = () => `roam.outlineColors.${documentId ?? ''}`;
+  function loadOutlineColors() {
+    try {
+      outlineColors = JSON.parse(localStorage.getItem(colorsKey()) ?? '{}') ?? {};
+    } catch {
+      outlineColors = {};
+    }
+  }
+  $: if (documentId) loadOutlineColors();
+  $: paletteScope = selectedKey ? Number(selectedKey.split('-')[0]) : null;
+  function setOutlineColor(c: string | null) {
+    const scope = paletteScope === null || Number.isNaN(paletteScope) ? '*' : String(paletteScope);
+    const next = { ...outlineColors };
+    if (c === null) delete next[scope];
+    else next[scope] = c;
+    outlineColors = next;
+    try {
+      localStorage.setItem(colorsKey(), JSON.stringify(next));
+    } catch {
+      // storage unavailable: the choice still applies for this visit
+    }
+    renderMap();
+  }
+
   function regionKey(pageNumber: number, i: number) {
     return `${pageNumber}-${i}`;
   }
@@ -247,10 +275,42 @@
     });
   }
 
-  $: parcelRegions = (showAllCategories
-    ? allParcelRegions
-    : allParcelRegions.filter((r: any) => r.category !== 'not_a_parcel_drawing')
-  ).filter((r: any) => !isOtherSheetCopy(r));
+  // The same parcel is often drawn on several sheets of one packet (Imperial County plat: Parcels A, B
+  // and C on pages 9, 21, 23 and 25 -- twelve cards for three parcels). Cards of one parcel (label
+  // words contained in each other, stated acreage within 8% when both state one) on DIFFERENT pages
+  // collapse to the one worth looking at: the confirmed one, else the one that has geometry, else the
+  // first page. Removed (deleted) parcels are never listed.
+  const statedAcres = (e: any) => {
+    const m = String(e.parcel.vision_geometry?.stated_area_acres ?? '').match(/\d+(?:\.\d+)?/);
+    return m ? parseFloat(m[0]) : null;
+  };
+  function sameParcel(a: any, b: any): boolean {
+    if (a.page === b.page) return false;
+    const wa = labelWords(a.parcel.vision_geometry?.parcel_label);
+    const wb = labelWords(b.parcel.vision_geometry?.parcel_label);
+    if (!wa.size || !wb.size) return false;
+    const [small, big] = wa.size <= wb.size ? [wa, wb] : [wb, wa];
+    if (![...small].every((w) => big.has(w))) return false;
+    const aa = statedAcres(a);
+    const ab = statedAcres(b);
+    return aa === null || ab === null || Math.abs(aa - ab) <= 0.08 * Math.max(aa, ab);
+  }
+  const copyRank = (e: any) =>
+    (e.parcel.human_confirmed ? 0 : 4) + (e.parcel.boundary_geojson_wgs84 ? 0 : 2) + (e.parcel.spatial_validation ? 0 : 1);
+  function dedupeCopies(list: any[]): any[] {
+    const kept: any[] = [];
+    for (const e of [...list].sort((x, y) => copyRank(x) - copyRank(y) || x.page - y.page)) {
+      if (!kept.some((k) => sameParcel(k, e))) kept.push(e);
+    }
+    return list.filter((e) => kept.includes(e));
+  }
+
+  $: parcelRegions = dedupeCopies(
+    (showAllCategories
+      ? allParcelRegions
+      : allParcelRegions.filter((r: any) => r.category !== 'not_a_parcel_drawing')
+    ).filter((r: any) => !isOtherSheetCopy(r) && !r.parcel.deleted)
+  );
 
   $: hiddenCount = allParcelRegions.filter((r: any) => r.category === 'not_a_parcel_drawing' && !isOtherSheetCopy(r)).length;
 
@@ -263,8 +323,8 @@
   // A confirmed parcel still being calibrated/placed has no spatial_validation yet, but it is a
   // real parcel mid-processing, not a "no geometry" region -- keep it (with its spinner) in the
   // main list instead of the collapsed group.
-  $: geometryRegions = parcelRegions.filter((e: any) => e.parcel.spatial_validation || verdict(e.parcel).busy);
-  $: noGeometryRegions = parcelRegions.filter((e: any) => !e.parcel.spatial_validation && !verdict(e.parcel).busy);
+  $: geometryRegions = parcelRegions.filter((e: any) => e.parcel.spatial_validation || verdict(e.parcel, e.page).busy);
+  $: noGeometryRegions = parcelRegions.filter((e: any) => !e.parcel.spatial_validation && !verdict(e.parcel, e.page).busy);
 
   async function ensureLeaflet() {
     if (!L) {
@@ -272,7 +332,7 @@
     }
   }
 
-  async function renderMap() {
+  async function renderMap(keepView = false) {
     await ensureLeaflet();
     if (!map) {
       map = L.map(mapEl, { zoomControl: true, fadeAnimation: false, zoomAnimation: false, maxZoom: 23 });
@@ -303,6 +363,7 @@
     clearVertexMarkers();
 
     const bounds: any[] = [];
+    layerByKey = new Map();
 
     for (const entryItem of parcelRegions) {
       const { page, i, parcel } = entryItem;
@@ -314,27 +375,36 @@
       const shapeOk = parcel.spatial_validation?.valid;
       const locationPrecision = parcelLocationPrecision(parcel);
       const gate = calibrationGate(parcel);
-      const color = gate === 'unconfirmed' || gate === 'pending'
-        ? '#6b6a63' // never green/amber for an uncorroborated placement -- see calibrationGate()
+      // Vivid on purpose: grey outlines vanished into roads and rooftops on satellite imagery. Green =
+      // placed and verified; orange = shape fine, location approximate; red = placement not corroborated;
+      // magenta = the shape itself failed its checks. A colour picked from the palette overrides all.
+      const autoColor = gate === 'unconfirmed' || gate === 'pending'
+        ? '#ff1f3d'
         : shapeOk
           ? (parcel.human_confirmed
               ? confirmedPlacementOk(parcel)
               : locationPrecision === 'surveyed' || locationPrecision === 'manual')
-            ? '#2f7a4f'
-            : '#c98a1a'
-          : '#c53b3b';
+            ? '#12b53b'
+            : '#ff8c00'
+          : '#d100d1';
+      const color = outlineColors[page] ?? outlineColors['*'] ?? autoColor;
       const key = regionKey(page, i);
 
       const layer = L.geoJSON(parcel.boundary_geojson_wgs84, {
         style: {
           color,
-          weight: selectedKey === key ? 3.5 : 2,
+          weight: selectedKey === key ? 4.5 : 3,
           fillColor: color,
-          fillOpacity: selectedKey === key ? 0.22 : 0.12
+          fillOpacity: selectedKey === key ? 0.3 : 0.18
         }
       });
 
-      layer.on('click', () => selectRegion(key));
+      layer.on('click', () => {
+        if (justDragged) return; // the mouse-up that ended a drag is not a selection
+        selectRegion(key);
+      });
+      layer.on('mousedown', (e: any) => startMove(e, entryItem));
+      layerByKey.set(key, layer);
       layer.addTo(layerGroup);
 
       if (editingKey === key) {
@@ -349,11 +419,163 @@
       let combined = bounds[0];
       for (const b of bounds.slice(1)) combined = combined.extend(b);
       lastFitBounds = combined;
-      map.fitBounds(combined, { padding: [40, 40], animate: false });
+      if (!keepView) map.fitBounds(combined, { padding: [40, 40], animate: false });
     } else {
       lastFitBounds = null;
       map.setView([20, 0], 2);
     }
+  }
+
+  // ---- drag-to-move ----------------------------------------------------------------------------
+  // Pick a parcel up and drop it where it belongs: a translation only, applied to the whole sheet's
+  // confirmed parcels together by default (so shared edges stay shared) or to one parcel. The server
+  // stores it as an offset from the computed position (POST /move-parcels), which survives
+  // re-verification and which the automatic fits leave alone.
+  let moveMode = false;
+  let moveWholeSheet = true;
+  let moveError = '';
+  let justDragged = false;
+  let layerByKey: Map<string, any> = new Map();
+  let moving: { entries: any[]; start: any; originals: Map<string, any>; moved: boolean } | null = null;
+
+  const M_PER_DEG_LAT = 110574;
+  const mPerDegLng = (lat: number) => 111320 * Math.cos((lat * Math.PI) / 180);
+
+  function moveGroupFor(entry: any): any[] {
+    const ok = (e: any) => e.parcel.human_confirmed && e.parcel.boundary_geojson_wgs84;
+    if (!moveWholeSheet) return [entry];
+    return parcelRegions.filter((e: any) => e.page === entry.page && e.regionIndex === entry.regionIndex && ok(e));
+  }
+
+  function shiftLatLngs(ls: any, dLat: number, dLng: number): any {
+    return Array.isArray(ls) ? ls.map((x: any) => shiftLatLngs(x, dLat, dLng)) : L.latLng(ls.lat + dLat, ls.lng + dLng);
+  }
+
+  function startMove(e: any, entry: any) {
+    if (!moveMode || !entry.parcel.human_confirmed || !entry.parcel.boundary_geojson_wgs84) return;
+    L.DomEvent.stopPropagation(e);
+    map.dragging.disable();
+    const entries = moveGroupFor(entry);
+    const originals = new Map<string, any[]>();
+    for (const en of entries) {
+      const layer = layerByKey.get(regionKey(en.page, en.i));
+      if (layer) originals.set(regionKey(en.page, en.i), layer.getLayers().map((l: any) => l.getLatLngs()));
+    }
+    moving = { entries, start: e.latlng, originals, moved: false };
+    moveError = '';
+    map.on('mousemove', onMoveDrag);
+    map.once('mouseup', endMove);
+    document.addEventListener('mouseup', endMove, { once: true });
+  }
+
+  function onMoveDrag(e: any) {
+    if (!moving) return;
+    moving.moved = true;
+    const dLat = e.latlng.lat - moving.start.lat;
+    const dLng = e.latlng.lng - moving.start.lng;
+    for (const [key, originals] of moving.originals) {
+      const layer = layerByKey.get(key);
+      layer?.getLayers().forEach((l: any, i: number) => l.setLatLngs(shiftLatLngs(originals[i], dLat, dLng)));
+    }
+  }
+
+  async function endMove(e?: any) {
+    if (!moving) return;
+    const m = moving;
+    moving = null;
+    map.off('mousemove', onMoveDrag);
+    document.removeEventListener('mouseup', endMove);
+    map.dragging.enable();
+    const end = e?.latlng ?? m.start;
+    const east = (end.lng - m.start.lng) * mPerDegLng(m.start.lat);
+    const north = (end.lat - m.start.lat) * M_PER_DEG_LAT;
+    if (!m.moved || Math.hypot(east, north) < 0.3) {
+      renderMap(true); // a click, not a drag
+      return;
+    }
+    justDragged = true;
+    setTimeout(() => (justDragged = false), 250);
+    await postMove(m.entries, east, north);
+  }
+
+  async function postMove(entries: any[], east: number, north: number) {
+    const first = entries[0];
+    try {
+      const res = await fetch(`${API_BASE}/documents/${documentId}/move-parcels`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          page_number: first.page,
+          region_index: first.regionIndex,
+          parcel_indexes: entries.map((en: any) => en.parcelIndex),
+          east_m: east,
+          north_m: north
+        })
+      });
+      if (!res.ok) throw new Error((await res.json().catch(() => null))?.detail ?? `${res.status} ${res.statusText}`);
+      applyServerParcels(first, entries, (await res.json()).parcels);
+    } catch (err) {
+      moveError = err instanceof Error ? err.message : 'Could not move the parcel.';
+      renderMap(true);
+    }
+  }
+
+  function applyServerParcels(first: any, entries: any[], parcels: any[]) {
+    const page = result.pages.find((p: any) => p.page_number === first.page);
+    const list = page?.regions?.[first.regionIndex]?.parcels;
+    if (!list) return;
+    entries.forEach((en: any, k: number) => (list[en.parcelIndex] = parcels[k]));
+    result = result;
+    queueMicrotask(() => renderMap(true));
+  }
+
+  async function resetPosition(entry: any) {
+    const entries = moveGroupFor(entry);
+    try {
+      const res = await fetch(`${API_BASE}/documents/${documentId}/reset-position`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          page_number: entry.page,
+          region_index: entry.regionIndex,
+          parcel_indexes: entries.map((en: any) => en.parcelIndex)
+        })
+      });
+      if (!res.ok) throw new Error((await res.json().catch(() => null))?.detail ?? `${res.status} ${res.statusText}`);
+      applyServerParcels(entry, entries, (await res.json()).parcels);
+    } catch (err) {
+      moveError = err instanceof Error ? err.message : 'Could not reset the position.';
+    }
+  }
+
+  // Arrow keys nudge the selected parcel (1 m; Shift 5 m) while move mode is on; quick presses are
+  // sent as one move.
+  let nudge = { east: 0, north: 0 };
+  let nudgeTimer: ReturnType<typeof setTimeout> | null = null;
+  function onKeydown(e: KeyboardEvent) {
+    if (!moveMode || !selectedKey) return;
+    const tag = (e.target as HTMLElement | null)?.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    const step = e.shiftKey ? 5 : 1;
+    const d: Record<string, [number, number]> = {
+      ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, step], ArrowDown: [0, -step]
+    };
+    const delta = d[e.key];
+    if (!delta) return;
+    e.preventDefault();
+    nudge = { east: nudge.east + delta[0], north: nudge.north + delta[1] };
+    if (nudgeTimer) clearTimeout(nudgeTimer);
+    nudgeTimer = setTimeout(async () => {
+      const entry = parcelRegions.find((r: any) => regionKey(r.page, r.i) === selectedKey);
+      const send = nudge;
+      nudge = { east: 0, north: 0 };
+      if (entry && entry.parcel.human_confirmed && entry.parcel.boundary_geojson_wgs84) await postMove(moveGroupFor(entry), send.east, send.north);
+    }, 350);
+  }
+
+  $: if (map) {
+    moveMode;
+    map.getContainer().style.cursor = moveMode ? 'move' : '';
   }
 
   // Bearing/distance between two lat/lng points, formatted to match the
@@ -526,6 +748,7 @@
     // as plain 'surveyed', same as any other fully-trusted source.
     plss_single_source: 'PLSS monument (uncorroborated)',
     aliquot: 'Matches PLSS legal description (BLM)',
+    control: 'Fitted to 2 printed survey control points',
     street: 'Street address (approx.)',
     city: 'City / ZIP only (coarse)',
     manual: 'Manually pinned',
@@ -546,13 +769,16 @@
   // guess -- that override is per-parcel, so its location check has to
   // be evaluated per-parcel too, not from the shared anchorPrecision.
   function parcelLocationPrecision(parcel: any): string {
-    if (parcel.anchor_override) return 'manual';
+    if (parcel.anchor_override || parcel.manual_position) return 'manual';
     // Fitted onto the BLM aliquot part the legal description names, with combined area and both
     // outer extents agreeing within 2% (app/routes/documents.py::_fit_sheet_to_aliquot).
     if (parcel.placement?.aliquot_fit?.corroborated) return 'aliquot';
+    // Placed from two printed surveyed coordinates, the second predicted from the first within tolerance
+    // (app/services/control_points.py).
+    if (parcel.placement?.control_fit?.validated) return 'control';
     return anchorPrecision;
   }
-  const locationConfirmed = (precision: string) => precision === 'surveyed' || precision === 'manual' || precision === 'aliquot';
+  const locationConfirmed = (precision: string) => precision === 'surveyed' || precision === 'manual' || precision === 'aliquot' || precision === 'control';
 
   // A confirmed boundary's SHAPE can close and match the stated area
   // (spatial_validation.valid) while its real-world scale/rotation were
@@ -574,7 +800,7 @@
     if (status === 'cross_validated' || status === 'single_source') return 'placeable';
     // Rotation/scale unverified from printed bearings, but the outline's area AND extents match the
     // BLM aliquot part within 2% -- that independently corroborates scale and orientation too.
-    if (parcel.placement?.aliquot_fit?.corroborated) return 'placeable';
+    if (parcel.placement?.aliquot_fit?.corroborated || parcel.placement?.control_fit?.validated) return 'placeable';
     // status === 'unverified', or calibration missing entirely despite
     // human_confirmed (no anchor to calibrate against) -- both mean the
     // same thing to a viewer: this placement was never corroborated.
@@ -590,7 +816,7 @@
   // ~2,600 ft off -- so it must not stand in for a confirmed parcel's own
   // placement.
   function confirmedPlacementOk(parcel: any): boolean {
-    return !!parcel.anchor_override || parcel.placement?.status === 'surveyed_corner' || !!parcel.placement?.aliquot_fit?.corroborated;
+    return !!parcel.anchor_override || !!parcel.manual_position || parcel.placement?.status === 'surveyed_corner' || !!parcel.placement?.aliquot_fit?.corroborated;
   }
 
   // The user drew an outline for this parcel (its sheet entity holds a confirmed_polygon) but it
@@ -602,7 +828,14 @@
     );
   }
 
-  function verdict(parcel: any): { cls: string; label: string; busy?: boolean } {
+  // The server is still reading the page's printed survey coordinates to refine this sheet's placement
+  // (a few minutes; a marker older than 15 min is a read that died with its process).
+  function controlReadInProgress(pg: any): boolean {
+    const cp = pg?.control_points;
+    return cp?.status === 'reading' && Date.now() / 1000 - (cp.started_at ?? 0) < 900;
+  }
+
+  function verdict(parcel: any, pageNumber?: number): { cls: string; label: string; busy?: boolean } {
     const shapeOk = !!parcel.spatial_validation?.valid;
     const locationPrecision = parcelLocationPrecision(parcel);
     const locationOk = parcel.human_confirmed
@@ -610,6 +843,13 @@
       : locationPrecision === 'surveyed' || locationPrecision === 'manual';
     if (outlineAwaitingBind(parcel)) return { cls: 'busy', label: 'Confirming boundary…', busy: true };
     if (!parcel.human_confirmed) return { cls: 'moderate', label: 'Boundary not confirmed' };
+    if (
+      pageNumber !== undefined &&
+      parcel.placement?.status !== 'surveyed_corner' &&
+      controlReadInProgress((result?.pages ?? []).find((p: any) => p.page_number === pageNumber))
+    ) {
+      return { cls: 'busy', label: 'Refining placement…', busy: true };
+    }
     const gate = calibrationGate(parcel);
     if (gate === 'pending' || (parcel.placement?.status === 'pending')) {
       return { cls: 'busy', label: 'Calibrating & placing…', busy: true };
@@ -1124,6 +1364,8 @@
   });
 </script>
 
+<svelte:window on:keydown={onKeydown} />
+
 <svelte:head>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </svelte:head>
@@ -1327,6 +1569,36 @@
             </div>
           {/if}
 
+          <div class="palette panel move-panel">
+            <label class="move-toggle">
+              <input type="checkbox" bind:checked={moveMode} />
+              <span><strong>Move parcels</strong> — drag an outline on the map to drop it where it belongs</span>
+            </label>
+            {#if moveMode}
+              <label class="move-toggle sub">
+                <input type="checkbox" bind:checked={moveWholeSheet} />
+                <span>Move all of this sheet's parcels together</span>
+              </label>
+              <p class="move-hint">Shape and size stay as they are. Arrow keys nudge the selected parcel 1 m (Shift: 5 m).</p>
+            {/if}
+            {#if moveError}<p class="move-hint err">{moveError}</p>{/if}
+          </div>
+          <div class="palette panel">
+            <span class="palette-title">Outline colour · {paletteScope === null || Number.isNaN(paletteScope) ? 'all pages' : `page ${paletteScope}`}</span>
+            <div class="palette-row">
+              <button class="swatch auto" class:active={!(outlineColors[String(paletteScope)] ?? outlineColors['*'])} title="Automatic: green verified, orange approximate, red unconfirmed" on:click={() => setOutlineColor(null)}>Auto</button>
+              {#each PALETTE as c}
+                <button
+                  class="swatch"
+                  class:active={(outlineColors[String(paletteScope)] ?? outlineColors['*']) === c}
+                  style={`background:${c}`}
+                  title={c}
+                  aria-label={`Outline colour ${c}`}
+                  on:click={() => setOutlineColor(c)}
+                ></button>
+              {/each}
+            </div>
+          </div>
           {#if hiddenCount > 0}
             <button class="category-banner panel" on:click={() => (showAllCategories = true)}>
               {hiddenCount} region{hiddenCount === 1 ? '' : 's'} likely not a boundary map (aerial, vicinity map, certificate) hidden — click to show
@@ -1364,13 +1636,13 @@
                     {parcel.vision_geometry?.parcel_label || `Page ${entry.page} parcel`}
                     {#if parcel.human_edited}<span class="edited-badge">edited</span>{/if}
                   </span>
-                  {#if v || parcel.extraction_note || parcel.georeference_error || verdict(parcel).busy}
-                    {@const verdictInfo = verdict(parcel)}
+                  {#if v || parcel.extraction_note || parcel.georeference_error || verdict(parcel, entry.page).busy}
+                    {@const verdictInfo = verdict(parcel, entry.page)}
                     <span class="pill {verdictInfo.cls}">{#if verdictInfo.busy}<span class="spinner" aria-hidden="true"></span>{/if}{verdictInfo.label}</span>
                   {/if}
                 </div>
-                {#if verdict(parcel).busy}
-                  <p class="busy-note">Checking scale and orientation against the drawing, then placing it on the map. This card updates by itself.</p>
+                {#if verdict(parcel, entry.page).busy}
+                  <p class="busy-note">{verdict(parcel, entry.page).label === 'Refining placement…' ? 'Reading the survey coordinates printed on the sheet to fix its exact position. This card updates by itself.' : 'Checking scale and orientation against the drawing, then placing it on the map. This card updates by itself.'}</p>
                 {/if}
 
                 {#if v}
@@ -1443,6 +1715,11 @@
                     <button class="btn btn-ghost btn-sm" on:click={() => openViewer(entry)}>
                       Open source drawing
                     </button>
+                    {#if parcel.manual_position}
+                      <button class="btn btn-ghost btn-sm" title="Put it back where the app computed it" on:click={() => resetPosition(entry)}>
+                        Reset position
+                      </button>
+                    {/if}
                     <a class="btn btn-ghost btn-sm" href={boundaryReviewHref(parcel.roster_id ? `${entry.page}-${parcel.roster_id}` : `${entry.page}-${entry.i}`)}>
                       {parcel.human_confirmed ? 'Re-confirm boundary' : 'Confirm boundary'}
                     </a>
@@ -2137,6 +2414,65 @@ h1 {
   justify-content: space-between;
   gap: 10px;
   margin-bottom: 10px;
+}
+.move-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.move-toggle {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.move-toggle.sub {
+  padding-left: 18px;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+.move-hint {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.move-hint.err {
+  color: #c53b3b;
+}
+.palette {
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+.palette-title {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.palette-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  padding: 0;
+}
+.swatch.auto {
+  width: auto;
+  border-radius: 11px;
+  padding: 0 9px;
+  font-size: 0.72rem;
+  background: #fff;
+}
+.swatch.active {
+  outline: 2px solid #1c7ed6;
+  outline-offset: 2px;
 }
 .busy-note {
   margin: 0 0 10px;

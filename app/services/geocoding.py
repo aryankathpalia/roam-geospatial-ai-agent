@@ -187,10 +187,34 @@ async def geocode_anchor(
         except GeocodingError as exc:
             logger.warning("Anchor geocode failed for %r: %s", query, exc)
             continue
+        results = [r for r in results if _consistent_with_query(r, query)]
         if results:
             return await _reconcile_with_locality(results, query, candidates, limit)
 
     return [], None
+
+
+_STATE_ABBR_RE = re.compile(r",\s*([A-Z]{2})\b(?!\.)")
+
+
+def _consistent_with_query(result: Location, query: str) -> bool:
+    """
+    A query that names a US state ("El Centro, CA, 92243") must not be answered from somewhere else:
+    Nominatim returned a Venezuelan "El Centro" for the OCR-garbled "EI Centro, CA", and every parcel
+    on the document was drawn in South America. Only rejects a result that positively contradicts a
+    state the query states; a query with no state, or a result with no country/region, is not judged.
+    """
+
+    from app.services.plss import _STATE_ABBR
+
+    names = {abbr: name.title() for name, abbr in _STATE_ABBR.items()}
+    hits = [m.group(1).upper() for m in _STATE_ABBR_RE.finditer(query)]
+    state = next((names[h] for h in reversed(hits) if h in names), None)
+    if state is None or not result.country:
+        return True
+    if result.country.lower() not in ("united states", "united states of america", "usa"):
+        return False
+    return not result.region or result.region.lower() == state.lower()
 
 
 # "<place>, XX" or a ZIP: the query says which state/area it means.

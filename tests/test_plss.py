@@ -209,3 +209,46 @@ def test_aliquot_north_half_of_south_half_with_ocr_dropped_fraction(fake_blm):
 
 def test_no_aliquot_phrase_returns_none(fake_blm):
     assert plss._resolve_aliquot("FAKE1", "A DIVISION OF PARCEL 17-2-1-4") is None
+
+
+PAYETTE_TEXT = (
+    "A parcel of land being a portion of the W1/2 of the NE1/4 of Section 34, Township 9 North, Range 5 West of the\n"
+    "Boise Meridian, Payette County, Idaho. COMMENCING at the NE1/16 corner of said Section 34, marked by an aluminum cap,\n"
+    "from which the CE1/16 corner of said Section 34 bears South 00 24'53\" West, 1305.74 feet.\n"
+    "BASIS OF BEARING is between the NE1/16 corner and the CE1/16 corner of Section 34, T. 9 N., R. 5 W., B.M.\n"
+)
+
+
+def test_trs_long_form_with_of_the_lead_in_and_the_abbreviated_heading_both_parse():
+    long_form = plss._find_trs(PAYETTE_TEXT.split("Idaho.")[0])
+    assert long_form.meridian_name == "Boise Meridian" and (long_form.township_no, long_form.range_no) == (9, 5)
+    assert (long_form.township_dir, long_form.range_dir) == ("N", "W")
+    for heading in ("SECTION34. T.9 N.. R.5W.. B.M.", "Section 34, T. 9 N., R. 5 W., B.M., Idaho"):
+        abbr = plss._find_trs(heading)
+        assert abbr is not None and abbr.meridian_name == "Boise Meridian" and (abbr.township_no, abbr.range_no) == (9, 5)
+
+
+def test_sixteenth_corners_resolve_and_the_pair_is_corroborated(fake_blm):
+    anchor = plss.resolve_plss_anchor(_pages(PAYETTE_TEXT.replace("Section 34", "Section 17")), "Idaho")
+    assert anchor is not None and anchor.corroborated is True  # two independently named monuments
+    # NE1/16 = centre of the NE 1/4: (0.75, 0.75) of the 0.01-degree test section; CE1/16 at (0.75, 0.5).
+    assert (anchor.lon, anchor.lat) == pytest.approx((0.0075, 0.0075), abs=1e-9)
+    assert anchor.description == "NE1/16 corner of Section 17" and len(anchor.notes) == 2
+
+
+def test_the_two_named_monuments_are_a_quarter_section_apart_like_the_printed_distance():
+    # Printed 1,305.74 ft for a ~1,320 ft quarter side: the geometry the resolver assumes for NE1/16 -> CE1/16.
+    ne, ce = plss._SIXTEENTH["NE"], plss._SIXTEENTH["CE"]
+    assert (ne[0] - ce[0], ne[1] - ce[1]) == (0.0, 0.25)
+
+
+def test_abbreviated_aliquot_is_read_as_the_west_half_of_the_ne_quarter_and_flagged_as_a_portion(fake_blm):
+    plss._ring_cache.clear()
+    text = "being a portion of the W1/2 of the NE1/4 of Section 17, Township 9 North"
+    aliquot = plss._resolve_aliquot("FAKE1", text)
+    assert aliquot["description"] == "WEST 1/2 of NE 1/4 of Section 17" and aliquot["portion_of"] is True
+    lons = [p[0] for p in aliquot["polygon"]]
+    lats = [p[1] for p in aliquot["polygon"]]
+    # section 17 = (0..S) x (0..S): the NE quarter is (S/2..S)^2, its west half u in (S/2 .. 3S/4)
+    assert (min(lons), max(lons)) == pytest.approx((0.005, 0.0075)) and (min(lats), max(lats)) == pytest.approx((0.005, 0.01))
+    assert plss._resolve_aliquot("FAKE1", "THE SOUTH 2 OF SECTION 17")["portion_of"] is False

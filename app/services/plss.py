@@ -125,6 +125,25 @@ _TRM_RE = re.compile(
     r"([A-Z][A-Z.\s]{0,30}MERIDIAN|[A-Z]{1,5}\.?[A-Z]\.?[A-Z]?\.?)",
     re.IGNORECASE,
 )
+# "T. 9 N., R. 5 W., B.M." -- the abbreviated form most plat headings use (OCR often turns the
+# periods into doubled ones or drops the spaces: "T.9 N.. R.5W.. B.M.").
+_SEPD = r"[.,，\s]*"  # also periods: OCR doubles them ("N.. R.5W.. B.M.")
+_TRM_ABBR_RE = re.compile(
+    r"\bT\.?\s*(\d{1,3})\s*([NS])\b" + _SEPD + r"R\.?\s*(\d{1,3})\s*([EW])\b" + _SEPD +
+    r"((?:[A-Z]\.?){1,4})(?![A-Za-z])",
+    re.IGNORECASE,
+)
+# Sixteenth-section corners as plats name them. Measured on the Payette ROS: the printed distance
+# from the "NE1/16 corner" to the "CE1/16 corner" of Section 34 is 1,305.74 ft, a quarter of the
+# section side -- so NE1/16 is the centre of the NE 1/4 and CE1/16 the midpoint between the section
+# centre and the E 1/4 corner. (u east fraction, v north fraction of the section.)
+_SIXTEENTH = {
+    "NE": (0.75, 0.75), "NW": (0.25, 0.75), "SE": (0.75, 0.25), "SW": (0.25, 0.25),
+    "CN": (0.5, 0.75), "CE": (0.75, 0.5), "CS": (0.5, 0.25), "CW": (0.25, 0.5),
+}
+_SIXTEENTH_RE = re.compile(
+    r"\b(NE|NW|SE|SW|CN|CE|CS|CW)\s*1/16\s*CORNER\s+(?:OF\s+)?(?:SAID\s+|THE\s+)?SECTION\s*(\d{1,2})\b", re.IGNORECASE
+)
 _TWO_SECTION_QUARTER_RE = re.compile(
     r"1/4\s*CORNER\s+OF\s+SECTIONS?\s+(\d{1,2})\s+AND\s+(\d{1,2})", re.IGNORECASE
 )
@@ -138,7 +157,9 @@ _FULL_CORNER_RE = re.compile(
 
 def _normalize_meridian(raw: str) -> str | None:
     if "MERIDIAN" in raw.upper():
-        return " ".join(w.capitalize() for w in raw.strip().split())
+        # "...Range 5 West of the Boise Meridian": the lead-in is not part of the name.
+        cleaned = re.sub(r"^\s*(?:OF\s+THE\s+|OF\s+|THE\s+)", "", raw.strip(), flags=re.IGNORECASE)
+        return " ".join(w.capitalize() for w in cleaned.split())
     key = re.sub(r"[.\s]", "", raw).upper()
     return _MERIDIAN_ABBR.get(key)
 
@@ -153,12 +174,15 @@ class _TRS:
 
 
 def _find_trs(text: str) -> _TRS | None:
-    m = _TRM_RE.search(text)
-    if not m:
-        return None
-    meridian = _normalize_meridian(m.group(5))
-    if meridian is None:
-        return None
+    for rx in (_TRM_RE, _TRM_ABBR_RE):
+        for m in rx.finditer(text):
+            meridian = _normalize_meridian(m.group(5))
+            if meridian is not None:
+                return _trs_from(m, meridian)
+    return None
+
+
+def _trs_from(m, meridian: str) -> _TRS:
     return _TRS(
         township_no=int(m.group(1)), township_dir=m.group(2)[0].upper(),
         range_no=int(m.group(3)), range_dir=m.group(4)[0].upper(),
@@ -260,6 +284,19 @@ def _resolve_one_section_quarter(plssid: str, section_no: int, direction: str) -
     return _midpoint(corners[a], corners[b])
 
 
+def _resolve_sixteenth(plssid: str, section_no: int, name: str) -> tuple[float, float] | None:
+    ring = _fetch_section_ring(plssid, section_no)
+    corners = _section_corners(ring) if ring else None
+    if corners is None:
+        return None
+    u, v = _SIXTEENTH[name]
+    sw, se, nw, ne = corners["SW"], corners["SE"], corners["NW"], corners["NE"]
+    return (
+        sw[0] * (1 - u) * (1 - v) + se[0] * u * (1 - v) + nw[0] * (1 - u) * v + ne[0] * u * v,
+        sw[1] * (1 - u) * (1 - v) + se[1] * u * (1 - v) + nw[1] * (1 - u) * v + ne[1] * u * v,
+    )
+
+
 def _resolve_full_corner(plssid: str, section_no: int, direction: str) -> tuple[float, float] | None:
     ring = _fetch_section_ring(plssid, section_no)
     if ring is None:
@@ -295,11 +332,17 @@ def _resolve_two_section_quarter(
 # OF SECTION 17", "NE 1/4 OF SECTION 9". OCR often drops the "1/" of a half
 # or quarter symbol ("NORTH 2 OF THE SOUTH 2", confirmed on the Patnaude
 # packet), so a bare 2 / 4 is accepted in the same position.
-_ALIQUOT_PART = r"(?:(?:NORTH|SOUTH|EAST|WEST)\s*(?:1/2|½|2)|(?:NE|NW|SE|SW)\s*(?:1/4|¼|4))"
+_ALIQUOT_PART = (
+    r"(?:\b(?:NORTH|SOUTH|EAST|WEST)\s*(?:1/2|\u00bd|2)"
+    r"|\b[NSEW]\s*(?:1/2|\u00bd)"
+    r"|\b(?:NE|NW|SE|SW)\s*(?:1/4|\u00bc|4))"
+)
 _ALIQUOT_RE = re.compile(
     r"((?:" + _ALIQUOT_PART + r"\s+OF\s+(?:THE\s+)?)+)SECTION\s+(\d{1,2})\b", re.IGNORECASE
 )
-_ALIQUOT_PART_RE = re.compile(r"(NORTH|SOUTH|EAST|WEST|NE|NW|SE|SW)", re.IGNORECASE)
+_PORTION_RE = re.compile(r"PORTION\s+OF|PART\s+OF|LYING\s+(?:IN|WITHIN)|SITUATE[D]?\s+IN|LOCATED\s+IN|BEING\s+IN", re.IGNORECASE)
+_ALIQUOT_ABBR = {"N": "NORTH", "S": "SOUTH", "E": "EAST", "W": "WEST"}
+_ALIQUOT_PART_RE = re.compile(r"(NORTH|SOUTH|EAST|WEST|NE|NW|SE|SW|N|S|E|W)\s*(?:1/2|\u00bd|2|1/4|\u00bc|4)", re.IGNORECASE)
 
 
 def _apply_aliquot(box: list[float], part: str) -> None:
@@ -334,7 +377,7 @@ def _resolve_aliquot(plssid: str, text: str) -> dict | None:
     m = _ALIQUOT_RE.search(text)
     if not m:
         return None
-    parts = _ALIQUOT_PART_RE.findall(m.group(1))
+    parts = [_ALIQUOT_ABBR.get(t.upper(), t.upper()) for t in _ALIQUOT_PART_RE.findall(m.group(1))]
     section_no = int(m.group(2))
     ring = _fetch_section_ring(plssid, section_no)
     corners = _section_corners(ring) if ring else None
@@ -347,7 +390,10 @@ def _resolve_aliquot(plssid: str, text: str) -> dict | None:
     polygon = [_bilinear(corners, u, v) for u, v in ((u0, v1), (u1, v1), (u1, v0), (u0, v0))]
     area_m2, _ = _GEOD.polygon_area_perimeter([p[0] for p in polygon], [p[1] for p in polygon])
     words = " of ".join(f"{p.upper()} {'1/4' if len(p) == 2 else '1/2'}" for p in parts)
+    lead = text[max(0, m.start() - 60):m.start()]
     return {
+        # "...being a PORTION OF the W1/2 of the NE1/4 of Section 34": the parcels are only part of it.
+        "portion_of": bool(_PORTION_RE.search(lead)),
         "description": f"{words} of Section {section_no}",
         "polygon": [list(p) for p in polygon],
         "acres": abs(area_m2) / 4046.8564224,
@@ -418,6 +464,15 @@ def resolve_plss_anchor(pages_result: list[dict], state_name: str) -> PLSSAnchor
             point = _resolve_one_section_quarter(plssid, s, d)
             if point:
                 resolved.append((f"{d}1/4 corner of Section {s}", point))
+        seen_16 = set()
+        for m in _SIXTEENTH_RE.finditer(text):
+            name, sec = m.group(1).upper(), int(m.group(2))
+            if (name, sec) in seen_16:
+                continue  # a plat names the same monument several times
+            seen_16.add((name, sec))
+            point = _resolve_sixteenth(plssid, sec, name)
+            if point:
+                resolved.append((f"{name}1/16 corner of Section {sec}", point))
         for m in _FULL_CORNER_RE.finditer(text):
             d, s = m.group(1).upper(), int(m.group(2))
             point = _resolve_full_corner(plssid, s, d)
