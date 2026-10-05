@@ -252,3 +252,24 @@ def test_abbreviated_aliquot_is_read_as_the_west_half_of_the_ne_quarter_and_flag
     # section 17 = (0..S) x (0..S): the NE quarter is (S/2..S)^2, its west half u in (S/2 .. 3S/4)
     assert (min(lons), max(lons)) == pytest.approx((0.005, 0.0075)) and (min(lats), max(lats)) == pytest.approx((0.005, 0.01))
     assert plss._resolve_aliquot("FAKE1", "THE SOUTH 2 OF SECTION 17")["portion_of"] is False
+
+
+def test_find_trs_accepts_ampersand_meridian_abbreviation():
+    for text in ("Section 21, T13S, R12E, G&SRM, Pima County", "T13S, R12E, G & S.R.M."):
+        trs = plss._find_trs(text)
+        assert (trs.township_no, trs.township_dir, trs.range_no, trs.range_dir) == (13, "S", 12, "E")
+        assert trs.meridian_name == "Gila-Salt River Meridian"
+
+
+def test_spelled_out_corner_monuments_and_base_and_meridian():
+    text = (
+        "Section 21, Township 13 South, Range 12 East of the Gila and Salt River Base and Meridian. "
+        "Beginning at the North One Quarter corner of said Section 21, from which the Northeast "
+        "corner of said Section 21, bears North 89 East"
+    )
+    assert plss._find_trs(text).meridian_name == "Gila and Salt River Meridian"
+    assert [m.group(1).upper() for m in plss._ONE_SECTION_QUARTER_RE.finditer(text)] == ["NORTH"]
+    assert [m.group(1).upper() for m in plss._FULL_CORNER_RE.finditer(text)] == ["NORTHEAST"]
+    # "Northeast Quarter of the Northeast Quarter of Section 21" names no corner monument
+    assert not list(plss._ONE_SECTION_QUARTER_RE.finditer(
+        "the Northeast Quarter of the Northeast Quarter of Section 21"))

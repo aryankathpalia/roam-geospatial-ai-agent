@@ -152,6 +152,42 @@ def _parse_survey_number(raw: str) -> float | None:
     return float(f"{whole}.{match.group(2)}")
 
 
+# County "ground" coordinates are grid coordinates scaled by a combined factor about the projection
+# origin: Washoe County plats print "DIVIDE GROUND COORDINATES BY THE COMBINED FACTOR OF 1.000197939 TO
+# CONVERT TO GRID COORDINATES". Read as grid, a ground coordinate lands (factor-1) x its distance from the
+# zone origin away -- ~900 m on a Washoe sheet (N 14.8M ft x 0.000198 = 2,900 ft). OCR garbles the number
+# ("1.O00197939": a letter O for the zero) and the words ("C□NVERT"), so both are read tolerantly.
+_FACTOR_NUM = r"([0-9OoIl]\.[0-9OoIl]{5,})"
+_GROUND_FACTOR_RE = re.compile(
+    r"(?:COMBINED|GRID\s*TO\s*GROUND|SCALE|ELEVATION)\s*FACT[O0]R(?:\s*(?:OF|IS|BY|=|:)\s*|[^0-9OoIl]{0,10})" + _FACTOR_NUM, re.IGNORECASE
+)
+
+
+def ground_to_grid_multiplier(text: str) -> float | None:
+    """
+    The number to multiply a printed GROUND coordinate by to get its grid (state-plane) value, from the
+    sheet's own statement of the combined factor; None when the sheet prints no such statement or does not
+    call its coordinates ground. Never inferred: a sheet without the statement is read as grid, as before.
+    """
+
+    if not re.search(r"GROUND\s*C[O0]", text, re.IGNORECASE):
+        return None
+    m = _GROUND_FACTOR_RE.search(text)
+    if not m:
+        return None
+    try:
+        factor = float(m.group(1).translate(str.maketrans("OoIl", "0011")))
+    except ValueError:
+        return None
+    if not (0.99 < factor < 1.01) or factor == 1.0:
+        return None
+    # "MULTIPLY GROUND ... BY" is the rarer wording; everything else (DIVIDE GROUND, or a grid-to-ground
+    # factor) means grid = ground / factor.
+    if re.search(r"MULTIPLY\s+GROUND", text, re.IGNORECASE):
+        return factor
+    return 1.0 / factor
+
+
 def find_surveyed_coordinates(
     pages_result: list[dict], state_name: str, near_lat: float, near_lon: float
 ) -> tuple[float, float] | None:
@@ -173,8 +209,9 @@ def find_surveyed_coordinates(
     text = "\n".join(r.get("ocr_text") or "" for p in pages_result for r in p["regions"])
     northings = [_parse_survey_number(m.group(1)) for m in _N_COORD_RE.finditer(text)]
     eastings = [_parse_survey_number(m.group(1)) for m in _E_COORD_RE.finditer(text)]
+    to_grid = ground_to_grid_multiplier(text) or 1.0
     pairs = [
-        (n, e) for n, e in zip(northings, eastings) if n is not None and e is not None
+        (n * to_grid, e * to_grid) for n, e in zip(northings, eastings) if n is not None and e is not None
     ]
     if not pairs:
         return None
@@ -189,18 +226,27 @@ def find_surveyed_coordinates(
     # regardless of order, so a wrong guess here just gets skipped.
     candidates.sort(key=lambda pair: "ftUS" not in pair[1])
 
+    # A plat prints several N/E pairs: the parcel's own corners, but also distant survey monuments
+    # it ties to (a Washoe plat listed a monument 15 km away FIRST). So do not take the first pair
+    # that falls inside the tolerance: convert them all and keep the one that lands NEAREST the
+    # coarse anchor, which is independent evidence of where the site is.
+    best: tuple[float, float, float] | None = None  # (distance_m, lat, lon)
+    transformers: dict[str, Transformer] = {}
     for northing, easting in pairs:
         for code, _name in candidates:
             try:
-                transformer = Transformer.from_crs(f"EPSG:{code}", "EPSG:4326", always_xy=True)
+                transformer = transformers.get(code) or Transformer.from_crs(
+                    f"EPSG:{code}", "EPSG:4326", always_xy=True
+                )
+                transformers[code] = transformer
                 lon, lat = transformer.transform(easting, northing)
             except Exception:  # noqa: BLE001 -- a bad/inapplicable CRS, try the next
                 continue
             _, _, distance_m = _GEOD.inv(lon, lat, near_lon, near_lat)
-            if distance_m / 1609.34 <= _STATE_PLANE_VALIDATION_MILES:
-                return lat, lon
+            if distance_m / 1609.34 <= _STATE_PLANE_VALIDATION_MILES and (best is None or distance_m < best[0]):
+                best = (distance_m, lat, lon)
 
-    return None
+    return (best[1], best[2]) if best else None
 
 
 # Same set as app.pipeline.page_ocr.OCR_ELIGIBLE_CLASSES -- duplicated
@@ -378,7 +424,31 @@ def find_anchor_candidates(pages_result: list[dict], limit: int = 3) -> list[str
         if len(candidates) >= limit:
             break
 
+    county = _county_state_candidate(pages_result)
+    if county and county.lower() not in seen:
+        candidates.append(county)  # last resort: coarse, but names the state for PLSS/state-plane
+
     return candidates
+
+
+def _county_state_candidate(pages_result: list[dict]) -> str | None:
+    """The "<Name> County, <State>" the document names most often, e.g. "Pima County, Arizona"
+    from a legal description with no street address. Geocodes to a coarse point, but it is enough
+    to identify the state, which the PLSS and state-plane refinements need."""
+    from app.services.plss import _STATE_ABBR
+
+    states = "|".join(sorted((re.escape(n) for n in _STATE_ABBR if len(n) > 2), key=len, reverse=True))
+    rx = re.compile(r"\b([A-Z][A-Za-z.'-]+(?:\s[A-Z][A-Za-z.'-]+)?)\s+County\s*,?\s*(" + states + r")\b", re.I)
+    counts: dict[str, int] = {}
+    for page in pages_result:
+        for region in page.get("regions", []):
+            for m in rx.finditer(region.get("ocr_text") or ""):
+                name = " ".join(m.group(1).split()).title()
+                if name.split()[0].lower() in {"the", "of", "in", "and"}:
+                    continue
+                key = f"{name} County, {m.group(2).title()}"
+                counts[key] = counts.get(key, 0) + 1
+    return max(counts, key=counts.get) if counts else None
 
 
 def georeference_traverse_to_geojson(

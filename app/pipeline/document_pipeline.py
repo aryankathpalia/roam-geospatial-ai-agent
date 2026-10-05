@@ -32,6 +32,7 @@ from app.services.georeference import (
     georeference_traverse_to_geojson,
 )
 from app.services.plss import resolve_plss_anchor
+from app.services.apn import resolve_apn_site
 from app.services.geometry import (
     align_to_shared_edge,
     assemble_traverse,
@@ -300,6 +301,7 @@ async def process_document(
     anchor_lat: float | None = None
     anchor_lon: float | None = None
     anchor: dict | None = None
+    anchor_state: str | None = None  # the state the geocode landed in, for the county parcel lookup
     progress_tracker.update(document_id, "georeferencing", "searching document text for a location")
 
     explicit_coords = find_explicit_coordinates(
@@ -331,6 +333,7 @@ async def process_document(
             # geocode tells us which STATE to look in -- see
             # find_surveyed_coordinates' docstring for why this can only
             # make the anchor more precise, never wrong in a new way.
+            anchor_state = geocoded[0].region
             if geocoded[0].region:
                 surveyed = find_surveyed_coordinates(
                     [{"regions": e["regions"]} for e in page_entries],
@@ -385,6 +388,25 @@ async def process_document(
         else:
             progress_tracker.update(
                 document_id, "georeferencing", "no geocodable location found in document text"
+            )
+
+    # The APNs the document prints (its own and its neighbours'), looked up in the county's public parcel
+    # layer: real parcel polygons on the ground, used after confirmation to seat the outlines between their
+    # neighbours (app/routes/documents.py::_fit_sheet_to_apn). Evidence only -- the anchor is unchanged.
+    apn_site = None
+    if anchor_lat is not None and anchor_lon is not None:
+        try:
+            site = resolve_apn_site(
+                "\n".join(r.get("ocr_text") or "" for e in page_entries for r in e["regions"]),
+                anchor_state, anchor_lat, anchor_lon,
+            )
+            apn_site = site.to_dict() if site else None
+        except Exception:  # noqa: BLE001 -- a county service hiccup must not fail the document
+            apn_site = None
+        if apn_site:
+            progress_tracker.update(
+                document_id, "georeferencing",
+                f"found {len(apn_site['neighbours']) + (1 if apn_site['target'] else 0)} printed APN(s) in county parcel records",
             )
 
     # ---------------------------------------------------------
@@ -453,6 +475,7 @@ async def process_document(
         "anchor_lat": anchor_lat,
         "anchor_lon": anchor_lon,
         "anchor": anchor,
+        "apn_site": apn_site,
         "processing": {"complete": True},
     }
 

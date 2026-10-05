@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
   import { boundaryRefs, groupCandidates, type BoundaryRef } from '$lib/boundaryCandidates';
+  import * as curveLib from '$lib/curves';
 
   // Boundary confirmation step of the main flow: /workspace links here
   // (?doc=<id>[&parcel=<page-region-parcel>]) after a document is
@@ -45,6 +46,12 @@
   // Vertices in crop-pixel space, [x, y] each. Edited in absolute
   // space -- see header comment.
   let vertices: [number, number][] = [];
+  // Curved edges: edge i (vertex i -> i+1) -> its quadratic control point in the edge's own frame
+  // (see $lib/curves). Straight edges are simply absent.
+  let curves: curveLib.Curves = {};
+  let curveMode = false;
+  let selectedEdgeIdx: number | null = null;
+  let draggingWaypoint: { edge: number; k: number } | null = null;
   let draggingIdx: number | null = null;
   let selectedVertexIdx: number | null = null;
 
@@ -308,6 +315,9 @@
   // whichever parcel was selected previously instead.
   function seedVertices(ref: ParcelRef) {
     if (!cropWidth || !cropHeight) return;
+    curves = {};
+    curveMode = false;
+    selectedEdgeIdx = null;
 
     // Compute (and keep) the local<->pixel transform whenever this
     // parcel has an original traverse ring, REGARDLESS of which branch
@@ -334,7 +344,14 @@
       // (shouldn't normally happen, but keeps this robust).
       const sx = cropWidth / (confirmed.crop_width || cropWidth);
       const sy = cropHeight / (confirmed.crop_height || cropHeight);
-      vertices = confirmed.vertices.map(([x, y]: [number, number]) => [x * sx, y * sy]);
+      const spec = confirmed.curve_spec;
+      if (spec?.vertices?.length >= 3) {
+        // saved with curved edges: the corners and the curves, not the sampled points
+        vertices = spec.vertices.map(([x, y]: [number, number]) => [x * sx, y * sy]);
+        curves = curveLib.migrateCurves(spec.curves);
+      } else {
+        vertices = confirmed.vertices.map(([x, y]: [number, number]) => [x * sx, y * sy]);
+      }
       seedSource = 'confirmed';
       return;
     }
@@ -444,7 +461,59 @@
     (e.target as Element).setPointerCapture(e.pointerId);
   }
 
+  function onWaypointDown(k: number, e: PointerEvent) {
+    e.stopPropagation();
+    if (selectedEdgeIdx === null) return;
+    draggingWaypoint = { edge: selectedEdgeIdx, k };
+    (e.target as Element).setPointerCapture(e.pointerId);
+  }
+
+  // The diamond at the middle of a still-straight selected edge: pulling it creates the first waypoint.
+  function onMidHandleDown(e: PointerEvent) {
+    e.stopPropagation();
+    if (selectedEdgeIdx === null || !handlePt) return;
+    const made = curveLib.addWaypoint(vertices, curves, selectedEdgeIdx, handlePt);
+    if (made.index < 0) return;
+    curves = made.curves;
+    draggingWaypoint = { edge: selectedEdgeIdx, k: made.index };
+    (e.target as Element).setPointerCapture(e.pointerId);
+  }
+
+  // Curve mode: clicking the selected edge drops another waypoint on it.
+  function onEdgeClick(i: number, e: MouseEvent) {
+    if (curveMode && i === selectedEdgeIdx) {
+      const svg = (e.currentTarget as SVGElement).closest('svg') as SVGSVGElement;
+      const [x, y] = svgPoint(e as unknown as PointerEvent, svg);
+      curves = curveLib.addWaypoint(vertices, curves, i, [x, y]).curves;
+    } else {
+      selectEdge(i);
+    }
+  }
+
+  function removeWaypointAt(k: number) {
+    if (selectedEdgeIdx === null) return;
+    curves = curveLib.removeWaypoint(curves, selectedEdgeIdx, k);
+  }
+
+  function selectEdge(i: number) {
+    selectedEdgeIdx = i;
+    selectedVertexIdx = null;
+  }
+
+  function straightenSelectedEdge() {
+    if (selectedEdgeIdx === null) return;
+    const next = { ...curves };
+    delete next[selectedEdgeIdx];
+    curves = next;
+  }
+
   function onSvgMove(e: PointerEvent, svg: SVGSVGElement) {
+    if (draggingWaypoint !== null && vertices[draggingWaypoint.edge]) {
+      const [cx, cy] = svgPoint(e, svg);
+      const p: [number, number] = [Math.max(0, Math.min(cropWidth, cx)), Math.max(0, Math.min(cropHeight, cy))];
+      curves = curveLib.moveWaypoint(vertices, curves, draggingWaypoint.edge, draggingWaypoint.k, p);
+      return;
+    }
     if (draggingIdx === null) return;
     const [x, y] = svgPoint(e, svg);
     // Absolute-space edit: only the dragged vertex moves. No bearing/
@@ -460,13 +529,24 @@
 
   function onSvgUp() {
     draggingIdx = null;
+    if (draggingWaypoint !== null) curves = curveLib.settle(curves, draggingWaypoint.edge);
+    draggingWaypoint = null;
   }
 
   function addVertexOnEdge(edgeIdx: number, e: MouseEvent) {
     const svg = (e.currentTarget as SVGElement).closest('svg') as SVGSVGElement;
     const [x, y] = svgPoint(e as unknown as PointerEvent, svg);
+    insertVertexOnEdge(edgeIdx, [x, y]);
+  }
+
+  // Inserts a vertex on edge `edgeIdx`. On a curved edge the new vertex goes ON the curve and its
+  // waypoints are shared out between the two halves; the curve indexes after it shift up by one.
+  function insertVertexOnEdge(edgeIdx: number, at: [number, number]) {
     const insertAt = edgeIdx + 1;
-    vertices = [...vertices.slice(0, insertAt), [x, y], ...vertices.slice(insertAt)];
+    const vertex = curves[edgeIdx] ? curveLib.pointOnEdge(vertices, curves, edgeIdx, at) : at;
+    curves = curveLib.curvesAfterInsert(vertices, curves, edgeIdx, vertex);
+    vertices = [...vertices.slice(0, insertAt), vertex, ...vertices.slice(insertAt)];
+    selectedEdgeIdx = null;
   }
 
   // Explicit "Add point" button, for complex shapes where double-
@@ -487,18 +567,17 @@
         bestIdx = i;
       }
     }
-    const [x1, y1] = vertices[bestIdx];
-    const [x2, y2] = vertices[(bestIdx + 1) % vertices.length];
-    const mid: [number, number] = [(x1 + x2) / 2, (y1 + y2) / 2];
-    const insertAt = bestIdx + 1;
-    vertices = [...vertices.slice(0, insertAt), mid, ...vertices.slice(insertAt)];
-    selectedVertexIdx = insertAt;
+    const mid = curveLib.midpointOf(vertices[bestIdx], vertices[(bestIdx + 1) % vertices.length], curves[bestIdx]);
+    insertVertexOnEdge(bestIdx, mid);
+    selectedVertexIdx = bestIdx + 1;
   }
 
   function deleteSelectedVertex() {
     if (selectedVertexIdx === null || vertices.length <= 3) return;
+    curves = curveLib.curvesAfterDelete(curves, selectedVertexIdx, vertices.length);
     vertices = vertices.filter((_, i) => i !== selectedVertexIdx);
     selectedVertexIdx = null;
+    selectedEdgeIdx = null;
   }
 
   function onKeydown(e: KeyboardEvent) {
@@ -516,7 +595,9 @@
     if (!selected || vertices.length < 3) return;
     saveStatus = 'saving';
     try {
-      const local_vertices = localTransform ? toLocalVertices(vertices, localTransform) : null;
+      const flat = curveLib.flatten(vertices, curves);
+      const local_vertices = localTransform ? toLocalVertices(flat.points, localTransform) : null;
+      const curve_spec = Object.keys(curves).length ? { vertices, curves, corner_indices: flat.cornerIndices } : null;
       const res = await fetch(`${API_BASE}/documents/${documentId.trim()}/confirm-boundary`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -528,10 +609,11 @@
           label: selected.kind === 'manual_new' ? manualName.trim() : null,
           // legacy documents (no parcel entities): the extracted parcel's index
           parcel_index: selected.parcelId || selected.kind === 'manual_new' ? null : selected.parcelIndex,
-          vertices,
+          vertices: flat.points,
           crop_width: cropWidth,
           crop_height: cropHeight,
-          local_vertices
+          local_vertices,
+          curve_spec
         })
       });
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
@@ -558,6 +640,12 @@
 
   let georeferenced = false;
   let savedState: 'bound' | 'waiting_for_document' = 'bound';
+
+  $: handlePt =
+    selectedEdgeIdx !== null && vertices[selectedEdgeIdx]
+      ? curveLib.midpointOf(vertices[selectedEdgeIdx], vertices[(selectedEdgeIdx + 1) % vertices.length], curves[selectedEdgeIdx])
+      : null;
+  $: waypointPts = selectedEdgeIdx !== null && vertices[selectedEdgeIdx] ? curveLib.waypointPoints(vertices, curves, selectedEdgeIdx) : [];
 
   function polygonPoints(pts: [number, number][]): string {
     return pts.map(([x, y]) => `${x},${y}`).join(' ');
@@ -715,6 +803,17 @@
             <button on:click={resetToSeed}>Reset to seed</button>
             <button on:click={addPointOnLongestEdge}>Add point</button>
             <button
+              class:active-tool={curveMode}
+              on:click={() => (curveMode = !curveMode)}
+              disabled={selectedEdgeIdx === null}
+              title="Select an edge, then pull the diamond at its middle to bend it. Click the edge to add more bend points; double-click a diamond to remove it."
+            >
+              {curveMode ? 'Done curving' : 'Curve edge'}
+            </button>
+            <button on:click={straightenSelectedEdge} disabled={selectedEdgeIdx === null || !curves[selectedEdgeIdx]}>
+              Straighten edge
+            </button>
+            <button
               on:click={deleteSelectedVertex}
               disabled={selectedVertexIdx === null || vertices.length <= 3}
             >
@@ -771,14 +870,16 @@
                   <circle cx={m.x} cy={m.y} r={cropWidth * 0.0028} class="roster-dot" class:active={m.active} />
                   <text x={m.x + cropWidth * 0.009} y={m.y + cropWidth * 0.004} class="roster-label" class:active={m.active} style={`font-size:${cropWidth * 0.011}px`}>{m.label}</text>
                 {/each}
-                <polygon points={polygonPoints(vertices)} class="boundary-poly" />
-                {#each vertices as [x, y], i}
-                  <line
-                    x1={x}
-                    y1={y}
-                    x2={vertices[(i + 1) % vertices.length][0]}
-                    y2={vertices[(i + 1) % vertices.length][1]}
+                <path d={curveLib.outlinePath(vertices, curves)} class="boundary-poly" />
+                {#if selectedEdgeIdx !== null && vertices[selectedEdgeIdx]}
+                  <path d={curveLib.edgePath(vertices, curves, selectedEdgeIdx)} class="edge-selected" />
+                {/if}
+                {#each vertices as _v, i}
+                  <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+                  <path
+                    d={curveLib.edgePath(vertices, curves, i)}
                     class="edge-hit"
+                    on:click={(e) => onEdgeClick(i, e)}
                     on:dblclick={(e) => addVertexOnEdge(i, e)}
                   />
                 {/each}
@@ -787,13 +888,43 @@
                   <circle cx={x} cy={y} r={cropWidth / 700 + 1} class="vertex" class:selected={i === selectedVertexIdx} />
                   <circle cx={x} cy={y} r={cropWidth / 220 + 3} class="vertex-hit" on:pointerdown={(e) => onVertexDown(i, e)} />
                 {/each}
+                {#if curveMode && selectedEdgeIdx !== null}
+                  {#each waypointPts as [wx, wy], k}
+                    <!-- a bend point ON the edge: drag to reshape, double-click to remove -->
+                    <rect
+                      x={wx - cropWidth / 450 - 1}
+                      y={wy - cropWidth / 450 - 1}
+                      width={2 * (cropWidth / 450 + 1)}
+                      height={2 * (cropWidth / 450 + 1)}
+                      transform={`rotate(45 ${wx} ${wy})`}
+                      class="curve-handle"
+                    />
+                    <!-- svelte-ignore a11y_no_static_element_interactions -->
+                    <circle cx={wx} cy={wy} r={cropWidth / 220 + 4} class="vertex-hit" on:pointerdown={(e) => onWaypointDown(k, e)} on:dblclick={() => removeWaypointAt(k)} />
+                  {/each}
+                  {#if waypointPts.length === 0 && handlePt}
+                    <!-- still straight: pull this to start bending the edge -->
+                    <rect
+                      x={handlePt[0] - cropWidth / 450 - 1}
+                      y={handlePt[1] - cropWidth / 450 - 1}
+                      width={2 * (cropWidth / 450 + 1)}
+                      height={2 * (cropWidth / 450 + 1)}
+                      transform={`rotate(45 ${handlePt[0]} ${handlePt[1]})`}
+                      class="curve-handle"
+                    />
+                    <circle cx={handlePt[0]} cy={handlePt[1]} r={cropWidth / 220 + 4} class="vertex-hit" on:pointerdown={onMidHandleDown} />
+                  {/if}
+                {/if}
               </svg>
             {/if}
           </div>
           <p class="hint">
             Drag a point to move it (only that vertex moves). Double-click an edge, or use "Add
             point", to add a vertex -- add as many as the shape needs, no 3/4-point limit. Click a
-            vertex then press Delete/Backspace to remove it.
+            vertex then press Delete/Backspace to remove it. To curve an edge: click it, press
+            "Curve edge", pull the diamond at its middle, then click the edge again wherever it
+            bends more -- every diamond is a point the curve passes through (double-click one to
+            remove it).
           </p>
         {/if}
       </main>
@@ -1072,7 +1203,26 @@
     vector-effect: non-scaling-stroke;
     pointer-events: none;
   }
+  .edge-selected {
+    fill: none;
+    stroke: #ff8c00;
+    stroke-width: 3;
+    vector-effect: non-scaling-stroke;
+    pointer-events: none;
+  }
+  .curve-handle {
+    fill: #ff8c00;
+    stroke: #fff;
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+    pointer-events: none;
+  }
+  button.active-tool {
+    background: #ff8c00;
+    color: #fff;
+  }
   .edge-hit {
+    fill: none;
     stroke: transparent;
     stroke-width: 14;
     vector-effect: non-scaling-stroke;

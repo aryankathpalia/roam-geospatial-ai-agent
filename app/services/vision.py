@@ -155,13 +155,20 @@ def _wait_for_token_budget(tokens_needed: int) -> None:
         _token_usage.append((time.monotonic(), tokens_needed))
 
 
+_REQUEST_TIMEOUT_MS = 240_000
+
+
 def _get_client() -> genai.Client:
     if not settings.GEMINI_API_KEY:
         raise RuntimeError(
             "GEMINI_API_KEY is not set. Get a free key at "
             "https://aistudio.google.com/apikey and set it in .env."
         )
-    return genai.Client(api_key=settings.GEMINI_API_KEY)
+    # A request that never answers must fail, not block the pipeline forever (seen: a reprocess sat
+    # at "reading parcel labels" for 10+ minutes). The slowest model measured takes ~143 s per call.
+    return genai.Client(
+        api_key=settings.GEMINI_API_KEY, http_options=types.HttpOptions(timeout=_REQUEST_TIMEOUT_MS)
+    )
 
 
 _TILE_OVERLAP_PX = 50
@@ -911,7 +918,10 @@ the ones it creates, divides, adjusts or depicts as its subject, outlined and la
 drawing (for example "PARCEL 1", "REMAINDER PARCEL", "LOT 48", "Parcel A").
 
 Do NOT list: adjoining or neighboring properties (usually labeled with an OWNER name and an APN),
-the parent parcel named only in a title or note, roads, easements, or the vicinity map.
+the parent parcel named only in a title or note, roads, the vicinity map, and ANY easement,
+right-of-way or utility strip (e.g. "30' ESMT") -- those lie inside or across a parcel and are
+not parcels. A "remainder" that is only the unoutlined rest of the parent tract (no printed area,
+no boundary of its own) is not a target parcel either; the sale/subject parcel is.
 
 For each target parcel return:
 - label: the parcel's name exactly as printed on the drawing (e.g. "REMAINDER PARCEL", "PARCEL 1").

@@ -86,3 +86,28 @@ def test_ocr_ei_is_read_as_el_street_addresses_lead_and_letterhead_and_foreign_m
     assert not any("801 MAIN" in c for c in out)                      # phone number: an agency's office
     assert out.index("2205 Cross Road El Centro, CA 92243") < out.index("17533 East Starflower Court Queen Creek, AZ 85142")
     assert out.index("2205 Cross Road El Centro, CA 92243") < out.index("El Centro, CA, 92243")
+
+
+def test_county_state_candidate_for_deed_without_street_address():
+    from app.services import georeference as g
+
+    pages = [{"regions": [{"class": "text", "ocr_text":
+        "Section 21, Township 13 South, Range 12 East, Gila and Salt River Meridian, "
+        "Pima County, Arizona. Records of Pima County, Arizona."}]}]
+    assert g._county_state_candidate(pages) == "Pima County, Arizona"
+    assert g._county_state_candidate([{"regions": [{"ocr_text": "no place named here"}]}]) is None
+
+
+def test_surveyed_coordinates_prefer_the_pair_nearest_the_site_not_the_first():
+    """A plat lists a far-away control monument first, then the monuments at the parcel."""
+    from app.services import georeference as g
+
+    text = (
+        'MONUMENT "N74SM01028" N:14872076.61 E:2257793.63 (GROUND COORDINATE) '
+        'N:14834576.92 E:2289281.05 (GROUND COORDINATE) '
+        "NEVADA STATE PLANE COORDINATE SYSTEM OF 1983, WEST ZONE, DISTANCES SHOWN ARE GROUND "
+        "DISTANCES USING A PROJECT COMBINED GRID TO GROUND SCALE FACTOR OF 1.000197939."
+    )
+    pages = [{"regions": [{"ocr_text": text}]}]
+    lat, lon = g.find_surveyed_coordinates(pages, "Nevada", 39.4357, -119.7724)
+    assert abs(lat - 39.4362) < 0.002 and abs(lon + 119.7724) < 0.002  # the parcel-side pair, not 39.538

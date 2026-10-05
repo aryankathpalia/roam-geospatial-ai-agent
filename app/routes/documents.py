@@ -30,7 +30,7 @@ from app.services import control_points
 from app.services import parcel_roster
 from app.services import gemini_edge_association
 from app.services import placement as placement_service
-from app.services.georeference import georeference_traverse_to_geojson
+from app.services.georeference import georeference_traverse_to_geojson, ground_to_grid_multiplier
 from app.services.spatial_validation import validate_traverse
 
 logger = logging.getLogger(__name__)
@@ -230,13 +230,20 @@ def get_progress(document_id: str):
 
 
 @router.get("/{document_id}")
-def get_document(document_id: str):
+def get_document(document_id: str, background_tasks: BackgroundTasks):
     """
     Reload a previously-processed document's stored result, for the
     review UI to resume without re-uploading/re-processing.
     """
 
     result = _load_result(document_id)
+    # A control-point read that died with its process (a dev-server reload mid-read) leaves a stale
+    # "reading" marker; the page poll that finds it restarts the read instead of leaving the cards on
+    # "Refining placement…" forever. _ensure_control_points does nothing for a fresh or finished read.
+    for page in result.get("pages", []):
+        cp = page.get("control_points") or {}
+        if cp.get("status") == "reading" and not _control_read_fresh(page):
+            background_tasks.add_task(_ensure_control_points, document_id, page["page_number"])
     return {
         "document_id": document_id,
         # "processing": only the candidate regions exist so far (saved right after
@@ -518,6 +525,11 @@ class ConfirmBoundaryRequest(BaseModel):
     # position at the same display scale. Null when this parcel had no
     # original traverse ring to invert against (nothing to project).
     local_vertices: list[list[float]] | None = None
+    # Curved edges, so the outline can be re-opened and edited: the user's corners and each curved
+    # edge's control point ({"vertices": [...], "curves": {edge: [a, b]}, "corner_indices": [...]}).
+    # `vertices` above are then the corners PLUS points sampled along each curve, so the stored polygon
+    # (area, map ring) follows the curve; everything downstream just sees a polygon.
+    curve_spec: dict | None = None
 
 
 _RESULT_LOCK = threading.RLock()
@@ -542,6 +554,27 @@ def _locate_parcel(result: dict, body) -> tuple[dict, list, dict] | None:
 def _anchor_for(result: dict, parcel: dict) -> tuple[float | None, float | None]:
     override = parcel.get("anchor_override") or {}
     return override.get("lat", result.get("anchor_lat")), override.get("lon", result.get("anchor_lon"))
+
+
+def _stated_acres(result: dict, parcel: dict) -> float | None:
+    """
+    The parcel's printed area in acres. The vision pass only fills `stated_area_acres` when the plat prints
+    ACRES; the sheet roster reads whatever the sheet prints beside each parcel label ("85,396 SQ. FT.") and
+    parcel_roster.parse_acres converts it -- so a parcel linked to a roster entity falls back to that. Without
+    it a plat that states square feet had no area, hence no scale, hence outlines sized from a guess.
+    """
+
+    vg = parcel.get("vision_geometry") or {}
+    acres = parcel_roster.parse_acres(vg.get("stated_area_acres"))
+    if acres:
+        return acres
+    roster_id = parcel.get("roster_id")
+    if roster_id:
+        for page in result.get("pages", []):
+            for entity in (page.get("sheet") or {}).get("parcels", []):
+                if entity.get("id") == roster_id:
+                    return parcel_roster.parse_acres(entity.get("stated_area")) or None
+    return None
 
 
 def _derive_confirmed_geometry(
@@ -676,13 +709,8 @@ def _derive_confirmed_geometry(
                     # edge) survives georeferencing.
                     local_pivot = (0.0, 0.0)
 
-            stated_sqft = None
-            stated_acres_str = parcel.get("vision_geometry", {}).get("stated_area_acres")
-            if stated_acres_str:
-                try:
-                    stated_sqft = float(stated_acres_str) * 43560.0
-                except (TypeError, ValueError):
-                    stated_sqft = None
+            stated_acres = _stated_acres(result, parcel)
+            stated_sqft = stated_acres * 43560.0 if stated_acres else None
 
             calibration_info = calibration_service.calibrate(
                 polygon_page_px, ocr_lines, stated_sqft,
@@ -825,7 +853,10 @@ def _derive_confirmed_geometry(
     parcel["spatial_validation"] = validate_traverse(
         traverse,
         region_ocr_text,
-        stated_area_acres=parcel.get("vision_geometry", {}).get("stated_area_acres"),
+        stated_area_acres=(
+            parcel.get("vision_geometry", {}).get("stated_area_acres")
+            or (str(_stated_acres(result, parcel)) if _stated_acres(result, parcel) else None)
+        ),
         calls=parcel.get("resolved_boundary_calls"),
     )
     parcel["boundary_source"] = boundary_source
@@ -899,6 +930,7 @@ def _verify_confirmation(document_id: str, body, confirmation_id: str) -> None:
             _reapply_manual_position(parcel)
         _unify_sheet_frame(result, body.page_number)
         _fit_sheet_to_aliquot(result, body.page_number)
+        _fit_sheet_to_apn(result, body.page_number)
         _fit_sheet_to_control_points(result, body.page_number)
         _save_result(document_id, result)
     _ensure_control_points(document_id, body.page_number)
@@ -1077,6 +1109,74 @@ def _fit_sheet_to_aliquot(result: dict, page_number: int) -> None:
             f"(BLM section corners): combined {total_acres:.2f} ac vs {target_acres:.2f} ac; moved {shift_m:.0f} m"
         )
         placement["notes"] = [n for n in placement.get("notes", []) if not n.startswith("fitted with")] + [note]
+
+
+def _fit_sheet_to_apn(result: dict, page_number: int) -> None:
+    """
+    Seats a sheet's confirmed parcels, as a GROUP, on the county's own parcel polygons for the APNs the
+    document prints (result["apn_site"], see app/services/apn.py): onto the target parcel's polygon when
+    it still exists and its area matches, otherwise in the gap between the neighbours, overlapping none
+    of them and hugging their boundaries. A plat's neighbour APNs are exact, independent evidence of
+    where it sits; on a Reno 3-lot split the printed-monument anchor left the lots ~65 m off, with the
+    public road running through the middle lot.
+
+    Translation only, applied only when the fit is corroborated (see apn.placement_by_apn), recomputed
+    from each parcel's unfitted placement every time. Takes precedence over the aliquot fit (finer
+    evidence); parcels placed from validated control points or by hand are left alone.
+    """
+
+    from app.services.apn import placement_by_apn
+
+    site = result.get("apn_site")
+    page = next((p for p in result.get("pages", []) if p["page_number"] == page_number), None)
+    if not site or page is None:
+        return
+
+    members = []
+    for region in page.get("regions", []):
+        for parcel in region.get("parcels") or []:
+            if not parcel.get("human_confirmed") or not parcel.get("boundary_geojson_wgs84"):
+                continue
+            if parcel.get("anchor_override") or parcel.get("manual_position"):
+                continue
+            placement = parcel.get("placement") or {}
+            if (placement.get("control_fit") or {}).get("validated"):
+                continue
+            if placement.get("status") == "pending":
+                return  # wait until every confirmed parcel on the sheet is verified
+            fitted_before = placement.get("apn_fit") or placement.get("aliquot_fit")
+            if fitted_before and parcel.get("boundary_geojson_wgs84_unfitted"):
+                unfitted = parcel["boundary_geojson_wgs84_unfitted"]
+            else:
+                unfitted = copy.deepcopy(parcel["boundary_geojson_wgs84"])
+            members.append((parcel, unfitted))
+    if not members:
+        return
+
+    fit = placement_by_apn([u["geometry"]["coordinates"][0] for _, u in members], site)
+    for parcel, unfitted in members:
+        placement = parcel.setdefault("placement", {"status": "approximate", "notes": []})
+        placement["notes"] = [n for n in placement.get("notes", []) if not n.startswith("seated on the county parcel")]
+        if not fit or not fit["corroborated"]:
+            if placement.pop("apn_fit", None) and not placement.get("aliquot_fit"):
+                parcel["boundary_geojson_wgs84"] = unfitted  # undo an earlier fit that no longer holds
+                parcel.pop("boundary_geojson_wgs84_unfitted", None)
+            continue
+        moved = _shift_feature(unfitted, fit["east_m"], fit["north_m"])
+        moved.setdefault("properties", {})["georeferenced"] = "fitted_to_county_parcels"
+        parcel["boundary_geojson_wgs84_unfitted"] = unfitted
+        parcel["boundary_geojson_wgs84"] = moved
+        placement.pop("aliquot_fit", None)
+        shift_m = math.hypot(fit["east_m"], fit["north_m"])
+        placement["apn_fit"] = {**fit, "shift_m": round(shift_m, 1), "source": site.get("source")}
+        how = (
+            f"onto APN {site.get('target_apn')}" if fit["mode"] == "target_parcel"
+            else f"between {len(site.get('neighbours') or [])} neighbouring parcels the plat names by APN"
+        )
+        placement["notes"].append(
+            f"seated on the county parcel records ({site.get('source')}) {how}: moved {shift_m:.0f} m "
+            "from the anchor-based position."
+        )
 
 
 def _unify_sheet_frame(result: dict, page_number: int) -> bool:
@@ -1306,8 +1406,9 @@ def _control_fit_applicable(result: dict) -> bool:
 
 
 # A "reading" marker older than this is a read that died with its process (e.g. a dev-server
-# reload): it must neither block a retry nor keep the UI showing "refining" forever.
-_CONTROL_READ_STALE_S = 900
+# reload): it must neither block a retry nor keep the UI showing "refining" forever. Real reads take
+# 2-5 minutes; a dead one is noticed on the next page load (see get_document) and re-run.
+_CONTROL_READ_STALE_S = 480
 
 
 def _control_read_fresh(page: dict) -> bool:
@@ -1347,11 +1448,17 @@ def _ensure_control_points(document_id: str, page_number: int) -> None:
         eligible = False
         for region in page.get("regions", []):
             members = _control_fit_members(region)
-            if members:
+            # A sheet already seated on the county parcel records needs no coordinate read (minutes of OCR).
+            if members and all(((p.get("placement") or {}).get("apn_fit") or {}).get("corroborated") for p in members):
+                continue
+            if members and any((p.get("calibration") or {}).get("scale_ft_per_px") for p in members):
                 eligible = True
                 ox, oy = _region_page_origin(region)
                 focus += [(ox + v[0], oy + v[1]) for p in members for v in p["confirmed_boundary_pixels"]["vertices"]]
         if not eligible:
+            if existing is not None:  # a dead read's marker, and nothing to read for: leave no stale state
+                page.pop("control_points", None)
+                _save_result(document_id, result)
             return
         page["control_points"] = {"status": "reading", "started_at": time.time()}
         _save_result(document_id, result)
@@ -1413,6 +1520,14 @@ def _fit_sheet_to_control_points(result: dict, page_number: int) -> bool:
     points = [control_points.ControlPoint.from_dict(d) for d in cache["points"]]
     if len(points) < 2:
         return False
+    # Some sheets print GROUND coordinates plus a combined factor (Washoe County); the anchor was converted
+    # with it (georeference.find_surveyed_coordinates), so the control points must be too.
+    page_text = "\n".join(r.get("ocr_text") or "" for pg in result.get("pages", []) for r in pg.get("regions", []))
+    to_grid = ground_to_grid_multiplier(page_text) or 1.0
+    if to_grid != 1.0:
+        for c in points:
+            c.northing *= to_grid
+            c.easting *= to_grid
     epsg = control_points.resolve_crs_from_anchor(points, result["anchor_lat"], result["anchor_lon"])
 
     from pyproj import Transformer
@@ -1481,6 +1596,7 @@ def _fit_sheet_to_control_points(result: dict, page_number: int) -> bool:
                 "anchor_control_point": a.to_dict(), "check_control_point": b.to_dict(),
                 "candidate_correspondences": outcome.details.get("candidate_correspondences"),
                 "scale_borrowed_from_sheet": borrowed_scale,
+                "ground_to_grid_multiplier": to_grid if to_grid != 1.0 else None,
             }
             stale = ("two printed control points", "position comes from the document-level anchor", "scale/rotation not calibrated")
             placement["notes"] = [
@@ -1546,6 +1662,8 @@ def _apply_confirmation(document_id: str, result: dict, body, wait: bool) -> tup
         "crop_height": body.crop_height,
         "id": confirmation_id,
     }
+    if body.curve_spec:
+        parcel["confirmed_boundary_pixels"]["curve_spec"] = body.curve_spec
     parcel["human_confirmed"] = True
 
     if not body.local_vertices:
@@ -1616,7 +1734,7 @@ def _bind_entity(document_id: str, result: dict, page_number: int, entity: dict)
     body = ConfirmBoundaryRequest(
         page_number=page_number, region_index=ref["region"], parcel_index=ref["parcel"],
         vertices=poly["vertices"], crop_width=poly["crop_width"], crop_height=poly["crop_height"],
-        local_vertices=poly.get("local_vertices"),
+        local_vertices=poly.get("local_vertices"), curve_spec=poly.get("curve_spec"),
     )
     if (poly.get("region_index") is not None) and poly["region_index"] != ref["region"]:
         # drawn on the sheet's main drawing, but the extracted parcel was read from another region:
@@ -1689,6 +1807,7 @@ def confirm_boundary(
         entity["confirmed_polygon"] = {
             "vertices": body.vertices, "crop_width": body.crop_width, "crop_height": body.crop_height,
             "local_vertices": body.local_vertices, "region_index": body.region_index, "id": uuid4().hex,
+            **({"curve_spec": body.curve_spec} if body.curve_spec else {}),
         }
         pending = None
         if (result.get("processing") or {}).get("complete", True):

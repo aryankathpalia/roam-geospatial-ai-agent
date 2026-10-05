@@ -96,7 +96,7 @@ _MERIDIAN_ABBR = {
     "UM": "Uintah Meridian",
     "NMM": "New Mexico Principal Meridian",
     "NMPM": "New Mexico Principal Meridian",
-    "GSRM": "Gila and Salt River Meridian",
+    "GSRM": "Gila-Salt River Meridian",
     "SBM": "San Bernardino Meridian",
     "SBBM": "San Bernardino Meridian",
     "HM": "Humboldt Meridian",
@@ -122,7 +122,7 @@ _MERIDIAN_ABBR = {
 _SEP = r"[,，\s]*"
 _TRM_RE = re.compile(
     r"TOWNSHIP\s+(\d{1,3})\s*(NORTH|SOUTH)" + _SEP + r"RANGE\s+(\d{1,3})\s*(EAST|WEST)" + _SEP +
-    r"([A-Z][A-Z.\s]{0,30}MERIDIAN|[A-Z]{1,5}\.?[A-Z]\.?[A-Z]?\.?)",
+    r"([A-Z][A-Z.\s]{0,45}MERIDIAN|[A-Z]{1,5}\.?[A-Z]\.?[A-Z]?\.?)",
     re.IGNORECASE,
 )
 # "T. 9 N., R. 5 W., B.M." -- the abbreviated form most plat headings use (OCR often turns the
@@ -130,7 +130,7 @@ _TRM_RE = re.compile(
 _SEPD = r"[.,，\s]*"  # also periods: OCR doubles them ("N.. R.5W.. B.M.")
 _TRM_ABBR_RE = re.compile(
     r"\bT\.?\s*(\d{1,3})\s*([NS])\b" + _SEPD + r"R\.?\s*(\d{1,3})\s*([EW])\b" + _SEPD +
-    r"((?:[A-Z]\.?){1,4})(?![A-Za-z])",
+    r"((?:[A-Z]\.?\s?&?\s?){1,5})(?![A-Za-z])",
     re.IGNORECASE,
 )
 # Sixteenth-section corners as plats name them. Measured on the Payette ROS: the printed distance
@@ -148,19 +148,25 @@ _TWO_SECTION_QUARTER_RE = re.compile(
     r"1/4\s*CORNER\s+OF\s+SECTIONS?\s+(\d{1,2})\s+AND\s+(\d{1,2})", re.IGNORECASE
 )
 _ONE_SECTION_QUARTER_RE = re.compile(
-    r"\b([NSEW])\s*1/4\s*CORNER\s+(?:OF\s+)?SECTION\s+(\d{1,2})\b", re.IGNORECASE
+    r"\b(NORTH|SOUTH|EAST|WEST|N|S|E|W)\s*(?:1/4|ONE[- ]?QUARTER|QUARTER)\s*CORNER\s+"
+    r"(?:OF\s+)?(?:SAID\s+|THE\s+)?SECTION\s+(\d{1,2})\b", re.IGNORECASE
 )
 _FULL_CORNER_RE = re.compile(
-    r"\b(NE|NW|SE|SW)\s+CORNER\s+(?:OF\s+)?SECTION\s+(\d{1,2})\b", re.IGNORECASE
+    r"\b(NORTHEAST|NORTHWEST|SOUTHEAST|SOUTHWEST|NE|NW|SE|SW)\s+CORNER\s+"
+    r"(?:OF\s+)?(?:SAID\s+|THE\s+)?SECTION\s+(\d{1,2})\b", re.IGNORECASE
 )
+_FULL_CORNER_CODE = {"NORTHEAST": "NE", "NORTHWEST": "NW", "SOUTHEAST": "SE", "SOUTHWEST": "SW"}
 
 
 def _normalize_meridian(raw: str) -> str | None:
     if "MERIDIAN" in raw.upper():
         # "...Range 5 West of the Boise Meridian": the lead-in is not part of the name.
         cleaned = re.sub(r"^\s*(?:OF\s+THE\s+|OF\s+|THE\s+)", "", raw.strip(), flags=re.IGNORECASE)
-        return " ".join(w.capitalize() for w in cleaned.split())
-    key = re.sub(r"[.\s]", "", raw).upper()
+        # "Gila and Salt River Base and Meridian" -> BLM's "Gila and Salt River Meridian"
+        cleaned = re.sub(r"\bBASE\s+(?:AND|&)\s+", "", cleaned, flags=re.IGNORECASE)
+        words = [w.capitalize() for w in cleaned.split()]
+        return " ".join(w.lower() if w in ("And", "Of") else w for w in words)
+    key = re.sub(r"[.\s&]", "", raw).upper()
     return _MERIDIAN_ABBR.get(key)
 
 
@@ -190,10 +196,11 @@ def _trs_from(m, meridian: str) -> _TRS:
     )
 
 
-def _resolve_township_plssid(state_abbr: str, trs: _TRS) -> str | None:
+def _query_township(state_abbr: str, trs: _TRS, meridian: str | None) -> list[dict]:
     where = (
-        f"STATEABBR='{state_abbr}' AND PRINMER='{trs.meridian_name}' AND "
-        f"TWNSHPNO='{trs.township_no:03d}' AND TWNSHPDIR='{trs.township_dir}' AND "
+        f"STATEABBR='{state_abbr}' AND "
+        + (f"PRINMER='{meridian}' AND " if meridian else "")
+        + f"TWNSHPNO='{trs.township_no:03d}' AND TWNSHPDIR='{trs.township_dir}' AND "
         f"RANGENO='{trs.range_no:03d}' AND RANGEDIR='{trs.range_dir}'"
     )
     resp = httpx.get(
@@ -202,7 +209,15 @@ def _resolve_township_plssid(state_abbr: str, trs: _TRS) -> str | None:
         timeout=_HTTP_TIMEOUT,
     )
     resp.raise_for_status()
-    feats = resp.json().get("features") or []
+    return resp.json().get("features") or []
+
+
+def _resolve_township_plssid(state_abbr: str, trs: _TRS) -> str | None:
+    feats = _query_township(state_abbr, trs, trs.meridian_name)
+    if not feats:
+        # BLM spells meridians its own way ("Gila-Salt River Meridian"); the printed name may
+        # differ. A state/township/range with exactly ONE match is unambiguous without it.
+        feats = _query_township(state_abbr, trs, None)
     if len(feats) != 1:
         return None
     return feats[0]["attributes"]["PLSSID"]
@@ -459,8 +474,12 @@ def resolve_plss_anchor(pages_result: list[dict], state_name: str) -> PLSSAnchor
             point = _resolve_two_section_quarter(plssid, a, b)
             if point:
                 resolved.append((f"1/4 corner of Sections {a} and {b}", point))
+        seen_q: set[tuple[str, int]] = set()
         for m in _ONE_SECTION_QUARTER_RE.finditer(text):
-            d, s = m.group(1).upper(), int(m.group(2))
+            d, s = m.group(1).upper()[0], int(m.group(2))
+            if (d, s) in seen_q:
+                continue  # a deed names the same monument on several pages
+            seen_q.add((d, s))
             point = _resolve_one_section_quarter(plssid, s, d)
             if point:
                 resolved.append((f"{d}1/4 corner of Section {s}", point))
@@ -473,8 +492,13 @@ def resolve_plss_anchor(pages_result: list[dict], state_name: str) -> PLSSAnchor
             point = _resolve_sixteenth(plssid, sec, name)
             if point:
                 resolved.append((f"{name}1/16 corner of Section {sec}", point))
+        seen_c: set[tuple[str, int]] = set()
         for m in _FULL_CORNER_RE.finditer(text):
             d, s = m.group(1).upper(), int(m.group(2))
+            d = _FULL_CORNER_CODE.get(d, d)
+            if (d, s) in seen_c:
+                continue
+            seen_c.add((d, s))
             point = _resolve_full_corner(plssid, s, d)
             if point:
                 resolved.append((f"{d} corner of Section {s}", point))

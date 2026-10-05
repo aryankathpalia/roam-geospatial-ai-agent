@@ -14,6 +14,7 @@ from pathlib import Path
 sys.modules.setdefault("paddleocr", types.SimpleNamespace(PaddleOCR=object))
 
 import pytest  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
 from PIL import Image  # noqa: E402
 from pyproj import Geod  # noqa: E402
 
@@ -398,3 +399,55 @@ def test_the_read_starts_even_when_a_sibling_has_no_placed_geometry(tmp_path, mo
     saved = json.loads((tmp_path / doc / "result.json").read_text())
     assert saved["pages"][0]["control_points"]["status"] == "done"
     assert all(p["placement"]["control_fit"]["validated"] for p in saved["pages"][0]["regions"][0]["parcels"])
+
+
+def test_a_sheet_with_no_calibrated_scale_is_never_read_nor_marked_refining(tmp_path, monkeypatch):
+    """Derry-style fallback needs a scale to compare vertex separations against; a sheet without one
+    (no stated acreage, no corroborating edge) used to sit on "Refining placement..." for nothing."""
+    doc = "noscale-doc"
+    (tmp_path / doc / "pages").mkdir(parents=True)
+    Image.new("RGB", (3400, 2200), "white").save(tmp_path / doc / "pages" / "page_013.png")
+    r = _result(points=False)
+    for p in _parcels(r):
+        p["calibration"]["scale_ft_per_px"] = None
+    (tmp_path / doc / "result.json").write_text(json.dumps(r))
+    monkeypatch.setattr(docs, "DOCUMENT_ROOT", tmp_path)
+    monkeypatch.setattr(docs, "run_parcelmap_ocr", lambda img: (_ for _ in ()).throw(AssertionError("must not read")))
+    docs._ensure_control_points(doc, 13)
+    assert "control_points" not in json.loads((tmp_path / doc / "result.json").read_text())["pages"][0]
+
+
+def test_loading_a_document_restarts_a_read_that_died_but_not_one_still_running(tmp_path, monkeypatch):
+    doc = "heal-doc"
+    (tmp_path / doc / "pages").mkdir(parents=True)
+    Image.new("RGB", (3400, 2200), "white").save(tmp_path / doc / "pages" / "page_013.png")
+    r = _result(points=False)
+    r["pages"][0]["control_points"] = {"status": "reading", "started_at": docs.time.time() - 3600}
+    (tmp_path / doc / "result.json").write_text(json.dumps(r))
+    monkeypatch.setattr(docs, "DOCUMENT_ROOT", tmp_path)
+    monkeypatch.setattr(docs, "run_parcelmap_ocr", lambda img: ([], True))
+    monkeypatch.setattr(cp, "recover_control_points", lambda img, fn, only_tiles=None: _tile_lines())
+    from app.main import app
+    client = TestClient(app)
+    assert client.get(f"/documents/{doc}").status_code == 200     # TestClient runs the background task before returning
+    assert json.loads((tmp_path / doc / "result.json").read_text())["pages"][0]["control_points"]["status"] == "done"
+
+    # a fresh marker is a read in progress: loading must not start a second one
+    r2 = _result(points=False)
+    r2["pages"][0]["control_points"] = {"status": "reading", "started_at": docs.time.time()}
+    (tmp_path / doc / "result.json").write_text(json.dumps(r2))
+    assert client.get(f"/documents/{doc}").status_code == 200
+    assert json.loads((tmp_path / doc / "result.json").read_text())["pages"][0]["control_points"]["status"] == "reading"
+
+
+def test_a_dead_reading_marker_is_cleared_when_there_is_nothing_to_read(tmp_path, monkeypatch):
+    doc = "clear-doc"
+    (tmp_path / doc / "pages").mkdir(parents=True)
+    r = _result(points=False)
+    for p in _parcels(r):
+        p["calibration"]["scale_ft_per_px"] = None
+    r["pages"][0]["control_points"] = {"status": "reading", "started_at": docs.time.time() - 3600}
+    (tmp_path / doc / "result.json").write_text(json.dumps(r))
+    monkeypatch.setattr(docs, "DOCUMENT_ROOT", tmp_path)
+    docs._ensure_control_points(doc, 13)
+    assert "control_points" not in json.loads((tmp_path / doc / "result.json").read_text())["pages"][0]

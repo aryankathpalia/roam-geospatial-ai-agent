@@ -749,6 +749,10 @@
     plss_single_source: 'PLSS monument (uncorroborated)',
     aliquot: 'Matches PLSS legal description (BLM)',
     control: 'Fitted to 2 printed survey control points',
+    apn: 'Fitted to county parcel records (APN)',
+    // The document anchor is a printed monument coordinate, but nothing confirmed where THIS outline
+    // sits relative to it -- shown amber, not green.
+    surveyed_anchor: 'Near a printed survey monument (position unconfirmed)',
     street: 'Street address (approx.)',
     city: 'City / ZIP only (coarse)',
     manual: 'Manually pinned',
@@ -776,9 +780,13 @@
     // Placed from two printed surveyed coordinates, the second predicted from the first within tolerance
     // (app/services/control_points.py).
     if (parcel.placement?.control_fit?.validated) return 'control';
+    // Seated between (or onto) the parcels the plat names by APN, in the county's own parcel layer
+    // (app/routes/documents.py::_fit_sheet_to_apn).
+    if (parcel.placement?.apn_fit?.corroborated) return 'apn';
+    if (parcel.human_confirmed && anchorPrecision === 'surveyed' && !confirmedPlacementOk(parcel)) return 'surveyed_anchor';
     return anchorPrecision;
   }
-  const locationConfirmed = (precision: string) => precision === 'surveyed' || precision === 'manual' || precision === 'aliquot' || precision === 'control';
+  const locationConfirmed = (precision: string) => precision === 'surveyed' || precision === 'manual' || precision === 'aliquot' || precision === 'control' || precision === 'apn';
 
   // A confirmed boundary's SHAPE can close and match the stated area
   // (spatial_validation.valid) while its real-world scale/rotation were
@@ -800,7 +808,7 @@
     if (status === 'cross_validated' || status === 'single_source') return 'placeable';
     // Rotation/scale unverified from printed bearings, but the outline's area AND extents match the
     // BLM aliquot part within 2% -- that independently corroborates scale and orientation too.
-    if (parcel.placement?.aliquot_fit?.corroborated || parcel.placement?.control_fit?.validated) return 'placeable';
+    if (parcel.placement?.aliquot_fit?.corroborated || parcel.placement?.control_fit?.validated || parcel.placement?.apn_fit?.corroborated) return 'placeable';
     // status === 'unverified', or calibration missing entirely despite
     // human_confirmed (no anchor to calibrate against) -- both mean the
     // same thing to a viewer: this placement was never corroborated.
@@ -816,7 +824,7 @@
   // ~2,600 ft off -- so it must not stand in for a confirmed parcel's own
   // placement.
   function confirmedPlacementOk(parcel: any): boolean {
-    return !!parcel.anchor_override || !!parcel.manual_position || parcel.placement?.status === 'surveyed_corner' || !!parcel.placement?.aliquot_fit?.corroborated;
+    return !!parcel.anchor_override || !!parcel.manual_position || parcel.placement?.status === 'surveyed_corner' || !!parcel.placement?.aliquot_fit?.corroborated || !!parcel.placement?.apn_fit?.corroborated;
   }
 
   // The user drew an outline for this parcel (its sheet entity holds a confirmed_polygon) but it
@@ -829,10 +837,10 @@
   }
 
   // The server is still reading the page's printed survey coordinates to refine this sheet's placement
-  // (a few minutes; a marker older than 15 min is a read that died with its process).
+  // (a few minutes; a marker older than 8 min is a read that died with its process).
   function controlReadInProgress(pg: any): boolean {
     const cp = pg?.control_points;
-    return cp?.status === 'reading' && Date.now() / 1000 - (cp.started_at ?? 0) < 900;
+    return cp?.status === 'reading' && Date.now() / 1000 - (cp.started_at ?? 0) < 480;
   }
 
   function verdict(parcel: any, pageNumber?: number): { cls: string; label: string; busy?: boolean } {
@@ -846,6 +854,7 @@
     if (
       pageNumber !== undefined &&
       parcel.placement?.status !== 'surveyed_corner' &&
+      !parcel.placement?.apn_fit?.corroborated &&
       controlReadInProgress((result?.pages ?? []).find((p: any) => p.page_number === pageNumber))
     ) {
       return { cls: 'busy', label: 'Refining placement…', busy: true };

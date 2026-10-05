@@ -362,3 +362,28 @@ def test_deleting_a_parcel_also_removes_it_from_the_extracted_list_and_it_is_nev
     parcel_roster.join_evidence(7, pg7["sheet"], pg7["regions"])      # the next evidence join (finalize / reprocess)
     assert not any(e.get("evidence_ref") == {"region": 3, "parcel": 0} for e in pg7["sheet"]["parcels"])
     assert "p7-x1" not in {e["id"] for e in pg7["sheet"]["parcels"]}
+
+
+def test_curved_edges_are_stored_with_the_outline_so_it_can_be_reopened(patnaude_client):
+    c, root = patnaude_client
+    corners = [[400, 400], [700, 400], [700, 700], [400, 700]]
+    # edge 0 (top) bent: 4 corners + 3 points sampled along the curve, as the editor sends them
+    flat = [[400, 400], [475, 380], [550, 372], [625, 380], [700, 400], [700, 700], [400, 700]]
+    spec = {"vertices": corners, "curves": {"0": [0.5, -0.2]}, "corner_indices": [0, 4, 5, 6]}
+    r = c.post(f"/documents/{PATNAUDE}/confirm-boundary?wait=true", json={
+        "page_number": 7, "region_index": 3, "parcel_index": 3, "vertices": flat,
+        "crop_width": 4500.0, "crop_height": 4300.0, "curve_spec": spec})
+    assert r.status_code == 200
+    parcel = _patnaude_parcel(root, "REMAINDER PARCEL")
+    assert parcel["confirmed_boundary_pixels"]["vertices"] == flat      # the polygon every later step sees follows the curve
+    assert parcel["confirmed_boundary_pixels"]["curve_spec"] == spec    # ...and the editor gets its corners and curves back
+    assert len(parcel["boundary_geojson_wgs84"]["geometry"]["coordinates"][0]) == len(flat) + 1
+
+
+def test_a_straight_outline_stores_no_curve_spec(patnaude_client):
+    c, root = patnaude_client
+    r = c.post(f"/documents/{PATNAUDE}/confirm-boundary?wait=true", json={
+        "page_number": 7, "region_index": 3, "parcel_index": 3,
+        "vertices": [[400, 400], [700, 400], [700, 700], [400, 700]], "crop_width": 4500.0, "crop_height": 4300.0})
+    assert r.status_code == 200
+    assert "curve_spec" not in _patnaude_parcel(root, "REMAINDER PARCEL")["confirmed_boundary_pixels"]

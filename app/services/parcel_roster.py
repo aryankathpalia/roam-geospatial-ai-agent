@@ -47,7 +47,8 @@ def parse_acres(text: Any) -> float | None:
     if not m:
         return None
     value = float(m.group(1))
-    if re.search(r"\b(SF|SQ\.?\s*FT|SQUARE\s+F)", t):
+    # "S.F." / "SF" / "SQ. FT." / "SQUARE FEET" / "sq ft" -- and "±" or OCR junk may precede the number
+    if re.search(r"\bS\.?\s*F\b|\bSQ\.?\s*FT|\bSQUARE\s+F", t):
         value /= 43560.0
     return value
 
@@ -67,6 +68,31 @@ def clean_point(x: Any, y: Any) -> list[float] | None:
     if not (0.0 <= fx <= 1.0 and 0.0 <= fy <= 1.0):
         return None
     return [round(fx, 4), round(fy, 4)]
+
+
+_ENCUMBRANCE_RE = re.compile(
+    r"\b(ESMT|EASEMENT|EASMT|R/?W|ROW|RIGHT[- ]OF[- ]WAY|ROAD|ROADWAY|UTILITY|ACCESS)\b", re.I
+)
+
+
+def is_encumbrance(label: Any) -> bool:
+    """An easement / right-of-way label: a strip lying INSIDE or ACROSS a parcel, not a parcel."""
+    return bool(_ENCUMBRANCE_RE.search(str(label or "")))
+
+
+def drop_non_parcels(parcels: list[dict]) -> list[dict]:
+    """Drop what the model lists but is not a parcel to outline, while a real parcel remains:
+    easements/rights-of-way, and a 'remainder' with neither a printed area nor a location (just
+    the complementary depiction of the rest of the parent tract)."""
+    real = [p for p in parcels if not is_encumbrance(p.get("label"))]
+    if not real:
+        return parcels  # an easement-only sheet: the easement IS the subject
+    kept = [
+        p for p in real
+        if not (re.search(r"\bREMAINDER\b", str(p.get("label") or ""), re.I)
+                and not p.get("stated_area") and not p.get("point") and len(real) > 1)
+    ]
+    return kept or real
 
 
 def sanitize_roster(items: Any) -> list[dict]:
@@ -94,7 +120,7 @@ def sanitize_roster(items: Any) -> list[dict]:
         )
         if len(out) >= MAX_PARCELS_PER_SHEET:
             break
-    return out
+    return drop_non_parcels(out)
 
 
 def new_entity(
@@ -289,7 +315,13 @@ def carry_over_user_data(stored: dict | None, new: dict) -> None:
     for st_page in stored.get("pages", []):
         st_sheet = st_page.get("sheet")
         nw_page = new_pages.get(st_page["page_number"])
-        if not st_sheet or not nw_page or not nw_page.get("sheet"):
+        if not st_sheet or not nw_page:
+            continue
+        if not nw_page.get("sheet"):
+            # This run did not (yet) rebuild the sheet -- e.g. the roster read timed out. The user's
+            # outlines live on it, so keep the stored sheet rather than drop them.
+            if any(e.get("confirmed_polygon") or e.get("source") == "manual" for e in st_sheet.get("parcels") or []):
+                nw_page["sheet"] = st_sheet
             continue
         nw_sheet = nw_page["sheet"]
         entities = nw_sheet.setdefault("parcels", [])
@@ -298,5 +330,6 @@ def carry_over_user_data(stored: dict | None, new: dict) -> None:
             if e["id"] in by_id:
                 if e.get("confirmed_polygon"):
                     by_id[e["id"]]["confirmed_polygon"] = e["confirmed_polygon"]
-            elif e.get("source") == "manual":
+            elif e.get("source") == "manual" or e.get("confirmed_polygon"):
+                # a hand-named parcel, or a confirmed one this run's roster did not list again
                 entities.append(e)

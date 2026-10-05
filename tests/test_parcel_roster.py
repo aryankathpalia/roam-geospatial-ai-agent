@@ -161,3 +161,44 @@ def test_join_is_idempotent_and_never_steals_linked_evidence():
     before = [dict(e["evidence_ref"]) for e in sheet["parcels"]]
     pr.join_evidence(7, sheet, regions)                    # run again (the finalize step does)
     assert [e["evidence_ref"] for e in sheet["parcels"]] == before and len(sheet["parcels"]) == 2
+
+
+def test_easement_and_unoutlined_remainder_are_not_parcels():
+    out = pr.sanitize_roster([
+        {"label": "SALE PARCEL", "stated_area": "11.003 ACRES +/-", "point_x": 0.38, "point_y": 0.34},
+        {"label": "30' ESMT", "stated_area": "0.3294 acres +/-", "point_x": 0.55, "point_y": 0.5},
+        {"label": "Remainder parcel"},
+    ])
+    assert [p["label"] for p in out] == ["SALE PARCEL"]
+
+
+def test_easement_only_sheet_keeps_the_easement():
+    out = pr.sanitize_roster([{"label": "20' UTILITY EASEMENT", "point_x": 0.5, "point_y": 0.5}])
+    assert len(out) == 1
+
+
+def test_remainder_with_area_is_kept():
+    out = pr.sanitize_roster([
+        {"label": "PARCEL 1", "point_x": 0.3, "point_y": 0.3},
+        {"label": "REMAINDER PARCEL", "stated_area": "120.4 AC"},
+    ])
+    assert len(out) == 2
+
+
+def test_parse_acres_reads_every_square_foot_spelling():
+    for text in ("16,022 S.F.", "�16,022 S.F.", "16,022 SF", "16,022 SQ. FT.", "16,022 sq ft", "16,022 square feet"):
+        assert abs(pr.parse_acres(text) - 16022 / 43560) < 1e-6, text
+    assert pr.parse_acres("11.003 ACRES +/-") == 11.003
+    assert pr.parse_acres("1.5 SF Bay lot") is not None  # no crash on odd text
+
+
+def test_carry_over_keeps_confirmed_outlines_when_the_roster_read_failed():
+    stored = {"pages": [{"page_number": 16, "sheet": {"parcels": [
+        {"id": "p16-1", "label": "PARCEL 1", "confirmed_polygon": {"vertices": [[0, 0], [1, 0], [1, 1]]}},
+    ]}}]}
+    no_sheet = {"pages": [{"page_number": 16, "regions": []}]}
+    pr.carry_over_user_data(stored, no_sheet)
+    assert no_sheet["pages"][0]["sheet"]["parcels"][0]["confirmed_polygon"]
+    empty_roster = {"pages": [{"page_number": 16, "sheet": {"parcels": []}}]}
+    pr.carry_over_user_data(stored, empty_roster)
+    assert empty_roster["pages"][0]["sheet"]["parcels"][0]["id"] == "p16-1"
