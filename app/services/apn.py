@@ -35,6 +35,9 @@ _HTTP_TIMEOUT = 20.0
 _MAX_LOOKUPS = 25
 # A parcel the document names must lie this close to the coarse anchor to count at all ...
 _NEAR_ANCHOR_M = 30_000.0
+# ... unless the anchor is only a county / city centroid: an APN is unique within its county, and a county
+# can be 200 km long (Washoe's centroid is ~110 km from Reno)
+COARSE_ANCHOR_RADIUS_M = 250_000.0
 # ... and this close to the cluster's median, so a deed referenced from across the county is dropped.
 _CLUSTER_M = 600.0
 
@@ -83,6 +86,18 @@ class ApnSite:
     target_apn: str | None  # the APN the document names most often (its own land)
     target: ApnParcel | None  # that parcel's county polygon, when it still exists
     neighbours: list[ApnParcel] = field(default_factory=list)
+
+    @property
+    def centre(self) -> tuple[float, float] | None:
+        """(lon, lat) of the site: the target parcel's centroid, else the middle of its neighbours."""
+
+        if self.target:
+            return self.target.centroid
+        if not self.neighbours:
+            return None
+        lons = sorted(n.centroid[0] for n in self.neighbours)
+        lats = sorted(n.centroid[1] for n in self.neighbours)
+        return ((lons[0] + lons[-1]) / 2, (lats[0] + lats[-1]) / 2)
 
     def to_dict(self) -> dict:
         def p(x: ApnParcel) -> dict:
@@ -152,13 +167,20 @@ def _lookup(client: httpx.Client, svc: _Service, apn: str) -> ApnParcel | None:
     )
 
 
-def resolve_apn_site(text: str, state_name: str | None, near_lat: float, near_lon: float) -> ApnSite | None:
+def resolve_apn_site(
+    text: str, state_name: str | None, near_lat: float, near_lon: float,
+    subject: list[str] | None = None, extra: list[str] | None = None, radius_m: float = _NEAR_ANCHOR_M,
+) -> ApnSite | None:
     """
     Looks up the document's APNs in the registered parcel layer(s) for its state. None when no service
     covers the state, no APN is printed, or nothing found lands near the coarse anchor.
+
+    `subject`: APNs the location-evidence pass read as the SUBJECT parcel's own (verified printed) -- the
+    drawing tells whose an APN is, which mention counts cannot. `extra`: further verified APNs it read
+    (e.g. ones the label regex misses because the sheet prints them without "APN").
     """
 
-    apns = extract_apns(text)[:_MAX_LOOKUPS]
+    apns = list(dict.fromkeys(list(subject or []) + extract_apns(text) + list(extra or [])))[:_MAX_LOOKUPS]
     services = [s for s in _SERVICES if state_name and s.state.lower() == state_name.strip().lower()]
     if not apns or not services:
         return None
@@ -169,7 +191,7 @@ def resolve_apn_site(text: str, state_name: str | None, near_lat: float, near_lo
             with httpx.Client(headers={"User-Agent": "ROAM/1.0"}) as client:
                 for apn in apns:
                     parcel = _lookup(client, svc, apn)
-                    if parcel and _metres(parcel.centroid, (near_lon, near_lat)) <= _NEAR_ANCHOR_M:
+                    if parcel and _metres(parcel.centroid, (near_lon, near_lat)) <= radius_m:
                         found.append(parcel)
         except (httpx.HTTPError, ValueError, KeyError) as exc:
             logger.warning("APN lookup via %s failed: %s", svc.name, exc)
@@ -179,7 +201,7 @@ def resolve_apn_site(text: str, state_name: str | None, near_lat: float, near_lo
         lats = sorted(p.centroid[1] for p in found)
         median = (lons[len(lons) // 2], lats[len(lats) // 2])
         found = [p for p in found if _metres(p.centroid, median) <= _CLUSTER_M]
-        own = target_apn(text)
+        own = (subject or [None])[0] or target_apn(text)
         target = next((p for p in found if p.apn == own), None)
         return ApnSite(
             source=svc.name, target_apn=own, target=target,
@@ -355,16 +377,34 @@ def placement_by_apn(group_rings: list[list[tuple[float, float]]], site: dict) -
         if r is not winner and placed(r).symmetric_difference(footprint).area / group.area >= _DISTINCT_FOOTPRINT
     ]
     unique = min(rivals, default=math.inf) - best[0] >= _UNIQUE_MARGIN
+    # How clearly the orientation is decided: the best score at any rotation that lands elsewhere.
+    other_turns = [
+        r[1][0] for r in results
+        if r is not winner and placed(r).symmetric_difference(footprint).area / group.area >= _DISTINCT_FOOTPRINT
+    ]
+    rotation_margin = min(other_turns, default=math.inf) - best[0]
+    corroborated = overlap <= _FIT_MAX_OVERLAP and hugging >= _FIT_MIN_HUGGING and unique and len(neighbours) >= 3
     return {
         "east_m": dx, "north_m": dy, "rotation_deg": round(theta, 2),
         "pivot": [lon0 + pivot[0] / kx, lat0 + pivot[1] / ky],
         "mode": "between_neighbours", "overlap": round(overlap, 3),
         "gap_m": round(gap, 2), "hugging": round(hugging, 2), "unique": unique, "area_ratio": None,
-        "corroborated": overlap <= _FIT_MAX_OVERLAP and hugging >= _FIT_MIN_HUGGING and unique and len(neighbours) >= 3,
+        "rotation_margin": round(rotation_margin, 2) if rotation_margin != math.inf else None,
+        "corroborated": corroborated,
+        # Not corroborated, but clearly better than the anchor-based placement: the orientation is decided
+        # (a sheet drawn with north to the side, calibration unverified) and the outlines sit between their
+        # neighbours without overlapping them -- only a slide along a street front stays open. Applied, but
+        # the location is still reported as unconfirmed.
+        "improves": corroborated or (
+            overlap <= _FIT_MAX_OVERLAP and hugging >= _IMPROVE_MIN_HUGGING
+            and rotation_margin >= _IMPROVE_ROTATION_MARGIN and len(neighbours) >= 3
+        ),
     }
 
 
 _ROTATION_TIE = 0.5
+_IMPROVE_MIN_HUGGING = 0.3
+_IMPROVE_ROTATION_MARGIN = 0.75
 _DISTINCT_FOOTPRINT = 0.1
 
 

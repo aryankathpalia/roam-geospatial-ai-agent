@@ -910,6 +910,37 @@ def parse_sheet_roles(payload: list, count: int) -> dict[int, dict]:
 
 _ROSTER_IMAGE_PX = 2400
 _ROSTER_BATCH_SIZE = 3
+_NULLABLE_STR = {"type": "string", "nullable": True}
+_LOCATION_SCHEMA = {
+    "type": "object",
+    "nullable": True,
+    "properties": {
+        "apns": {"type": "array", "items": {"type": "object", "properties": {
+            "apn": {"type": "string"},
+            "role": {"type": "string", "enum": ["subject", "neighbour", "referenced"]},
+            "side": _NULLABLE_STR,
+        }, "required": ["apn", "role"]}},
+        "coordinates": {"type": "array", "items": {"type": "object", "properties": {
+            "northing": {"type": "number"}, "easting": {"type": "number"},
+            "kind": {"type": "string", "enum": ["monument", "parcel_corner", "point_of_beginning", "other"]},
+            "label": _NULLABLE_STR,
+        }, "required": ["northing", "easting", "kind"]}},
+        "coordinate_system": {"type": "object", "nullable": True, "properties": {
+            "zone": _NULLABLE_STR, "datum": _NULLABLE_STR,
+            "units": {"type": "string", "nullable": True, "enum": ["us_survey_feet", "international_feet", "meters"]},
+            "coordinates_are": {"type": "string", "nullable": True, "enum": ["grid", "ground"]},
+            "combined_factor": {"type": "number", "nullable": True},
+        }},
+        "plss": {"type": "object", "nullable": True, "properties": {
+            "township": {"type": "integer", "nullable": True}, "township_dir": _NULLABLE_STR,
+            "range": {"type": "integer", "nullable": True}, "range_dir": _NULLABLE_STR,
+            "meridian": _NULLABLE_STR,
+            "sections": {"type": "array", "items": {"type": "integer"}},
+            "aliquot": _NULLABLE_STR,
+        }},
+        "address": _NULLABLE_STR, "city": _NULLABLE_STR, "county": _NULLABLE_STR, "state": _NULLABLE_STR,
+    },
+}
 _ROSTER_PROMPT = """You are looking at {count} parcel-map sheets from ONE land-use / land-record packet.
 Each image is the main drawing of one sheet. They are numbered 1 to {count} in the order given.
 
@@ -932,7 +963,27 @@ For each target parcel return:
 - point_x, point_y: a point INSIDE that parcel, as fractions of the image width and height
   (0,0 = top-left, 1,1 = bottom-right).
 
-If a sheet shows no target parcel, return an empty list for it. Never invent a parcel or an id."""
+If a sheet shows no target parcel, return an empty list for it. Never invent a parcel or an id.
+
+ALSO, for each sheet, report its LOCATION EVIDENCE in "location" -- copy values exactly as printed, and
+use null for anything not printed on THIS sheet (never infer or look anything up):
+- apns: every assessor parcel number (APN / A.P.N.) printed, with role "subject" (the land this map
+  divides or depicts -- often in the title block, owner's certificate or inside the outline),
+  "neighbour" (an adjoining property, usually with an owner name outside the boundary) or "referenced"
+  (named only in notes/references), and side: the compass side of the subject it lies on (N, NE, E, SE,
+  S, SW, W, NW) for a neighbour, else null.
+- coordinates: every printed state-plane / grid coordinate pair (northing, easting as plain numbers) with
+  kind "monument" (a named survey control monument or GPS station), "parcel_corner" (a corner of the
+  subject parcel), "point_of_beginning", or "other", and label: the monument name or corner label.
+- coordinate_system: the printed state-plane zone (e.g. "Nevada West"), datum (e.g. "NAD 83/94"), units
+  ("us_survey_feet", "international_feet" or "meters"), whether the printed coordinates are "grid" or
+  "ground", and combined_factor: the printed combined / grid-to-ground scale factor as a number.
+- plss: township (number and N/S), range (number and E/W), meridian as printed, section number(s), and the
+  aliquot part as printed (e.g. "NE 1/4 of the NE 1/4"), if the sheet prints a Public Land Survey
+  description.
+- address (the subject's street address), city, county and state, if printed.
+For each target parcel also give area_value (the number in its stated area, e.g. 16022) and area_unit
+("acres" or "square_feet")."""
 _ROSTER_SCHEMA = {
     "type": "array",
     "items": {
@@ -949,10 +1000,13 @@ _ROSTER_SCHEMA = {
                         "stated_area": {"type": "string", "nullable": True},
                         "point_x": {"type": "number"},
                         "point_y": {"type": "number"},
+                        "area_value": {"type": "number", "nullable": True},
+                        "area_unit": {"type": "string", "nullable": True, "enum": ["acres", "square_feet"]},
                     },
                     "required": ["label"],
                 },
             },
+            "location": _LOCATION_SCHEMA,
         },
         "required": ["image_number", "parcels"],
     },
@@ -972,15 +1026,39 @@ def read_parcel_roster(images: list[Image.Image]) -> list[list[dict]]:
     if not images:
         return []
     client = _get_client()
-    out: list[list[dict]] = [[] for _ in images]
+    out = RosterAnswers([] for _ in images)
+    out.locations = [None] * len(images)
     for start in range(0, len(images), _ROSTER_BATCH_SIZE):
         batch = images[start : start + _ROSTER_BATCH_SIZE]
-        for idx, parcels in _read_roster_batch(client, batch).items():
+        payload = _read_roster_batch(client, batch)
+        for idx, parcels in parse_roster(payload, len(batch)).items():
             out[start + idx] = parcels
+        for idx, location in parse_roster_locations(payload, len(batch)).items():
+            out.locations[start + idx] = location
     return out
 
 
-def _read_roster_batch(client: genai.Client, images: list[Image.Image]) -> dict[int, list[dict]]:
+class RosterAnswers(list):
+    """Per sheet, its roster (a list of parcels) -- with `.locations`: per sheet, the location evidence
+    read in the same call (sanitised, NOT yet verified against OCR; see location_evidence.py)."""
+
+    locations: list
+
+
+def parse_roster_locations(payload: list, count: int) -> dict[int, dict]:
+    from app.services.location_evidence import sanitize_location
+
+    found: dict[int, dict] = {}
+    for item in payload if isinstance(payload, list) else []:
+        if not isinstance(item, dict):
+            continue
+        idx = (item.get("image_number") or 0) - 1
+        if 0 <= idx < count and isinstance(item.get("location"), dict):
+            found[idx] = sanitize_location(item["location"])
+    return found
+
+
+def _read_roster_batch(client: genai.Client, images: list[Image.Image]) -> list:
     parts: list = []
     tokens = 0
     for image in images:
@@ -1001,7 +1079,7 @@ def _read_roster_batch(client: genai.Client, images: list[Image.Image]) -> dict[
             response_mime_type="application/json", response_schema=_ROSTER_SCHEMA, temperature=0,
         ),
     )
-    return parse_roster(json.loads(response.text), len(images))
+    return json.loads(response.text)
 
 
 def parse_roster(payload: list, count: int) -> dict[int, list[dict]]:

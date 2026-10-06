@@ -76,6 +76,8 @@ _US_LON_RANGE = (-180.0, -65.0)
 ANCHOR_SURVEYED = "surveyed"
 ANCHOR_STREET = "street"
 ANCHOR_CITY = "city"
+# the centre of the parcels a plat names by APN, from the county's own parcel layer (app/services/apn.py)
+ANCHOR_APN = "apn_parcel"
 _STREET_NUMBER_RE = re.compile(r"^\s*\d+[A-Za-z]?\s+\S")
 
 
@@ -159,7 +161,7 @@ def _parse_survey_number(raw: str) -> float | None:
 # ("1.O00197939": a letter O for the zero) and the words ("C□NVERT"), so both are read tolerantly.
 _FACTOR_NUM = r"([0-9OoIl]\.[0-9OoIl]{5,})"
 _GROUND_FACTOR_RE = re.compile(
-    r"(?:COMBINED|GRID\s*TO\s*GROUND|SCALE|ELEVATION)\s*FACT[O0]R(?:\s*(?:OF|IS|BY|=|:)\s*|[^0-9OoIl]{0,10})" + _FACTOR_NUM, re.IGNORECASE
+    r"(?:COMBINED|GRID\s*T[O0]\s*GROUND|SCALE|ELEVATION)\s*FACT[O0]R(?:\s*(?:OF|IS|BY|=|:)\s*|[^0-9OoIl]{0,10})" + _FACTOR_NUM, re.IGNORECASE
 )
 
 
@@ -189,7 +191,8 @@ def ground_to_grid_multiplier(text: str) -> float | None:
 
 
 def find_surveyed_coordinates(
-    pages_result: list[dict], state_name: str, near_lat: float, near_lon: float
+    pages_result: list[dict], state_name: str, near_lat: float, near_lon: float,
+    parcel_pairs: list[tuple[float, float]] | None = None, ground_to_grid: float | None = None,
 ) -> tuple[float, float] | None:
     """
     Looks for a printed "N: ... E: ..." state-plane corner coordinate,
@@ -203,18 +206,32 @@ def find_surveyed_coordinates(
     nothing to validate it against).
     """
 
-    from pyproj import Transformer
-    from pyproj.database import query_crs_info
-
     text = "\n".join(r.get("ocr_text") or "" for p in pages_result for r in p["regions"])
     northings = [_parse_survey_number(m.group(1)) for m in _N_COORD_RE.finditer(text)]
     eastings = [_parse_survey_number(m.group(1)) for m in _E_COORD_RE.finditer(text)]
-    to_grid = ground_to_grid_multiplier(text) or 1.0
+    # ground_to_grid: the sheet's combined factor as read by the location-evidence pass (verified printed),
+    # for wordings the regex does not know
+    to_grid = ground_to_grid_multiplier(text) or ground_to_grid or 1.0
     pairs = [
         (n * to_grid, e * to_grid) for n, e in zip(northings, eastings) if n is not None and e is not None
     ]
+    # Pairs the evidence pass says mark the PARCEL (a corner, the point of beginning), not a monument: tried
+    # first, since a monument can sit kilometres away.
+    corner_pairs = [(n * to_grid, e * to_grid) for n, e in (parcel_pairs or [])]
+    if corner_pairs:
+        found = _nearest_conversion(corner_pairs, state_name, near_lat, near_lon)
+        if found:
+            return found
     if not pairs:
         return None
+    return _nearest_conversion(pairs, state_name, near_lat, near_lon)
+
+
+def _nearest_conversion(
+    pairs: list[tuple[float, float]], state_name: str, near_lat: float, near_lon: float
+) -> tuple[float, float] | None:
+    from pyproj import Transformer
+    from pyproj.database import query_crs_info
 
     candidates = [
         (crs.code, crs.name)

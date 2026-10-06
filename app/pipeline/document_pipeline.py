@@ -16,6 +16,7 @@ out to separate containers via Function.map().
 
 import asyncio
 import logging
+import math
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import Any
@@ -24,6 +25,8 @@ from PIL import Image
 
 from app.services.geocoding import geocode_anchor
 from app.services.georeference import (
+    ANCHOR_APN,
+    ANCHOR_CITY,
     ANCHOR_SURVEYED,
     classify_anchor_query,
     find_anchor_candidates,
@@ -32,7 +35,8 @@ from app.services.georeference import (
     georeference_traverse_to_geojson,
 )
 from app.services.plss import resolve_plss_anchor
-from app.services.apn import resolve_apn_site
+from app.services.apn import COARSE_ANCHOR_RADIUS_M, resolve_apn_site
+from app.services import location_evidence
 from app.services.geometry import (
     align_to_shared_edge,
     assemble_traverse,
@@ -77,6 +81,9 @@ from app.pipeline.page_ocr import (
 DOCUMENT_ROOT = Path("data/documents")
 
 logger = logging.getLogger(__name__)
+
+# printed state-plane coordinates replace a county-parcel (APN) anchor only within this distance of it
+_SURVEYED_AGREES_WITH_APN_M = 300.0
 
 # (band_png_bytes, y_offset) in -> OCR'd lines out, one pair per band.
 BandJob = tuple[bytes, float]
@@ -304,6 +311,21 @@ async def process_document(
     anchor_state: str | None = None  # the state the geocode landed in, for the county parcel lookup
     progress_tracker.update(document_id, "georeferencing", "searching document text for a location")
 
+    # What the sheets' drawings say about their location (read with the roster), each number checked
+    # against this document's OCR text -- see app/services/location_evidence.py. It only ADDS candidates
+    # and role labels to the deterministic readers below; each is still checked against independent data.
+    doc_text = "\n".join(r.get("ocr_text") or "" for e in page_entries for r in e["regions"])
+    evidence = location_evidence.merge([
+        location_evidence.verify(e["sheet"]["location_evidence"], doc_text)
+        for e in page_entries if (e.get("sheet") or {}).get("location_evidence")
+    ])
+    regions_for_anchor = [{"regions": e["regions"]} for e in page_entries]
+    canonical_plss = location_evidence.plss_text(evidence)
+    if canonical_plss:
+        # the drawing's PLSS description in the wording plss.py parses, AFTER the OCR text (a fallback
+        # only: e.g. a rotated title block OCR cannot read)
+        regions_for_anchor = regions_for_anchor + [{"regions": [{"class": "Text", "ocr_text": canonical_plss}]}]
+
     explicit_coords = find_explicit_coordinates(
         [{"regions": e["regions"]} for e in page_entries]
     )
@@ -316,9 +338,12 @@ async def process_document(
             f"anchored to coordinates printed on the document ({anchor_lat:.5f}, {anchor_lon:.5f})",
         )
     else:
-        anchor_candidates = find_anchor_candidates(
-            [{"regions": e["regions"]} for e in page_entries], limit=6
-        )
+        evidence_queries = location_evidence.geocode_queries(evidence)
+        anchor_candidates = list(dict.fromkeys(
+            evidence_queries[:1]  # the subject's printed street address, verified in the OCR text
+            + find_anchor_candidates([{"regions": e["regions"]} for e in page_entries], limit=6)
+            + evidence_queries[1:]  # its county and state: coarse, but names the state
+        ))
         geocoded, matched_query = await geocode_anchor(anchor_candidates)
         if geocoded:
             anchor_lat = geocoded[0].latitude
@@ -333,13 +358,15 @@ async def process_document(
             # geocode tells us which STATE to look in -- see
             # find_surveyed_coordinates' docstring for why this can only
             # make the anchor more precise, never wrong in a new way.
-            anchor_state = geocoded[0].region
+            anchor_state = geocoded[0].region or (evidence or {}).get("state")
             if geocoded[0].region:
                 surveyed = find_surveyed_coordinates(
                     [{"regions": e["regions"]} for e in page_entries],
                     geocoded[0].region,
                     anchor_lat,
                     anchor_lon,
+                    parcel_pairs=location_evidence.parcel_coordinate_pairs(evidence),
+                    ground_to_grid=location_evidence.ground_to_grid(evidence),
                 )
                 if surveyed:
                     anchor_lat, anchor_lon = surveyed
@@ -363,10 +390,7 @@ async def process_document(
                     # better (the explicit-coordinate branch above, or the
                     # state-plane branch just checked).
                     try:
-                        plss_anchor = resolve_plss_anchor(
-                            [{"regions": e["regions"]} for e in page_entries],
-                            geocoded[0].region,
-                        )
+                        plss_anchor = resolve_plss_anchor(regions_for_anchor, geocoded[0].region)
                     except Exception:  # noqa: BLE001 -- a network/service hiccup; keep the geocode
                         plss_anchor = None
                     if plss_anchor:
@@ -396,18 +420,52 @@ async def process_document(
     apn_site = None
     if anchor_lat is not None and anchor_lon is not None:
         try:
+            coarse = (anchor or {}).get("precision") == ANCHOR_CITY
             site = resolve_apn_site(
-                "\n".join(r.get("ocr_text") or "" for e in page_entries for r in e["regions"]),
-                anchor_state, anchor_lat, anchor_lon,
+                doc_text, anchor_state, anchor_lat, anchor_lon,
+                subject=location_evidence.subject_apns(evidence),
+                extra=[a["apn"] for a in (evidence or {}).get("apns", [])],
+                **({"radius_m": COARSE_ANCHOR_RADIUS_M} if coarse else {}),
             )
             apn_site = site.to_dict() if site else None
         except Exception:  # noqa: BLE001 -- a county service hiccup must not fail the document
-            apn_site = None
+            site, apn_site = None, None
         if apn_site:
             progress_tracker.update(
                 document_id, "georeferencing",
                 f"found {len(apn_site['neighbours']) + (1 if apn_site['target'] else 0)} printed APN(s) in county parcel records",
             )
+            # A county / city centroid is no anchor for a parcel (Washoe's is ~110 km from Reno): the
+            # parcels the plat names ARE on the ground, so the site's centre replaces it -- and the printed
+            # state-plane coordinates, rejected as too far from the centroid, get another chance.
+            centre = site.centre
+            if coarse and centre:
+                anchor_lon, anchor_lat = centre
+                own = apn_site["target_apn"] if apn_site["target"] else None
+                anchor = {
+                    "precision": ANCHOR_APN,
+                    "source": (
+                        f"county parcel record for APN {own}" if own
+                        else f"between {len(apn_site['neighbours'])} neighbouring parcels named by APN"
+                    ) + f" ({apn_site['source']})",
+                }
+                if anchor_state:
+                    surveyed = find_surveyed_coordinates(
+                        [{"regions": e["regions"]} for e in page_entries], anchor_state, anchor_lat, anchor_lon,
+                        parcel_pairs=location_evidence.parcel_coordinate_pairs(evidence),
+                        ground_to_grid=location_evidence.ground_to_grid(evidence),
+                    )
+                    # only when the two agree: a printed control monument may sit far from the parcel
+                    if surveyed and math.hypot(
+                        (surveyed[0] - centre[1]) * 110_540,
+                        (surveyed[1] - centre[0]) * 111_320 * math.cos(math.radians(centre[1])),
+                    ) <= _SURVEYED_AGREES_WITH_APN_M:
+                        anchor_lat, anchor_lon = surveyed
+                        anchor = {
+                            "precision": ANCHOR_SURVEYED,
+                            "source": "state-plane coordinate printed on the document (agrees with county parcel records)",
+                        }
+                progress_tracker.update(document_id, "georeferencing", f"anchored by {anchor['source']}")
 
     # ---------------------------------------------------------
     # Vision escalation: ParcelMap regions (flagged needs_vision by
@@ -476,6 +534,7 @@ async def process_document(
         "anchor_lon": anchor_lon,
         "anchor": anchor,
         "apn_site": apn_site,
+        "location_evidence": evidence,
         "processing": {"complete": True},
     }
 
@@ -1115,13 +1174,17 @@ async def run_roster_stage(page_entries: list[dict[str, Any]]) -> None:
         for entry in targets:
             entry["sheet"]["roster"] = {"status": "failed"}
         return
-    for entry, parcels in zip(targets, answers):
+    locations = getattr(answers, "locations", None) or [None] * len(targets)
+    for entry, parcels, location in zip(targets, answers, locations):
         sheet = entry["sheet"]
+        if location:
+            sheet["location_evidence"] = location  # unverified until OCR (location_evidence.verify)
         for item in parcels:
             sheet["parcels"].append(
                 parcel_roster.new_entity(
                     entry["page_number"], sheet["parcels"], label=item["label"], region_index=sheet["main_region"],
                     source="roster", printed_id=item["printed_id"], stated_area=item["stated_area"], point=item["point"],
+                    stated_area_sqft=item.get("stated_area_sqft"),
                 )
             )
         sheet["roster"] = {"status": "ready" if sheet["parcels"] else "empty"}

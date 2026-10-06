@@ -111,3 +111,10 @@ def test_surveyed_coordinates_prefer_the_pair_nearest_the_site_not_the_first():
     pages = [{"regions": [{"ocr_text": text}]}]
     lat, lon = g.find_surveyed_coordinates(pages, "Nevada", 39.4357, -119.7724)
     assert abs(lat - 39.4362) < 0.002 and abs(lon + 119.7724) < 0.002  # the parcel-side pair, not 39.538
+
+
+def test_ground_factor_wording_with_ocr_zero_in_to():
+    from app.services.georeference import ground_to_grid_multiplier
+
+    text = "WASHOE COUNTY CONTROL POINT GROUND COORDINATES ... A COMBINED GRID T0 GROUND FACT0R OF 1.000197939 WAS USED."
+    assert abs(ground_to_grid_multiplier(text) - 1 / 1.000197939) < 1e-12

@@ -95,6 +95,21 @@ def drop_non_parcels(parcels: list[dict]) -> list[dict]:
     return kept or real
 
 
+def verified_area_sqft(text: Any, value: Any, unit: Any) -> float | None:
+    """The model's normalised area (value + unit), in square feet -- kept ONLY when its number is the one
+    printed in the stated-area text (so "16,022 S.F." / "±16,022 SF" / "10.04± ACRES" read the same way
+    whatever the wording, but a value the model made up or misread is dropped)."""
+
+    if not isinstance(text, str) or not isinstance(value, (int, float)) or isinstance(value, bool) or value <= 0:
+        return None
+    if unit not in ("acres", "square_feet"):
+        return None
+    printed = [float(n.replace(",", "")) for n in re.findall(r"\d[\d,]*(?:\.\d+)?", text)]
+    if not any(abs(n - value) <= 1e-6 * max(1.0, value) for n in printed):
+        return None
+    return float(value) * 43560.0 if unit == "acres" else float(value)
+
+
 def sanitize_roster(items: Any) -> list[dict]:
     """Model output -> [{label, printed_id, stated_area, point}], one per distinct label."""
     out: list[dict] = []
@@ -115,6 +130,7 @@ def sanitize_roster(items: Any) -> list[dict]:
                 "label": label.strip(),
                 "printed_id": clean_printed_id(item.get("printed_id")),
                 "stated_area": area.strip() if isinstance(area, str) and area.strip() else None,
+                "stated_area_sqft": verified_area_sqft(area, item.get("area_value"), item.get("area_unit")),
                 "point": clean_point(item.get("point_x"), item.get("point_y")),
             }
         )
@@ -134,6 +150,7 @@ def new_entity(
     stated_area: str | None = None,
     point: list[float] | None = None,
     manual: bool = False,
+    stated_area_sqft: float | None = None,
 ) -> dict:
     prefix = {"roster": "", "extraction": "x", "manual": "m"}[source]
     taken = {e["id"] for e in existing}
@@ -145,6 +162,7 @@ def new_entity(
         "label": label,
         "printed_id": printed_id,
         "stated_area": stated_area,
+        "stated_area_sqft": stated_area_sqft,
         "point": point,
         "region_index": region_index,
         "source": source,

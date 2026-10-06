@@ -75,3 +75,11 @@ def test_target_parcel_fit_undoes_a_wrong_rotation():
     fit = apn.placement_by_apn(lots, {"neighbours": [], "target": {"apn": "T", "ring": parent}})
     assert fit["mode"] == "target_parcel" and fit["corroborated"], fit
     assert abs(fit["rotation_deg"] + 60) < 0.5 and fit["overlap"] > 0.98, fit
+
+
+def test_site_centre_is_the_target_else_the_middle_of_the_neighbours():
+    t = apn.ApnParcel("T", _ring(0, 0, 10, 10))
+    n = [apn.ApnParcel("A", _ring(-100, 0, 10, 10)), apn.ApnParcel("B", _ring(100, 0, 10, 10))]
+    assert apn.ApnSite("s", "T", t, n).centre == t.centroid
+    lon, lat = apn.ApnSite("s", None, None, n).centre
+    assert abs((lon - LON0) * KX - 5) < 0.5 and abs((lat - LAT0) * KY - 5) < 0.5

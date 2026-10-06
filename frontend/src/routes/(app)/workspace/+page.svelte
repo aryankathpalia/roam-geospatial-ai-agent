@@ -750,6 +750,7 @@
     aliquot: 'Matches PLSS legal description (BLM)',
     control: 'Fitted to 2 printed survey control points',
     apn: 'Fitted to county parcel records (APN)',
+    apn_parcel: 'County parcel record (APN)',
     // The document anchor is a printed monument coordinate, but nothing confirmed where THIS outline
     // sits relative to it -- shown amber, not green.
     surveyed_anchor: 'Near a printed survey monument (position unconfirmed)',

@@ -573,6 +573,8 @@ def _stated_acres(result: dict, parcel: dict) -> float | None:
         for page in result.get("pages", []):
             for entity in (page.get("sheet") or {}).get("parcels", []):
                 if entity.get("id") == roster_id:
+                    if entity.get("stated_area_sqft"):  # the model's unit reading, checked against the text
+                        return entity["stated_area_sqft"] / 43560.0
                     return parcel_roster.parse_acres(entity.get("stated_area")) or None
     return None
 
@@ -1157,7 +1159,7 @@ def _fit_sheet_to_apn(result: dict, page_number: int) -> None:
     for parcel, unfitted in members:
         placement = parcel.setdefault("placement", {"status": "approximate", "notes": []})
         placement["notes"] = [n for n in placement.get("notes", []) if not n.startswith("seated on the county parcel")]
-        if not fit or not fit["corroborated"]:
+        if not fit or not (fit["corroborated"] or fit.get("improves")):
             if placement.pop("apn_fit", None) and not placement.get("aliquot_fit"):
                 parcel["boundary_geojson_wgs84"] = unfitted  # undo an earlier fit that no longer holds
                 parcel.pop("boundary_geojson_wgs84_unfitted", None)
@@ -1179,6 +1181,9 @@ def _fit_sheet_to_apn(result: dict, page_number: int) -> None:
             f"seated on the county parcel records ({site.get('source')}) {how}: moved {shift_m:.0f} m "
             + (f"and turned {turn:+.1f} deg " if abs(turn) >= 0.05 else "")
             + "from the anchor-based position."
+            + ("" if fit["corroborated"] else
+               " Orientation decided by the neighbouring parcels; position along the street front not pinned"
+               " down, so the location stays unconfirmed.")
         )
 
 
