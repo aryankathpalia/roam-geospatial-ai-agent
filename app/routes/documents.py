@@ -3,6 +3,7 @@ import copy
 import json
 import logging
 import math
+import re
 import threading
 import time
 from uuid import uuid4
@@ -2021,3 +2022,112 @@ def annotate_document(document_id: str):
         "status": "annotated",
         "result": result,
     }
+
+# ------------------------------------------------------------------------------------------------
+# Final report: viewer model, reviewer edits, figures and exports (app/services/report*.py)
+# ------------------------------------------------------------------------------------------------
+
+class ReportEditsRequest(BaseModel):
+    project: dict[str, str | None] = {}
+    parcels: dict[str, dict[str, str | None]] = {}
+    editor: str | None = None
+
+
+_EXPORTS = {
+    # fmt: (filename suffix, media type)
+    "pdf": ("report.pdf", "application/pdf"),
+    "zip": ("package.zip", "application/zip"),
+    "geojson": ("parcels.geojson", "application/geo+json"),
+    "kml": ("parcels.kml", "application/vnd.google-earth.kml+xml"),
+    "shp": ("shapefile_wgs84.zip", "application/zip"),
+    "shp-stateplane": ("shapefile_stateplane.zip", "application/zip"),
+    "csv": ("attributes.csv", "text/csv"),
+    "vertices-csv": ("vertices.csv", "text/csv"),
+}
+
+
+def _report_for(document_id: str) -> dict:
+    from app.services.report import build_report
+
+    report = build_report(_load_result(document_id), document_id)
+    if not report["parcels"]:
+        raise HTTPException(status_code=409, detail="No confirmed, placed parcels yet -- confirm boundaries first.")
+    return report
+
+
+@router.get("/{document_id}/report")
+def get_report(document_id: str):
+    """The report model the viewer shows (and every export is rendered from)."""
+
+    return _report_for(document_id)
+
+
+@router.put("/{document_id}/report/edits")
+def save_report_edits(document_id: str, body: ReportEditsRequest):
+    """Merges a reviewer's edits (project header, parcel label / APN / review status / notes) into the
+    document, logging each change, and returns the updated report."""
+
+    from app.services.report import merge_edits
+
+    with _RESULT_LOCK:
+        result = _load_result(document_id)
+        result["report_edits"] = merge_edits(
+            result.get("report_edits") or {}, body.model_dump(), body.editor
+        )
+        _save_result(document_id, result)
+    return _report_for(document_id)
+
+
+@router.get("/{document_id}/report/figure/{name}")
+def report_figure(document_id: str, name: str):
+    """A report figure (parcels.png / location.png), cached per parcel geometry."""
+
+    import hashlib
+    from fastapi.responses import Response
+    from app.services import static_map
+
+    if name not in ("parcels.png", "location.png"):
+        raise HTTPException(status_code=404, detail="Unknown figure")
+    report = _report_for(document_id)
+    rings = [p["ring"] for p in report["parcels"]]
+    labels = [p["label"] for p in report["parcels"]]
+    key = hashlib.sha1(json.dumps([name, rings, labels]).encode()).hexdigest()[:16]
+    cache = DOCUMENT_ROOT / document_id / "report_cache" / f"{key}.png"
+    if not cache.exists():
+        cache.parent.mkdir(parents=True, exist_ok=True)
+        png = (
+            static_map.render(rings, labels, width=1400, height=1000) if name == "parcels.png"
+            else static_map.render(rings, zoom_out=5, marker_only=True, place_labels=True, width=1400, height=800)
+        )
+        cache.write_bytes(png)
+    return Response(content=cache.read_bytes(), media_type="image/png")
+
+
+@router.get("/{document_id}/export/{fmt}")
+def export_report(document_id: str, fmt: str):
+    """Downloads the report / data in one format, or the whole deliverable package (fmt=zip)."""
+
+    from fastapi.responses import Response
+    from app.services import report_export as rx
+
+    if fmt not in _EXPORTS:
+        raise HTTPException(status_code=404, detail=f"Unknown export format. One of: {', '.join(_EXPORTS)}")
+    report = _report_for(document_id)
+    builders = {
+        "pdf": lambda: rx.pdf(report),
+        "zip": lambda: rx.package(report),
+        "geojson": lambda: rx.geojson(report),
+        "kml": lambda: rx.kml(report),
+        "shp": lambda: rx.shapefile_zip(report),
+        "shp-stateplane": lambda: rx.shapefile_zip(report, report["crs"]["state_plane"]),
+        "csv": lambda: rx.attributes_csv(report),
+        "vertices-csv": lambda: rx.vertices_csv(report),
+    }
+    if fmt == "shp-stateplane" and not report["crs"]["state_plane"]:
+        raise HTTPException(status_code=409, detail="No state-plane zone for this location.")
+    suffix, media = _EXPORTS[fmt]
+    stem = re.sub(r"[^A-Za-z0-9_-]+", "_", Path(report["project"]["title"]).stem)[:60].strip("_") or "roam"
+    return Response(
+        content=builders[fmt](), media_type=media,
+        headers={"Content-Disposition": f'attachment; filename="{stem}_{suffix}"'},
+    )

@@ -1513,6 +1513,7 @@
           {boundaryConfirmedCount} of {boundaryCandidates.length} candidate parcel{boundaryCandidates.length === 1 ? '' : 's'} confirmed
           <span class="location-source">— the target parcel's outline is what ROAM places on the map. Confirm it on the drawing to calibrate and place it.</span>
           <a class="btn btn-ghost btn-sm" href={boundaryReviewHref()}>Confirm boundaries →</a>
+          <a class="btn btn-ghost btn-sm" href={`/report?doc=${encodeURIComponent(documentId ?? '')}`}>Report &amp; export →</a>
         </div>
       {/if}
 

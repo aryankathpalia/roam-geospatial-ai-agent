@@ -12,6 +12,8 @@ python-dotenv
 httpx
 shapely
 pyproj
+# shapefile writer for the export package (app/services/report_export.py)
+pyshp
 
 # PDF rendering/inspection (app/services/pdf_renderer.py, pdf_inspector.py)
 pymupdf
