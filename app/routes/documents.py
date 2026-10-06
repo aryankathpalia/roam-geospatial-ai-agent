@@ -2131,3 +2131,27 @@ def export_report(document_id: str, fmt: str):
         content=builders[fmt](), media_type=media,
         headers={"Content-Disposition": f'attachment; filename="{stem}_{suffix}"'},
     )
+
+
+class FillRequest(BaseModel):
+    x: float
+    y: float
+    gap: int = 5
+
+
+@router.post("/{document_id}/pages/{page_number}/regions/{region_index}/fill")
+def fill_region_at(document_id: str, page_number: int, region_index: int, body: FillRequest):
+    """Click-to-fill for the boundary editor: the region around (x, y) -- crop pixels, the same crop
+    .../crop.png serves -- bounded by the drawing's linework, as a polygon (app/services/region_fill.py)."""
+
+    from app.services.region_fill import crop_gray, fill_region
+
+    result = _load_result(document_id)
+    page = next((p for p in result["pages"] if p["page_number"] == page_number), None)
+    if page is None or not (0 <= region_index < len(page["regions"])):
+        raise HTTPException(status_code=404, detail="No such page/region")
+    region = page["regions"][region_index]
+    page_path = DOCUMENT_ROOT / document_id / "pages" / f"page_{page_number:03d}.png"
+    if not page_path.exists():
+        raise HTTPException(status_code=404, detail="Rendered page not found")
+    return fill_region(crop_gray(page_path, region["bbox"], region.get("class")), body.x, body.y, body.gap)

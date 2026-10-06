@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 # 3-2-3 / 3-4-2 as some counties write them). The label is required, so a bearing or a phone number never
 # matches.
 _APN_RE = re.compile(
-    r"\bA\.?\s?P\.?\s?N\.?\s*(?:NO\.?|#|:|=)?\s*(\d{3})[-\s.](\d{2,4})[-\s.](\d{2,3})\b", re.IGNORECASE
+    r"\bA\.?\s?P\.?\s?N\.?\s*(?:NO\.?|#|:|=)?\s*(\d{2,3})[-\s.](\d{2,4})[-\s.](\d{2,3})\b", re.IGNORECASE
 )
 
 _HTTP_TIMEOUT = 20.0
@@ -140,6 +140,15 @@ def target_apn(text: str) -> str | None:
     return counts[0][0]
 
 
+def apn_variants(apn: str) -> list[str]:
+    """The APN as printed, then with its book number zero-padded: plats often print "38-710-14" for the
+    county's "038-710-14"."""
+
+    parts = apn.split("-")
+    padded = "-".join([parts[0].zfill(3)] + parts[1:])
+    return [apn] if padded == apn else [apn, padded]
+
+
 def _metres(a: tuple[float, float], b: tuple[float, float]) -> float:
     lat = math.radians((a[1] + b[1]) / 2)
     return math.hypot((a[0] - b[0]) * 111_320 * math.cos(lat), (a[1] - b[1]) * 110_540)
@@ -190,7 +199,11 @@ def resolve_apn_site(
         try:
             with httpx.Client(headers={"User-Agent": "ROAM/1.0"}) as client:
                 for apn in apns:
-                    parcel = _lookup(client, svc, apn)
+                    parcel = None
+                    for variant in apn_variants(apn):
+                        parcel = _lookup(client, svc, variant)
+                        if parcel:
+                            break
                     if parcel and _metres(parcel.centroid, (near_lon, near_lat)) <= radius_m:
                         found.append(parcel)
         except (httpx.HTTPError, ValueError, KeyError) as exc:

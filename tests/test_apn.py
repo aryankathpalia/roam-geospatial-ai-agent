@@ -83,3 +83,9 @@ def test_site_centre_is_the_target_else_the_middle_of_the_neighbours():
     assert apn.ApnSite("s", "T", t, n).centre == t.centroid
     lon, lat = apn.ApnSite("s", None, None, n).centre
     assert abs((lon - LON0) * KX - 5) < 0.5 and abs((lat - LAT0) * KY - 5) < 0.5
+
+
+def test_short_book_numbers_are_read_and_padded():
+    assert apn.extract_apns("A.P.N. 38-710-14  APN: 038-710-17") == ["38-710-14", "038-710-17"]
+    assert apn.apn_variants("38-710-14") == ["38-710-14", "038-710-14"]
+    assert apn.apn_variants("038-710-14") == ["038-710-14"]

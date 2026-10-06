@@ -55,6 +55,63 @@
   let draggingIdx: number | null = null;
   let selectedVertexIdx: number | null = null;
 
+  // ---- Drawing tools (edit = drag corners; pen = click corners in order; rect = drag a box;
+  // fill = click inside a lot to take the region its lines enclose; move = drag to move, drag outside
+  // the shape to rotate it). Undo/redo covers every change; zoom with the wheel, pan with the right
+  // mouse button or Space+drag.
+  type Tool = 'edit' | 'pen' | 'rect' | 'fill' | 'move' | 'hand';
+  const TOOLS: [Tool, string, string, string][] = [
+    ['edit', 'Edit', 'V', 'Drag corners; double-click an edge to add one'],
+    ['pen', 'Draw', 'P', 'Click each corner in order; click the first corner or press Enter to close. Shift locks 45/90 degrees'],
+    ['rect', 'Rectangle', 'R', 'Drag a box'],
+    ['fill', 'Fill', 'F', 'Click inside a lot: takes the region its lines enclose'],
+    ['move', 'Move / rotate', 'M', 'Drag inside the shape to move it, outside to rotate it'],
+    ['hand', 'Hand', 'H', 'Drag to move around the drawing (also: drag empty paper in Edit, or two-finger swipe)']
+  ];
+  let tool: Tool = 'edit';
+  const TOOL_ICONS: Record<Tool, string> = {
+    edit: 'M4 20l4.5-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20zM14 7l3 3',
+    pen: 'M12 19l7-7 3 3-7 7-3-3zM18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5zM2 2l7.6 7.6M11 13a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
+    rect: 'M4 5h16v14H4z',
+    fill: 'M19 11l-8-8-8.5 8.5a2.1 2.1 0 0 0 0 3L7 19a2.1 2.1 0 0 0 3 0L19 11zM5 2l5 5M20 15s2 2.4 2 4a2 2 0 0 1-4 0c0-1.6 2-4 2-4z',
+    move: 'M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20',
+    hand: 'M18 11V6a2 2 0 0 0-4 0v5M14 10V4a2 2 0 0 0-4 0v6M10 10.5V6a2 2 0 0 0-4 0v8a8 8 0 0 0 16 0v-2a2 2 0 0 0-4 0'
+  };
+  // display options and layout
+  let showVertices = true;
+  let showOthers = true;
+  let centreFull = false;
+  let simplifyMsg = '';
+  let penPoints: [number, number][] = [];
+  let cursorPt: [number, number] | null = null;
+  let rectStart: [number, number] | null = null;
+  let fillGap = 5;
+  let fillBusy = false;
+  let fillMsg = '';
+  let snapOn = true;
+  let moveDrag: {
+    mode: 'move' | 'rotate';
+    start: [number, number];
+    orig: [number, number][];
+    centre: [number, number];
+  } | null = null;
+  type Snapshot = { vertices: [number, number][]; curves: curveLib.Curves };
+  let undoStack: Snapshot[] = [];
+  let redoStack: Snapshot[] = [];
+  let zoom = 1;
+  let pan: [number, number] = [0, 0];
+  let panDrag: { start: [number, number]; orig: [number, number]; moved: boolean } | null = null;
+  // two-finger touch: pinch to zoom, move both fingers to pan
+  let touches = new Map<number, [number, number]>();
+  let pinch: { dist: number; mid: [number, number]; zoom: number; pan: [number, number] } | null = null;
+  let spaceDown = false;
+  let stageEl: HTMLDivElement;
+  let stageW = 0;
+  // drawing units per screen pixel: handles are sized in SCREEN pixels, so a corner stays easy to grab
+  // (and wins over the edge under it) however large the sheet or however far it is zoomed
+  $: px = cropWidth && stageW ? cropWidth / (stageW * zoom) : 1;
+  let svgEl: SVGSVGElement;
+
   let saveStatus: 'idle' | 'saving' | 'saved' | 'error' = 'idle';
   let seedSource: 'confirmed' | 'traverse' | 'none' = 'none';
 
@@ -260,6 +317,14 @@
     manualName = '';
     saveStatus = 'idle';
     selectedVertexIdx = null;
+    undoStack = [];
+    redoStack = [];
+    penPoints = [];
+    rectStart = null;
+    zoom = 1;
+    pan = [0, 0];
+    fillMsg = '';
+    simplifyMsg = '';
     const src = `${API_BASE}/documents/${documentId.trim()}/pages/${ref.pageNumber}/regions/${ref.regionIndex}/crop.png`;
     cropSrc = src;
     cropWidth = 0;
@@ -362,21 +427,8 @@
       return;
     }
 
-    // The roster's point inside this parcel: a small square there, to drag onto its boundary.
-    if (ref.point) {
-      const hw = cropWidth * 0.07;
-      const hh = cropHeight * 0.07;
-      const cx = Math.min(Math.max(ref.point[0] * cropWidth, hw), cropWidth - hw);
-      const cy = Math.min(Math.max(ref.point[1] * cropHeight, hh), cropHeight - hh);
-      vertices = [
-        [cx - hw, cy - hh],
-        [cx + hw, cy - hh],
-        [cx + hw, cy + hh],
-        [cx - hw, cy + hh]
-      ];
-      seedSource = 'none';
-      return;
-    }
+    // (The roster's guessed position of each parcel is not used to place the starting shape: it was
+    // often in the wrong lot, and a misleading start is worse than a neutral one.)
 
     // No seed available at all -- start with a rough centered square
     // the user can drag into place from scratch.
@@ -456,6 +508,8 @@
 
   function onVertexDown(idx: number, e: PointerEvent) {
     e.stopPropagation();
+    if (tool !== 'edit') return;
+    checkpoint();
     draggingIdx = idx;
     selectedVertexIdx = idx;
     (e.target as Element).setPointerCapture(e.pointerId);
@@ -464,6 +518,7 @@
   function onWaypointDown(k: number, e: PointerEvent) {
     e.stopPropagation();
     if (selectedEdgeIdx === null) return;
+    checkpoint();
     draggingWaypoint = { edge: selectedEdgeIdx, k };
     (e.target as Element).setPointerCapture(e.pointerId);
   }
@@ -472,6 +527,7 @@
   function onMidHandleDown(e: PointerEvent) {
     e.stopPropagation();
     if (selectedEdgeIdx === null || !handlePt) return;
+    checkpoint();
     const made = curveLib.addWaypoint(vertices, curves, selectedEdgeIdx, handlePt);
     if (made.index < 0) return;
     curves = made.curves;
@@ -481,6 +537,14 @@
 
   // Curve mode: clicking the selected edge drops another waypoint on it.
   function onEdgeClick(i: number, e: MouseEvent) {
+    const svgNode = (e.currentTarget as SVGElement).closest('svg') as SVGSVGElement;
+    const at = svgPoint(e as unknown as PointerEvent, svgNode);
+    const near = vertices.findIndex((v) => Math.hypot(v[0] - at[0], v[1] - at[1]) <= 12 * px);
+    if (near >= 0) {
+      selectedVertexIdx = near;
+      selectedEdgeIdx = null;
+      return;
+    }
     if (curveMode && i === selectedEdgeIdx) {
       const svg = (e.currentTarget as SVGElement).closest('svg') as SVGSVGElement;
       const [x, y] = svgPoint(e as unknown as PointerEvent, svg);
@@ -502,12 +566,28 @@
 
   function straightenSelectedEdge() {
     if (selectedEdgeIdx === null) return;
+    checkpoint();
     const next = { ...curves };
     delete next[selectedEdgeIdx];
     curves = next;
   }
 
   function onSvgMove(e: PointerEvent, svg: SVGSVGElement) {
+    if (e.pointerType === 'touch' && pinchMove(e)) return;
+    if (panDrag) {
+      const dx = e.clientX - panDrag.start[0];
+      const dy = e.clientY - panDrag.start[1];
+      if (!panDrag.moved && Math.hypot(dx, dy) < 4) return;
+      panDrag.moved = true;
+      pan = [panDrag.orig[0] + dx, panDrag.orig[1] + dy];
+      return;
+    }
+    const raw = svgPoint(e, svg);
+    cursorPt = tool === 'pen' ? penTarget(raw, e.shiftKey) : raw;
+    if (moveDrag) {
+      dragShape(raw);
+      return;
+    }
     if (draggingWaypoint !== null && vertices[draggingWaypoint.edge]) {
       const [cx, cy] = svgPoint(e, svg);
       const p: [number, number] = [Math.max(0, Math.min(cropWidth, cx)), Math.max(0, Math.min(cropHeight, cy))];
@@ -520,14 +600,33 @@
     // distance recompute, no cascading re-walk of the rest of the
     // ring -- this is the fix for the distortion bug from the
     // Leaflet-based editor.
-    vertices[draggingIdx] = [
+    vertices[draggingIdx] = snapPoint([
       Math.max(0, Math.min(cropWidth, x)),
       Math.max(0, Math.min(cropHeight, y))
-    ];
+    ], draggingIdx);
     vertices = vertices; // trigger reactivity
   }
 
-  function onSvgUp() {
+  function onSvgUp(e?: PointerEvent) {
+    if (e?.pointerType === 'touch') touchEnd(e);
+    if (panDrag && !panDrag.moved) {
+      selectedVertexIdx = null; // a plain click on empty paper
+      selectedEdgeIdx = null;
+    }
+    panDrag = null;
+    moveDrag = null;
+    if (rectStart && cursorPt) {
+      const [x0, y0] = rectStart;
+      const [x1, y1] = cursorPt;
+      if (Math.abs(x1 - x0) > 3 && Math.abs(y1 - y0) > 3) {
+        checkpoint();
+        const box: [number, number][] = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+        vertices = box.map((pt) => snapPoint(pt));
+        curves = {};
+        tool = 'edit';
+      }
+      rectStart = null;
+    }
     draggingIdx = null;
     if (draggingWaypoint !== null) curves = curveLib.settle(curves, draggingWaypoint.edge);
     draggingWaypoint = null;
@@ -542,6 +641,7 @@
   // Inserts a vertex on edge `edgeIdx`. On a curved edge the new vertex goes ON the curve and its
   // waypoints are shared out between the two halves; the curve indexes after it shift up by one.
   function insertVertexOnEdge(edgeIdx: number, at: [number, number]) {
+    checkpoint();
     const insertAt = edgeIdx + 1;
     const vertex = curves[edgeIdx] ? curveLib.pointOnEdge(vertices, curves, edgeIdx, at) : at;
     curves = curveLib.curvesAfterInsert(vertices, curves, edgeIdx, vertex);
@@ -574,21 +674,373 @@
 
   function deleteSelectedVertex() {
     if (selectedVertexIdx === null || vertices.length <= 3) return;
+    checkpoint();
     curves = curveLib.curvesAfterDelete(curves, selectedVertexIdx, vertices.length);
     vertices = vertices.filter((_, i) => i !== selectedVertexIdx);
     selectedVertexIdx = null;
     selectedEdgeIdx = null;
   }
 
+  // ---- history
+  function checkpoint() {
+    undoStack = [
+      ...undoStack.slice(-79),
+      { vertices: vertices.map((v) => [v[0], v[1]] as [number, number]), curves: JSON.parse(JSON.stringify(curves)) }
+    ];
+    redoStack = [];
+  }
+  function undo() {
+    if (penPoints.length) {
+      penPoints = penPoints.slice(0, -1);
+      return;
+    }
+    const last = undoStack[undoStack.length - 1];
+    if (!last) return;
+    redoStack = [...redoStack, { vertices, curves }];
+    undoStack = undoStack.slice(0, -1);
+    vertices = last.vertices;
+    curves = last.curves;
+    selectedVertexIdx = null;
+    selectedEdgeIdx = null;
+  }
+  function redo() {
+    const next = redoStack[redoStack.length - 1];
+    if (!next) return;
+    undoStack = [...undoStack, { vertices, curves }];
+    redoStack = redoStack.slice(0, -1);
+    vertices = next.vertices;
+    curves = next.curves;
+  }
+
+  // ---- snapping: corners of the sheet's other confirmed parcels (adjoining lots share them exactly)
+  $: ghosts = selected
+    ? parcelRefs
+        .filter((r) => r.key !== selectedKey && r.pageNumber === selected.pageNumber && r.regionIndex === selected.regionIndex)
+        .map((r: any) => r.entity?.confirmed_polygon ?? r.parcel?.confirmed_boundary_pixels)
+        .filter((c: any) => c?.vertices?.length >= 3)
+        .map((c: any) =>
+          (c.curve_spec?.vertices ?? c.vertices).map(
+            ([x, y]: [number, number]) =>
+              [(x * cropWidth) / (c.crop_width || cropWidth), (y * cropHeight) / (c.crop_height || cropHeight)] as [number, number]
+          )
+        )
+    : [];
+  $: snapTargets = (ghosts as [number, number][][]).flat();
+
+  function snapRadius(): number {
+    // about 12 screen pixels, in crop units
+    const w = svgEl?.getBoundingClientRect().width || cropWidth;
+    return (12 * cropWidth) / w;
+  }
+  function snapPoint(p: [number, number], skipOwn?: number): [number, number] {
+    if (!snapOn) return p;
+    let best: [number, number] | null = null;
+    let bestD = snapRadius();
+    const own = tool === 'pen' ? penPoints : vertices.filter((_, i) => i !== skipOwn);
+    for (const q of [...snapTargets, ...own]) {
+      const d = Math.hypot(q[0] - p[0], q[1] - p[1]);
+      if (d < bestD) {
+        bestD = d;
+        best = q;
+      }
+    }
+    return best ? [best[0], best[1]] : p;
+  }
+
+  // ---- pen: the next corner, snapped; Shift locks the new edge to 45-degree steps from the last one
+  function penTarget(p: [number, number], shift: boolean): [number, number] {
+    const n = penPoints.length;
+    if (shift && n >= 1) {
+      const a = penPoints[n - 1];
+      const ref = n >= 2 ? Math.atan2(a[1] - penPoints[n - 2][1], a[0] - penPoints[n - 2][0]) : 0;
+      const ang = Math.atan2(p[1] - a[1], p[0] - a[0]);
+      const step = Math.PI / 4;
+      const snapped = ref + Math.round((ang - ref) / step) * step;
+      const len = Math.hypot(p[0] - a[0], p[1] - a[1]);
+      return [a[0] + Math.cos(snapped) * len, a[1] + Math.sin(snapped) * len];
+    }
+    return snapPoint(p);
+  }
+  function finishPen() {
+    if (penPoints.length >= 3) {
+      checkpoint();
+      vertices = penPoints;
+      curves = {};
+      selectedVertexIdx = null;
+      selectedEdgeIdx = null;
+      tool = 'edit';
+    }
+    penPoints = [];
+  }
+
+  // ---- canvas presses, by tool
+  function onCanvasDown(e: PointerEvent) {
+    if (e.pointerType === 'touch' && trackTouch(e)) return; // second finger: pinch
+    const onPaper = e.button === 0 && tool === 'edit' && !isHandle(e.target);
+    if (e.button === 2 || e.button === 1 || spaceDown || (e.button === 0 && tool === 'hand') || onPaper) {
+      // a press on empty paper in Edit is a click (deselect) until it moves a few pixels
+      panDrag = { start: [e.clientX, e.clientY], orig: [pan[0], pan[1]], moved: !onPaper };
+      (e.currentTarget as Element).setPointerCapture(e.pointerId);
+      e.preventDefault();
+      return;
+    }
+    if (e.button !== 0) return;
+    const p = svgPoint(e, svgEl);
+    if (tool === 'pen') {
+      const target = penTarget(p, e.shiftKey);
+      if (penPoints.length >= 3 && Math.hypot(target[0] - penPoints[0][0], target[1] - penPoints[0][1]) < snapRadius()) {
+        finishPen(); // clicked the first corner again: close the shape
+      } else {
+        penPoints = [...penPoints, target];
+      }
+    } else if (tool === 'rect') {
+      rectStart = snapPoint(p);
+      (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    } else if (tool === 'fill') {
+      fillAt(p);
+    } else if (tool === 'move' && vertices.length >= 3) {
+      checkpoint();
+      moveDrag = {
+        mode: pointInPolygon(p, vertices) ? 'move' : 'rotate',
+        start: p,
+        orig: vertices.map((v) => [v[0], v[1]] as [number, number]),
+        centre: centroid(vertices)
+      };
+      (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    } else if (tool === 'edit') {
+      selectedVertexIdx = null;
+    }
+  }
+
+  function dragShape(p: [number, number]) {
+    if (!moveDrag) return;
+    const { mode, start, orig, centre } = moveDrag;
+    if (mode === 'move') {
+      const dx = p[0] - start[0];
+      const dy = p[1] - start[1];
+      vertices = orig.map(([x, y]) => [x + dx, y + dy] as [number, number]);
+    } else {
+      const a = Math.atan2(p[1] - centre[1], p[0] - centre[0]) - Math.atan2(start[1] - centre[1], start[0] - centre[0]);
+      const c = Math.cos(a);
+      const s = Math.sin(a);
+      vertices = orig.map(
+        ([x, y]) => [centre[0] + (x - centre[0]) * c - (y - centre[1]) * s, centre[1] + (x - centre[0]) * s + (y - centre[1]) * c] as [number, number]
+      );
+    }
+  }
+
+  function centroid(pts: [number, number][]): [number, number] {
+    return [pts.reduce((a, p) => a + p[0], 0) / pts.length, pts.reduce((a, p) => a + p[1], 0) / pts.length];
+  }
+  function pointInPolygon([x, y]: [number, number], pts: [number, number][]): boolean {
+    let inside = false;
+    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+      const [xi, yi] = pts[i];
+      const [xj, yj] = pts[j];
+      if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  }
+
+  // ---- fill: the region around the click, bounded by the drawing's lines (server-side, same crop)
+  async function fillAt(p: [number, number]) {
+    if (!selected || fillBusy) return;
+    fillBusy = true;
+    fillMsg = '';
+    try {
+      const res = await fetch(
+        `${API_BASE}/documents/${documentId.trim()}/pages/${selected.pageNumber}/regions/${selected.regionIndex}/fill`,
+        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ x: p[0], y: p[1], gap: fillGap }) }
+      );
+      const data = await res.json();
+      if (data.vertices?.length >= 3) {
+        checkpoint();
+        vertices = data.vertices.map((v: [number, number]) => snapPoint(v));
+        curves = {};
+        selectedVertexIdx = null;
+        selectedEdgeIdx = null;
+        fillMsg = `Filled with ${data.vertices.length} corners. Check it against the lines; fix a corner in Edit, or Undo and try another gap.`;
+      } else {
+        fillMsg = data.error ?? 'Nothing was filled.';
+      }
+    } catch {
+      fillMsg = 'Fill failed.';
+    } finally {
+      fillBusy = false;
+    }
+  }
+
+  // ---- zoom (wheel, around the cursor) and pan
+  // Wheel: a trackpad PINCH arrives as a wheel event with ctrlKey -> smooth zoom; a two-finger SWIPE
+  // (horizontal component, or small fine-grained steps) pans; a mouse wheel's coarse notches zoom.
+  function onWheel(e: WheelEvent) {
+    if (!stageEl) return;
+    e.preventDefault();
+    const rect = stageEl.getBoundingClientRect();
+    const at: [number, number] = [e.clientX - rect.left, e.clientY - rect.top];
+    if (e.ctrlKey) {
+      zoomAt(at, zoom * Math.exp(-e.deltaY * 0.01));
+      return;
+    }
+    const swipe = e.deltaMode === 0 && (Math.abs(e.deltaX) > 0 || Math.abs(e.deltaY) < 40);
+    if (swipe) {
+      pan = [pan[0] - e.deltaX, pan[1] - e.deltaY];
+      return;
+    }
+    zoomAt(at, zoom * (e.deltaY < 0 ? 1.2 : 1 / 1.2));
+  }
+  function zoomAt([cx, cy]: [number, number], target: number) {
+    const next = Math.min(12, Math.max(1, target));
+    pan = next === 1 ? [0, 0] : [cx - ((cx - pan[0]) * next) / zoom, cy - ((cy - pan[1]) * next) / zoom];
+    zoom = next;
+  }
+  function isHandle(t: EventTarget | null): boolean {
+    const cls = (t as Element | null)?.getAttribute?.('class') ?? '';
+    return /vertex-hit|edge-hit|curve-handle/.test(cls);
+  }
+  function stagePoint(e: PointerEvent): [number, number] {
+    const r = stageEl.getBoundingClientRect();
+    return [e.clientX - r.left, e.clientY - r.top];
+  }
+  // returns true once two fingers are down (the event then belongs to the pinch, not a tool)
+  function trackTouch(e: PointerEvent): boolean {
+    touches.set(e.pointerId, stagePoint(e));
+    (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
+    if (touches.size === 2) {
+      const [a, b] = [...touches.values()];
+      pinch = { dist: Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, mid: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], zoom, pan: [pan[0], pan[1]] };
+      panDrag = null;
+      moveDrag = null;
+      draggingIdx = null;
+      return true;
+    }
+    return false;
+  }
+  function pinchMove(e: PointerEvent): boolean {
+    if (!touches.has(e.pointerId)) return false;
+    touches.set(e.pointerId, stagePoint(e));
+    if (!pinch || touches.size < 2) return false;
+    const [a, b] = [...touches.values()];
+    const dist = Math.hypot(a[0] - b[0], a[1] - b[1]) || 1;
+    const mid: [number, number] = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+    const next = Math.min(12, Math.max(1, (pinch.zoom * dist) / pinch.dist));
+    // keep the drawing point that was under the fingers' midpoint under it, then follow the midpoint
+    const k = next / pinch.zoom;
+    pan = [mid[0] - (pinch.mid[0] - pinch.pan[0]) * k, mid[1] - (pinch.mid[1] - pinch.pan[1]) * k];
+    zoom = next;
+    return true;
+  }
+  function touchEnd(e: PointerEvent) {
+    touches.delete(e.pointerId);
+    if (touches.size < 2) pinch = null;
+  }
+  function resetView() {
+    zoom = 1;
+    pan = [0, 0];
+  }
+  // zoom buttons: about the middle of the visible drawing
+  function zoomBy(f: number) {
+    if (!stageEl) return;
+    const rect = stageEl.getBoundingClientRect();
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const next = Math.min(12, Math.max(1, zoom * f));
+    pan = next === 1 ? [0, 0] : [cx - ((cx - pan[0]) * next) / zoom, cy - ((cy - pan[1]) * next) / zoom];
+    zoom = next;
+  }
+
+  // Simplify: drop corners that lie (almost) on the straight line through their neighbours -- tidies the
+  // extra points a Fill leaves along a straight lot line. Curved edges are kept as they are.
+  function simplifyOutline() {
+    if (vertices.length <= 3 || Object.keys(curves).length) {
+      simplifyMsg = Object.keys(curves).length ? 'Straighten curved edges first; Simplify keeps curves untouched.' : '';
+      return;
+    }
+    const tolerance = Math.max(cropWidth, cropHeight) * 0.003; // about 0.3% of the sheet
+    let pts = vertices.map((v) => [v[0], v[1]] as [number, number]);
+    let changed = true;
+    while (changed && pts.length > 3) {
+      changed = false;
+      for (let i = 0; i < pts.length; i++) {
+        const a = pts[(i - 1 + pts.length) % pts.length];
+        const b = pts[i];
+        const c = pts[(i + 1) % pts.length];
+        const len = Math.hypot(c[0] - a[0], c[1] - a[1]) || 1;
+        const off = Math.abs((c[0] - a[0]) * (a[1] - b[1]) - (a[0] - b[0]) * (c[1] - a[1])) / len;
+        if (off < tolerance) {
+          pts.splice(i, 1);
+          changed = true;
+          break;
+        }
+      }
+    }
+    const removed = vertices.length - pts.length;
+    if (removed) {
+      checkpoint();
+      vertices = pts;
+      selectedVertexIdx = null;
+      selectedEdgeIdx = null;
+    }
+    simplifyMsg = removed ? `Removed ${removed} redundant corner${removed === 1 ? '' : 's'}.` : 'Nothing to simplify.';
+  }
+
+  function setTool(t: Tool) {
+    tool = t;
+    penPoints = [];
+    rectStart = null;
+    fillMsg = '';
+    curveMode = false;
+  }
+
   function onKeydown(e: KeyboardEvent) {
+    const tag = (e.target as HTMLElement)?.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+      e.preventDefault();
+      if (e.shiftKey) redo();
+      else undo();
+      return;
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+      e.preventDefault();
+      redo();
+      return;
+    }
+    if (e.key === ' ') {
+      spaceDown = true;
+      e.preventDefault();
+      return;
+    }
+    if (e.key === 'Escape') {
+      setTool('edit');
+      return;
+    }
+    if (e.key === 'Enter' && tool === 'pen') {
+      finishPen();
+      return;
+    }
+    if (!e.ctrlKey && !e.metaKey && !e.altKey) {
+      const keyTool: Record<string, Tool> = { v: 'edit', p: 'pen', r: 'rect', f: 'fill', m: 'move', h: 'hand' };
+      const t = keyTool[e.key.toLowerCase()];
+      if (t) {
+        setTool(t);
+        return;
+      }
+    }
     if ((e.key === 'Delete' || e.key === 'Backspace') && selectedVertexIdx !== null) {
       e.preventDefault();
       deleteSelectedVertex();
     }
   }
+  function onKeyup(e: KeyboardEvent) {
+    if (e.key === ' ') spaceDown = false;
+  }
+
 
   function resetToSeed() {
-    if (selected) seedVertices(selected);
+    if (!selected) return;
+    checkpoint();
+    seedVertices(selected);
   }
 
   async function confirmBoundary() {
@@ -651,538 +1103,736 @@
     return pts.map(([x, y]) => `${x},${y}`).join(' ');
   }
 
-  // Where ROAM read each parcel on this canvas (the roster's points), so you can see which is which.
-  $: markers = selected
-    ? parcelRefs
-        .filter((r) => r.kind === 'parcel' && r.point && r.pageNumber === selected.pageNumber && r.regionIndex === selected.regionIndex)
-        .map((r) => ({ x: r.point![0] * cropWidth, y: r.point![1] * cropHeight, label: r.label, active: r.key === selectedKey }))
-    : [];
   $: realParcels = parcelRefs.filter((r) => r.kind === 'parcel');
   $: confirmedCount = realParcels.filter((r) => r.parcel.human_confirmed).length;
 
 </script>
 
-<svelte:window on:keydown={onKeydown} />
+<svelte:window on:keydown={onKeydown} on:keyup={onKeyup} />
 
-<div class="page">
-  <header>
-    <h1>Confirm parcel boundary</h1>
-    <p class="hint">
-      Parcels on the ParcelMap sheets ROAM found are listed by sheet, most likely target sheet first. Pick the target parcel, drag
-      the outline onto its boundary on the drawing (seeded from a previous confirmation, else the
-      vision-extracted calls, else a blank square), then Confirm. Confirming saves your outline and places
-      it on the map; verification details are on the map page.
-      {#if documentId.trim()}
-        <a href={`/workspace?doc=${encodeURIComponent(documentId.trim())}`}>Back to map →</a>
-      {/if}
-    </p>
-  </header>
-
-  <div class="load-row">
-    <input
-      type="text"
-      placeholder="document id"
-      bind:value={documentId}
-      on:keydown={(e) => e.key === 'Enter' && loadDocument()}
-    />
-    <button on:click={() => loadDocument()} disabled={loading}>{loading ? 'Loading…' : 'Load'}</button>
-    {#if loadError}<span class="error">{loadError}</span>{/if}
+<div class="br" class:full={centreFull}>
+  <header class="br-head">
+    <a class="back" href={documentId.trim() ? `/workspace?doc=${encodeURIComponent(documentId.trim())}` : '/workspace'} title="Back to map">←</a>
+    <div class="titles">
+      <h1>Confirm Parcel Boundary</h1>
+      <p>Select a parcel, outline it on the drawing, and confirm to save it on the map.</p>
+    </div>
     {#if parcelRefs.length > 0}
-      <span class="spacer" />
-      <span class="confirmed-count">{confirmedCount} / {realParcels.length} confirmed</span>
+      <div class="progress" title="Parcels confirmed on this document">
+        <span>{confirmedCount} / {realParcels.length} confirmed</span>
+        <div class="bar"><div style={`width:${realParcels.length ? (confirmedCount / realParcels.length) * 100 : 0}%`}></div></div>
+      </div>
       <a
-        class="primary-link"
+        class="btn primary"
         class:disabled={confirmedCount === 0}
         href={confirmedCount === 0 ? undefined : `/workspace?doc=${encodeURIComponent(documentId.trim())}`}
-      >
-        Continue to map →
-      </a>
+      >Continue to map →</a>
     {/if}
+  </header>
+
+  <div class="loadbar">
+    <input type="text" placeholder="Document ID" bind:value={documentId} on:keydown={(e) => e.key === 'Enter' && loadDocument()} />
+    <button class="btn" on:click={() => loadDocument()} disabled={loading}>{loading ? 'Loading…' : 'Load'}</button>
+    {#if loadError}<span class="error">{loadError}</span>{/if}
   </div>
 
   {#if parcelRefs.length > 0}
-    <div class="body">
-      <aside>
-        <h2>Parcels</h2>
+    <div class="br-grid">
+      <!-- ============ LEFT: sheets and their parcels ============ -->
+      <aside class="col left">
         {#if reading}
-          <p class="hint reading-note">ROAM is still reading the document in the background — you can start drawing now.</p>
-          {#if showReprocessHint}
-            <p class="hint reading-note stuck-hint">
-              Taking longer than usual — if this doesn't finish, the process reading it may have
-              been interrupted.
-              <button class="restore-btn" disabled={reprocessing} on:click={reprocessDocument}>
-                {reprocessing ? 'Restarting…' : 'Restart processing'}
-              </button>
-            </p>
-          {/if}
+          <div class="notice">
+            ROAM is still reading the document — you can start outlining now.
+            {#if showReprocessHint}
+              <div class="stuck">
+                Taking longer than usual; the process may have been interrupted.
+                <button class="btn sm" disabled={reprocessing} on:click={reprocessDocument}>{reprocessing ? 'Restarting…' : 'Restart processing'}</button>
+              </div>
+            {/if}
+          </div>
         {/if}
+
         {#each displayGroups as group, gi}
           {#if !group.primary && !group.copyOf && (gi === 0 || displayGroups.slice(0, gi).every((g) => g.primary || g.copyOf))}
-            <h2 class="other-heading">Other maps</h2>
-            <p class="hint sheet-note">Sheets that are probably not this packet's own parcel map (reference surveys, aerial or location maps, other drawings) — still selectable.</p>
+            <h2 class="col-title other">Other maps in this document</h2>
+            <p class="muted small">Probably not this packet's own parcel map (reference surveys, aerial or location maps, other drawings) — still selectable.</p>
           {/if}
-          <h3 class="sheet-heading">
-            Page {group.pageNumber} · parcel map
-            {#if group.badge}<span class="ref-badge" title={group.note ?? ''}>{group.badge}</span>{/if}
-            {#if group.copyOf}<span class="ref-badge" title="Shows the same parcels as that page">copy of page {group.copyOf}</span>{/if}
-          </h3>
-          {#if group.duplicates.length > 0 && !group.copyOf}
-            <p class="hint sheet-note">
-              The same {group.refs.length === 1 ? 'parcel' : 'parcels'} also appear{group.duplicates.length === 1 ? 's' : ''} on page{group.duplicates.length === 1 ? '' : 's'}
-              {group.duplicates.map((d) => d.pageNumber).join(', ')} — folded away.
-              <button class="restore-btn" on:click={() => toggleCopies(group.pageNumber)}>
-                {expandedCopies.has(group.pageNumber) ? 'Hide' : 'Show'}
-              </button>
-            </p>
-          {/if}
-          {#if group.note}<p class="hint sheet-note">{group.note}</p>{/if}
-          <ul>
-            {#each group.refs as ref}
-              <li class="parcel-row">
-                <button
-                  class:active={ref.key === selectedKey}
-                  class:muted-row={ref.kind !== 'parcel'}
-                  on:click={() => selectParcel(ref)}
-                >
-                  <span class="parcel-name">{ref.label}</span>
-                  {#if ref.parcel.human_confirmed}<span class="badge">confirmed</span>{/if}
-                  {#if ref.manual}<span class="ref-badge" title="You named this parcel; ROAM did not detect its identity.">manually named</span>{/if}
-                  {#if ref.meta}<span class="parcel-meta">{ref.meta}</span>{/if}
-                </button>
-                {#if ref.parcelId && !ref.parcel.human_confirmed}
-                  <button
-                    class="delete-btn"
-                    title="Delete this parcel entity (only possible before it's confirmed)"
-                    on:click={() => deleteParcelEntity(ref)}
-                  >✕</button>
-                {/if}
-              </li>
-            {/each}
-          </ul>
+          <section class="card sheet" class:active-sheet={selected && group.refs.some((r) => r.key === selectedKey)} class:other-sheet={!group.primary && !group.copyOf}>
+            <div class="sheet-head">
+              <span class="sheet-name">Page {group.pageNumber} · Parcel map</span>
+              {#if selected && group.refs.some((r) => r.key === selectedKey)}<span class="pill green">Active sheet</span>{/if}
+              {#if group.badge}<span class="pill grey" title={group.note ?? ''}>{group.badge}</span>{/if}
+              {#if group.copyOf}<span class="pill grey">copy of page {group.copyOf}</span>{/if}
+            </div>
+            {#if group.duplicates.length > 0 && !group.copyOf}
+              <p class="muted small">
+                Same {group.refs.length === 1 ? 'parcel' : 'parcels'} also on page{group.duplicates.length === 1 ? '' : 's'}
+                {group.duplicates.map((d) => d.pageNumber).join(', ')} — folded away.
+                <button class="link" on:click={() => toggleCopies(group.pageNumber)}>{expandedCopies.has(group.pageNumber) ? 'Hide' : 'Show'}</button>
+              </p>
+            {/if}
+            {#if group.note}<p class="muted small">{group.note}</p>{/if}
+            <div class="list-head"><span>Parcels on this sheet</span><span class="pill grey">{group.refs.filter((r) => r.kind === 'parcel').length}</span></div>
+            <ul class="parcels">
+              {#each group.refs as ref}
+                <li>
+                  <button class="parcel-card" class:selected={ref.key === selectedKey} class:muted-row={ref.kind !== 'parcel'} on:click={() => selectParcel(ref)}>
+                    <span class="radio" class:on={ref.key === selectedKey}></span>
+                    <span class="pc-body">
+                      <span class="pc-name">{ref.label}</span>
+                      <span class="pc-tags">
+                        {#if ref.parcel?.human_confirmed}<span class="pill green">Confirmed</span>
+                        {:else if ref.kind === 'parcel'}<span class="pill amber">Not confirmed</span>{/if}
+                        {#if ref.manual}<span class="pill grey" title="You named this parcel; ROAM did not detect its identity.">named by you</span>{/if}
+                      </span>
+                      {#if ref.meta}<span class="pc-meta">{ref.meta}</span>{/if}
+                    </span>
+                  </button>
+                  {#if ref.parcelId && !ref.parcel?.human_confirmed}
+                    <button class="icon-btn" title="Delete this parcel (only before it is confirmed)" on:click={() => deleteParcelEntity(ref)}>✕</button>
+                  {/if}
+                </li>
+              {/each}
+            </ul>
+          </section>
         {/each}
 
-        {#if deleteError}<p class="hint error-hint">{deleteError}</p>{/if}
+        {#if deleteError}<p class="error small">{deleteError}</p>{/if}
 
         {#if excludedParcels.length > 0}
-          <h2 class="excluded-heading">Not offered by default ({excludedParcels.length})</h2>
-          <p class="hint excluded-hint">
-            Flagged as likely vicinity/locus-map duplicates, scattered fragments, or otherwise
-            under-evidenced. Restore if this looks wrong, or delete it for good.
-          </p>
-          <ul>
-            {#each excludedParcels as ref}
-              <li class="excluded-item">
-                <span class="excluded-label" title={ref.excludedReason ?? ''}>Page {ref.pageNumber} · {ref.label}</span>
-                <button class="restore-btn" on:click={() => restoreExcludedParcel(ref)}>Restore</button>
-                {#if ref.parcelId}
-                  <button class="delete-btn" title="Delete for good" on:click={() => deleteParcelEntity(ref)}>✕</button>
-                {/if}
-              </li>
-            {/each}
-          </ul>
+          <section class="card">
+            <div class="sheet-head"><span class="sheet-name">Not offered by default ({excludedParcels.length})</span></div>
+            <p class="muted small">Flagged as likely vicinity/locus-map duplicates or under-evidenced fragments. Restore if this looks wrong.</p>
+            <ul class="excluded">
+              {#each excludedParcels as ref}
+                <li>
+                  <span title={ref.excludedReason ?? ''}>Page {ref.pageNumber} · {ref.label}</span>
+                  <button class="link" on:click={() => restoreExcludedParcel(ref)}>Restore</button>
+                  {#if ref.parcelId}<button class="icon-btn" title="Delete for good" on:click={() => deleteParcelEntity(ref)}>✕</button>{/if}
+                </li>
+              {/each}
+            </ul>
+          </section>
         {/if}
       </aside>
 
-      <main>
+      <!-- ============ CENTRE: tools and the drawing ============ -->
+      <section class="col centre">
         {#if selected}
-          <div class="toolbar">
-            <span class="seed-note">
-              seed: <strong>{seedSource}</strong>
-              {#if seedSource === 'traverse'}
-                (rough fit from vision-extracted calls — position/rotation/scale are guesses, correct
-                by dragging)
-              {:else if seedSource === 'none'}
-                (no automatic shape available — draw from scratch)
-              {/if}
-              {#if !localTransform && !reading && selected.kind === 'parcel'}
-                <span class="warn">— no survey calls were extracted for this parcel, so the outline is saved
-                  but cannot be placed on the map.</span
-                >
-              {/if}
-            </span>
-            <button on:click={resetToSeed}>Reset to seed</button>
-            <button on:click={addPointOnLongestEdge}>Add point</button>
-            <button
-              class:active-tool={curveMode}
-              on:click={() => (curveMode = !curveMode)}
-              disabled={selectedEdgeIdx === null}
-              title="Select an edge, then pull the diamond at its middle to bend it. Click the edge to add more bend points; double-click a diamond to remove it."
-            >
-              {curveMode ? 'Done curving' : 'Curve edge'}
-            </button>
-            <button on:click={straightenSelectedEdge} disabled={selectedEdgeIdx === null || !curves[selectedEdgeIdx]}>
-              Straighten edge
-            </button>
-            <button
-              on:click={deleteSelectedVertex}
-              disabled={selectedVertexIdx === null || vertices.length <= 3}
-            >
-              Delete selected vertex
-            </button>
-            <button
-              on:click={confirmBoundary}
-              disabled={vertices.length < 3 || selected.kind === 'reading' || (selected.kind === 'manual_new' && !manualName.trim())}
-            >
-              Confirm boundary
-            </button>
-            {#if saveStatus === 'saving'}<span>saving…</span>{/if}
-            {#if saveStatus === 'saved' && savedState === 'waiting_for_document'}
-              <span class="ok">saved ✓ — ROAM is still reading the document; your outline is placed on the
-                map automatically when it finishes. <a href={`/workspace?doc=${encodeURIComponent(documentId.trim())}`}>Continue to map →</a></span
-              >
-            {:else if saveStatus === 'saved' && georeferenced}
-              <span class="ok">saved ✓ — placed on the map.
-                <a href={`/workspace?doc=${encodeURIComponent(documentId.trim())}`}>View on map →</a></span
-              >
-            {:else if saveStatus === 'saved'}
-              <span class="ok">saved ✓ (pixel shape only — not projected)</span>
+          <div class="toolbar" role="toolbar" aria-label="Drawing tools">
+            {#each TOOLS as [t, label, key, tip]}
+              <button class="tool" class:on={tool === t} on:click={() => setTool(t)} title={`${tip} (${key})`}>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d={TOOL_ICONS[t]} /></svg>
+                <span>{label}</span>
+              </button>
+            {/each}
+            {#if tool === 'fill'}
+              <label class="gap" title="Bridges breaks in the boundary lines: raise it if the fill leaks out, lower it if it stops short">
+                Gap <input type="range" min="1" max="21" step="2" bind:value={fillGap} /> <b>{fillGap}px</b>
+              </label>
             {/if}
-            {#if saveStatus === 'error'}<span class="error">save failed</span>{/if}
+            <span class="grow"></span>
+            <button class="tool icon" on:click={undo} disabled={!undoStack.length && !penPoints.length} title="Undo (Ctrl+Z)">
+              <svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3" /></svg>
+            </button>
+            <button class="tool icon" on:click={redo} disabled={!redoStack.length} title="Redo (Ctrl+Shift+Z)">
+              <svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5M20 9H9a5 5 0 0 0 0 10h3" /></svg>
+            </button>
+            <button class="tool" on:click={resetView} disabled={zoom === 1} title="Fit the whole sheet">Reset view</button>
+            <button class="tool icon" on:click={() => (centreFull = !centreFull)} title={centreFull ? 'Exit full screen' : 'Full screen'}>
+              <svg viewBox="0 0 24 24"><path d={centreFull ? 'M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5' : 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5'} /></svg>
+            </button>
           </div>
+          <p class="tool-hint">
+            {#if tool === 'pen'}Draw: click each corner in order{penPoints.length ? ` (${penPoints.length} placed)` : ''}. Click the first corner or press Enter to close · Esc cancels · hold Shift for 45°/90° turns.
+            {:else if tool === 'fill'}{fillBusy ? 'Filling…' : fillMsg || 'Fill: click inside a lot — the region its lines enclose becomes the outline.'}
+            {:else if tool === 'rect'}Rectangle: drag from one corner to the opposite corner.
+            {:else if tool === 'move'}Move: drag inside the shape · Rotate: drag outside it.
+            {:else if tool === 'hand'}Hand: drag to move around the drawing.
+            {:else}Edit: drag a corner · double-click an edge to add one · click a corner and press Delete to remove it · drag empty paper to move the page.{/if}
+          </p>
 
           {#if selected.kind === 'reading'}
-            <p class="hint pending-note">
-              Reading parcel labels from this map… you can outline a parcel as soon as the names appear.
-            </p>
+            <p class="notice">Reading parcel labels from this map… you can outline a parcel as soon as the names appear.</p>
           {:else if selected.kind === 'manual_new'}
-            <div class="manual-name">
-              <label>
-                Parcel name
-                <input type="text" bind:value={manualName} placeholder="e.g. Parcel 1" />
-              </label>
-              <span class="hint">
-                You are naming this parcel yourself — ROAM did not detect its identity, and no parcel ID is inferred.
-              </span>
-            </div>
+            <label class="manual-name">
+              <span>Parcel name</span>
+              <input type="text" bind:value={manualName} placeholder="e.g. Parcel 1" />
+              <small>You are naming this parcel yourself — ROAM did not detect its identity.</small>
+            </label>
           {/if}
 
-          <div class="stage">
-            <img bind:this={cropImgEl} src={cropSrc} alt="source crop" on:load={onCropLoad} />
-            {#if cropWidth > 0}
-              <svg
-                viewBox={`0 0 ${cropWidth} ${cropHeight}`}
-                preserveAspectRatio="none"
-                on:pointermove={(e) => onSvgMove(e, e.currentTarget)}
-                on:pointerup={onSvgUp}
-                on:pointerleave={onSvgUp}
-              >
-                {#each markers as m}
-                  <circle cx={m.x} cy={m.y} r={cropWidth * 0.0028} class="roster-dot" class:active={m.active} />
-                  <text x={m.x + cropWidth * 0.009} y={m.y + cropWidth * 0.004} class="roster-label" class:active={m.active} style={`font-size:${cropWidth * 0.011}px`}>{m.label}</text>
-                {/each}
-                <path d={curveLib.outlinePath(vertices, curves)} class="boundary-poly" />
-                {#if selectedEdgeIdx !== null && vertices[selectedEdgeIdx]}
-                  <path d={curveLib.edgePath(vertices, curves, selectedEdgeIdx)} class="edge-selected" />
+          <div class="stage-wrap">
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <div class="stage" bind:this={stageEl} bind:clientWidth={stageW} on:wheel={onWheel} on:contextmenu|preventDefault class:panning={spaceDown} class:dragging-page={!!panDrag?.moved} data-tool={tool}>
+              <div class="zoom-layer" style={`transform: translate(${pan[0]}px, ${pan[1]}px) scale(${zoom})`}>
+                <img bind:this={cropImgEl} src={cropSrc} alt="source drawing" on:load={onCropLoad} />
+                {#if cropWidth > 0}
+                  <svg
+                    bind:this={svgEl}
+                    viewBox={`0 0 ${cropWidth} ${cropHeight}`}
+                    preserveAspectRatio="none"
+                    on:pointerdown={onCanvasDown}
+                    on:pointermove={(e) => onSvgMove(e, e.currentTarget)}
+                    on:pointerup={onSvgUp}
+                    on:pointerleave={onSvgUp}
+                    on:dblclick={() => tool === 'pen' && finishPen()}
+                  >
+                    {#if showOthers}
+                      {#each ghosts as g}
+                        <polygon points={polygonPoints(g)} class="ghost" />
+                      {/each}
+                    {/if}
+                    <path d={curveLib.outlinePath(vertices, curves)} class="boundary-poly" />
+                    {#if selectedEdgeIdx !== null && vertices[selectedEdgeIdx]}
+                      <path d={curveLib.edgePath(vertices, curves, selectedEdgeIdx)} class="edge-selected" />
+                    {/if}
+                    {#each vertices as _v, i}
+                      <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+                      <path
+                        d={curveLib.edgePath(vertices, curves, i)}
+                        class="edge-hit"
+                        class:inactive={tool !== 'edit'}
+                        on:click={(e) => onEdgeClick(i, e)}
+                        on:dblclick={(e) => addVertexOnEdge(i, e)}
+                      />
+                    {/each}
+                    {#each vertices as [x, y], i}
+                      {#if showVertices || i === selectedVertexIdx}
+                        <circle cx={x} cy={y} r={(i === selectedVertexIdx ? 6 : 4.5) * px} class="vertex" class:selected={i === selectedVertexIdx} />
+                      {/if}
+                      <circle cx={x} cy={y} r={11 * px} class="vertex-hit" class:inactive={tool !== 'edit'} on:pointerdown={(e) => onVertexDown(i, e)} />
+                    {/each}
+                    {#if tool === 'pen' && penPoints.length}
+                      <polyline points={polygonPoints(cursorPt ? [...penPoints, cursorPt] : penPoints)} class="pen-line" />
+                      {#each penPoints as [x, y], i}
+                        <circle cx={x} cy={y} r={5 * px} class="pen-dot" class:first={i === 0} />
+                      {/each}
+                    {/if}
+                    {#if tool === 'rect' && rectStart && cursorPt}
+                      <rect x={Math.min(rectStart[0], cursorPt[0])} y={Math.min(rectStart[1], cursorPt[1])} width={Math.abs(cursorPt[0] - rectStart[0])} height={Math.abs(cursorPt[1] - rectStart[1])} class="pen-line" />
+                    {/if}
+                    {#if curveMode && selectedEdgeIdx !== null}
+                      {#each waypointPts as [wx, wy], k}
+                        <rect
+                          x={wx - 5 * px}
+                          y={wy - 5 * px}
+                          width={10 * px}
+                          height={10 * px}
+                          transform={`rotate(45 ${wx} ${wy})`}
+                          class="curve-handle"
+                        />
+                        <!-- svelte-ignore a11y_no_static_element_interactions -->
+                        <circle cx={wx} cy={wy} r={11 * px} class="vertex-hit" on:pointerdown={(e) => onWaypointDown(k, e)} on:dblclick={() => removeWaypointAt(k)} />
+                      {/each}
+                      {#if waypointPts.length === 0 && handlePt}
+                        <rect
+                          x={handlePt[0] - 5 * px}
+                          y={handlePt[1] - 5 * px}
+                          width={10 * px}
+                          height={10 * px}
+                          transform={`rotate(45 ${handlePt[0]} ${handlePt[1]})`}
+                          class="curve-handle"
+                        />
+                        <circle cx={handlePt[0]} cy={handlePt[1]} r={11 * px} class="vertex-hit" on:pointerdown={onMidHandleDown} />
+                      {/if}
+                    {/if}
+                  </svg>
                 {/if}
-                {#each vertices as _v, i}
-                  <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-                  <path
-                    d={curveLib.edgePath(vertices, curves, i)}
-                    class="edge-hit"
-                    on:click={(e) => onEdgeClick(i, e)}
-                    on:dblclick={(e) => addVertexOnEdge(i, e)}
-                  />
-                {/each}
-                {#each vertices as [x, y], i}
-                  <!-- small visible dot for precision; a larger invisible circle keeps it easy to grab -->
-                  <circle cx={x} cy={y} r={cropWidth / 700 + 1} class="vertex" class:selected={i === selectedVertexIdx} />
-                  <circle cx={x} cy={y} r={cropWidth / 220 + 3} class="vertex-hit" on:pointerdown={(e) => onVertexDown(i, e)} />
-                {/each}
-                {#if curveMode && selectedEdgeIdx !== null}
-                  {#each waypointPts as [wx, wy], k}
-                    <!-- a bend point ON the edge: drag to reshape, double-click to remove -->
-                    <rect
-                      x={wx - cropWidth / 450 - 1}
-                      y={wy - cropWidth / 450 - 1}
-                      width={2 * (cropWidth / 450 + 1)}
-                      height={2 * (cropWidth / 450 + 1)}
-                      transform={`rotate(45 ${wx} ${wy})`}
-                      class="curve-handle"
-                    />
-                    <!-- svelte-ignore a11y_no_static_element_interactions -->
-                    <circle cx={wx} cy={wy} r={cropWidth / 220 + 4} class="vertex-hit" on:pointerdown={(e) => onWaypointDown(k, e)} on:dblclick={() => removeWaypointAt(k)} />
-                  {/each}
-                  {#if waypointPts.length === 0 && handlePt}
-                    <!-- still straight: pull this to start bending the edge -->
-                    <rect
-                      x={handlePt[0] - cropWidth / 450 - 1}
-                      y={handlePt[1] - cropWidth / 450 - 1}
-                      width={2 * (cropWidth / 450 + 1)}
-                      height={2 * (cropWidth / 450 + 1)}
-                      transform={`rotate(45 ${handlePt[0]} ${handlePt[1]})`}
-                      class="curve-handle"
-                    />
-                    <circle cx={handlePt[0]} cy={handlePt[1]} r={cropWidth / 220 + 4} class="vertex-hit" on:pointerdown={onMidHandleDown} />
-                  {/if}
-                {/if}
-              </svg>
-            {/if}
+              </div>
+            </div>
+            <div class="zoom-ctl">
+              <button on:click={() => zoomBy(1.25)} title="Zoom in">+</button>
+              <button on:click={() => zoomBy(1 / 1.25)} title="Zoom out">−</button>
+              <button on:click={resetView} title="Fit sheet">⤢</button>
+            </div>
+            <div class="zoom-pct">{Math.round(zoom * 100)}%</div>
           </div>
-          <p class="hint">
-            Drag a point to move it (only that vertex moves). Double-click an edge, or use "Add
-            point", to add a vertex -- add as many as the shape needs, no 3/4-point limit. Click a
-            vertex then press Delete/Backspace to remove it. To curve an edge: click it, press
-            "Curve edge", pull the diamond at its middle, then click the edge again wherever it
-            bends more -- every diamond is a point the curve passes through (double-click one to
-            remove it).
-          </p>
+          <p class="muted small foot-hint">Mouse wheel or pinch zooms · drag empty paper, two-finger swipe or Space+drag moves the page · Ctrl+Z / Ctrl+Shift+Z undo and redo · keys: V edit, P draw, R rectangle, F fill, M move, H hand.</p>
+        {:else}
+          <div class="empty">
+            <p><b>Pick a parcel</b> on the left to outline it.</p>
+            <p class="muted">Tip: <b>Fill</b> (F) outlines a lot from one click inside it.</p>
+          </div>
         {/if}
-      </main>
+      </section>
+
+      <!-- ============ RIGHT: the selected parcel ============ -->
+      <aside class="col right">
+        {#if selected}
+          <section class="card">
+            <div class="sel-head">
+              <span class="muted small">Selected parcel</span>
+              {#if selected.parcel?.human_confirmed}<span class="pill green">Confirmed</span>{:else}<span class="pill amber">Not confirmed</span>{/if}
+            </div>
+            <h2 class="sel-name">{selected.kind === 'manual_new' ? manualName || 'New parcel' : selected.label}</h2>
+            <div class="stats">
+              {#if selected.meta}
+                <div class="stat"><span>Stated area</span><b>{selected.meta}</b></div>
+              {/if}
+              {#if selected.parcel?.spatial_validation?.area_sqft}
+                <div class="stat"><span>Area (computed)</span><b>{Math.round(selected.parcel.spatial_validation.area_sqft).toLocaleString()} sq ft</b><small>{selected.parcel.spatial_validation.area_acres} ac</small></div>
+              {/if}
+              {#if selected.parcel?.spatial_validation?.perimeter_ft}
+                <div class="stat"><span>Perimeter</span><b>{Number(selected.parcel.spatial_validation.perimeter_ft).toLocaleString()} ft</b></div>
+              {/if}
+              <div class="stat"><span>Corners</span><b>{vertices.length}</b></div>
+            </div>
+            {#if !localTransform && !reading && selected.kind === 'parcel' && !selected.parcel?.human_confirmed}
+              <p class="warn small">No survey calls were read for this parcel; ROAM sizes it from the sheet's stated areas once confirmed.</p>
+            {/if}
+          </section>
+
+          <section class="card">
+            <h3 class="card-title">Editing tools</h3>
+            <div class="tool-grid">
+              <button on:click={addPointOnLongestEdge} title="Add a corner on the longest edge (or double-click any edge)">
+                <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg><span>Add point</span>
+              </button>
+              <button on:click={deleteSelectedVertex} disabled={selectedVertexIdx === null || vertices.length <= 3} title="Delete the selected corner (or press Delete)">
+                <svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" /></svg><span>Delete point</span>
+              </button>
+              <button class:on={tool === 'move'} on:click={() => setTool('move')} title="Move or rotate the whole outline (M)">
+                <svg viewBox="0 0 24 24"><path d={TOOL_ICONS.move} /></svg><span>Move / rotate</span>
+              </button>
+              <button on:click={straightenSelectedEdge} disabled={selectedEdgeIdx === null || !curves[selectedEdgeIdx]} title="Make the selected curved edge straight again">
+                <svg viewBox="0 0 24 24"><path d="M5 19 19 5" /></svg><span>Straighten</span>
+              </button>
+              <button class:on={curveMode} on:click={() => (curveMode = !curveMode)} disabled={selectedEdgeIdx === null} title="Click an edge first, then pull the diamond to bend it">
+                <svg viewBox="0 0 24 24"><path d="M5 19C5 10 10 5 19 5" /></svg><span>{curveMode ? 'Done curving' : 'Curve edge'}</span>
+              </button>
+              <button on:click={simplifyOutline} disabled={vertices.length <= 3} title="Remove corners that sit on a straight line (tidies a Fill result)">
+                <svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8" /></svg><span>Simplify</span>
+              </button>
+            </div>
+            {#if simplifyMsg}<p class="muted small">{simplifyMsg}</p>{/if}
+          </section>
+
+          <section class="card">
+            <h3 class="card-title">Display options</h3>
+            <label class="check"><input type="checkbox" bind:checked={showVertices} /> Show corner points</label>
+            <label class="check"><input type="checkbox" bind:checked={snapOn} /> Snap to corners of other parcels</label>
+            <label class="check"><input type="checkbox" bind:checked={showOthers} /> Show other parcels on this sheet</label>
+          </section>
+
+          <section class="card actions">
+            <button
+              class="btn primary block"
+              on:click={confirmBoundary}
+              disabled={vertices.length < 3 || selected.kind === 'reading' || (selected.kind === 'manual_new' && !manualName.trim())}
+            >✓ Confirm boundary</button>
+            {#if saveStatus === 'saving'}<p class="muted small">Saving…</p>{/if}
+            {#if saveStatus === 'saved' && savedState === 'waiting_for_document'}
+              <p class="ok small">Saved ✓ — placed on the map automatically when ROAM finishes reading.</p>
+            {:else if saveStatus === 'saved' && georeferenced}
+              <p class="ok small">Saved ✓ — placed on the map. <a href={`/workspace?doc=${encodeURIComponent(documentId.trim())}`}>View →</a></p>
+            {:else if saveStatus === 'saved'}
+              <p class="ok small">Saved ✓ (outline stored; not yet placed).</p>
+            {/if}
+            {#if saveStatus === 'error'}<p class="error small">Save failed.</p>{/if}
+            <button class="btn block" on:click={resetToSeed} title="Back to the starting outline">↺ Reset outline</button>
+            {#if selected.parcelId && !selected.parcel?.human_confirmed}
+              <button class="btn danger block" on:click={() => selected && deleteParcelEntity(selected)}>Delete parcel</button>
+            {/if}
+          </section>
+        {/if}
+      </aside>
     </div>
   {:else if result}
-    <p>No parcels with geometry found on this document.</p>
+    <p class="muted">No parcels with geometry found on this document.</p>
   {/if}
 </div>
 
 <style>
-  .page {
-    padding: 1.5rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    font-family: system-ui, sans-serif;
-  }
-  header h1 {
-    font-size: 1.25rem;
-    margin-bottom: 0.25rem;
-  }
-  .hint {
-    color: #666;
-    font-size: 0.85rem;
-  }
-  .load-row {
+  .br {
+    --blue: #2563eb;
+    --blue-soft: #eff4ff;
+    --line: #e5e7eb;
+    --ink: #111827;
+    --muted: #6b7280;
+    --green: #15803d;
+    --green-soft: #dcfce7;
+    --amber: #b45309;
+    --amber-soft: #fef3c7;
+    color: var(--ink);
+    font-size: 14px;
     display: flex;
-    gap: 0.5rem;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .br-head {
+    display: flex;
     align-items: center;
-    margin: 1rem 0;
+    gap: 16px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 18px;
   }
-  .load-row input {
-    flex: 1;
-    padding: 0.4rem 0.6rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  .error {
-    color: #c0392b;
-  }
-  .ok {
-    color: #2e7d32;
-  }
-  .warn {
-    color: #b45f00;
-  }
-  .spacer {
-    flex: 1;
-  }
-  .confirmed-count {
-    font-size: 0.8rem;
-    color: #555;
-  }
-  .primary-link {
-    padding: 0.35rem 0.8rem;
-    border-radius: 4px;
-    background: #3477eb;
-    color: #fff;
-    font-size: 0.85rem;
+  .back {
+    font-size: 20px;
     text-decoration: none;
+    color: var(--ink);
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    border: 1px solid var(--line);
   }
-  .primary-link.disabled {
+  .titles {
+    flex: 1;
+    min-width: 0;
+  }
+  .titles h1 {
+    margin: 0;
+    font-size: 22px;
+  }
+  .titles p {
+    margin: 2px 0 0;
+    color: var(--muted);
+  }
+  .progress {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 180px;
+    font-size: 13px;
+  }
+  .progress .bar {
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress .bar div {
+    height: 100%;
+    background: var(--blue);
+  }
+  .btn {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 9px;
+    padding: 8px 14px;
+    font: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--ink);
+    text-align: center;
+  }
+  .btn:disabled,
+  .btn.disabled {
     opacity: 0.45;
     pointer-events: none;
   }
-  .body {
-    display: grid;
-    grid-template-columns: 240px 1fr;
-    gap: 1rem;
+  .btn.primary {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: #fff;
   }
-  aside ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  .btn.danger {
+    color: #b91c1c;
+    border-color: #fecaca;
+  }
+  .btn.block {
+    display: block;
+    width: 100%;
+  }
+  .btn.sm {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+  .loadbar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .loadbar input {
+    flex: 0 1 380px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    font: inherit;
+  }
+  .br-grid {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr) 260px;
+    gap: 14px;
+    align-items: start;
+  }
+  .col.centre {
+    container-type: inline-size;
+  }
+  /* a narrow drawing column: tool buttons show their icon only (name in the tooltip) */
+  @container (max-width: 760px) {
+    .toolbar .tool span {
+      display: none;
+    }
+    .toolbar .tool {
+      padding: 7px 9px;
+    }
+  }
+  .col {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
-  }
-  aside button {
-    width: 100%;
-    text-align: left;
-    padding: 0.4rem 0.5rem;
-    border: 1px solid #ddd;
-    background: #fafafa;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.85rem;
-  }
-  aside button.active {
-    border-color: #3477eb;
-    background: #eaf1ff;
-  }
-  .excluded-heading {
-    margin-top: 1.25rem;
-    font-size: 0.85rem;
-    color: #777;
-  }
-  .excluded-hint {
-    margin: 0.2rem 0 0.5rem 0;
-    font-size: 0.75rem;
-  }
-  .excluded-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.4rem;
-    padding: 0.3rem 0.5rem;
-    font-size: 0.8rem;
-    color: #888;
-  }
-  .excluded-label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    cursor: help;
-  }
-  .excluded-label {
-    flex: 1 1 auto;
+    gap: 12px;
     min-width: 0;
   }
-  aside .restore-btn {
-    width: auto;
+  .card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px;
   }
-  .sheet-heading {
-    margin: 0.9rem 0 0.25rem;
-    font-size: 0.78rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: #55534b;
+  .card-title,
+  .col-title {
+    margin: 0 0 10px;
+    font-size: 15px;
   }
-  .ref-badge {
-    display: inline-block;
-    margin-left: 0.4rem;
-    padding: 0 0.35rem;
-    border-radius: 4px;
-    font-size: 0.68rem;
-    font-weight: 500;
-    text-transform: none;
-    letter-spacing: 0;
-    background: #ecebe4;
-    color: #6b6a63;
+  .col-title.other {
+    margin: 6px 0 0;
   }
-  .parcel-name {
-    display: block;
-    font-weight: 600;
+  .sheet.active-sheet {
+    border-color: #bfd3fe;
   }
-  .parcel-meta {
-    display: block;
-    margin-top: 0.1rem;
-    font-size: 0.72rem;
-    color: #6b6a63;
+  .sheet.other-sheet {
+    background: #fafafa;
   }
-  aside button.muted-row {
-    color: #77756c;
-    font-style: italic;
-  }
-  .manual-name {
+  .sheet-head {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.6rem;
-    margin: 0.3rem 0 0.5rem;
-    font-size: 0.85rem;
+    gap: 6px;
+    margin-bottom: 6px;
   }
-  .manual-name input {
-    margin-left: 0.4rem;
-    padding: 0.25rem 0.5rem;
-  }
-  .roster-dot {
-    fill: #1f6f4a;
-    stroke: #fff;
-    stroke-width: 1;
-    pointer-events: none;
-  }
-  .roster-dot.active {
-    fill: #3477eb;
-  }
-  .roster-label {
-    fill: #1f6f4a;
-    paint-order: stroke;
-    stroke: #fff;
-    stroke-width: 4px;
+  .sheet-name {
     font-weight: 600;
-    pointer-events: none;
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
-  .roster-label.active {
-    fill: #1d4fb0;
+  .list-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 8px 0 6px;
+    font-weight: 600;
   }
-  .other-heading {
-    margin: 1.1rem 0 0.2rem;
-    font-size: 0.9rem;
+  .pill {
+    font-size: 11.5px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    white-space: nowrap;
+    font-weight: 500;
   }
-  .reading-note,
-  .pending-note {
-    margin: 0.2rem 0 0.5rem;
-    font-size: 0.78rem;
+  .pill.green {
+    background: var(--green-soft);
+    color: var(--green);
   }
-  .sheet-note {
-    margin: 0 0 0.3rem;
-    font-size: 0.72rem;
+  .pill.amber {
+    background: var(--amber-soft);
+    color: var(--amber);
   }
-  .restore-btn {
-    flex-shrink: 0;
-    font-size: 0.75rem;
-    padding: 0.15rem 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: #fafafa;
-    cursor: pointer;
+  .pill.grey {
+    background: #f3f4f6;
+    color: #4b5563;
   }
-  .parcel-row {
+  .parcels,
+  .excluded {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .parcels li,
+  .excluded li {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 6px;
   }
-  .parcel-row button:first-child {
+  .parcel-card {
     flex: 1;
-  }
-  .delete-btn {
-    flex-shrink: 0;
-    font-size: 0.75rem;
-    width: 1.5rem;
-    height: 1.5rem;
-    line-height: 1;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: #fafafa;
-    color: #a33;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    text-align: left;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    background: #fff;
     cursor: pointer;
+    font: inherit;
+    color: inherit;
   }
-  .delete-btn:hover {
-    background: #fdeaea;
-    border-color: #a33;
+  .parcel-card:hover {
+    border-color: #c7d2fe;
   }
-  .error-hint {
-    color: #a33;
+  .parcel-card.selected {
+    border-color: var(--blue);
+    background: var(--blue-soft);
   }
-  .badge {
-    margin-left: 0.4rem;
-    font-size: 0.7rem;
-    color: #2e7d32;
+  .parcel-card.muted-row {
+    opacity: 0.8;
+  }
+  .radio {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid #9ca3af;
+    margin-top: 3px;
+    flex: none;
+  }
+  .radio.on {
+    border-color: var(--blue);
+    background: radial-gradient(var(--blue) 45%, #fff 50%);
+  }
+  .pc-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .pc-name {
+    font-weight: 600;
+  }
+  .pc-tags {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .pc-meta {
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .icon-btn {
+    border: none;
+    background: none;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px;
+  }
+  .icon-btn:hover {
+    color: #b91c1c;
+  }
+  .link {
+    border: none;
+    background: none;
+    color: var(--blue);
+    cursor: pointer;
+    font: inherit;
+    padding: 0 2px;
+  }
+  .muted {
+    color: var(--muted);
+  }
+  .small {
+    font-size: 12.5px;
+    margin: 4px 0;
+  }
+  .notice {
+    background: var(--blue-soft);
+    border: 1px solid #c7d7fe;
+    border-radius: 11px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  .notice .stuck {
+    margin-top: 6px;
   }
   .toolbar {
     display: flex;
-    gap: 0.6rem;
-    align-items: center;
     flex-wrap: wrap;
-    margin-bottom: 0.5rem;
-    font-size: 0.85rem;
+    align-items: center;
+    gap: 4px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 6px;
   }
-  .seed-note {
-    color: #555;
+  .tool {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid transparent;
+    background: none;
+    border-radius: 8px;
+    padding: 7px 11px;
+    font: inherit;
+    cursor: pointer;
+    color: var(--ink);
+  }
+  .tool:hover {
+    background: #f3f4f6;
+  }
+  .tool.on {
+    background: var(--blue);
+    color: #fff;
+  }
+  .tool:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .tool svg,
+  .tool-grid svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .tool.icon {
+    padding: 7px 8px;
+  }
+  .grow {
+    flex: 1;
+  }
+  .gap {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    margin-left: 6px;
+    padding: 4px 10px;
+    background: var(--blue-soft);
+    border-radius: 8px;
+  }
+  .tool-hint {
+    margin: 0;
+    font-size: 13px;
+    color: #374151;
+  }
+  .manual-name {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+  }
+  .manual-name input {
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font: inherit;
+    max-width: 320px;
+  }
+  .stage-wrap {
+    position: relative;
   }
   .stage {
     position: relative;
-    max-width: 100%;
-    border: 1px solid #ddd;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
     line-height: 0;
+    overflow: hidden;
+  }
+  .zoom-layer {
+    position: relative;
+    transform-origin: 0 0;
   }
   .stage img {
     width: 100%;
@@ -1196,51 +1846,248 @@
     height: 100%;
     touch-action: none;
   }
+  .stage[data-tool='pen'] svg,
+  .stage[data-tool='rect'] svg,
+  .stage[data-tool='fill'] svg {
+    cursor: crosshair;
+  }
+  .stage[data-tool='hand'] svg {
+    cursor: grab;
+  }
+  .stage.panning svg,
+  .stage.dragging-page svg {
+    cursor: grabbing !important;
+  }
+  .stage[data-tool='move'] svg {
+    cursor: move;
+  }
+  .stage.panning svg {
+    cursor: grab;
+  }
+  .zoom-ctl {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+  .zoom-ctl button {
+    width: 34px;
+    height: 32px;
+    border: none;
+    border-bottom: 1px solid var(--line);
+    background: #fff;
+    font-size: 17px;
+    cursor: pointer;
+  }
+  .zoom-ctl button:last-child {
+    border-bottom: none;
+  }
+  .zoom-pct {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-size: 12px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 3px 8px;
+    line-height: 1.4;
+  }
+  .foot-hint {
+    margin-top: 0;
+  }
+  .empty {
+    background: #fff;
+    border: 1px dashed #d1d5db;
+    border-radius: 14px;
+    padding: 60px 20px;
+    text-align: center;
+  }
+  .sel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .sel-name {
+    margin: 4px 0 10px;
+    font-size: 18px;
+  }
+  .stats {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    background: #f9fafb;
+    border: 1px solid #f0f0f0;
+    border-radius: 9px;
+    padding: 8px 10px;
+  }
+  .stat span {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .stat small {
+    color: var(--muted);
+  }
+  .tool-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  .tool-grid button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 10px 4px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--ink);
+  }
+  .tool-grid button:hover:not(:disabled) {
+    border-color: #c7d2fe;
+    background: var(--blue-soft);
+  }
+  .tool-grid button.on {
+    border-color: var(--blue);
+    background: var(--blue-soft);
+    color: var(--blue);
+  }
+  .tool-grid button:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .check {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 13.5px;
+    padding: 4px 0;
+  }
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .warn {
+    color: var(--amber);
+  }
+  .ok {
+    color: var(--green);
+  }
+  .error {
+    color: #b91c1c;
+  }
+  /* full screen: the drawing column takes the whole window */
+  .br.full .col.centre {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: #f5f5f4;
+    padding: 12px;
+    overflow: auto;
+  }
+  /* drawing overlays */
   .boundary-poly {
-    fill: rgba(52, 119, 235, 0.12);
-    stroke: #3477eb;
-    stroke-width: 1;
+    fill: rgba(37, 99, 235, 0.14);
+    stroke: #2563eb;
+    stroke-width: 2;
     vector-effect: non-scaling-stroke;
     pointer-events: none;
   }
   .edge-selected {
     fill: none;
-    stroke: #ff8c00;
+    stroke: #f97316;
     stroke-width: 3;
     vector-effect: non-scaling-stroke;
     pointer-events: none;
   }
-  .curve-handle {
-    fill: #ff8c00;
-    stroke: #fff;
-    stroke-width: 1;
-    vector-effect: non-scaling-stroke;
-    pointer-events: none;
-  }
-  button.active-tool {
-    background: #ff8c00;
-    color: #fff;
-  }
   .edge-hit {
     fill: none;
     stroke: transparent;
-    stroke-width: 14;
+    stroke-width: 8;
     vector-effect: non-scaling-stroke;
-    cursor: copy;
+    cursor: pointer;
   }
   .vertex {
     fill: #fff;
-    stroke: #3477eb;
-    stroke-width: 1;
+    stroke: #2563eb;
+    stroke-width: 2;
     vector-effect: non-scaling-stroke;
     pointer-events: none;
+  }
+  .vertex.selected {
+    fill: #f97316;
+    stroke: #f97316;
   }
   .vertex-hit {
     fill: transparent;
     cursor: grab;
   }
-  .vertex.selected {
-    fill: #ffb300;
-    stroke: #b45f00;
+  .curve-handle {
+    fill: #f97316;
+    stroke: #fff;
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+    pointer-events: none;
+  }
+  .ghost {
+    fill: rgba(107, 114, 128, 0.14);
+    stroke: #6b7280;
+    stroke-width: 1.5;
+    stroke-dasharray: 5 4;
+    vector-effect: non-scaling-stroke;
+    pointer-events: none;
+  }
+  .pen-line {
+    fill: rgba(234, 88, 12, 0.08);
+    stroke: #ea580c;
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+    pointer-events: none;
+  }
+  .pen-dot {
+    fill: #ea580c;
+    pointer-events: none;
+  }
+  .pen-dot.first {
+    fill: #fff;
+    stroke: #ea580c;
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+  }
+  .inactive {
+    pointer-events: none;
+  }
+  @media (max-width: 1180px) {
+    .br-grid {
+      grid-template-columns: 260px minmax(0, 1fr);
+    }
+    .col.right {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+  }
+  @media (max-width: 760px) {
+    .br-grid {
+      grid-template-columns: 1fr;
+    }
+    .br-head {
+      flex-wrap: wrap;
+    }
   }
 </style>
