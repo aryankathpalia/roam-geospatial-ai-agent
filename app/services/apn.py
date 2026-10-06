@@ -206,6 +206,7 @@ _DISTINCT_M = 15.0  # a rival position at least this far from the best ...
 _UNIQUE_MARGIN = 1.5  # ... must score this much worse, or the neighbours do not pin the group down
 _SEARCH_M = 250.0
 _TARGET_AREA_MIN, _TARGET_AREA_MAX = 0.8, 1.25
+_TARGET_MIN_IOU = 0.85  # the confirmed outlines and the county polygon cover the same land
 
 
 def _area_m2(rings: list) -> float:
@@ -259,61 +260,153 @@ def placement_by_apn(group_rings: list[list[tuple[float, float]]], site: dict) -
         return None
 
     if target and len(target) >= 4:
+        from shapely.affinity import rotate as _rot
+
         t = local(target)
-        dx = t.centroid.x - group.centroid.x
-        dy = t.centroid.y - group.centroid.y
-        moved = _translate(group, dx, dy)
-        overlap = moved.intersection(t).area / group.area
+        pivot_t = (group.centroid.x, group.centroid.y)
+        # Centre the group on the target parcel at each candidate rotation (the calibrated one, the
+        # 180-degree walk ambiguity, and the turns aligning their edge grids); keep the best overlap.
+        def at(theta: float) -> tuple[float, float, float, float]:
+            g = _rot(group, -theta, origin=pivot_t) if theta else group
+            dx, dy = t.centroid.x - g.centroid.x, t.centroid.y - g.centroid.y
+            moved = _translate(g, dx, dy)
+            return moved.intersection(t).area / moved.union(t).area, theta, dx, dy
+
+        # every 2 degrees, then refined -- overlap is cheap, and an irregular tract has no edge grid to align
+        best_t = max((at(float(a)) for a in range(-180, 180, 2)), key=lambda r: r[0])
+        for step in (0.5, 0.1):
+            best_t = max((at(best_t[1] + k * step) for k in range(-4, 5)), key=lambda r: r[0])
+        keep = at(0.0)  # the drawing's own calibrated orientation wins a near-tie
+        if keep[0] >= best_t[0] - 0.005:
+            best_t = keep
+        iou, theta, dx, dy = best_t
+        theta = _angle_diff(theta, 0.0)
         area_ratio = group.area / t.area if t.area else 0.0
         return {
-            "east_m": dx, "north_m": dy, "mode": "target_parcel", "overlap": round(overlap, 3),
-            "gap_m": None, "area_ratio": round(area_ratio, 3),
-            "corroborated": overlap >= 0.9 and 0.9 <= area_ratio <= 1.1,
+            "east_m": dx, "north_m": dy, "rotation_deg": round(theta, 2),
+            "pivot": [lon0 + pivot_t[0] / kx, lat0 + pivot_t[1] / ky],
+            "mode": "target_parcel", "overlap": round(iou, 3), "gap_m": None, "area_ratio": round(area_ratio, 3),
+            "corroborated": iou >= _TARGET_MIN_IOU and _TARGET_AREA_MIN <= area_ratio <= _TARGET_AREA_MAX,
         }
 
     import numpy as np
     import shapely
+    from shapely.affinity import rotate
 
     nb = unary_union([local(r) for r in neighbours])
     boundary = nb.boundary
     shapely.prepare(boundary)
-    samples = np.array(_boundary_samples(group, 2.0))
+    pivot = (group.centroid.x, group.centroid.y)
 
-    def score(dx: float, dy: float) -> tuple[float, float, float]:
-        moved = _translate(group, dx, dy)
-        overlap = moved.intersection(nb).area / group.area
-        d = shapely.distance(boundary, shapely.points(samples + (dx, dy)))
-        # capped: an edge facing a road has no neighbour to hug, and must not drag the fit across it
-        gap = float(np.minimum(d, _GAP_CAP_M).mean())
-        return overlap * _OVERLAP_WEIGHT + gap, overlap, gap
+    def search(geom):
+        samples = np.array(_boundary_samples(geom, 2.0))
 
-    best = (math.inf, 0.0, 0.0, 0.0, 0.0)  # (score, dx, dy, overlap, gap)
-    coarse: dict[tuple[float, float], float] = {}
-    for step, radius, centre in ((_COARSE_STEP_M, _SEARCH_M, (0.0, 0.0)), (1.0, 6.0, None), (0.25, 1.0, None)):
-        cx, cy = centre if centre is not None else (best[1], best[2])
-        n = int(radius / step)
-        for i in range(-n, n + 1):
-            for j in range(-n, n + 1):
-                dx, dy = cx + i * step, cy + j * step
-                s, ov, gap = score(dx, dy)
-                if centre is not None:
-                    coarse[(dx, dy)] = s
-                if s < best[0]:
-                    best = (s, dx, dy, ov, gap)
+        def score(dx: float, dy: float) -> tuple[float, float, float]:
+            moved = _translate(geom, dx, dy)
+            overlap = moved.intersection(nb).area / geom.area
+            d = shapely.distance(boundary, shapely.points(samples + (dx, dy)))
+            # capped: an edge facing a road has no neighbour to hug, and must not drag the fit across it
+            gap = float(np.minimum(d, _GAP_CAP_M).mean())
+            return overlap * _OVERLAP_WEIGHT + gap, overlap, gap
+
+        best = (math.inf, 0.0, 0.0, 0.0, 0.0)  # (score, dx, dy, overlap, gap)
+        coarse: dict[tuple[float, float], float] = {}
+        for step, radius, centre in ((_COARSE_STEP_M, _SEARCH_M, (0.0, 0.0)), (1.0, 6.0, None), (0.25, 1.0, None)):
+            cx, cy = centre if centre is not None else (best[1], best[2])
+            n = int(radius / step)
+            for i in range(-n, n + 1):
+                for j in range(-n, n + 1):
+                    dx, dy = cx + i * step, cy + j * step
+                    sc, ov, gap = score(dx, dy)
+                    if centre is not None:
+                        coarse[(dx, dy)] = sc
+                    if sc < best[0]:
+                        best = (sc, dx, dy, ov, gap)
+        d = shapely.distance(boundary, shapely.points(samples + (best[1], best[2])))
+        return best, coarse, float((d <= _HUG_M).mean())
+
+    # Rotation: the placement's own (the drawing's calibrated orientation), plus the turns that line the
+    # group's dominant edge direction up with the neighbours' -- a wrongly calibrated rotation (one misread
+    # bearing) is corrected by the land around it, and the 180-degree walk-direction ambiguity too.
+    rotations = _rotation_candidates(group, nb)
+    results = []
+    for theta in rotations:
+        geom = rotate(group, -theta, origin=pivot) if theta else group  # shapely: +angle is counter-clockwise
+        best, coarse, hugging = search(geom)
+        results.append((theta, best, coarse, hugging))
+    winner = min(results, key=lambda r: r[1][0])
+    keep = results[0]  # rotation 0: the drawing's own calibrated orientation wins a near-tie
+    if winner is not keep and keep[1][0] - winner[1][0] < _ROTATION_TIE:
+        winner = keep
+    theta, best, coarse, hugging = winner
     _, dx, dy, overlap, gap = best
-    d = shapely.distance(boundary, shapely.points(samples + (dx, dy)))
-    hugging = float((d <= _HUG_M).mean())
-    # The second-best position well away from the best one: if it scores almost as well, the neighbours
-    # do not pin the group down (e.g. a row of identical lots) and the fit is not corroborated.
-    runner_up = min(
-        (s for (ddx, ddy), s in coarse.items() if math.hypot(ddx - dx, ddy - dy) >= _DISTINCT_M), default=math.inf
-    )
-    unique = runner_up - best[0] >= _UNIQUE_MARGIN
+
+    def placed(r):
+        g = rotate(group, -r[0], origin=pivot) if r[0] else group
+        return _translate(g, r[1][1], r[1][2])
+
+    footprint = placed(winner)
+    # The best rival -- another position, or another rotation that puts the outline somewhere else (a
+    # symmetric group turned 180 deg lands on the same footprint, which is no rival): if it scores almost
+    # as well, the neighbours do not pin the group down and the fit is not corroborated.
+    rivals = [sc for (ddx, ddy), sc in coarse.items() if math.hypot(ddx - dx, ddy - dy) >= _DISTINCT_M]
+    rivals += [
+        r[1][0] for r in results
+        if r is not winner and placed(r).symmetric_difference(footprint).area / group.area >= _DISTINCT_FOOTPRINT
+    ]
+    unique = min(rivals, default=math.inf) - best[0] >= _UNIQUE_MARGIN
     return {
-        "east_m": dx, "north_m": dy, "mode": "between_neighbours", "overlap": round(overlap, 3),
+        "east_m": dx, "north_m": dy, "rotation_deg": round(theta, 2),
+        "pivot": [lon0 + pivot[0] / kx, lat0 + pivot[1] / ky],
+        "mode": "between_neighbours", "overlap": round(overlap, 3),
         "gap_m": round(gap, 2), "hugging": round(hugging, 2), "unique": unique, "area_ratio": None,
         "corroborated": overlap <= _FIT_MAX_OVERLAP and hugging >= _FIT_MIN_HUGGING and unique and len(neighbours) >= 3,
     }
+
+
+_ROTATION_TIE = 0.5
+_DISTINCT_FOOTPRINT = 0.1
+
+
+def _angle_diff(a: float, b: float) -> float:
+    return (a - b + 180.0) % 360.0 - 180.0
+
+
+def _dominant_direction(geom) -> float | None:
+    """Length-weighted dominant edge direction modulo 90 degrees (a rectilinear layout's grid), in degrees."""
+
+    from shapely.geometry import MultiPolygon
+
+    sx = sy = 0.0
+    polys = list(geom.geoms) if isinstance(geom, MultiPolygon) else [geom]
+    for poly in polys:
+        c = list(poly.exterior.coords)
+        for (x0, y0), (x1, y1) in zip(c, c[1:]):
+            length = math.hypot(x1 - x0, y1 - y0)
+            ang = math.atan2(y1 - y0, x1 - x0) * 4  # x4 folds the four grid directions together
+            sx += length * math.cos(ang)
+            sy += length * math.sin(ang)
+    if sx == 0 and sy == 0:
+        return None
+    return math.degrees(math.atan2(sy, sx)) / 4
+
+
+def _rotation_candidates(group, neighbours) -> list[float]:
+    """0 (keep the calibrated orientation), 180 (the walk-direction ambiguity) and the turns that align the
+    group's dominant edge direction with the neighbours' (each of the four grid directions)."""
+
+    out = [0.0, 180.0]
+    dg, dn = _dominant_direction(group), _dominant_direction(neighbours)
+    if dg is not None and dn is not None:
+        # dominant directions are counter-clockwise from east; a clockwise turn of theta aligns them
+        base = -_angle_diff(dn, dg) % 90.0
+        for k in range(4):
+            out.append(_angle_diff(base + 90.0 * k, 0.0))
+    uniq: list[float] = []
+    for t in out:
+        if all(abs(_angle_diff(t, u)) >= 1.0 for u in uniq):
+            uniq.append(t)
+    return uniq
 
 
 def _translate(geom, dx: float, dy: float):

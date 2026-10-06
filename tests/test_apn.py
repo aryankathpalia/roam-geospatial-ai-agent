@@ -62,3 +62,16 @@ def test_target_polygon_is_used_only_when_its_area_matches():
 def test_no_service_for_the_state_means_no_lookup():
     assert apn.resolve_apn_site("A.P.N. 085-570-29", "Ohio", 40.0, -83.0) is None
     assert apn.resolve_apn_site("no parcel numbers here", "Nevada", 39.6, -119.76) is None
+
+
+def test_target_parcel_fit_undoes_a_wrong_rotation():
+    """The lots were placed turned 60 deg (one misread bearing) and 1 km off; the county polygon of the
+    parent parcel they split puts them back."""
+    quad = [(0, 0), (500, 0), (500, 400), (150, 250)]  # irregular: no edge grid to align by
+    parent = [(LON0 + x / KX, LAT0 + y / KY) for x, y in quad + quad[:1]]
+    th = math.radians(60)  # clockwise
+    turned = [(x * math.cos(th) + y * math.sin(th) + 700, -x * math.sin(th) + y * math.cos(th) - 900) for x, y in quad]
+    lots = [[(LON0 + x / KX, LAT0 + y / KY) for x, y in turned + turned[:1]]]
+    fit = apn.placement_by_apn(lots, {"neighbours": [], "target": {"apn": "T", "ring": parent}})
+    assert fit["mode"] == "target_parcel" and fit["corroborated"], fit
+    assert abs(fit["rotation_deg"] + 60) < 0.5 and fit["overlap"] > 0.98, fit

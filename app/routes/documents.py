@@ -1162,7 +1162,8 @@ def _fit_sheet_to_apn(result: dict, page_number: int) -> None:
                 parcel["boundary_geojson_wgs84"] = unfitted  # undo an earlier fit that no longer holds
                 parcel.pop("boundary_geojson_wgs84_unfitted", None)
             continue
-        moved = _shift_feature(unfitted, fit["east_m"], fit["north_m"])
+        turned = _rotate_feature(unfitted, fit.get("pivot"), fit.get("rotation_deg") or 0.0)
+        moved = _shift_feature(turned, fit["east_m"], fit["north_m"])
         moved.setdefault("properties", {})["georeferenced"] = "fitted_to_county_parcels"
         parcel["boundary_geojson_wgs84_unfitted"] = unfitted
         parcel["boundary_geojson_wgs84"] = moved
@@ -1173,9 +1174,11 @@ def _fit_sheet_to_apn(result: dict, page_number: int) -> None:
             f"onto APN {site.get('target_apn')}" if fit["mode"] == "target_parcel"
             else f"between {len(site.get('neighbours') or [])} neighbouring parcels the plat names by APN"
         )
+        turn = fit.get("rotation_deg") or 0.0
         placement["notes"].append(
             f"seated on the county parcel records ({site.get('source')}) {how}: moved {shift_m:.0f} m "
-            "from the anchor-based position."
+            + (f"and turned {turn:+.1f} deg " if abs(turn) >= 0.05 else "")
+            + "from the anchor-based position."
         )
 
 
@@ -1204,29 +1207,54 @@ def _unify_sheet_frame(result: dict, page_number: int) -> bool:
         members = _control_fit_members(region)
         if not members:
             continue
-        scaled = [
+        movable = [
             p for p in members
-            if (p.get("calibration") or {}).get("scale_ft_per_px") and p.get("boundary_geojson_wgs84")
+            if (p.get("confirmed_boundary_pixels") or {}).get("vertices")
             and not (p.get("placement") or {}).get("control_fit", {}).get("validated")
         ]
-        if len(scaled) < 2:
+        sheet_scale = _sheet_area_scale(movable)
+        placed = [p for p in movable if p.get("boundary_geojson_wgs84")]
+        if not placed:
             continue
+        # A confirmed outline the pipeline could not place on its own (no survey calls attributed to it)
+        # is still fixed RELATIVE to the others by the drawing: it joins the frame only with a sheet scale.
+        if sheet_scale is None:
+            movable = placed
+        scaled = [p for p in movable if (p.get("calibration") or {}).get("scale_ft_per_px") and p.get("boundary_geojson_wgs84")]
+        if sheet_scale is None and (len(scaled) < 2 or not scaled):
+            continue
+        if len(movable) < 2:
+            continue
+        if not scaled:
+            scaled = placed
 
         def verified(p):
-            c = p["calibration"]
+            c = p.get("calibration") or {}
             return c.get("status") in ("cross_validated", "single_source") and c.get("rotation_deg") is not None
 
         pool = [p for p in scaled if verified(p)] or scaled
-        best = min(pool, key=lambda p: p["calibration"].get("scale_agreement_pct") if p["calibration"].get("scale_agreement_pct") is not None else 1e9)
-        scale = best["calibration"]["scale_ft_per_px"]
+        best = min(pool, key=lambda p: (p.get("calibration") or {}).get("scale_agreement_pct") if (p.get("calibration") or {}).get("scale_agreement_pct") is not None else 1e9)
+        # Several parcels' stated areas agreeing on ONE scale is sheet-level evidence, stronger than any
+        # single parcel's (Washoe 4-lot map: 0.4998-0.5023 ft/px from four areas, while two parcels had
+        # rejected their own area scale over a 9% disagreement with one misread edge).
+        scale = sheet_scale["scale"] if sheet_scale else best["calibration"]["scale_ft_per_px"]
         rotation = best["calibration"]["rotation_deg"] if verified(best) else 0.0
 
         def working(p):
+            if not p.get("boundary_geojson_wgs84"):
+                p["boundary_geojson_wgs84"] = {
+                    "type": "Feature", "properties": {"parcel_label": p.get("parcel_label")},
+                    "geometry": {"type": "Polygon", "coordinates": [[]]},
+                }
+                p.pop("georeference_error", None)
             return p.get("boundary_geojson_wgs84_unfitted") or p["boundary_geojson_wgs84"]
 
         ref_px = tuple(best["confirmed_boundary_pixels"]["vertices"][0])
         ref_ll = working(best)["geometry"]["coordinates"][0][0]
-        for p in scaled:
+        for p in (movable if sheet_scale else scaled):
+            if sheet_scale:
+                stated_acres = _stated_acres(result, p)
+                _rescale_validation(p, scale, sheet_scale, stated_acres * 43560 if stated_acres else None)
             ring = []
             for x, y in p["confirmed_boundary_pixels"]["vertices"]:
                 dx, dy = (x - ref_px[0]) * scale, -(y - ref_px[1]) * scale
@@ -1247,6 +1275,87 @@ def _unify_sheet_frame(result: dict, page_number: int) -> bool:
             }
             changed = True
     return changed
+
+
+_SHEET_SCALE_TOL = 0.02
+
+
+def _pixel_area(vertices: list) -> float:
+    pts = [(float(x), float(y)) for x, y in vertices]
+    return abs(sum(a[0] * b[1] - b[0] * a[1] for a, b in zip(pts, pts[1:] + pts[:1]))) / 2
+
+
+def _sheet_area_scale(parcels: list[dict]) -> dict | None:
+    """
+    One scale for the whole sheet from the parcels' STATED areas: each confirmed outline's pixel area
+    and its printed area imply ft/px; when two or more agree within _SHEET_SCALE_TOL, their median is
+    the sheet's scale. None when fewer than two parcels state an area or they disagree.
+    """
+
+    implied = []
+    for p in parcels:
+        stated = (p.get("spatial_validation") or {}).get("stated_area_sqft")
+        px = _pixel_area(p["confirmed_boundary_pixels"]["vertices"])
+        if stated and px > 0:
+            implied.append(math.sqrt(stated / px))
+    if len(implied) < 2:
+        return None
+    median = sorted(implied)[len(implied) // 2]
+    spread = max(abs(v - median) for v in implied) / median
+    if spread > _SHEET_SCALE_TOL:
+        return None
+    return {"scale": median, "count": len(implied), "spread_pct": round(spread * 100, 2)}
+
+
+def _rescale_validation(parcel: dict, scale: float, sheet_scale: dict, stated_sqft: float | None = None) -> None:
+    """Recomputes a parcel's area check at the sheet scale (its own calibration may have had none). A
+    parcel the pipeline never placed gets one built from its confirmed outline."""
+
+    vertices = parcel["confirmed_boundary_pixels"]["vertices"]
+    sv = parcel.get("spatial_validation")
+    if not sv:
+        perimeter = sum(math.dist(a, b) for a, b in zip(vertices, vertices[1:] + vertices[:1])) * scale
+        sv = parcel["spatial_validation"] = {
+            "valid": True, "issues": [], "perimeter_ft": round(perimeter, 2), "precision_ratio": None,
+            "self_intersects": False, "stated_area_sqft": stated_sqft, "curve_diagnostics": [],
+            "source": "confirmed outline at the sheet scale",
+        }
+    area = _pixel_area(vertices) * scale * scale
+    stated = sv.get("stated_area_sqft") or stated_sqft
+    sv["stated_area_sqft"] = stated
+    sv["area_sqft"] = round(area, 2)
+    sv["area_acres"] = round(area / 43560, 3)
+    sv["issues"] = [i for i in sv.get("issues", []) if not i.startswith("Walked area")]
+    if stated:
+        diff = abs(area - stated) / stated * 100
+        sv["area_diff_pct"] = round(diff, 2)
+        sv["area_matches_stated"] = diff <= 15
+        sv["valid"] = diff <= 15 and not sv.get("self_intersects") and not sv["issues"]
+    cal = parcel.setdefault("calibration", {})
+    cal["sheet_scale"] = {**sheet_scale, "scale_ft_per_px": scale}
+    if not cal.get("scale_ft_per_px"):
+        cal["scale_ft_per_px"] = scale
+
+
+def _rotate_feature(feature: dict, pivot: list | None, clockwise_deg: float) -> dict:
+    """The GeoJSON polygon turned `clockwise_deg` about `pivot` (lon, lat), in a local metric frame."""
+
+    out = copy.deepcopy(feature)
+    if not pivot or abs(clockwise_deg) < 1e-9:
+        return out
+    lon0, lat0 = pivot
+    kx, ky = 111_320 * math.cos(math.radians(lat0)), 110_540
+    t = math.radians(clockwise_deg)
+    c, s_ = math.cos(t), math.sin(t)
+    rings = []
+    for ring in feature["geometry"]["coordinates"]:
+        new = []
+        for lon, lat in ring:
+            x, y = (lon - lon0) * kx, (lat - lat0) * ky
+            new.append([lon0 + (x * c + y * s_) / kx, lat0 + (-x * s_ + y * c) / ky])
+        rings.append(new)
+    out["geometry"]["coordinates"] = rings
+    return out
 
 
 def _shift_feature(feature: dict, east_m: float, north_m: float) -> dict:
