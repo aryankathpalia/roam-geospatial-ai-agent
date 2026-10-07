@@ -238,6 +238,21 @@ def get_document(document_id: str, background_tasks: BackgroundTasks):
     """
 
     result = _load_result(document_id)
+    # Verifications orphaned by a restart: re-queue them rather than leave the cards on "Calibrating &
+    # placing…" forever.
+    # Never WAIT for the result lock here: a long fit running under it must not freeze every page poll. If
+    # it is busy, skip -- the next poll tries again.
+    requeued: list[tuple] = []
+    if _RESULT_LOCK.acquire(blocking=False):
+        try:
+            result = _load_result(document_id)  # fresh copy, read under the lock
+            requeued = _requeue_orphaned_verifications(document_id, result)
+            if requeued:
+                _save_result(document_id, result)
+        finally:
+            _RESULT_LOCK.release()
+    for body, confirmation_id in requeued:
+        background_tasks.add_task(_verify_confirmation, document_id, body, confirmation_id)
     # A control-point read that died with its process (a dev-server reload mid-read) leaves a stale
     # "reading" marker; the page poll that finds it restarts the read instead of leaving the cards on
     # "Refining placement…" forever. _ensure_control_points does nothing for a fresh or finished read.
@@ -880,7 +895,59 @@ def _derive_confirmed_geometry(
     parcel.pop("georeference_error", None)
 
 
+# Verifications running in THIS process, by confirmation id -> start time. A verification that dies with its
+# process (a dev-server reload, a crash) leaves its parcel "pending" on disk forever; because this registry
+# is empty after a restart, a pending parcel that is not in it is known to be orphaned and is re-queued
+# (_requeue_orphaned_verifications).
+_VERIFYING: dict[str, float] = {}
+_VERIFY_STALE_S = 900
+
+
+def _verification_running(confirmation_id: str | None) -> bool:
+    started = _VERIFYING.get(confirmation_id or "")
+    return started is not None and time.time() - started < _VERIFY_STALE_S
+
+
 def _verify_confirmation(document_id: str, body, confirmation_id: str) -> None:
+    _VERIFYING[confirmation_id] = time.time()
+    try:
+        _verify_confirmation_inner(document_id, body, confirmation_id)
+    finally:
+        _VERIFYING.pop(confirmation_id, None)
+
+
+def _requeue_orphaned_verifications(document_id: str, result: dict) -> list[tuple]:
+    """
+    Confirmed parcels left "pending" with no verification running for them -- the process that was verifying
+    them died. Re-applies each one's confirmed outline (provisional placement) and returns the
+    (body, confirmation_id) pairs to verify again, registered as running so a poll arriving before the task
+    starts does not queue them twice. Mutates `result`; the caller saves it.
+    """
+
+    if not (result.get("processing") or {}).get("complete", True):
+        return []
+    out = []
+    for page in result.get("pages", []):
+        for entity in (page.get("sheet") or {}).get("parcels", []):
+            ref = entity.get("evidence_ref")
+            if not entity.get("confirmed_polygon") or not ref:
+                continue
+            region = page["regions"][ref["region"]]
+            parcels = region.get("parcels") or []
+            parcel = parcels[ref["parcel"]] if ref["parcel"] < len(parcels) else None
+            if not parcel or not parcel.get("human_confirmed"):
+                continue
+            pending = (parcel.get("placement") or {}).get("status") == "pending" or (parcel.get("calibration") or {}).get("status") == "pending"
+            if not pending or _verification_running((parcel.get("confirmed_boundary_pixels") or {}).get("id")):
+                continue
+            queued = _bind_entity(document_id, result, page["page_number"], entity)
+            if queued:
+                _VERIFYING[queued[1]] = time.time()
+                out.append(queued)
+    return out
+
+
+def _verify_confirmation_inner(document_id: str, body, confirmation_id: str) -> None:
     """
     Background half of confirm-boundary: runs calibration and absolute
     placement on a snapshot (slow -- OCR and a Gemini call, no lock held),
@@ -1218,7 +1285,7 @@ def _unify_sheet_frame(result: dict, page_number: int) -> bool:
             if (p.get("confirmed_boundary_pixels") or {}).get("vertices")
             and not (p.get("placement") or {}).get("control_fit", {}).get("validated")
         ]
-        sheet_scale = _sheet_area_scale(movable)
+        sheet_scale = _sheet_area_scale(movable) or _corroborated_parcel_scale(movable)
         placed = [p for p in movable if p.get("boundary_geojson_wgs84")]
         if not placed:
             continue
@@ -1258,9 +1325,13 @@ def _unify_sheet_frame(result: dict, page_number: int) -> bool:
         ref_px = tuple(best["confirmed_boundary_pixels"]["vertices"][0])
         ref_ll = working(best)["geometry"]["coordinates"][0][0]
         for p in (movable if sheet_scale else scaled):
-            if sheet_scale:
+            own = (p.get("calibration") or {}).get("scale_ft_per_px")
+            if sheet_scale or (own and abs(own - scale) / scale > _SHEET_SCALE_TOL):
+                # redrawn at a scale other than its own: its area check must be at the scale it is drawn at
                 stated_acres = _stated_acres(result, p)
-                _rescale_validation(p, scale, sheet_scale, stated_acres * 43560 if stated_acres else None)
+                _rescale_validation(
+                    p, scale, sheet_scale or {"source": "frame parcel scale"}, stated_acres * 43560 if stated_acres else None
+                )
             ring = []
             for x, y in p["confirmed_boundary_pixels"]["vertices"]:
                 dx, dy = (x - ref_px[0]) * scale, -(y - ref_px[1]) * scale
@@ -1311,6 +1382,34 @@ def _sheet_area_scale(parcels: list[dict]) -> dict | None:
     if spread > _SHEET_SCALE_TOL:
         return None
     return {"scale": median, "count": len(implied), "spread_pct": round(spread * 100, 2)}
+
+
+_CORROBORATED_SCALE_PCT = 2.0  # stated-area scale and measured-edge scale agree this closely ...
+_CORROBORATED_SCALE_EDGES = 2  # ... on at least this many edges
+
+
+def _corroborated_parcel_scale(parcels: list[dict]) -> dict | None:
+    """
+    The sheet's scale from ONE parcel whose stated area and printed edge lengths agree on it, for a
+    sheet where another confirmed parcel has no scale of its own (it rejected its evidence -- e.g. an
+    area misread from a blurred label, which then disagreed with its edges). The parcels are drawn on
+    the same sheet at the same scale, so the corroborated one stands for both. None unless some parcel
+    lacks a scale and exactly one clear best exists.
+    """
+
+    if not any(not (p.get("calibration") or {}).get("scale_ft_per_px") for p in parcels):
+        return None
+    strong = [
+        p for p in parcels
+        if (c := p.get("calibration") or {}).get("scale_ft_per_px")
+        and c.get("scale_agreement_pct") is not None and c["scale_agreement_pct"] <= _CORROBORATED_SCALE_PCT
+        and (c.get("corroborating_edge_count") or 0) >= _CORROBORATED_SCALE_EDGES
+    ]
+    scales = [p["calibration"]["scale_ft_per_px"] for p in strong]
+    if not scales or (max(scales) - min(scales)) / min(scales) > _SHEET_SCALE_TOL:
+        return None  # several strong parcels that disagree: no single sheet scale to trust
+    median = sorted(scales)[len(scales) // 2]
+    return {"scale": median, "count": len(scales), "spread_pct": None, "source": "corroborated parcel scale"}
 
 
 def _rescale_validation(parcel: dict, scale: float, sheet_scale: dict, stated_sqft: float | None = None) -> None:
@@ -1486,6 +1585,67 @@ def reset_position(document_id: str, body: ResetPositionRequest):
             placement["notes"] = [n for n in placement.get("notes", []) if not n.startswith("moved by hand")]
         _save_result(document_id, result)
         return {"document_id": document_id, "parcels": parcels}
+
+
+class StatedAreaRequest(BaseModel):
+    page_number: int
+    entity_id: str
+    stated_area: str  # as printed, e.g. "1.55± AC." or "67,400 SQ. FT."; empty clears it
+
+
+_AREA_TOLERANCE = 0.15  # as spatial_validation's area check
+
+
+def _recheck_stated_area(sv: dict, stated_sqft: float | None) -> None:
+    """The area check of a parcel's validation against a corrected printed area (its walked area stays)."""
+
+    sv["stated_area_sqft"] = stated_sqft
+    sv["issues"] = [i for i in sv.get("issues", []) if not i.startswith("Walked area")]
+    area = sv.get("area_sqft")
+    if stated_sqft and area is not None:
+        diff = abs(area - stated_sqft) / stated_sqft
+        sv["area_diff_pct"] = round(diff * 100, 2)
+        sv["area_matches_stated"] = diff <= _AREA_TOLERANCE
+        if diff > _AREA_TOLERANCE:
+            sv["issues"].append(
+                f"Walked area ({area:,.0f} sqft) differs from the document's stated area ({stated_sqft:,.0f} sqft) "
+                f"by {diff:.0%} -- beyond the {_AREA_TOLERANCE:.0%} tolerance."
+            )
+    else:
+        sv["area_diff_pct"] = None
+        sv["area_matches_stated"] = None
+    sv["valid"] = not sv["issues"] and not sv.get("self_intersects")
+
+
+@router.put("/{document_id}/stated-area")
+def set_stated_area(document_id: str, body: StatedAreaRequest):
+    """
+    Corrects a parcel's printed area where it was misread (a blurred label on a scan). Updates the sheet
+    entity and every parcel bound to it, and re-runs their area check at their current scale; the reading
+    as first extracted is kept as `stated_area_as_read`. Re-confirming the boundary recalibrates with it.
+    """
+
+    text = body.stated_area.strip()
+    acres = parcel_roster.parse_acres(text) if text else None
+    if text and not acres:
+        raise HTTPException(status_code=400, detail="Area not understood -- e.g. '1.55 AC' or '67,400 SQ. FT.'")
+    with _RESULT_LOCK:
+        result = _load_result(document_id)
+        page = next((p for p in result["pages"] if p["page_number"] == body.page_number), None)
+        entity = next((e for e in ((page or {}).get("sheet") or {}).get("parcels", []) if e.get("id") == body.entity_id), None)
+        if entity is None:
+            raise HTTPException(status_code=404, detail="Parcel not found on this sheet")
+        entity.setdefault("stated_area_as_read", entity.get("stated_area"))
+        entity["stated_area"] = text or None
+        entity["stated_area_sqft"] = acres * 43560 if acres else None
+        entity["stated_area_edited"] = True
+        bound = [p for r in page.get("regions", []) for p in r.get("parcels") or [] if p.get("roster_id") == body.entity_id]
+        for parcel in bound:
+            parcel.setdefault("vision_geometry", {})["stated_area_acres"] = str(acres) if acres else None
+            if parcel.get("spatial_validation"):
+                _recheck_stated_area(parcel["spatial_validation"], entity["stated_area_sqft"])
+        _save_result(document_id, result)
+        return {"document_id": document_id, "entity": entity, "parcels": bound}
 
 
 def _control_fit_members(region: dict) -> list[dict] | None:

@@ -101,3 +101,13 @@ def test_surveyed_coordinates_try_parcel_corner_pairs_first():
         ground_to_grid=1 / 1.000197939,
     )
     assert abs(lat - 39.4362) < 0.002 and abs(lon + 119.7724) < 0.002
+
+
+def test_factor_whose_tail_ocr_lost_still_counts_as_printed():
+    # real Washoe sheet: OCR read "CRD TO FACTOR OF1.0001973WASSTOCOVT" for 1.000197938 -- dropping the
+    # factor placed the whole sheet ~900 m north (ground coordinates used as grid)
+    assert le._printed_factor(1.000197938, "CRD TO FACTOR OF1.0001973WASSTOCOVT")
+    assert le._printed_factor(1.000197938, "FACTOR OF 1.OOO197938")
+    assert not le._printed_factor(1.000197938, "FACTOR OF 1.000231")  # a different factor
+    assert not le._printed_factor(1.000197938, "1.0001 MILES")  # too few digits to say it is the same number
+    assert not le._printed_factor(1.000197938, "S 89 10 E 116.59 102.02")

@@ -344,30 +344,46 @@ def placement_by_apn(group_rings: list[list[tuple[float, float]]], site: dict) -
             gap = float(np.minimum(d, _GAP_CAP_M).mean())
             return overlap * _OVERLAP_WEIGHT + gap, overlap, gap
 
-        best = (math.inf, 0.0, 0.0, 0.0, 0.0)  # (score, dx, dy, overlap, gap)
-        coarse: dict[tuple[float, float], float] = {}
-        for step, radius, centre in ((_COARSE_STEP_M, _SEARCH_M, (0.0, 0.0)), (1.0, 6.0, None), (0.25, 1.0, None)):
-            cx, cy = centre if centre is not None else (best[1], best[2])
+        # Coarse pass on a raster, every shift at once (the same score as `score`, to within a cell): the
+        # overlap is one FFT cross-correlation of the group with the neighbours, the gap a lookup into the
+        # distance transform of the neighbours' edges. Scoring 10k positions polygon by polygon took a minute.
+        coarse = _raster_coarse_scores(geom, nb, boundary, samples)
+        dx, dy = min(coarse, key=coarse.get)
+        sc, ov, gap = score(dx, dy)
+        return (sc, dx, dy, ov, gap), coarse, score, samples
+
+    def refine(best, score, samples):
+        for step, radius in ((1.0, 6.0), (0.25, 1.0)):
+            cx, cy = best[1], best[2]
             n = int(radius / step)
             for i in range(-n, n + 1):
                 for j in range(-n, n + 1):
                     dx, dy = cx + i * step, cy + j * step
                     sc, ov, gap = score(dx, dy)
-                    if centre is not None:
-                        coarse[(dx, dy)] = sc
                     if sc < best[0]:
                         best = (sc, dx, dy, ov, gap)
         d = shapely.distance(boundary, shapely.points(samples + (best[1], best[2])))
-        return best, coarse, float((d <= _HUG_M).mean())
+        return best, float((d <= _HUG_M).mean())
 
     # Rotation: the placement's own (the drawing's calibrated orientation), plus the turns that line the
     # group's dominant edge direction up with the neighbours' -- a wrongly calibrated rotation (one misread
     # bearing) is corrected by the land around it, and the 180-degree walk-direction ambiguity too.
     rotations = _rotation_candidates(group, nb)
-    results = []
+    rough = []
     for theta in rotations:
         geom = rotate(group, -theta, origin=pivot) if theta else group  # shapely: +angle is counter-clockwise
-        best, coarse, hugging = search(geom)
+        rough.append((theta, *search(geom)))
+    # Exact refinement only where it can decide something: the two best rotations, the calibrated one (it
+    # wins near-ties), and any rotation close enough to matter for the uniqueness / rotation margins. The
+    # rest score far worse than the leaders even after the most a 5 m grid can overstate a score.
+    lead = sorted(range(len(rough)), key=lambda k: rough[k][1][0])
+    cutoff = rough[lead[0]][1][0] + _UNIQUE_MARGIN + _COARSE_SLACK
+    results = []
+    for k, (theta, best, coarse, score, samples) in enumerate(rough):
+        if k == 0 or k in lead[:2] or best[0] <= cutoff:
+            best, hugging = refine(best, score, samples)
+        else:
+            hugging = 0.0  # never the winner
         results.append((theta, best, coarse, hugging))
     winner = min(results, key=lambda r: r[1][0])
     keep = results[0]  # rotation 0: the drawing's own calibrated orientation wins a near-tie
@@ -416,6 +432,9 @@ def placement_by_apn(group_rings: list[list[tuple[float, float]]], site: dict) -
 
 
 _ROTATION_TIE = 0.5
+_COARSE_SLACK = 1.5  # how much worse a 5 m grid point can score than the refined position near it
+_RASTER_M = 0.5  # cell size of the coarse search raster
+_RASTER_MAX_CELLS = 3000
 _IMPROVE_MIN_HUGGING = 0.3
 _IMPROVE_ROTATION_MARGIN = 0.75
 _DISTINCT_FOOTPRINT = 0.1
@@ -460,6 +479,62 @@ def _rotation_candidates(group, neighbours) -> list[float]:
         if all(abs(_angle_diff(t, u)) >= 1.0 for u in uniq):
             uniq.append(t)
     return uniq
+
+
+def _raster_coarse_scores(geom, nb, boundary, samples) -> dict[tuple[float, float], float]:
+    """placement_by_apn's score (overlap * weight + capped mean gap) at every coarse-grid shift within
+    _SEARCH_M, computed on a _RASTER_M raster: {(dx, dy): score}."""
+
+    import cv2
+    import numpy as np
+
+    gx0, gy0, gx1, gy1 = geom.bounds
+    pad = _SEARCH_M + _GAP_CAP_M + 5
+    # a large tract gets coarser cells: the raster stays at most ~_RASTER_MAX_CELLS a side (memory, time)
+    r = max(_RASTER_M, (max(gx1 - gx0, gy1 - gy0) + 2 * pad) / _RASTER_MAX_CELLS)
+    gx0, gy0 = math.floor(gx0 / r) * r, math.floor(gy0 / r) * r
+    x0, y0 = gx0 - pad, gy0 - pad
+    w = int(math.ceil((gx1 - gx0 + 2 * pad) / r)) + 2
+    h = int(math.ceil((gy1 - gy0 + 2 * pad) / r)) + 2
+
+    def cells(coords, ox, oy):  # cv2 fixed point, 2 fractional bits
+        return np.round(np.array([((x - ox) / r, (y - oy) / r) for x, y in coords]) * 4).astype(np.int32)
+
+    def fill(mask, g, ox, oy):
+        for p in getattr(g, "geoms", [g]):
+            if p.geom_type != "Polygon" or p.is_empty:
+                continue
+            cv2.fillPoly(mask, [cells(p.exterior.coords, ox, oy)], 1, shift=2)
+            for hole in p.interiors:
+                cv2.fillPoly(mask, [cells(hole.coords, ox, oy)], 0, shift=2)
+
+    neighbours = np.zeros((h, w), np.uint8)
+    fill(neighbours, nb, x0, y0)
+    gw, gh = int(math.ceil((gx1 - gx0) / r)) + 2, int(math.ceil((gy1 - gy0) / r)) + 2
+    mask = np.zeros((gh, gw), np.uint8)
+    fill(mask, geom, gx0, gy0)
+    # overlap[a, b] = sum(mask[u, v] * neighbours[a + u, b + v]) -- cross-correlation (float32, DFT inside)
+    overlap = cv2.matchTemplate(neighbours.astype(np.float32), mask.astype(np.float32), cv2.TM_CCORR)
+    overlap *= r * r / geom.area
+
+    edges = np.full((h, w), 255, np.uint8)
+    for line in getattr(boundary, "geoms", [boundary]):
+        cv2.polylines(edges, [cells(line.coords, x0, y0)], False, 0, 1, shift=2)
+    gap_field = np.minimum(cv2.distanceTransform(edges, cv2.DIST_L2, 5) * r, _GAP_CAP_M)
+
+    oc, orow = int(round((gx0 - x0) / r)), int(round((gy0 - y0) / r))  # the group raster's origin
+    s_cols, s_rows = (samples[:, 0] - x0) / r, (samples[:, 1] - y0) / r
+    n, step = int(_SEARCH_M / _COARSE_STEP_M), _COARSE_STEP_M / r
+    out: dict[tuple[float, float], float] = {}
+    for i in range(-n, n + 1):
+        ci = int(round(i * step))
+        cols = np.clip(np.round(s_cols + ci).astype(int), 0, w - 1)
+        for j in range(-n, n + 1):
+            cj = int(round(j * step))
+            rows = np.clip(np.round(s_rows + cj).astype(int), 0, h - 1)
+            gap = float(gap_field[rows, cols].mean())
+            out[(i * _COARSE_STEP_M, j * _COARSE_STEP_M)] = float(overlap[orow + cj, oc + ci]) * _OVERLAP_WEIGHT + gap
+    return out
 
 
 def _translate(geom, dx: float, dy: float):

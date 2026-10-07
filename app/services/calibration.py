@@ -40,6 +40,8 @@ _EDGE_ASSOC_MAX_ORIENT_DIFF_DEG = 15
 _EDGE_MATCH_TOLERANCE_PCT = 3.0
 _SCALE_AGREEMENT_TOLERANCE_PCT = 5.0
 _ROTATION_AGREEMENT_TOLERANCE_DEG = 5.0
+# A rotation resting on ONE bearing edge is applied only this close to the drawing's own orientation.
+_SINGLE_SOURCE_MAX_TURN_DEG = 10.0
 # Tolerance for the quadrant-letter disambiguation fallback. Tighter than
 # the plain 5deg check on purpose: trying both quadrant options for every
 # bearing roughly doubles the chance that two UNRELATED bearings agree by
@@ -539,6 +541,22 @@ def calibrate(
         f"{len(independent_bearing_edges)} edge(s) with an independently read agreeing bearing: {independent_bearing_edges}"
         + (f"; quadrant-resolved (supporting only, not independent): {quadrant_resolved_edges}" if quadrant_resolved_edges else "")
     )
+    if status == "single_source" and _circular_diff(rotation_deg, 0.0, period=360) > _SINGLE_SOURCE_MAX_TURN_DEG:
+        # One matched bearing turning the whole sheet far off the drawing's orientation is wrong more often
+        # than right (a misassociated label on a short edge: 3 of 4 checked cases, each undone later by the
+        # county-parcel fit). Keep the scale, leave the drawing north-up, and let the county-parcel or
+        # printed-coordinate fit -- which find rotation for themselves -- turn it when the land says so.
+        notes.append(
+            f"one bearing edge implies a {rotation_deg:.1f}deg turn of the sheet -- too weak to turn it that far "
+            "on its own; rotation left unverified."
+        )
+        return CalibrationResult(
+            status="unverified", scale_ft_per_px=chosen_scale, rotation_deg=None,
+            scale_from_area=scale_from_area, scale_from_edges=scale_from_edges,
+            scale_agreement_pct=scale_agreement_pct, corroborating_edge_count=len(corroborating_edges),
+            notes=notes, corroborations=corroborations,
+            rotation_ambiguous_candidates_deg=[round(rotation_deg, 3)],
+        )
     if status == "single_source" and len(corroborating_edges) >= 2:
         notes.append(
             "scale is corroborated by 2+ edges, but rotation rests on fewer than 2 independently read "

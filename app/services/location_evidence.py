@@ -115,8 +115,21 @@ def _printed_factor(factor: float, text: str) -> bool:
     """A factor like 1.000197939 is printed (OCR may read its zeros as O)."""
 
     digits = f"{factor:.9f}".rstrip("0")
-    fixed = re.sub(r"(?<=[\d.])[Oo]|[Oo](?=[\d.])", "0", text)
-    return re.search(rf"(?<!\d){re.escape(digits)}", fixed) is not None
+    fixed, previous = text, None
+    while fixed != previous:  # repeated: "1.OOO19" has O's whose neighbours are only O's until the first pass
+        previous, fixed = fixed, re.sub(r"(?<=[\d.])[Oo]|[Oo](?=[\d.])", "0", fixed)
+    if re.search(rf"(?<!\d){re.escape(digits)}", fixed):
+        return True
+    # OCR garbles the factor's tail ("1.0001973WASSTOCOVT" for 1.000197938 -- a digit dropped): a printed number
+    # agreeing with it through the first three significant decimals is the same factor (to ~1e-6; the value
+    # used is the full one the evidence pass read).
+    def lead(s: str) -> str | None:
+        whole, _, frac = s.partition(".")
+        zeros = len(frac) - len(frac.lstrip("0"))
+        return f"{whole}.{frac[:zeros + 3]}" if len(frac) - zeros >= 3 else None
+
+    want = lead(digits)
+    return want is not None and any(lead(m.group(1)) == want for m in re.finditer(r"(?<!\d)(\d\.\d+)", fixed))
 
 
 def _printed_apn(apn: str, text: str) -> bool:

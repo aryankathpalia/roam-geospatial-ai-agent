@@ -282,6 +282,52 @@
 
   let deleteError = '';
 
+  // Correcting a misread printed area (a blurred label): saved on the sheet entity, rechecked server-side.
+  let editingArea = false;
+  let areaDraft = '';
+  let areaError = '';
+  let areaSaving = false;
+  $: selectedEntity = selected?.parcelId
+    ? (result?.pages ?? []).find((p: any) => p.page_number === selected?.pageNumber)?.sheet?.parcels?.find(
+        (e: any) => e.id === selected?.parcelId
+      ) ?? null
+    : null;
+  $: if (selected?.key !== areaEditKey) {
+    editingArea = false;
+    areaError = '';
+    areaEditKey = selected?.key ?? null;
+  }
+  let areaEditKey: string | null = null;
+
+  function startAreaEdit() {
+    areaDraft = selectedEntity?.stated_area ?? '';
+    areaError = '';
+    editingArea = true;
+  }
+
+  async function saveStatedArea() {
+    if (!selected?.parcelId) return;
+    areaSaving = true;
+    areaError = '';
+    try {
+      const res = await fetch(`${API_BASE}/documents/${documentId.trim()}/stated-area`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ page_number: selected.pageNumber, entity_id: selected.parcelId, stated_area: areaDraft })
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.detail ?? `${res.status} ${res.statusText}`);
+      }
+      editingArea = false;
+      await refreshDocument();
+    } catch (err) {
+      areaError = err instanceof Error ? err.message : 'Could not save the area.';
+    } finally {
+      areaSaving = false;
+    }
+  }
+
   // Removes a spurious, never-confirmed sheet entity (a scattered extraction
   // fragment, a duplicate from another sheet, or anything else the
   // excluded_reason heuristic didn't catch). The backend refuses this for a
@@ -1367,7 +1413,29 @@
             </div>
             <h2 class="sel-name">{selected.kind === 'manual_new' ? manualName || 'New parcel' : selected.label}</h2>
             <div class="stats">
-              {#if selected.meta}
+              {#if selectedEntity}
+                <div class="stat">
+                  <span>Stated area{#if selectedEntity.stated_area_edited} <em class="edited">corrected</em>{/if}</span>
+                  {#if editingArea}
+                    <form class="area-edit" on:submit|preventDefault={saveStatedArea}>
+                      <!-- svelte-ignore a11y-autofocus -->
+                      <input bind:value={areaDraft} placeholder="e.g. 1.55 AC or 67,400 SQ. FT." autofocus />
+                      <div class="area-actions">
+                        <button type="submit" class="mini primary" disabled={areaSaving}>{areaSaving ? 'Saving…' : 'Save'}</button>
+                        <button type="button" class="mini" on:click={() => (editingArea = false)}>Cancel</button>
+                      </div>
+                      <small>As printed on the sheet. Re-confirm the boundary afterwards to recalibrate with it.</small>
+                    </form>
+                  {:else}
+                    <b>{selectedEntity.stated_area || '—'}</b>
+                    {#if selectedEntity.stated_area_edited && selectedEntity.stated_area_as_read}
+                      <small>read as {selectedEntity.stated_area_as_read}</small>
+                    {/if}
+                    <button type="button" class="link-btn" on:click={startAreaEdit}>Wrong? Edit</button>
+                  {/if}
+                  {#if areaError}<small class="err">{areaError}</small>{/if}
+                </div>
+              {:else if selected.meta}
                 <div class="stat"><span>Stated area</span><b>{selected.meta}</b></div>
               {/if}
               {#if selected.parcel?.spatial_validation?.area_sqft}
@@ -1917,6 +1985,57 @@
   .sel-name {
     margin: 4px 0 10px;
     font-size: 18px;
+  }
+  .area-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .area-edit input {
+    font: inherit;
+    padding: 6px 8px;
+    border: 1px solid var(--border, #d6d3cc);
+    border-radius: 6px;
+    background: var(--surface, #fff);
+    color: inherit;
+  }
+  .area-actions {
+    display: flex;
+    gap: 6px;
+  }
+  .mini {
+    font: inherit;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border, #d6d3cc);
+    background: var(--surface, #fff);
+    color: inherit;
+    cursor: pointer;
+  }
+  .mini.primary {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+  }
+  .link-btn {
+    align-self: flex-start;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #2563eb;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .edited {
+    font-style: normal;
+    font-size: 11px;
+    color: #b45309;
+  }
+  .stat .err {
+    color: #b91c1c;
   }
   .stats {
     display: flex;

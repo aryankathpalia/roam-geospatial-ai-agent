@@ -231,17 +231,37 @@
   // but never actually reached the screen. renderMap skips drawing a
   // polygon for these (there's nothing to draw) but they still appear
   // as cards with their reason shown.
+  // When the document has parcel-map SHEETS with parcels (the roster the boundary editor offers), only the
+  // extracted parcels bound to one of those sheet entries are real, listable parcels. The rest is evidence:
+  // an extraction fragment flagged under-evidenced, or a metes-and-bounds legal description read from a text
+  // page. A document that is only a legal description (no drawing, so no sheet entries) keeps listing
+  // whatever was extracted.
+  $: sheetBound = (() => {
+    const bound = new Set<string>();
+    let anySheet = false;
+    for (const p of result?.pages ?? []) {
+      for (const e of p.sheet?.parcels ?? []) {
+        anySheet = true;
+        if (e.excluded_reason || !e.evidence_ref) continue;
+        bound.add(`${p.page_number}-${e.evidence_ref.region}-${e.evidence_ref.parcel}`);
+      }
+    }
+    return anySheet ? bound : null;
+  })();
+
   $: allParcelRegions = result
     ? (result.pages ?? []).flatMap((p: any) =>
         (p.regions ?? []).flatMap((region: any, regionIndex: number) =>
-          (region.parcels ?? []).map((parcel: any, parcelIndex: number) => ({
-            page: p.page_number,
-            regionIndex,
-            parcelIndex,
-            i: `${regionIndex}-${parcelIndex}`,
-            category: region.category ?? null,
-            parcel
-          }))
+          (region.parcels ?? [])
+            .map((parcel: any, parcelIndex: number) => ({
+              page: p.page_number,
+              regionIndex,
+              parcelIndex,
+              i: `${regionIndex}-${parcelIndex}`,
+              category: region.category ?? null,
+              parcel
+            }))
+            .filter((e: any) => !sheetBound || sheetBound.has(`${e.page}-${e.regionIndex}-${e.parcelIndex}`))
         )
       )
     : [];
@@ -865,6 +885,10 @@
       return { cls: 'busy', label: 'Calibrating & placing…', busy: true };
     }
     if (!parcel.spatial_validation) return { cls: 'moderate', label: 'Outline saved · not placed on the map' };
+    // The reviewer put it where it belongs: the computed placement's confidence no longer describes it.
+    if (parcel.manual_position || parcel.anchor_override) {
+      return shapeOk ? { cls: 'moderate', label: 'Placed by hand' } : { cls: 'high', label: 'Placed by hand · check area' };
+    }
     if (gate === 'unconfirmed') {
       return {
         cls: 'unconfirmed',

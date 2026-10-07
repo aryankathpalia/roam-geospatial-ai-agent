@@ -451,3 +451,81 @@ def test_a_dead_reading_marker_is_cleared_when_there_is_nothing_to_read(tmp_path
     monkeypatch.setattr(docs, "DOCUMENT_ROOT", tmp_path)
     docs._ensure_control_points(doc, 13)
     assert "control_points" not in json.loads((tmp_path / doc / "result.json").read_text())["pages"][0]
+
+
+def _pending_result():
+    return {
+        "processing": {"complete": True},
+        "pages": [{"page_number": 11, "regions": [{"parcels": [{
+            "human_confirmed": True,
+            "placement": {"status": "pending"}, "calibration": {"status": "pending"},
+            "confirmed_boundary_pixels": {"id": "old-id"},
+        }]}], "sheet": {"parcels": [{
+            "id": "p11-1", "confirmed_polygon": {"vertices": [[0, 0], [1, 0], [1, 1]]},
+            "evidence_ref": {"region": 0, "parcel": 0},
+        }]}}],
+    }
+
+
+def test_orphaned_pending_verification_is_requeued_once(monkeypatch):
+    from app.routes import documents as docs
+
+    calls = []
+
+    def fake_bind(document_id, result, page_number, entity):
+        calls.append(entity["id"])
+        # like the real binder: the parcel now carries the NEW confirmation id
+        result["pages"][0]["regions"][0]["parcels"][0]["confirmed_boundary_pixels"] = {"id": "new-id"}
+        return ("BODY", "new-id")
+
+    monkeypatch.setattr(docs, "_bind_entity", fake_bind)
+    docs._VERIFYING.clear()
+    res = _pending_result()
+    assert docs._requeue_orphaned_verifications("doc", res) == [("BODY", "new-id")] and calls == ["p11-1"]
+    # registered as running: the next poll, before the task has started, must not queue it again
+    assert docs._requeue_orphaned_verifications("doc", res) == [] and calls == ["p11-1"]
+    docs._VERIFYING.clear()
+
+
+def test_running_or_finished_verifications_are_left_alone(monkeypatch):
+    import time
+    from app.routes import documents as docs
+
+    monkeypatch.setattr(docs, "_bind_entity", lambda *a: ("BODY", "x"))
+    docs._VERIFYING.clear()
+    docs._VERIFYING["old-id"] = time.time()  # this confirmation's verification is running
+    assert docs._requeue_orphaned_verifications("doc", _pending_result()) == []
+    docs._VERIFYING["old-id"] = time.time() - 10_000  # ... but a stale registration is not trusted
+    assert len(docs._requeue_orphaned_verifications("doc", _pending_result())) == 1
+    done = _pending_result()
+    parcel = done["pages"][0]["regions"][0]["parcels"][0]
+    parcel["placement"] = {"status": "approximate"}
+    parcel["calibration"] = {"status": "single_source"}
+    docs._VERIFYING.clear()
+    assert docs._requeue_orphaned_verifications("doc", done) == []
+    assert docs._requeue_orphaned_verifications("doc", {"processing": {"complete": False}, "pages": []}) == []
+
+
+def test_correcting_a_misread_stated_area_rechecks_the_bound_parcels(monkeypatch):
+    # A blurred label read as "13921 SQ. FT." against a 1.55 ac outline: the reviewer types the right area.
+    result = {"pages": [{"page_number": 26, "sheet": {"parcels": [
+        {"id": "p26-1", "label": "PARCEL 1", "stated_area": "13921 SQ. FT.", "stated_area_sqft": 13921.0},
+    ]}, "regions": [{"parcels": [{
+        "roster_id": "p26-1", "vision_geometry": {"stated_area_acres": "0.3196"},
+        "spatial_validation": {"area_sqft": 67400.0, "stated_area_sqft": 13921.0, "self_intersects": False, "valid": False,
+                               "issues": ["Walked area (67,400 sqft) differs from the document's stated area (13,921 sqft) by 384%"]},
+    }]}]}]}
+    saved = []
+    monkeypatch.setattr(docs, "_load_result", lambda _id: result)
+    monkeypatch.setattr(docs, "_save_result", lambda _id, r: saved.append(r))
+    out = docs.set_stated_area("doc", docs.StatedAreaRequest(page_number=26, entity_id="p26-1", stated_area="1.55± AC."))
+    entity, sv = out["entity"], result["pages"][0]["regions"][0]["parcels"][0]["spatial_validation"]
+    assert entity["stated_area"] == "1.55± AC." and entity["stated_area_as_read"] == "13921 SQ. FT." and entity["stated_area_edited"]
+    assert abs(entity["stated_area_sqft"] - 1.55 * 43560) < 1
+    assert sv["valid"] and sv["area_matches_stated"] and sv["issues"] == [] and saved
+    # a second correction keeps the ORIGINAL reading, and an unreadable entry is refused
+    docs.set_stated_area("doc", docs.StatedAreaRequest(page_number=26, entity_id="p26-1", stated_area="1.5 AC"))
+    assert entity["stated_area_as_read"] == "13921 SQ. FT."
+    import pytest
+    with pytest.raises(docs.HTTPException):
+        docs.set_stated_area("doc", docs.StatedAreaRequest(page_number=26, entity_id="p26-1", stated_area="about one"))

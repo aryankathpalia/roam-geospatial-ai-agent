@@ -112,7 +112,9 @@ export function sheetOf(page: any): SheetInfo | null {
   }
   const maps = regions
     .map((r, i) => ({ r, i, area: (r.bbox?.[2] ?? 0) * (r.bbox?.[3] ?? 0) }))
-    .filter(({ r }) => r.class === 'ParcelMap' || (r.parcels ?? []).length);
+    // Only DRAWINGS make a sheet. A text region can hold parcels too -- a legal description's metes and
+    // bounds read as a traverse -- but that is evidence (calls), with nothing on the page to outline.
+    .filter(({ r }) => r.class === 'ParcelMap');
   if (!maps.length) return null;
   const main = maps.reduce((best, m) => (m.area > best.area ? m : best));
   const drawings = maps.filter((m) => m.i === main.i || m.area >= SHEET_INSET_AREA_FRACTION * main.area).map((m) => m.i);

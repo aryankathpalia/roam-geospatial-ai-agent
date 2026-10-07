@@ -52,10 +52,9 @@ def test_two_independent_bearings_cross_validated():
 
 def test_quadrant_resolved_plus_one_independent_is_single_source():
     res = _calibrate([_true(3), _misread(6)])
-    assert _rot_ok(res)
-    assert res.quadrant_resolved_edges == [6] and res.independent_bearing_edges == [3]
-    # two edges corroborate scale, but only one bearing was independently read
-    assert res.corroborating_edge_count == 2 and res.status == "single_source"
+    # two edges corroborate scale, but only one bearing was independently read: single source -- and
+    # LOT 48 sits ~25deg off north-up, too far for one bearing to turn the sheet (see the next test)
+    assert res.corroborating_edge_count == 2 and _single_source_turn_held_back(res)
 
 
 def test_quadrant_resolved_plus_two_independent_cross_validated():
@@ -66,8 +65,27 @@ def test_quadrant_resolved_plus_two_independent_cross_validated():
 
 def test_distance_only_edge_does_not_establish_rotation():
     res = _calibrate([_true(3), _distance_only(2)])
-    assert res.corroborating_edge_count == 2 and _rot_ok(res)
-    assert res.independent_bearing_edges == [3] and res.status == "single_source"
+    assert res.corroborating_edge_count == 2 and _single_source_turn_held_back(res)
+
+
+def _single_source_turn_held_back(res):
+    """One bearing implying a large turn is not applied, but is kept as a candidate for the printed-
+    coordinate fit (which confirms the real LOT 48 at this rotation)."""
+    cands = res.rotation_ambiguous_candidates_deg
+    return (res.status == "unverified" and res.rotation_deg is None and res.scale_ft_per_px == SCALE
+            and len(cands) == 1 and calibration._circular_diff(cands[0], ROT) < 0.5)
+
+
+def test_single_bearing_near_north_up_is_applied():
+    # the same evidence on a sheet drawn (almost) north-up: one bearing may make the small turn
+    near = 3.0
+    global ROT
+    saved, ROT = ROT, near
+    try:
+        res = _calibrate([_true(3), _distance_only(2)])
+        assert res.status == "single_source" and _rot_ok(res)
+    finally:
+        ROT = saved
 
 
 def test_conflicting_reading_on_one_edge_blocks_everything():
