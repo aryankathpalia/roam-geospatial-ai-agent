@@ -2,6 +2,7 @@
   import { onDestroy, onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { boundaryRefs, primaryCandidates } from '$lib/boundaryCandidates';
+  import AgentChat from '$lib/AgentChat.svelte';
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
   const LAST_DOCUMENT_KEY = 'roam:lastDocumentId';
@@ -444,6 +445,61 @@
       lastFitBounds = null;
       map.setView([20, 0], 2);
     }
+    drawAgentPreview();
+  }
+
+  // ---- AI placement review ---------------------------------------------------------------------
+  // The chat panel (lib/AgentChat.svelte) proposes fixes; a proposed move is previewed here as a dashed
+  // outline of the sheet's parcels at the proposed spot, and applying one reloads the document.
+  let agentOpen = false;
+  let agentFocus: { page: number; label: string | null } | null = null;
+  let agentPreview: any = null;
+  let previewLayer: any = null;
+
+  function openAgent(entry: any | null) {
+    agentFocus = entry ? { page: entry.page, label: entry.parcel?.vision_geometry?.parcel_label ?? null } : null;
+    agentOpen = true;
+    setTimeout(() => document.querySelector('.agent')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  }
+  function closeAgent() {
+    agentOpen = false;
+    setAgentPreview(null);
+  }
+  function setAgentPreview(p: any) {
+    agentPreview = p;
+    drawAgentPreview(true);
+  }
+  function drawAgentPreview(fit = false) {
+    if (previewLayer) {
+      previewLayer.remove();
+      previewLayer = null;
+    }
+    if (!map || !L || !agentPreview || agentPreview.kind !== 'move') return;
+    const shift = (coords: any[]) =>
+      coords.map(([lng, lat]: number[]) => [
+        lng + agentPreview.east_m / mPerDegLng(lat), lat + agentPreview.north_m / M_PER_DEG_LAT
+      ]);
+    previewLayer = L.layerGroup().addTo(map);
+    for (const e of parcelRegions) {
+      if (e.page !== agentPreview.page_number || !e.parcel.human_confirmed || !e.parcel.boundary_geojson_wgs84) continue;
+      const g = e.parcel.boundary_geojson_wgs84.geometry;
+      const moved = { ...e.parcel.boundary_geojson_wgs84, geometry: { ...g, coordinates: g.coordinates.map(shift) } };
+      L.geoJSON(moved, {
+        interactive: false,
+        style: { color: '#4f46e5', weight: 3, dashArray: '8 6', fillColor: '#6366f1', fillOpacity: 0.12 }
+      }).addTo(previewLayer);
+    }
+    if (fit) {
+      // show where it is now AND where it would go
+      let b: any = null;
+      previewLayer.eachLayer((l: any) => (b = b ? b.extend(l.getBounds()) : l.getBounds()));
+      if (b && lastFitBounds) b = b.extend(lastFitBounds);
+      if (b?.isValid()) map.fitBounds(b, { padding: [40, 40], animate: false });
+    }
+  }
+  async function onAgentApplied() {
+    setAgentPreview(null);
+    await refreshPending();
   }
 
   // ---- drag-to-move ----------------------------------------------------------------------------
@@ -1604,6 +1660,27 @@
             </div>
           {/if}
 
+          {#if documentId && !usingSample}
+            {#if agentOpen}
+              {#key `${documentId}`}
+                <AgentChat
+                  apiBase={API_BASE}
+                  {documentId}
+                  focus={agentFocus}
+                  previewId={agentPreview?.id ?? null}
+                  on:preview={(e) => setAgentPreview(e.detail)}
+                  on:applied={onAgentApplied}
+                  on:close={closeAgent}
+                />
+              {/key}
+            {:else}
+              <button class="ask-ai panel" on:click={() => openAgent(null)}>
+                <span class="ask-ai-icon" aria-hidden="true">✦</span>
+                <span><strong>Ask AI</strong> — something placed wrong? Describe it and the AI checks the evidence</span>
+              </button>
+            {/if}
+          {/if}
+
           <div class="palette panel move-panel">
             <label class="move-toggle">
               <input type="checkbox" bind:checked={moveMode} />
@@ -1754,6 +1831,9 @@
                       <button class="btn btn-ghost btn-sm" title="Put it back where the app computed it" on:click={() => resetPosition(entry)}>
                         Reset position
                       </button>
+                    {/if}
+                    {#if parcel.human_confirmed && parcel.boundary_geojson_wgs84 && !usingSample}
+                      <button class="btn btn-ghost btn-sm ask-ai-btn" on:click={() => openAgent(entry)}>✦ Ask AI</button>
                     {/if}
                     <a class="btn btn-ghost btn-sm" href={boundaryReviewHref(parcel.roster_id ? `${entry.page}-${parcel.roster_id}` : `${entry.page}-${entry.i}`)}>
                       {parcel.human_confirmed ? 'Re-confirm boundary' : 'Confirm boundary'}
@@ -2694,5 +2774,30 @@ h1 {
   .results-summary {
     grid-template-columns: 1fr;
   }
+}
+
+.ask-ai {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  font-size: 13px;
+  padding: 12px 14px;
+  border: 1px solid #c7d2fe;
+  background: #f5f7ff;
+  color: #312e81;
+  cursor: pointer;
+}
+.ask-ai:hover {
+  background: #eef2ff;
+}
+.ask-ai-icon {
+  font-size: 16px;
+  color: #4f46e5;
+}
+.ask-ai-btn {
+  color: #4f46e5;
 }
 </style>

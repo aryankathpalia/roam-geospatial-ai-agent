@@ -1648,6 +1648,98 @@ def set_stated_area(document_id: str, body: StatedAreaRequest):
         return {"document_id": document_id, "entity": entity, "parcels": bound}
 
 
+class AgentChatRequest(BaseModel):
+    message: str
+    history: list[dict] = []  # earlier visible turns: [{"role": "user"|"assistant", "content": str}]
+    page_number: int | None = None
+    label: str | None = None
+
+
+@router.post("/{document_id}/agent/chat")
+def agent_chat(document_id: str, body: AgentChatRequest):
+    """
+    One turn with the placement-review agent (services/placement_agent.py). It reads a snapshot of the
+    result -- no lock is held while it works (tens of seconds) -- and may return proposals, which are stored
+    as pending on the result; nothing else changes until the user applies one.
+    """
+
+    from app.services import placement_agent
+
+    if not body.message.strip():
+        raise HTTPException(status_code=400, detail="Empty message")
+    snapshot = _load_result(document_id)
+    focus = {"page_number": body.page_number, "label": body.label} if body.page_number is not None else None
+    try:
+        out = placement_agent.run(snapshot, body.message, body.history, focus)
+    except placement_agent.AgentError as exc:
+        raise HTTPException(status_code=502, detail=f"AI agent unavailable: {exc}")
+    if out["proposals"]:
+        with _RESULT_LOCK:
+            result = _load_result(document_id)
+            result.setdefault("agent_proposals", []).extend(out["proposals"])
+            _save_result(document_id, result)
+    return out
+
+
+def _agent_proposal(result: dict, proposal_id: str) -> dict:
+    proposal = next((p for p in result.get("agent_proposals", []) if p.get("id") == proposal_id), None)
+    if proposal is None:
+        raise HTTPException(status_code=404, detail="Proposal not found")
+    if proposal.get("status") != "pending":
+        raise HTTPException(status_code=409, detail=f"Proposal already {proposal.get('status')}")
+    return proposal
+
+
+@router.post("/{document_id}/agent/proposals/{proposal_id}/apply")
+def apply_agent_proposal(document_id: str, proposal_id: str):
+    """Applies a pending agent proposal through the same paths a user's own edit takes: a move is a hand move
+    of the sheet's confirmed parcels (Reset position undoes it), an area is a stated-area correction."""
+
+    with _RESULT_LOCK:
+        result = _load_result(document_id)
+        proposal = _agent_proposal(result, proposal_id)
+    if proposal["kind"] == "move":
+        page = next((p for p in result["pages"] if p["page_number"] == proposal["page_number"]), None)
+        if page is None:
+            raise HTTPException(status_code=404, detail="Page not found")
+        for ri, region in enumerate(page.get("regions", [])):
+            idx = [i for i, p in enumerate(region.get("parcels") or [])
+                   if p.get("human_confirmed") and p.get("boundary_geojson_wgs84")]
+            if idx:
+                move_parcels(document_id, MoveParcelsRequest(
+                    page_number=proposal["page_number"], region_index=ri, parcel_indexes=idx,
+                    east_m=proposal["east_m"], north_m=proposal["north_m"],
+                ))
+    elif proposal["kind"] == "stated_area":
+        page = next((p for p in result["pages"] if p["page_number"] == proposal["page_number"]), None)
+        parcel = next((p for r in (page or {}).get("regions", []) for p in r.get("parcels") or []
+                       if ((p.get("vision_geometry") or {}).get("parcel_label") or "").lower() == proposal["label"].lower()
+                       and p.get("roster_id")), None)
+        if parcel is None:
+            raise HTTPException(status_code=404, detail="Parcel not found")
+        set_stated_area(document_id, StatedAreaRequest(
+            page_number=proposal["page_number"], entity_id=parcel["roster_id"], stated_area=proposal["stated_area"],
+        ))
+    else:
+        raise HTTPException(status_code=400, detail="Unknown proposal kind")
+    with _RESULT_LOCK:
+        result = _load_result(document_id)
+        stored = next(p for p in result.get("agent_proposals", []) if p.get("id") == proposal_id)
+        stored.update(status="applied", applied_at=time.time())
+        _save_result(document_id, result)
+    return {"document_id": document_id, "proposal": stored}
+
+
+@router.post("/{document_id}/agent/proposals/{proposal_id}/discard")
+def discard_agent_proposal(document_id: str, proposal_id: str):
+    with _RESULT_LOCK:
+        result = _load_result(document_id)
+        proposal = _agent_proposal(result, proposal_id)
+        proposal.update(status="discarded", discarded_at=time.time())
+        _save_result(document_id, result)
+    return {"document_id": document_id, "proposal": proposal}
+
+
 def _control_fit_members(region: dict) -> list[dict] | None:
     """
     Confirmed parcels of one region the control-point fallback may place, or None when the
