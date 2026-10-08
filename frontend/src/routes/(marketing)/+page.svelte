@@ -1,6 +1,6 @@
 <script lang="ts">
   import AccountButton from '$lib/components/AccountButton.svelte';
-  import HeroAnimation from '$lib/components/HeroAnimation.svelte';
+  import MapCarousel from '$lib/components/MapCarousel.svelte';
   import { user } from '$lib/auth';
   import { onMount } from 'svelte';
 
@@ -131,7 +131,7 @@
   </div>
 
   <div class="hero-side">
-    <HeroAnimation />
+    <MapCarousel />
   </div>
 
   <div class="hero-visual">

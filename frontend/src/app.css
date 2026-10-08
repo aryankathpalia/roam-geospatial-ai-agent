@@ -31,6 +31,12 @@
 	box-sizing: border-box;
 }
 
+html {
+	/* in-page links (Pipeline, Evidence, Technology) stop below the sticky header */
+	scroll-padding-top: 96px;
+	scroll-behavior: smooth;
+}
+
 html,
 body,
 #svelte {
