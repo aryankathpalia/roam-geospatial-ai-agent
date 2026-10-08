@@ -1,6 +1,7 @@
 <script lang="ts">
   import AccountButton from '$lib/components/AccountButton.svelte';
   import MapCarousel from '$lib/components/MapCarousel.svelte';
+  import HeroAnimation from '$lib/components/HeroAnimation.svelte';
   import { user } from '$lib/auth';
   import { onMount } from 'svelte';
 
@@ -131,11 +132,11 @@
   </div>
 
   <div class="hero-side">
-    <MapCarousel />
+    <HeroAnimation />
   </div>
 
   <div class="hero-visual">
-    <img src="/images/hero-survey.jpg" alt="1903 plate map of Portland, Maine, showing colored ward and district boundaries" />
+    <MapCarousel />
   </div>
 </section>
 
@@ -400,19 +401,8 @@ h1 {
 
 .hero-visual {
   grid-column: 1 / -1;
-  border-radius: 16px;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow-float);
 }
 
-.hero-visual img {
-  display: block;
-  width: 100%;
-  height: clamp(280px, 44vw, 460px);
-  object-fit: cover;
-  object-position: 20% 30%;
-}
 
 .story {
   padding: 90px 28px;
