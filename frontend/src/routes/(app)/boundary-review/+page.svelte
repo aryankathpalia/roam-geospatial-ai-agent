@@ -2,6 +2,7 @@
   import { onDestroy, onMount } from 'svelte';
   import { boundaryRefs, groupCandidates, type BoundaryRef } from '$lib/boundaryCandidates';
   import * as curveLib from '$lib/curves';
+  import { currentDocument, isPlayground, setCurrentDocument } from '$lib/currentDocument';
 
   // Boundary confirmation step of the main flow: /workspace links here
   // (?doc=<id>[&parcel=<page-region-parcel>]) after a document is
@@ -129,18 +130,12 @@
     null;
 
   onMount(() => {
+    // ?doc= link, else the document open in this tab (e.g. a sample's playground copy): load it right away
     const params = new URLSearchParams(window.location.search);
-    const docParam = params.get('doc');
-    if (docParam) {
-      documentId = docParam;
+    const id = currentDocument(params.get('doc'));
+    if (id) {
+      documentId = id;
       loadDocument(params.get('parcel'));
-      return;
-    }
-    try {
-      const last = localStorage.getItem(LAST_DOCUMENT_KEY);
-      if (last) documentId = last;
-    } catch {
-      // ignore -- localStorage unavailable, not fatal
     }
   });
 
@@ -157,8 +152,10 @@
       const data = await res.json();
       result = data.result;
       parcelRefs = flattenParcels(result);
+      setCurrentDocument(documentId.trim());
       try {
-        localStorage.setItem(LAST_DOCUMENT_KEY, documentId.trim());
+        // a playground copy expires: never offer it as "last document" in a later session
+        if (!isPlayground(documentId.trim())) localStorage.setItem(LAST_DOCUMENT_KEY, documentId.trim());
       } catch {
         // best-effort only
       }

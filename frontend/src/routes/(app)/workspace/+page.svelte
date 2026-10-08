@@ -5,6 +5,7 @@
   import AgentChat from '$lib/AgentChat.svelte';
   import AccountButton from '$lib/components/AccountButton.svelte';
   import { user } from '$lib/auth';
+  import { setCurrentDocument } from '$lib/currentDocument';
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
   const LAST_DOCUMENT_KEY = 'roam:lastDocumentId';
@@ -80,6 +81,7 @@
       return {};
     }
   }
+  $: if (documentId) setCurrentDocument(documentId);
   $: sandboxOf = documentId ? (playgrounds()[documentId] ?? null) : null;
   $: sandboxSample = sandboxOf ? (samples.find((sm) => sm.id === sandboxOf) ?? null) : null;
 

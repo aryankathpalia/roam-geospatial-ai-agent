@@ -1,3 +1,4 @@
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -18,8 +19,10 @@ class Settings(BaseSettings):
     # Sign-in: the Google OAuth web client id (Google Cloud console -> Credentials), the secret that signs
     # ROAM's own session tokens (generated and kept in data/.session_secret when empty), and the Google
     # accounts that may change the shared sample documents (comma-separated).
-    GOOGLE_CLIENT_ID: str = ""
-    SESSION_SECRET: str = ""
+    # Also read under the Auth.js names (AUTH_GOOGLE_ID / AUTH_SECRET). The client SECRET is not needed: the
+    # browser signs in with Google Identity Services and only its ID token is verified here.
+    GOOGLE_CLIENT_ID: str = Field("", validation_alias=AliasChoices("GOOGLE_CLIENT_ID", "AUTH_GOOGLE_ID"))
+    SESSION_SECRET: str = Field("", validation_alias=AliasChoices("SESSION_SECRET", "AUTH_SECRET"))
     ADMIN_EMAILS: str = ""
     OPENROUTER_API_KEY: str = ""
     OPENROUTER_MODEL: str = "openrouter/free"

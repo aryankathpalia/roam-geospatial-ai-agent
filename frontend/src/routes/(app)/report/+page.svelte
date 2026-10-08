@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { currentDocument } from '$lib/currentDocument';
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
 
@@ -43,7 +44,7 @@
   ];
 
   onMount(() => {
-    documentId = $page.url.searchParams.get('doc') ?? '';
+    documentId = currentDocument($page.url.searchParams.get('doc')) ?? '';
     try {
       editor = localStorage.getItem('roam-report-editor') ?? '';
     } catch {
