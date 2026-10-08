@@ -156,7 +156,7 @@
         </p>
       </div>
       <div class="story-visual scan-visual">
-        <img src="/images/roam-detect.jpg" alt="A real tentative parcel map: ROAM finds the parcel drawing and traces its four parcels, each labelled with its area" />
+        <img src="/images/roam-detect.jpg" alt="A real survey plat with ROAM's layout detection: the parcel map, text blocks and the surveyor's seal boxed and labelled, and the four parcels traced" />
       </div>
     </div>
 
@@ -238,9 +238,9 @@
       <div class="story-visual map-visual">
         <img
           src="/images/roam-placed.jpg"
-          alt="The same four parcels, turned to north and placed on satellite imagery in Washoe County, Nevada"
+          alt="The same four parcels placed on satellite imagery in Washoe County, Nevada, each in its own colour"
         />
-        <span class="scan-tag">SATELLITE &middot; WASHOE COUNTY, NV &middot; PARCELS 1 TO 4</span>
+        <span class="scan-tag">SATELLITE &middot; WASHOE COUNTY, NV &middot; PARCELS AB-1 TO AB-4</span>
       </div>
     </div>
 
