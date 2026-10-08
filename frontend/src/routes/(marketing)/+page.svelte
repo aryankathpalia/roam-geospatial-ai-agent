@@ -1,5 +1,6 @@
 <script lang="ts">
   import AccountButton from '$lib/components/AccountButton.svelte';
+  import HeroAnimation from '$lib/components/HeroAnimation.svelte';
   import { user } from '$lib/auth';
   import { onMount } from 'svelte';
 
@@ -127,6 +128,10 @@
         <span class="chip">{c}</span>
       {/each}
     </div>
+  </div>
+
+  <div class="hero-side">
+    <HeroAnimation />
   </div>
 
   <div class="hero-visual">
@@ -326,6 +331,23 @@
   padding: 56px 28px 0;
   max-width: 1240px;
   margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 640px) minmax(0, 1fr);
+  column-gap: 48px;
+}
+
+.hero-side {
+  align-self: center;
+  margin: -24px 0 40px;
+}
+
+@media (max-width: 960px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .hero-side {
+    display: none;
+  }
 }
 
 .hero-inner {
@@ -377,6 +399,7 @@ h1 {
 }
 
 .hero-visual {
+  grid-column: 1 / -1;
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid var(--line);
