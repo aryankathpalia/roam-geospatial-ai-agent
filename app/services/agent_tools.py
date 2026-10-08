@@ -711,37 +711,49 @@ def find_position_from_imagery(result: dict, page_number: int, east_m: float = 0
         if not out["features_located"]:
             break
         if math.hypot(e + extra["east_m"] - east_m, n + extra["north_m"] - north_m) > max_move_m:
-            return {"page": page_number, "settled": False, "looks": looks,
-                    "plat_shows_around_parcels": out.get("plat_shows_around_parcels"),
-                    "observations": out.get("observations"),
-                    "hint": f"the matched features are more than {max_move_m:.0f} m away -- probably the wrong roads. "
-                            "Report that; widen max_move_m only if other evidence says the sheet is that far off.",
-                    "_image_jpeg_b64": images[-1] if images else None}
+            break  # matched roads beyond the reach: probably the wrong ones -- the close-ups start from here instead
         residual = math.hypot(extra["east_m"], extra["north_m"])
         if residual <= _SETTLED_M:
             accepted.append((e + extra["east_m"], n + extra["north_m"]))  # this look's own best estimate
             if len(accepted) >= 2:
                 break
         e, n = e + extra["east_m"], n + extra["north_m"]
+    feats = next((lk["features"] for lk in looks if lk["features"]), [])
+    if not feats:
+        return {"page": page_number, "settled": False, "looks": looks,
+                "plat_shows_around_parcels": out.get("plat_shows_around_parcels"),
+                "observations": out.get("observations"),
+                "hint": "could not find the features the plat draws around the parcels: report that instead of proposing",
+                "_image_jpeg_b64": images[-1] if images else None}
     if not accepted:
         return {"page": page_number, "settled": False, "looks": looks,
                 "plat_shows_around_parcels": out.get("plat_shows_around_parcels"),
                 "observations": out.get("observations"),
-                "hint": "the imagery readings did not settle: report what was seen instead of proposing a move",
+                "hint": "the imagery readings did not settle (they vary by ~10 m between looks): report what was seen "
+                        "-- a few metres is below what the imagery can measure -- instead of proposing a move",
                 "_image_jpeg_b64": images[-1] if images else None}
     me = sum(a[0] for a in accepted) / len(accepted)
     mn = sum(a[1] for a in accepted) / len(accepted)
     spread = max(math.hypot(a[0] - me, a[1] - mn) for a in accepted)
-    return {
-        "page": page_number, "settled": True,
-        "best_total_move": {"east_m": round(me, 1), "north_m": round(mn, 1)},
-        "uncertainty_m": round(max(spread, 1.0), 1),
-        "lines_up_with": [f"{f['name']} ({f['side']})" for f in looks[-1]["features"]],
-        "plat_shows_around_parcels": out.get("plat_shows_around_parcels"),
-        "looks": len(looks),
-        "hint": "propose best_total_move",
+    common = {
+        "page": page_number, "lines_up_with": [f"{f['name']} ({f['side']})" for f in feats],
+        "plat_shows_around_parcels": out.get("plat_shows_around_parcels"), "looks": len(looks),
         "_image_jpeg_b64": images[-1] if images else None,
     }
+    # The wide view is only good to ~10 m: measure each bordering side again in a close-up (~0.23 m/px).
+    page = _page(result, page_number)
+    close = _refine_close(result, page, feats, me, mn)
+    if close.get("refined"):
+        return {**common, "settled": True, "method": "close-ups of the bordering roads/canals",
+                "best_total_move": {"east_m": round(close["east_m"], 1), "north_m": round(close["north_m"], 1)},
+                "uncertainty_m": max(1.0, close["residual_m"]), "pinned_axes": close["pinned"],
+                "hint": "propose best_total_move"}
+    # The close-ups did not settle (the features may touch only part of a side): the agreeing wide looks stand,
+    # with their wider uncertainty.
+    return {**common, "settled": True, "method": "wide satellite view (close-ups did not settle)",
+            "best_total_move": {"east_m": round(me, 1), "north_m": round(mn, 1)},
+            "uncertainty_m": round(max(spread, _SETTLED_M), 1),
+            "hint": "propose best_total_move, saying it is accurate to about the uncertainty"}
 
 
 def get_parcel_details(result: dict, page_number: int, label: str) -> dict:
