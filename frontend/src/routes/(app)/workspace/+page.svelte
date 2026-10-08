@@ -1559,6 +1559,21 @@
     {/if}
   </header>
 
+  <!-- a signed-in user's own work comes before the samples -->
+  {#if (phase === 'idle' || phase === 'uploading' || phase === 'error') && $user && myDocuments.length}
+      <section class="my-docs panel" aria-label="Your documents">
+        <h2>Your documents</h2>
+        <ul>
+          {#each myDocuments.slice(0, 8) as d (d.id)}
+            <li>
+              <button class="link-btn" on:click={() => openDocument(d.id)}>{d.filename ?? d.id.slice(0, 8)}</button>
+              {#if d.created_at}<span class="muted">{new Date(d.created_at * 1000).toLocaleDateString()}</span>{/if}
+            </li>
+          {/each}
+        </ul>
+      </section>
+  {/if}
+
   {#if phase === 'idle' || phase === 'error'}
     <section class="gallery fade-up" aria-label="Sample documents">
       <div class="gallery-head">
@@ -1593,19 +1608,6 @@
   {/if}
 
   {#if (phase === 'idle' || phase === 'uploading' || phase === 'error') && $user}
-    {#if myDocuments.length}
-      <section class="my-docs panel" aria-label="Your documents">
-        <h2>Your documents</h2>
-        <ul>
-          {#each myDocuments.slice(0, 8) as d (d.id)}
-            <li>
-              <button class="link-btn" on:click={() => openDocument(d.id)}>{d.filename ?? d.id.slice(0, 8)}</button>
-              {#if d.created_at}<span class="muted">{new Date(d.created_at * 1000).toLocaleDateString()}</span>{/if}
-            </li>
-          {/each}
-        </ul>
-      </section>
-    {/if}
     <section
       class="dropzone panel"
       class:drag={dragOver}
