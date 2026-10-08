@@ -1,7 +1,8 @@
 <script lang="ts">
-  // Chat with the placement-review agent (POST /documents/{id}/agent/chat). The agent only PROPOSES fixes;
-  // each proposal is previewed on the map by the parent (`preview` event) and applied or discarded here.
-  // The conversation is kept per document in this browser (a convenience; the server keeps proposals).
+  // The AI placement review panel. Each request is a "run": the user's words, the checks the agent makes
+  // as they happen (streamed from POST /documents/{id}/agent/chat/stream), its finding, and any proposed
+  // fix -- previewed on the map by the parent (`preview` event), applied or discarded here. Runs are kept
+  // per document in this browser (a convenience; proposals themselves live on the server).
   import { createEventDispatcher, onDestroy, tick } from 'svelte';
 
   export let apiBase: string;
@@ -9,92 +10,151 @@
   export let focus: { page: number; label: string | null } | null = null;
   export let previewId: string | null = null;
 
-  type Step = { tool: string; summary: string };
+  type Step = { id: string; label: string; summary?: string; ok?: boolean; image?: string; running: boolean };
   type Proposal = {
     id: string; kind: 'move' | 'stated_area'; status: string; page_number: number; reason: string;
-    east_m?: number; north_m?: number; label?: string; stated_area?: string;
-    score?: { outline_hugging_a_neighbour_pct: number; overlap_with_neighbours_pct: number };
+    east_m?: number; north_m?: number; label?: string; stated_area?: string; from_user_instruction?: boolean;
+    check?: { kind: 'imagery' | 'county_parcels'; features?: string[]; hugging_pct?: number; overlap_pct?: number; corroborated?: boolean } | null;
   };
-  type Msg = { role: 'user' | 'assistant' | 'error'; content: string; steps?: Step[]; proposals?: Proposal[]; model?: string };
+  type Run = {
+    request: string; scope: string; steps: Step[]; thinking: boolean;
+    reply?: string; proposals?: Proposal[]; error?: string; done: boolean; started: number; seconds?: number;
+  };
 
   const dispatch = createEventDispatcher<{ preview: Proposal | null; applied: Proposal; close: void }>();
-  const storeKey = () => `roam.agentChat.${documentId}`;
+  const storeKey = () => `roam.agentRuns.${documentId}`;
 
-  let messages: Msg[] = load();
+  let runs: Run[] = load();
   let draft = '';
   let busy = false;
-  let elapsed = 0;
-  let timer: ReturnType<typeof setInterval> | null = null;
-  let listEl: HTMLDivElement;
+  let now = Date.now();
+  let clock: ReturnType<typeof setInterval> | null = null;
+  let bodyEl: HTMLDivElement;
   let acting: string | null = null;
+  let enlarged: string | null = null;
+  let abort: AbortController | null = null;
 
-  function load(): Msg[] {
+  $: scope = focus ? `Page ${focus.page}${focus.label ? ` · ${focus.label}` : ''}` : 'Whole document';
+  $: current = runs[runs.length - 1] ?? null;
+  $: earlier = runs.slice(0, -1);
+
+  function load(): Run[] {
     try {
-      return JSON.parse(localStorage.getItem(storeKey()) ?? '[]');
+      return (JSON.parse(localStorage.getItem(storeKey()) ?? '[]') as Run[]).filter((r) => r.done);
     } catch {
       return [];
     }
   }
   function save() {
     try {
-      localStorage.setItem(storeKey(), JSON.stringify(messages.slice(-40)));
+      // images stay out of storage: they are large and only useful while the run is fresh
+      const slim = runs.filter((r) => r.done).slice(-10).map((r) => ({ ...r, steps: r.steps.map(({ image, ...s }) => s) }));
+      localStorage.setItem(storeKey(), JSON.stringify(slim));
     } catch {
-      // storage unavailable -- the chat still works for this visit
+      // storage unavailable -- the panel still works for this visit
     }
   }
 
-  const suggestions = [
-    'Is this sheet in the right place? If not, why?',
-    'The parcels are about 20 m off from where they should be',
-    'The printed area on this parcel looks misread'
-  ];
+  const quick = ['It is a few metres off', 'It sits on the wrong side of the road', 'Is this in the right place?'];
 
   async function scrollDown() {
     await tick();
-    listEl?.scrollTo({ top: listEl.scrollHeight, behavior: 'smooth' });
+    bodyEl?.scrollTo({ top: bodyEl.scrollHeight, behavior: 'smooth' });
   }
 
-  async function send(text = draft) {
-    const message = text.trim();
-    if (!message || busy) return;
-    const history = messages
-      .filter((m) => m.role === 'user' || m.role === 'assistant')
-      .map((m) => ({ role: m.role, content: m.content }));
-    messages = [...messages, { role: 'user', content: message }];
+  function update(fn: (r: Run) => void) {
+    const r = runs[runs.length - 1];
+    fn(r);
+    runs = runs;
+  }
+
+  async function start(text = draft) {
+    const request = text.trim();
+    if (!request || busy) return;
+    const history = runs.flatMap((r) => [
+      { role: 'user', content: r.request },
+      ...(r.reply ? [{ role: 'assistant', content: r.reply }] : [])
+    ]);
+    runs = [...runs, { request, scope, steps: [], thinking: true, done: false, started: Date.now() }];
     draft = '';
     busy = true;
-    elapsed = 0;
-    timer = setInterval(() => (elapsed += 1), 1000);
-    save();
+    clock = setInterval(() => (now = Date.now()), 1000);
+    dispatch('preview', null);
     scrollDown();
+    abort = new AbortController();
     try {
-      const res = await fetch(`${apiBase}/documents/${documentId}/agent/chat`, {
+      const res = await fetch(`${apiBase}/documents/${documentId}/agent/chat/stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, history, page_number: focus?.page ?? null, label: focus?.label ?? null })
+        body: JSON.stringify({ message: request, history, page_number: focus?.page ?? null, label: focus?.label ?? null }),
+        signal: abort.signal
       });
-      const body = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(body?.detail ?? `${res.status} ${res.statusText}`);
-      messages = [...messages, {
-        role: 'assistant', content: body.reply || '(no answer)', steps: body.steps, proposals: body.proposals, model: body.model
-      }];
-      const firstMove = (body.proposals ?? []).find((p: Proposal) => p.kind === 'move');
-      if (firstMove) dispatch('preview', firstMove);
+      if (!res.ok || !res.body) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.detail ?? `${res.status} ${res.statusText}`);
+      }
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        let nl: number;
+        while ((nl = buffer.indexOf('\n')) >= 0) {
+          const line = buffer.slice(0, nl).trim();
+          buffer = buffer.slice(nl + 1);
+          if (line) handle(JSON.parse(line));
+        }
+      }
+      if (!runs[runs.length - 1].done) update((r) => (r.error = 'The review stopped without an answer.'));
     } catch (err) {
-      messages = [...messages, { role: 'error', content: err instanceof Error ? err.message : 'The AI agent did not answer.' }];
+      if (!(err instanceof DOMException && err.name === 'AbortError')) {
+        update((r) => (r.error = err instanceof Error ? err.message : 'The AI review did not answer.'));
+      } else {
+        update((r) => (r.error = 'Stopped.'));
+      }
     } finally {
+      update((r) => {
+        r.done = true;
+        r.thinking = false;
+        r.steps.forEach((s) => (s.running = false));
+        r.seconds = Math.round((Date.now() - r.started) / 1000);
+      });
       busy = false;
-      if (timer) clearInterval(timer);
-      timer = null;
+      abort = null;
+      if (clock) clearInterval(clock);
+      clock = null;
       save();
       scrollDown();
     }
   }
 
+  function handle(ev: any) {
+    if (ev.type === 'thinking') update((r) => (r.thinking = true));
+    else if (ev.type === 'step_start') update((r) => {
+      r.thinking = false;
+      r.steps.push({ id: ev.id, label: ev.label, running: true });
+    });
+    else if (ev.type === 'step_done') update((r) => {
+      const s = r.steps.find((x) => x.id === ev.id);
+      if (s) Object.assign(s, { summary: ev.summary, ok: ev.ok, image: ev.image, running: false });
+    });
+    else if (ev.type === 'done') {
+      update((r) => {
+        r.reply = ev.reply;
+        r.proposals = ev.proposals ?? [];
+        r.thinking = false;
+        r.done = true;
+      });
+      const firstMove = (ev.proposals ?? []).find((p: Proposal) => p.kind === 'move');
+      if (firstMove) dispatch('preview', firstMove);
+    } else if (ev.type === 'error') update((r) => (r.error = ev.message));
+    scrollDown();
+  }
+
   function setStatus(id: string, status: string) {
-    messages = messages.map((m) => ({
-      ...m, proposals: m.proposals?.map((p) => (p.id === id ? { ...p, status } : p))
-    }));
+    runs = runs.map((r) => ({ ...r, proposals: r.proposals?.map((p) => (p.id === id ? { ...p, status } : p)) }));
     save();
   }
 
@@ -104,152 +164,201 @@
       const res = await fetch(`${apiBase}/documents/${documentId}/agent/proposals/${p.id}/${action}`, { method: 'POST' });
       const body = await res.json().catch(() => null);
       if (!res.ok && res.status !== 409) throw new Error(body?.detail ?? `${res.status} ${res.statusText}`);
-      const status = res.status === 409 ? (body?.detail ?? '').replace('Proposal already ', '') || 'applied' : body.proposal.status;
-      setStatus(p.id, status);
+      setStatus(p.id, res.ok ? body.proposal.status : (body?.detail ?? '').replace('Proposal already ', '') || 'applied');
       if (previewId === p.id) dispatch('preview', null);
       if (action === 'apply' && res.ok) dispatch('applied', p);
     } catch (err) {
-      messages = [...messages, { role: 'error', content: err instanceof Error ? err.message : 'Could not update the proposal.' }];
-      save();
+      update((r) => (r.error = err instanceof Error ? err.message : 'Could not update the proposal.'));
     } finally {
       acting = null;
     }
   }
 
-  function clearChat() {
-    messages = [];
+  function clearAll() {
+    runs = [];
     save();
     dispatch('preview', null);
   }
 
-  function describe(p: Proposal): string {
-    if (p.kind === 'move') {
-      const e = p.east_m ?? 0;
-      const n = p.north_m ?? 0;
-      const dist = Math.round(Math.hypot(e, n));
-      const dir = `${Math.abs(Math.round(n))} m ${n >= 0 ? 'north' : 'south'}, ${Math.abs(Math.round(e))} m ${e >= 0 ? 'east' : 'west'}`;
-      return `Move page ${p.page_number}'s parcels ${dist} m (${dir})`;
-    }
-    return `Set ${p.label}'s printed area to “${p.stated_area}”`;
+  function direction(e = 0, n = 0): string {
+    const parts = [
+      Math.abs(n) >= 0.5 ? `${Math.abs(Math.round(n))} m ${n >= 0 ? 'north' : 'south'}` : '',
+      Math.abs(e) >= 0.5 ? `${Math.abs(Math.round(e))} m ${e >= 0 ? 'east' : 'west'}` : ''
+    ].filter(Boolean);
+    return parts.join(', ') || 'no move';
   }
 
-  // Bold (**x**) and line breaks only: the agent answers in short plain text.
+  function evidence(p: Proposal): string {
+    const c = p.check;
+    if (!c) return p.from_user_instruction ? 'As you instructed — not checked against the imagery' : '';
+    if (c.kind === 'imagery') return `Checked on the satellite imagery: lines up with ${c.features?.join(', ')}`;
+    return `Checked against the county parcels: ${c.hugging_pct}% of the outline against a neighbour, ${c.overlap_pct}% overlap${c.corroborated ? ' (corroborated)' : ''}`;
+  }
+
   function render(text: string): string {
     const esc = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     return esc.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
   }
 
   onDestroy(() => {
-    if (timer) clearInterval(timer);
+    if (clock) clearInterval(clock);
+    abort?.abort();
   });
 </script>
 
-<section class="agent panel" aria-label="AI placement reviewer">
+<section class="agent panel" aria-label="AI placement review">
   <header>
-    <div>
-      <strong>AI placement review</strong>
-      <span class="sub">{focus ? `Page ${focus.page}${focus.label ? ` · ${focus.label}` : ''}` : 'Whole document'}</span>
+    <div class="title">
+      <span class="spark" aria-hidden="true">✦</span>
+      <div>
+        <strong>AI placement review</strong>
+        <span class="sub">{scope}</span>
+      </div>
     </div>
     <div class="head-actions">
-      {#if messages.length}<button class="link" on:click={clearChat} disabled={busy}>Clear</button>{/if}
+      {#if runs.length && !busy}<button class="link" on:click={clearAll}>Clear</button>{/if}
       <button class="close" aria-label="Close" on:click={() => dispatch('close')}>×</button>
     </div>
   </header>
 
-  <div class="list" bind:this={listEl}>
-    {#if !messages.length}
-      <p class="intro">
-        Describe what looks wrong, in your own words. The AI checks the printed coordinates, the county parcel
-        records and the drawing, explains what it finds, and may propose a fix. Nothing changes until you apply it.
-      </p>
-      <div class="suggest">
-        {#each suggestions as s}
-          <button on:click={() => send(s)}>{s}</button>
-        {/each}
-      </div>
-    {/if}
-
-    {#each messages as m, mi (mi)}
-      <div class="msg {m.role}">
-        {#if m.role === 'assistant'}
-          {#if m.steps?.length}
-            <details class="steps">
-              <summary>Checked {m.steps.length} thing{m.steps.length === 1 ? '' : 's'}</summary>
-              <ol>{#each m.steps as s}<li>{s.summary}</li>{/each}</ol>
-            </details>
-          {/if}
-          <div class="text">{@html render(m.content)}</div>
-          {#each m.proposals ?? [] as p (p.id)}
-            <div class="proposal" class:done={p.status !== 'pending'} class:previewing={previewId === p.id}>
-              <span class="tag">Proposed fix</span>
-              <p class="what">{describe(p)}</p>
-              {#if p.kind === 'move' && p.score}
-                <p class="fit">Fit at the new spot: {p.score.outline_hugging_a_neighbour_pct}% of the outline against a neighbouring parcel, {p.score.overlap_with_neighbours_pct}% overlap</p>
-              {/if}
-              {#if p.status === 'pending'}
-                <div class="row">
-                  {#if p.kind === 'move'}
-                    <button class="ghost" on:click={() => dispatch('preview', previewId === p.id ? null : p)}>
-                      {previewId === p.id ? 'Hide preview' : 'Show on map'}
-                    </button>
-                  {/if}
-                  <button class="primary" disabled={acting === p.id} on:click={() => act(p, 'apply')}>Apply</button>
-                  <button class="ghost" disabled={acting === p.id} on:click={() => act(p, 'discard')}>Discard</button>
-                </div>
-              {:else}
-                <p class="status">{p.status === 'applied' ? '✓ Applied' + (p.kind === 'move' ? ' — “Reset position” on the card undoes it' : '') : 'Discarded'}</p>
-              {/if}
-            </div>
-          {/each}
-        {:else}
-          <div class="text">{m.content}</div>
-        {/if}
-      </div>
+  <div class="body" bind:this={bodyEl}>
+    {#each earlier as r}
+      <details class="past">
+        <summary>“{r.request}” <span>· {r.steps.length} checks{r.proposals?.length ? ' · proposed a fix' : ''}</span></summary>
+        {#if r.reply}<div class="reply">{@html render(r.reply)}</div>{/if}
+      </details>
     {/each}
 
-    {#if busy}
-      <div class="msg assistant working">
-        <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
-        Investigating… {elapsed}s
-        <small>Checking coordinates, county records and the drawing. On the free AI tier this takes 1–4 minutes.</small>
+    {#if !current}
+      <p class="intro">Tell the AI what looks wrong. It reads the plat, compares it with the satellite imagery and any county records, shows each check it makes, and proposes a fix you can preview and apply.</p>
+    {:else}
+      <div class="run">
+        <p class="request"><span>You asked</span>“{current.request}”</p>
+
+        <ol class="steps">
+          {#each current.steps as s (s.id)}
+            <li class:running={s.running} class:fail={s.ok === false}>
+              <span class="dot" aria-hidden="true">{#if s.running}<i class="spin"></i>{:else if s.ok === false}!{:else}✓{/if}</span>
+              <div class="step-text">
+                <span class="label">{s.running ? `${s.label}…` : s.summary ?? s.label}</span>
+                {#if s.image}
+                  <button class="shot" title="Enlarge" on:click={() => (enlarged = s.image ?? null)}>
+                    <img src={`data:image/jpeg;base64,${s.image}`} alt="Satellite imagery with the outlines and the features the AI matched" />
+                  </button>
+                {/if}
+              </div>
+            </li>
+          {/each}
+          {#if !current.done && current.thinking}
+            <li class="running thinking">
+              <span class="dot" aria-hidden="true"><i class="spin"></i></span>
+              <span class="label">{current.steps.length ? 'Deciding the next check…' : 'Reading your request…'}</span>
+            </li>
+          {/if}
+        </ol>
+
+        {#if !current.done}
+          <p class="elapsed">{Math.round((now - current.started) / 1000)}s · free AI models take 1–4 minutes
+            <button class="link" on:click={() => abort?.abort()}>Stop</button></p>
+        {/if}
+
+        {#if current.error}<p class="err">{current.error}</p>{/if}
+
+        {#if current.reply}
+          <div class="finding">
+            <span class="tag">Finding</span>
+            <div class="reply">{@html render(current.reply)}</div>
+          </div>
+        {/if}
+
+        {#each current.proposals ?? [] as p (p.id)}
+          <div class="fix" class:done={p.status !== 'pending'} class:previewing={previewId === p.id}>
+            <span class="tag">Proposed fix</span>
+            <p class="what">
+              {#if p.kind === 'move'}Move page {p.page_number}'s parcels {direction(p.east_m, p.north_m)}
+              {:else}Set {p.label}'s printed area to “{p.stated_area}”{/if}
+            </p>
+            {#if evidence(p)}<p class="evidence">{evidence(p)}</p>{/if}
+            {#if p.status === 'pending'}
+              <div class="row">
+                <button class="primary" disabled={acting === p.id} on:click={() => act(p, 'apply')}>Apply</button>
+                {#if p.kind === 'move'}
+                  <button class="ghost" on:click={() => dispatch('preview', previewId === p.id ? null : p)}>
+                    {previewId === p.id ? 'Hide preview' : 'Preview on map'}
+                  </button>
+                {/if}
+                <button class="ghost" disabled={acting === p.id} on:click={() => act(p, 'discard')}>Discard</button>
+              </div>
+              {#if previewId === p.id}<p class="hint">Dashed outline on the map = where it would go.</p>{/if}
+            {:else}
+              <p class="evidence">{p.status === 'applied' ? '✓ Applied' + (p.kind === 'move' ? ' · “Reset position” on the parcel card undoes it' : '') : 'Discarded'}</p>
+            {/if}
+          </div>
+        {/each}
       </div>
     {/if}
   </div>
 
-  <form class="composer" on:submit|preventDefault={() => send()}>
-    <textarea
-      rows="2"
-      bind:value={draft}
-      placeholder="e.g. The parcels should be across the street, next to the cul-de-sac"
-      disabled={busy}
-      on:keydown={(e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
-          send();
-        }
-      }}
-    ></textarea>
-    <button class="primary" type="submit" disabled={busy || !draft.trim()}>Send</button>
+  <form class="composer" on:submit|preventDefault={() => start()}>
+    {#if !current}
+      <div class="chips">
+        {#each quick as q}<button type="button" on:click={() => start(q)}>{q}</button>{/each}
+      </div>
+    {/if}
+    <div class="input-row">
+      <textarea
+        rows="2"
+        bind:value={draft}
+        placeholder={current ? 'Follow up, e.g. “it should be 10 m further west”' : 'Describe the problem, e.g. “the parcels should be west of the road”'}
+        disabled={busy}
+        on:keydown={(e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            start();
+          }
+        }}
+      ></textarea>
+      <button class="primary" type="submit" disabled={busy || !draft.trim()}>{current ? 'Send' : 'Review'}</button>
+    </div>
   </form>
 </section>
+
+{#if enlarged}
+  <button class="lightbox" aria-label="Close image" on:click={() => (enlarged = null)}>
+    <img src={`data:image/jpeg;base64,${enlarged}`} alt="Satellite imagery checked by the AI" />
+  </button>
+{/if}
 
 <style>
   .agent {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 14px;
+    gap: 12px;
+    padding: 14px 14px 12px;
     border: 1px solid #c7d2fe;
-    background: #fbfbff;
-    max-height: 74vh;
+    background: #fff;
+    max-height: 78vh;
   }
   header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 8px;
   }
-  header strong {
+  .title {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .spark {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: #eef2ff;
+    color: #4f46e5;
+  }
+  .title strong {
     display: block;
     font-size: 14px;
   }
@@ -260,7 +369,7 @@
   .head-actions {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
   }
   .close {
     border: 0;
@@ -268,106 +377,190 @@
     font-size: 20px;
     line-height: 1;
     cursor: pointer;
-    color: #6b7280;
+    color: #9ca3af;
   }
   .link {
     border: 0;
     background: none;
+    padding: 0;
     color: #4f46e5;
+    font: inherit;
     font-size: 12px;
     cursor: pointer;
   }
-  .list {
+  .body {
     flex: 1;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    min-height: 120px;
+    min-height: 80px;
   }
   .intro {
-    font-size: 13px;
-    color: #4b5563;
     margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #4b5563;
   }
-  .suggest {
+  .past {
+    font-size: 12.5px;
+    color: #4b5563;
+    border-bottom: 1px solid #f1f1f4;
+    padding-bottom: 6px;
+  }
+  .past summary {
+    cursor: pointer;
+  }
+  .past summary span {
+    color: #9ca3af;
+  }
+  .request {
+    margin: 0 0 8px;
+    font-size: 13px;
+    color: #111827;
+  }
+  .request span {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9ca3af;
+    margin-bottom: 2px;
+  }
+  .steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 2px;
+    position: relative;
   }
-  .suggest button {
-    text-align: left;
-    font: inherit;
+  .steps li {
+    display: grid;
+    grid-template-columns: 20px 1fr;
+    gap: 8px;
+    padding: 5px 0;
     font-size: 12.5px;
-    padding: 7px 10px;
-    border-radius: 8px;
-    border: 1px solid #e0e7ff;
-    background: #fff;
-    cursor: pointer;
-    color: #3730a3;
-  }
-  .msg {
-    font-size: 13px;
     line-height: 1.45;
+    color: #374151;
   }
-  .msg.user .text {
-    margin-left: 24px;
-    padding: 8px 10px;
-    border-radius: 10px;
-    background: #4f46e5;
-    color: #fff;
-    white-space: pre-wrap;
+  .steps li.running .label {
+    color: #4f46e5;
   }
-  .msg.assistant .text {
-    padding: 2px 0;
-    color: #1f2937;
+  .steps li.fail .label {
+    color: #b45309;
   }
-  .msg.error .text {
+  .dot {
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    border-radius: 50%;
+    background: #ecfdf5;
+    color: #059669;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  li.running .dot {
+    background: #eef2ff;
+  }
+  li.fail .dot {
+    background: #fffbeb;
+    color: #b45309;
+  }
+  .spin {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #c7d2fe;
+    border-top-color: #4f46e5;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .shot {
+    display: block;
+    margin-top: 6px;
+    padding: 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: zoom-in;
+    background: none;
+    width: 100%;
+    max-width: 260px;
+  }
+  .shot img {
+    display: block;
+    width: 100%;
+  }
+  .elapsed {
+    margin: 4px 0 0 28px;
+    font-size: 11.5px;
+    color: #9ca3af;
+  }
+  .err {
+    margin: 6px 0 0;
     padding: 8px 10px;
     border-radius: 8px;
     background: #fef2f2;
     color: #b91c1c;
+    font-size: 12.5px;
   }
-  .steps {
-    font-size: 12px;
-    color: #6b7280;
-    margin-bottom: 4px;
+  .finding {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f1f1f4;
   }
-  .steps ol {
-    margin: 4px 0 0 16px;
-    padding: 0;
-  }
-  .proposal {
-    margin-top: 8px;
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px dashed #6366f1;
-    background: #eef2ff;
-  }
-  .proposal.previewing {
-    border-style: solid;
-    box-shadow: 0 0 0 2px #c7d2fe;
-  }
-  .proposal.done {
-    border-color: #d1d5db;
-    background: #f9fafb;
+  .reply {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #1f2937;
   }
   .tag {
+    display: block;
+    margin-bottom: 3px;
     font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
+    color: #6b7280;
+  }
+  .fix {
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #a5b4fc;
+    background: #eef2ff;
+  }
+  .fix .tag {
     color: #4f46e5;
   }
-  .what {
-    margin: 4px 0;
-    font-weight: 600;
+  .fix.previewing {
+    box-shadow: 0 0 0 3px #e0e7ff;
   }
-  .fit,
-  .status {
-    margin: 0 0 6px;
+  .fix.done {
+    border-color: #e5e7eb;
+    background: #f9fafb;
+  }
+  .what {
+    margin: 2px 0 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e1b4b;
+  }
+  .evidence,
+  .hint {
+    margin: 0 0 8px;
     font-size: 12px;
     color: #4b5563;
+  }
+  .hint {
+    margin: 6px 0 0;
+    color: #6366f1;
   }
   .row {
     display: flex;
@@ -378,7 +571,7 @@
   button.ghost {
     font: inherit;
     font-size: 12.5px;
-    padding: 6px 12px;
+    padding: 7px 14px;
     border-radius: 8px;
     cursor: pointer;
   }
@@ -393,55 +586,61 @@
     color: #374151;
   }
   button:disabled {
-    opacity: 0.55;
+    opacity: 0.5;
     cursor: default;
   }
-  .working {
+  .composer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-top: 1px solid #f1f1f4;
+    padding-top: 10px;
+  }
+  .chips {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    color: #4f46e5;
+    gap: 6px;
   }
-  .working small {
-    flex-basis: 100%;
-    color: #6b7280;
+  .chips button {
+    font: inherit;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid #e0e7ff;
+    background: #f5f7ff;
+    color: #3730a3;
+    cursor: pointer;
   }
-  .dots {
-    display: inline-flex;
-    gap: 3px;
-  }
-  .dots i {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #6366f1;
-    animation: blink 1.2s infinite ease-in-out;
-  }
-  .dots i:nth-child(2) {
-    animation-delay: 0.2s;
-  }
-  .dots i:nth-child(3) {
-    animation-delay: 0.4s;
-  }
-  @keyframes blink {
-    0%, 80%, 100% { opacity: 0.25; }
-    40% { opacity: 1; }
-  }
-  .composer {
+  .input-row {
     display: flex;
     gap: 8px;
     align-items: flex-end;
   }
-  .composer textarea {
+  .input-row textarea {
     flex: 1;
     font: inherit;
     font-size: 13px;
-    resize: vertical;
+    resize: none;
     padding: 8px 10px;
     border-radius: 8px;
     border: 1px solid #d1d5db;
     background: #fff;
     color: inherit;
+  }
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    border: 0;
+    background: rgba(17, 24, 39, 0.75);
+    cursor: zoom-out;
+  }
+  .lightbox img {
+    max-width: min(92vw, 900px);
+    max-height: 90vh;
+    border-radius: 10px;
   }
 </style>

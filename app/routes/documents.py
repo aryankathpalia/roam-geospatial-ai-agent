@@ -1681,6 +1681,32 @@ def agent_chat(document_id: str, body: AgentChatRequest):
     return out
 
 
+@router.post("/{document_id}/agent/chat/stream")
+def agent_chat_stream(document_id: str, body: AgentChatRequest):
+    """The same turn as /agent/chat, streamed as newline-delimited JSON events (placement_agent.run_events) so
+    the panel shows each check as it happens. Proposals are stored when the turn finishes."""
+
+    from fastapi.responses import StreamingResponse
+
+    from app.services import placement_agent
+
+    if not body.message.strip():
+        raise HTTPException(status_code=400, detail="Empty message")
+    snapshot = _load_result(document_id)
+    focus = {"page_number": body.page_number, "label": body.label} if body.page_number is not None else None
+
+    def events():
+        for event in placement_agent.run_events(snapshot, body.message, body.history, focus):
+            if event["type"] == "done" and event["proposals"]:
+                with _RESULT_LOCK:
+                    result = _load_result(document_id)
+                    result.setdefault("agent_proposals", []).extend(event["proposals"])
+                    _save_result(document_id, result)
+            yield json.dumps(event, default=str) + "\n"
+
+    return StreamingResponse(events(), media_type="application/x-ndjson", headers={"Cache-Control": "no-cache"})
+
+
 def _agent_proposal(result: dict, proposal_id: str) -> dict:
     proposal = next((p for p in result.get("agent_proposals", []) if p.get("id") == proposal_id), None)
     if proposal is None:

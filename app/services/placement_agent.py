@@ -16,7 +16,7 @@ import json
 import logging
 import time
 import uuid
-from typing import Any
+from typing import Any, Iterator
 
 import httpx
 
@@ -30,6 +30,9 @@ _TIMEOUT_S = 120.0
 _MAX_STEPS = 14
 _MAX_TOOL_RESULT_CHARS = 6000
 _MAX_HISTORY_TURNS = 12
+_MATCH_M = 3.0  # a proposed move this close to a checked one is that move
+_STRONG_HUGGING_PCT = 50.0  # as the pipeline's own county fit: half the outline against a neighbour ...
+_MAX_OVERLAP_PCT = 3.0  # ... and almost no overlap with one
 # Free models come and go and rate-limit hard: tried in order on 429 / 5xx / an unusable reply.
 _FALLBACK_MODELS = [
     "nvidia/nemotron-3-ultra-550b-a55b:free",
@@ -58,10 +61,21 @@ so the county fit has nothing valid to fit to.
 Rules:
 - Investigate with tools before concluding; start with get_document_overview. Cite the numbers you found.
 - Never invent coordinates, APNs or measurements. If the evidence is insufficient, say what is missing.
-- To place a sheet: work out roughly where it belongs from the evidence (e.g. a correctly converted printed \
-coordinate, or where the plat's APN neighbours are), then call search_position_near from that rough move to find \
-the exact spot. Propose its best_total_move (when its rotation is 0) with propose_move, or a move you scored with \
-evaluate_position. Low overlap and high hugging is a good fit; say whether it is corroborated.
+- With county records (APNs found): work out roughly where the sheet belongs (a correctly converted printed \
+coordinate, where the APN neighbours are), then search_position_near from that rough move; propose its \
+best_total_move when its rotation is 0.
+- With no county records or printed coordinates (most places outside Washoe County, NV), or to double-check: call \
+find_position_from_imagery ONCE (pass the user's own words as user_note). It reads the plat for the roads/canals \
+bordering the parcels, lines the outlines up with them on the satellite imagery, confirms, and returns the best \
+total move with its uncertainty. Propose that best_total_move. If it does not settle, say what it saw instead. \
+Do not repeat it or look_at_imagery to chase a few metres: single readings vary by several metres.
+- If the user states the move themselves ("15 m west"), look at it if you can; propose it with \
+from_user_instruction=true when it cannot be checked.
+- Do not stop at "not enough evidence" while find_position_from_imagery is untried.
+- County records can be stale: if the plat's APN neighbours are scattered or the best county fit is not \
+corroborated, do not trust them; use the imagery.
+- Parcels the user moved by hand (moved_by_hand in the overview) are where the user decided they belong: say so, \
+and propose moving them only on strong evidence that they are wrong.
 - Proposing IS asking: the user approves or discards each proposal in the interface, so when the evidence supports \
 a fix, propose it in this turn instead of asking permission. You cannot change anything yourself.
 - Refer to things by their meaning (e.g. "the printed area"), not by internal field names.
@@ -71,12 +85,15 @@ a fix, propose it in this turn instead of asking permission. You cannot change a
 _PROPOSAL_TOOLS = [
     {"type": "function", "function": {
         "name": "propose_move",
-        "description": "Propose moving ALL confirmed parcels of a sheet together by east_m / north_m metres. Must be "
-                       "scored with evaluate_position first. The user approves or discards it.",
+        "description": "Propose moving ALL confirmed parcels of a sheet together by east_m / north_m metres (the TOTAL "
+                       "move from where they are now). The move must have been checked: a look_at_imagery at it that "
+                       "lines up, or evaluate_position / search_position_near. The user approves or discards it.",
         "parameters": {"type": "object", "additionalProperties": False, "required": ["page_number", "east_m", "north_m", "reason"],
                        "properties": {
                            "page_number": {"type": "integer"}, "east_m": {"type": "number"}, "north_m": {"type": "number"},
-                           "reason": {"type": "string", "description": "one or two sentences of evidence"}}},
+                           "reason": {"type": "string", "description": "one or two sentences of evidence"},
+                           "from_user_instruction": {"type": "boolean",
+                                                     "description": "true only when the user stated this move themselves"}}},
     }},
     {"type": "function", "function": {
         "name": "propose_stated_area",
@@ -131,33 +148,90 @@ def _chat(client: httpx.Client, messages: list[dict], tools: list[dict]) -> tupl
     raise AgentError(f"every model failed ({last})")
 
 
+_STEP_LABELS = {
+    "get_document_overview": "Reading how the sheet was placed",
+    "get_location_evidence": "Reading the location evidence printed on the plat",
+    "convert_state_plane": "Converting a printed survey coordinate",
+    "county_parcels_near": "Checking the county's parcel records at a spot",
+    "lookup_county_apns": "Looking up the plat's APNs in the county records",
+    "evaluate_position": "Testing a position against the neighbouring parcels",
+    "search_position_near": "Searching for the best fit among the county parcels",
+    "look_at_imagery": "Comparing the plat with the satellite imagery",
+    "find_position_from_imagery": "Lining the parcels up with the roads and canals on the imagery",
+    "get_parcel_details": "Reading a parcel's measurements",
+    "search_document_text": "Searching the document text",
+    "propose_move": "Preparing the proposed move",
+    "propose_stated_area": "Preparing the proposed area correction",
+}
+
+
+def _direction(e: float, n: float) -> str:
+    parts = [f"{abs(n):.0f} m {'north' if n >= 0 else 'south'}" if abs(n) >= 0.5 else "",
+             f"{abs(e):.0f} m {'east' if e >= 0 else 'west'}" if abs(e) >= 0.5 else ""]
+    return ", ".join(p for p in parts if p) or "no move"
+
+
 def _summary(name: str, args: dict, out: dict) -> str:
-    """A one-line description of a tool call for the user's 'what I checked' list."""
+    """One plain line describing what a tool call found, for the user's step list."""
 
     if "error" in out:
-        return f"{name}: {out['error']}"
+        return f"Could not complete: {out['error']}"
+    if name == "look_at_imagery":
+        feats = ", ".join(f"{f['name'].title()} ({f['side']})" for f in out.get("features_located", []))
+        at = out["viewed_at_move"]
+        where = "at the current position" if not (at["east_m"] or at["north_m"]) else f"moved {_direction(at['east_m'], at['north_m'])}"
+        if not feats:
+            return f"Looked at the imagery {where}: could not find the features the plat draws around the parcels"
+        if out.get("lines_up"):
+            return f"Looked at the imagery {where}: the outlines line up with {feats}"
+        extra = out["suggested_extra_move_m"]
+        return f"Looked at the imagery {where}: found {feats} — the outlines need to move {_direction(extra['east_m'], extra['north_m'])}"
+    if name == "find_position_from_imagery":
+        if not out.get("settled"):
+            return f"Compared the plat with the imagery {len(out.get('looks') or [])} times, but the readings did not settle"
+        best = out["best_total_move"]
+        return (f"Lined the parcels up with {', '.join(out['lines_up_with'])} on the imagery: they belong "
+                f"{_direction(best['east_m'], best['north_m'])} from here (±{out['uncertainty_m']:.0f} m, {out['looks']} looks)")
     if name == "evaluate_position":
-        return (f"Tested a move of {args.get('east_m', 0):+.0f} m east, {args.get('north_m', 0):+.0f} m north: "
-                f"{out['outline_hugging_a_neighbour_pct']}% of the outline against a neighbour, "
+        return (f"Tested a move {_direction(args.get('east_m', 0), args.get('north_m', 0))}: "
+                f"{out['outline_hugging_a_neighbour_pct']}% of the outline against a neighbouring parcel, "
                 f"{out['overlap_with_neighbours_pct']}% overlap")
     if name == "search_position_near":
         best = out["best_total_move"]
-        return (f"Searched for the best fit among the county parcels: {best['east_m']:+.0f} m east, "
-                f"{best['north_m']:+.0f} m north ({'corroborated' if out['corroborated'] else 'not corroborated'})")
+        return (f"Best fit among the county parcels: {_direction(best['east_m'], best['north_m'])} "
+                f"({'corroborated' if out['corroborated'] else 'not corroborated'})")
     if name == "lookup_county_apns":
-        return f"Looked up {len(out['apns'])} APNs in the county records ({out['found']} found)"
+        return f"Looked up {len(out['apns'])} APNs in the county records: {out['found']} found"
     if name == "county_parcels_near":
-        return f"Listed {out['count']} county parcels within {out['radius_m']:.0f} m of a point"
+        return f"Found {out['count']} county parcels within {out['radius_m']:.0f} m of a point"
     if name == "convert_state_plane":
         return f"Converted N {args.get('northing')} E {args.get('easting')}" + (" as ground coordinates" if args.get("ground_to_grid") else "")
     if name == "search_document_text":
-        return f"Searched the document text for “{args.get('pattern')}” ({len(out['hits'])} hits)"
-    return {"get_document_overview": "Read the document's placement state",
-            "get_location_evidence": f"Read the printed location evidence on page {args.get('page_number')}",
-            "get_parcel_details": f"Read {args.get('label')}'s details"}.get(name, name)
+        return f"Searched the document text for “{args.get('pattern')}”: {len(out['hits'])} hits"
+    if name == "get_location_evidence":
+        n = len(out.get("printed_coordinates") or [])
+        return (f"Plat evidence: {len(out.get('apns') or [])} APNs, {n} printed coordinate{'s' if n != 1 else ''}"
+                + (f", address {out['address']}" if out.get("address") else ""))
+    return {"get_document_overview": "Read how the sheet was placed",
+            "get_parcel_details": f"Read {args.get('label')}'s measurements"}.get(name, name)
 
 
-def _propose(result: dict, name: str, args: dict, evaluated: list[dict]) -> dict:
+def _checked_move(checks: list[dict], page: int, e: float, n: float) -> dict | None:
+    """The latest check of exactly this move: a county-parcel score, or an imagery look that lines up."""
+
+    return next((c for c in reversed(checks) if c["page"] == page and abs(c["east_m"] - e) <= _MATCH_M
+                 and abs(c["north_m"] - n) <= _MATCH_M), None)
+
+
+def _strong_county_fit(check: dict) -> bool:
+    """A county-parcel score good enough to move a sheet on: corroborated, or snug against its neighbours."""
+
+    return bool(check.get("corroborated")) or (
+        (check.get("hugging_pct") or 0) >= _STRONG_HUGGING_PCT and (check.get("overlap_pct") or 0) <= _MAX_OVERLAP_PCT
+    )
+
+
+def _propose(result: dict, name: str, args: dict, checks: list[dict]) -> dict:
     """Validates a proposal against the document and returns it (status pending), or an {'error'}."""
 
     page = args.get("page_number")
@@ -169,13 +243,17 @@ def _propose(result: dict, name: str, args: dict, evaluated: list[dict]) -> dict
         e, n = float(args["east_m"]), float(args["north_m"])
         if not (abs(e) < 20_000 and abs(n) < 20_000):
             return {"error": "move too large"}
-        score = next((s for s in reversed(evaluated) if s.get("page") == page
-                      and abs(s.get("east_m", 0) - e) < 1 and abs(s.get("north_m", 0) - n) < 1
-                      and not s.get("rotation_deg")), None)
-        if score is None:
-            return {"error": "score this exact move with evaluate_position (rotation 0) before proposing it"}
-        baseline = next((s for s in evaluated if s.get("page") == page and not s.get("east_m") and not s.get("north_m")), None)
-        proposal.update({"kind": "move", "east_m": round(e, 2), "north_m": round(n, 2), "score": score, "baseline": baseline})
+        check = _checked_move(checks, page, e, n)
+        if check and check["kind"] == "county_parcels" and not _strong_county_fit(check):
+            return {"error": f"the county parcels back this move only weakly ({check['hugging_pct']}% of the outline "
+                             f"against a neighbour, not corroborated) -- the plat's APNs may have been renumbered. "
+                             "Do not propose it; check the position with find_position_from_imagery instead."}
+        if check is None and not args.get("from_user_instruction"):
+            known = [{"east_m": c["east_m"], "north_m": c["north_m"]} for c in checks if c["page"] == page]
+            return {"error": "this move was not checked. " + (f"Checked moves you can propose: {known}" if known else
+                    "Check it first with find_position_from_imagery, look_at_imagery or evaluate_position.")}
+        proposal.update({"kind": "move", "east_m": round(e, 2), "north_m": round(n, 2),
+                         "check": check, "from_user_instruction": bool(args.get("from_user_instruction")) and check is None})
     else:
         label = str(args.get("label") or "")
         try:
@@ -190,10 +268,40 @@ def _propose(result: dict, name: str, args: dict, evaluated: list[dict]) -> dict
     return proposal
 
 
-def run(result: dict, user_message: str, history: list[dict] | None = None, focus: dict | None = None) -> dict:
+def _record_check(name: str, out: dict, result: dict, checks: list[dict]) -> None:
+    """Remembers the moves a tool verified, so a proposal of one of them needs no second check."""
+
+    if "error" in out:
+        return
+    if name == "evaluate_position":
+        checks.append({"page": out["page"], "east_m": out["east_m"], "north_m": out["north_m"], "kind": "county_parcels",
+                       "hugging_pct": out["outline_hugging_a_neighbour_pct"], "overlap_pct": out["overlap_with_neighbours_pct"]})
+    elif name == "search_position_near":
+        best = out["best_total_move"]
+        if not best.get("rotation_deg"):
+            checks.append({"page": out["page"], "east_m": best["east_m"], "north_m": best["north_m"], "kind": "county_parcels",
+                           "hugging_pct": round((out.get("outline_hugging_share") or 0) * 100, 1),
+                           "overlap_pct": round((out.get("overlap_with_neighbours") or 0) * 100, 1),
+                           "corroborated": out.get("corroborated")})
+    elif name == "find_position_from_imagery" and out.get("settled"):
+        best = out["best_total_move"]
+        checks.append({"page": out["page"], "east_m": best["east_m"], "north_m": best["north_m"], "kind": "imagery",
+                       "features": out["lines_up_with"], "uncertainty_m": out["uncertainty_m"]})
+    elif name == "look_at_imagery" and out.get("lines_up"):
+        at = out["viewed_at_move"]
+        checks.append({"page": out["page"], "east_m": at["east_m"], "north_m": at["north_m"], "kind": "imagery",
+                       "features": [f"{f['name']} ({f['side']}, {abs(f['move_to_meet_it_m'])} m)" for f in out["features_located"]]})
+
+
+def run_events(result: dict, user_message: str, history: list[dict] | None = None,
+               focus: dict | None = None) -> Iterator[dict]:
     """
-    One user turn. `history`: earlier visible turns [{role: user|assistant, content}]; `focus`: optional
-    {page_number, label} of the card the user opened the chat from. Returns {reply, steps, proposals, model}.
+    One user turn as a stream of events, for a live step list:
+      {"type": "thinking"}                                  -- the model is deciding its next step
+      {"type": "step_start", "id", "label"}                 -- a check started
+      {"type": "step_done", "id", "summary", "ok", "image"?} -- it finished (image: JPEG base64 of a look)
+      {"type": "done", "reply", "proposals", "model", "steps"}
+      {"type": "error", "message"}
     The result dict is read, never modified.
     """
 
@@ -210,46 +318,63 @@ def run(result: dict, user_message: str, history: list[dict] | None = None, focu
     tools = agent_tools.tool_specs() + _PROPOSAL_TOOLS
     steps: list[dict] = []
     proposals: list[dict] = []
-    evaluated: list[dict] = []
+    checks: list[dict] = []
     model = None
-    with httpx.Client(headers={"User-Agent": "ROAM/1.0"}) as client:
-        for _ in range(_MAX_STEPS):
-            msg, model = _chat(client, messages, tools)
-            calls = msg.get("tool_calls") or []
-            if not calls:
-                return {"reply": (msg.get("content") or "").strip(), "steps": steps, "proposals": proposals, "model": model}
-            messages.append({"role": "assistant", "content": msg.get("content") or "", "tool_calls": calls})
-            for call in calls:
-                fn = call.get("function") or {}
-                name = fn.get("name", "")
-                try:
-                    args = json.loads(fn.get("arguments") or "{}") or {}
-                except json.JSONDecodeError:
-                    args = {}
-                    out: dict = {"error": "arguments were not valid JSON"}
-                else:
-                    if name in ("propose_move", "propose_stated_area"):
-                        out = _propose(result, name, args, evaluated)
-                        if "error" not in out:
-                            proposals.append(out)
-                            out = {"ok": True, "proposal_id": out["id"], "note": "shown to the user for approval"}
+    try:
+        with httpx.Client(headers={"User-Agent": "ROAM/1.0"}) as client:
+            for _ in range(_MAX_STEPS):
+                yield {"type": "thinking"}
+                msg, model = _chat(client, messages, tools)
+                calls = msg.get("tool_calls") or []
+                if not calls:
+                    yield {"type": "done", "reply": (msg.get("content") or "").strip(), "proposals": proposals,
+                           "model": model, "steps": steps}
+                    return
+                messages.append({"role": "assistant", "content": msg.get("content") or "", "tool_calls": calls})
+                for call in calls:
+                    fn = call.get("function") or {}
+                    name = fn.get("name", "")
+                    step_id = f"s{len(steps) + 1}"
+                    yield {"type": "step_start", "id": step_id, "label": _STEP_LABELS.get(name, name)}
+                    try:
+                        args = json.loads(fn.get("arguments") or "{}") or {}
+                    except json.JSONDecodeError:
+                        args, out = {}, {"error": "arguments were not valid JSON"}
                     else:
-                        out = agent_tools.run_tool(result, name, args)
-                        if name == "evaluate_position" and "error" not in out:
-                            evaluated.append(out)
-                        if name == "search_position_near" and "error" not in out:
-                            best = out["best_total_move"]
-                            # the search's answer counts as scored: proposing exactly it needs no extra call
-                            score = agent_tools.run_tool(result, "evaluate_position", {
-                                "page_number": out["page"], "east_m": best["east_m"], "north_m": best["north_m"]})
-                            if "error" not in score:
-                                evaluated.append(score)
-                steps.append({"tool": name, "args": args, "summary": _summary(name, args, out) if "ok" not in out else
-                              f"Proposed: {name.replace('propose_', '').replace('_', ' ')}"})
-                text = json.dumps(out, default=str)
-                messages.append({"role": "tool", "tool_call_id": call.get("id", name), "name": name,
-                                 "content": text[:_MAX_TOOL_RESULT_CHARS]})
-        # out of steps: ask for the answer without tools
-        messages.append({"role": "user", "content": "Stop investigating and answer now with what you found."})
-        msg, model = _chat(client, messages, [])
-    return {"reply": (msg.get("content") or "").strip(), "steps": steps, "proposals": proposals, "model": model}
+                        if name in ("propose_move", "propose_stated_area"):
+                            out = _propose(result, name, args, checks)
+                            if "error" not in out:
+                                proposals.append(out)
+                                out = {"ok": True, "proposal_id": out["id"], "note": "shown to the user for approval"}
+                        else:
+                            out = agent_tools.run_tool(result, name, args)
+                            _record_check(name, out, result, checks)
+                    image = out.pop("_image_jpeg_b64", None)
+                    summary = ("Proposed a fix for you to review" if out.get("ok") else _summary(name, args, out))
+                    step = {"id": step_id, "tool": name, "summary": summary, "ok": "error" not in out}
+                    steps.append(step)
+                    yield {"type": "step_done", **step, **({"image": image} if image else {})}
+                    messages.append({"role": "tool", "tool_call_id": call.get("id", name), "name": name,
+                                     "content": json.dumps(out, default=str)[:_MAX_TOOL_RESULT_CHARS]})
+            messages.append({"role": "user", "content": "Stop investigating and answer now with what you found."})
+            yield {"type": "thinking"}
+            msg, model = _chat(client, messages, [])
+            yield {"type": "done", "reply": (msg.get("content") or "").strip(), "proposals": proposals,
+                   "model": model, "steps": steps}
+    except AgentError as exc:
+        if proposals:  # the work is done; only the write-up failed -- keep the proposal
+            yield {"type": "done", "reply": "The AI model is busy, so there is no written summary -- the checks above "
+                   "and the proposed fix below are complete.", "proposals": proposals, "model": model, "steps": steps}
+        else:
+            yield {"type": "error", "message": str(exc)}
+
+
+def run(result: dict, user_message: str, history: list[dict] | None = None, focus: dict | None = None) -> dict:
+    """run_events collected into one answer: {reply, steps, proposals, model}. Raises AgentError on failure."""
+
+    for event in run_events(result, user_message, history, focus):
+        if event["type"] == "done":
+            return {k: event[k] for k in ("reply", "steps", "proposals", "model")}
+        if event["type"] == "error":
+            raise AgentError(event["message"])
+    raise AgentError("the agent stopped without an answer")

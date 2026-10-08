@@ -38,7 +38,7 @@ def test_move_is_proposed_only_after_it_was_scored(monkeypatch):
     assert len(out["proposals"]) == 1
     prop = out["proposals"][0]
     assert prop["kind"] == "move" and prop["north_m"] == -300 and prop["status"] == "pending"
-    assert prop["score"]["outline_hugging_a_neighbour_pct"] > 90
+    assert prop["check"]["kind"] == "county_parcels" and prop["check"]["hugging_pct"] > 90
     # the first, unscored attempt came back to the model as an error
     first_tool_reply = next(m for m in sent[1] if m["role"] == "tool")
     assert "evaluate_position" in first_tool_reply["content"]
@@ -96,3 +96,46 @@ def test_applying_a_move_proposal_moves_the_sheet_by_hand(monkeypatch):
     assert moved["manual_position"]["north_m"] == -12.0 and moved["manual_position"]["east_m"] == 5.0
     assert abs((moved["boundary_geojson_wgs84"]["geometry"]["coordinates"][0][0][1] - before) * 110_540 + 12) < 0.5
     assert store["r"]["agent_proposals"][0]["status"] == "applied"
+
+
+def test_imagery_look_that_lines_up_backs_a_move_and_steps_stream(monkeypatch):
+    from app.services import agent_tools
+
+    doc = _doc()
+
+    def fake_look(result, page_number, east_m=0.0, north_m=0.0, user_note=None):
+        lined = abs(east_m + 70) < 1 and abs(north_m - 80) < 1
+        return {"page": page_number, "viewed_at_move": {"east_m": east_m, "north_m": north_m},
+                "features_located": [{"side": "east", "name": "CROSS ROAD", "boundary_on": "centreline",
+                                      "move_to_meet_it_m": 0.7 if lined else -70.0}],
+                "lines_up": lined, "suggested_extra_move_m": {"east_m": 0 if lined else -70.0, "north_m": 0 if lined else 80.0},
+                "suggested_total_move_m": {"east_m": -70.0, "north_m": 80.0}, "_image_jpeg_b64": "aGk="}
+
+    monkeypatch.setitem(agent_tools.TOOLS, "look_at_imagery", (fake_look, *agent_tools.TOOLS["look_at_imagery"][1:]))
+    _script(monkeypatch, [
+        {"tool_calls": [_call("look_at_imagery", page_number=3, user_note="it is off")]},
+        {"tool_calls": [_call("propose_move", page_number=3, east_m=-70, north_m=80, reason="r")]},  # not yet confirmed
+        {"tool_calls": [_call("look_at_imagery", page_number=3, east_m=-70, north_m=80)]},
+        {"tool_calls": [_call("propose_move", page_number=3, east_m=-70, north_m=80, reason="road on the east")]},
+        {"content": "Moved it next to Cross Road."},
+    ])
+    events = list(pa.run_events(doc, "fix it"))
+    kinds = [e["type"] for e in events]
+    assert kinds[0] == "thinking" and kinds[-1] == "done" and kinds.count("step_start") == kinds.count("step_done") == 4
+    looks = [e for e in events if e["type"] == "step_done" and e["tool"] == "look_at_imagery"]
+    assert looks[0]["image"] == "aGk=" and "need to move 80 m north, 70 m west" in looks[0]["summary"]
+    assert "line up with Cross Road (east)" in looks[1]["summary"]
+    done = events[-1]
+    assert len(done["proposals"]) == 1 and done["proposals"][0]["check"]["kind"] == "imagery"
+    assert "image" not in done["steps"][0]  # images go to the live step only, not into the saved answer
+
+
+def test_weak_county_fit_cannot_back_a_move(monkeypatch):
+    doc = _doc(neighbour_offset_m=-300.0)
+    _script(monkeypatch, [
+        {"tool_calls": [_call("evaluate_position", page_number=3, east_m=0, north_m=-250)]},  # off target: weak
+        {"tool_calls": [_call("propose_move", page_number=3, east_m=0, north_m=-250, reason="r")]},
+        {"content": "no fix"},
+    ])
+    out = pa.run(doc, "fix it")
+    assert out["proposals"] == [] and "only weakly" in out["steps"][1]["summary"]
