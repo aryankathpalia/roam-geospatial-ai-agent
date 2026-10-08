@@ -1,5 +1,10 @@
 <script lang="ts">
   import '../app.css';
+  import { browser } from '$app/environment';
+  import { installAuth } from '$lib/auth';
+
+  // during setup, not onMount: child pages mount (and start fetching) before this layout's onMount runs
+  if (browser) installAuth();
 </script>
 
 <svelte:head>

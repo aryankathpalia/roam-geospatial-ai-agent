@@ -11,7 +11,7 @@ from pathlib import Path
 
 import io
 
-from fastapi import APIRouter, BackgroundTasks, File, HTTPException, UploadFile
+from fastapi import APIRouter, BackgroundTasks, File, HTTPException, Request, UploadFile
 from fastapi.responses import StreamingResponse
 from PIL import Image
 from pydantic import BaseModel
@@ -70,9 +70,10 @@ def _save_result(document_id: str, result: dict) -> None:
 
 
 @router.post("/upload")
-async def upload_document(file: UploadFile = File(...)):
+async def upload_document(request: Request, file: UploadFile = File(...)):
     """
-    Upload a PDF document and start the ROAM processing pipeline.
+    Upload a PDF document and start the ROAM processing pipeline. Signed-in users only (main.py's gate); the
+    document belongs to them (services/doc_access.py).
     """
 
     # --------------------------------------------------
@@ -105,6 +106,11 @@ async def upload_document(file: UploadFile = File(...)):
 
     contents = await file.read()
     pdf_path.write_bytes(contents)
+    user = getattr(request.state, "user", None)
+    if user:
+        from app.services import doc_access
+
+        doc_access.write_access(document_id, {"owner": user["email"], "filename": file.filename, "created_at": time.time()})
 
     # --------------------------------------------------
     # 4. Kick off the ROAM processing pipeline in the background and

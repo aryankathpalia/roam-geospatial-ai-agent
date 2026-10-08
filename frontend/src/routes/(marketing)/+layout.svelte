@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { user } from '$lib/auth';
+  import AccountButton from '$lib/components/AccountButton.svelte';
   let mobileOpen = false;
 </script>
 
@@ -27,6 +29,7 @@
       </nav>
 
       <div class="nav-actions">
+        {#if $user}<AccountButton compact />{/if}
         <a href="/workspace" class="btn btn-primary">Open Workspace</a>
       </div>
 

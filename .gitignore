@@ -117,3 +117,6 @@ models/roam_layout_v1/roam_layout_best.onnx.data
 # report figure caches (app/services/static_map.py, routes/documents.py report_figure)
 data/tile_cache/
 data/documents/*/report_cache/
+
+# signs session tokens -- never commit
+data/.session_secret

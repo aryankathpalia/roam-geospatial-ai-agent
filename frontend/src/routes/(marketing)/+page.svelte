@@ -1,4 +1,5 @@
 <script lang="ts">
+  import AccountButton from '$lib/components/AccountButton.svelte';
   import { onMount } from 'svelte';
 
   let sample: any = null;
@@ -110,9 +111,10 @@
       exactly how well it closes.
     </p>
     <div class="hero-actions">
-      <a href="/workspace" class="btn btn-primary">Open Workspace</a>
-      <a href="#pipeline" class="btn btn-ghost">See how it works</a>
+      <a href="/workspace" class="btn btn-primary">Try a sample document</a>
+      <AccountButton text="continue_with" width={250} />
     </div>
+    <p class="hero-note">No sign-in needed to explore the samples. Sign in with Google to upload your own.</p>
     <div class="hero-chips">
       {#each capabilities as c}
         <span class="chip">{c}</span>
@@ -804,4 +806,12 @@ h1 {
     grid-template-columns: 1fr;
   }
 }
+  .hero-note {
+    margin: 10px 0 0;
+    font-size: 13px;
+    color: var(--text-muted, #6b7280);
+  }
+  .hero-actions {
+    align-items: center;
+  }
 </style>

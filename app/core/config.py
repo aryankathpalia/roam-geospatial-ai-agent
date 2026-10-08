@@ -15,6 +15,12 @@ class Settings(BaseSettings):
     NOMINATIM_BASE_URL: str = "https://nominatim.openstreetmap.org"
     OVERPASS_URL: str = "https://overpass-api.de/api/interpreter"
     OSRM_BASE_URL: str = "https://router.project-osrm.org"
+    # Sign-in: the Google OAuth web client id (Google Cloud console -> Credentials), the secret that signs
+    # ROAM's own session tokens (generated and kept in data/.session_secret when empty), and the Google
+    # accounts that may change the shared sample documents (comma-separated).
+    GOOGLE_CLIENT_ID: str = ""
+    SESSION_SECRET: str = ""
+    ADMIN_EMAILS: str = ""
     OPENROUTER_API_KEY: str = ""
     OPENROUTER_MODEL: str = "openrouter/free"
     MISTRAL_API_KEY: str = ""

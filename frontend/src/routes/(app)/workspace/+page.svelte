@@ -3,6 +3,8 @@
   import { goto } from '$app/navigation';
   import { boundaryRefs, primaryCandidates } from '$lib/boundaryCandidates';
   import AgentChat from '$lib/AgentChat.svelte';
+  import AccountButton from '$lib/components/AccountButton.svelte';
+  import { user } from '$lib/auth';
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
   const LAST_DOCUMENT_KEY = 'roam:lastDocumentId';
@@ -60,7 +62,89 @@
   let lastDocumentId: string | null = null;
   let resuming = false;
 
+  // ---- sample gallery, playground copies, own documents -----------------------------------------
+  // A sample opens as a private playground copy (POST /samples/{id}/open): change anything, nothing is
+  // kept. Which documents in this tab are playground copies (and of what) lives in sessionStorage, so the
+  // banner survives a trip to the boundary editor and is gone with the tab.
+  const PLAYGROUND_KEY = 'roam.playground';
+  type Sample = { id: string; title: string; location: string; pages: number; parcels: number; highlight: string; thumbnail: string };
+  let samples: Sample[] = [];
+  let samplesError = '';
+  let openingSample: string | null = null;
+  let myDocuments: { id: string; filename: string | null; created_at: number | null }[] = [];
+
+  function playgrounds(): Record<string, string> {
+    try {
+      return JSON.parse(sessionStorage.getItem(PLAYGROUND_KEY) ?? '{}');
+    } catch {
+      return {};
+    }
+  }
+  $: sandboxOf = documentId ? (playgrounds()[documentId] ?? null) : null;
+  $: sandboxSample = sandboxOf ? (samples.find((sm) => sm.id === sandboxOf) ?? null) : null;
+
+  async function loadSamples() {
+    try {
+      const res = await fetch(`${API_BASE}/samples`);
+      if (!res.ok) throw new Error(`${res.status}`);
+      samples = (await res.json()).samples;
+    } catch {
+      samplesError = `Could not reach the ROAM backend at ${API_BASE}.`;
+    }
+  }
+  async function loadMyDocuments() {
+    try {
+      const res = await fetch(`${API_BASE}/me/documents`);
+      myDocuments = res.ok ? (await res.json()).documents : [];
+    } catch {
+      myDocuments = [];
+    }
+  }
+  $: if ($user) loadMyDocuments();
+  else myDocuments = [];
+
+  async function openSample(sample: Sample, fresh = false) {
+    openingSample = sample.id;
+    errorMessage = '';
+    try {
+      // reuse this tab's copy unless asked for a fresh one
+      const existing = Object.entries(playgrounds()).find(([, of]) => of === sample.id)?.[0];
+      let id: string | null = !fresh && existing ? existing : null;
+      if (id && !(await fetch(`${API_BASE}/documents/${id}`)).ok) id = null; // expired on the server
+      if (!id) {
+        const res = await fetch(`${API_BASE}/samples/${sample.id}/open`, { method: 'POST' });
+        const body = await res.json().catch(() => null);
+        if (!res.ok) throw new Error(body?.detail ?? `${res.status} ${res.statusText}`);
+        id = body.document_id as string;
+        try {
+          const kept = Object.fromEntries(Object.entries(playgrounds()).filter(([, of]) => of !== sample.id));
+          sessionStorage.setItem(PLAYGROUND_KEY, JSON.stringify({ ...kept, [id]: sample.id }));
+        } catch {
+          // no session storage: the copy still works, the banner just will not survive a reload
+        }
+      }
+      selectedKey = null;
+      editingKey = null;
+      await openDocument(id, false);
+    } catch (err: any) {
+      errorMessage = `Could not open the sample: ${err.message}`;
+      phase = 'error';
+    } finally {
+      openingSample = null;
+    }
+  }
+
+  function resetPlayground() {
+    if (sandboxSample && confirm('Discard your changes and start this sample again?')) openSample(sandboxSample, true);
+  }
+
+  async function openDocument(id: string, remember = true) {
+    lastDocumentId = id;
+    await resumeLastDocument(remember);
+  }
+
   onMount(() => {
+    loadSamples();
     try {
       lastDocumentId = localStorage.getItem(LAST_DOCUMENT_KEY);
     } catch {
@@ -145,7 +229,7 @@
     }
   }
 
-  async function resumeLastDocument() {
+  async function resumeLastDocument(remember = true) {
     if (!lastDocumentId) return;
     resuming = true;
     errorMessage = '';
@@ -156,7 +240,9 @@
         throw new Error(`${res.status}: ${body.slice(0, 200)}`);
       }
       const data = await res.json();
-      rememberDocumentId(data.document_id ?? lastDocumentId);
+      const openedId = data.document_id ?? lastDocumentId;
+      if (remember && !playgrounds()[openedId]) rememberDocumentId(openedId);
+      else documentId = openedId;
       usingSample = false;
       if (data.status === 'processing') {
         // Only the candidate maps exist so far; wait for the finished result.
@@ -1471,7 +1557,53 @@
     {/if}
   </header>
 
-  {#if phase === 'idle' || phase === 'uploading' || phase === 'error'}
+  {#if phase === 'idle' || phase === 'error'}
+    <section class="gallery fade-up" aria-label="Sample documents">
+      <div class="gallery-head">
+        <h2>Try a sample document</h2>
+        <p>Already processed — open one to explore the map, the parcels, the report and the AI review. You get your own copy: change anything, nothing is saved.</p>
+      </div>
+      {#if samplesError}<p class="gallery-err">{samplesError}</p>{/if}
+      <div class="gallery-grid">
+        {#each samples as sm (sm.id)}
+          <button class="sample-card panel" disabled={openingSample !== null} on:click={() => openSample(sm)}>
+            <div class="sample-thumb"><img src={`${API_BASE}${sm.thumbnail}`} alt={`Plat: ${sm.title}`}/></div>
+            <div class="sample-body">
+              <span class="sample-title">{sm.title}</span>
+              <span class="sample-loc">{sm.location} · {sm.pages} pages · {sm.parcels} parcels</span>
+              <span class="sample-hl">{sm.highlight}</span>
+            </div>
+            {#if openingSample === sm.id}<span class="sample-opening">Opening…</span>{/if}
+          </button>
+        {/each}
+      </div>
+    </section>
+  {/if}
+
+  {#if (phase === 'idle' || phase === 'uploading' || phase === 'error') && !$user}
+    <section class="signin-card panel" aria-label="Upload your own document">
+      <div>
+        <h2>Process your own document</h2>
+        <p>Sign in with Google to upload a scanned deed, plat or survey PDF. Your documents are private to your account.</p>
+      </div>
+      <AccountButton text="signin_with" width={260} />
+    </section>
+  {/if}
+
+  {#if (phase === 'idle' || phase === 'uploading' || phase === 'error') && $user}
+    {#if myDocuments.length}
+      <section class="my-docs panel" aria-label="Your documents">
+        <h2>Your documents</h2>
+        <ul>
+          {#each myDocuments.slice(0, 8) as d (d.id)}
+            <li>
+              <button class="link-btn" on:click={() => openDocument(d.id)}>{d.filename ?? d.id.slice(0, 8)}</button>
+              {#if d.created_at}<span class="muted">{new Date(d.created_at * 1000).toLocaleDateString()}</span>{/if}
+            </li>
+          {/each}
+        </ul>
+      </section>
+    {/if}
     <section
       class="dropzone panel"
       class:drag={dragOver}
@@ -1512,11 +1644,11 @@
       <div class="dz-footer">
         <span>API target: <code class="mono">{API_BASE}</code></span>
         {#if lastDocumentId}
-          <button class="link-btn" on:click={resumeLastDocument} disabled={resuming}>
+          <button class="link-btn" on:click={() => resumeLastDocument()} disabled={resuming}>
             {resuming ? 'Resuming…' : 'Resume last document →'}
           </button>
         {/if}
-        <button class="link-btn" on:click={loadSample}>View a sample result instead →</button>
+        {#if samplesError}<button class="link-btn" on:click={loadSample}>View an offline sample result →</button>{/if}
       </div>
     </section>
   {/if}
@@ -1551,6 +1683,16 @@
 
   {#if phase === 'done' && result}
     <section class="results fade-up">
+      {#if sandboxOf}
+        <div class="playground-banner panel">
+          <span class="pg-dot"></span>
+          <span><strong>Playground copy</strong>{#if sandboxSample}&nbsp;of “{sandboxSample.title}”{/if} — move parcels, re-confirm boundaries, ask the AI. Nothing is saved: your copy is discarded when you leave.</span>
+          <span class="pg-actions">
+            <button class="btn btn-ghost btn-sm" on:click={resetPlayground}>Reset sample</button>
+            <button class="btn btn-ghost btn-sm" on:click={reset}>All samples</button>
+          </span>
+        </div>
+      {/if}
       {#if usingSample}
         <div class="sample-banner panel">
           <span class="status-dot"></span>
@@ -2765,6 +2907,144 @@ h1 {
   .results-grid.with-viewer .region-list {
     grid-column: 1 / -1;
   }
+}
+
+.gallery {
+  margin-bottom: 24px;
+}
+.gallery-head h2,
+.signin-card h2,
+.my-docs h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+.gallery-head p,
+.signin-card p {
+  margin: 0 0 14px;
+  font-size: 14px;
+  color: var(--text-muted, #6b7280);
+  max-width: 720px;
+}
+.gallery-err {
+  color: #b45309;
+  font-size: 13px;
+}
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+.sample-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.sample-card:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+.sample-card:disabled {
+  cursor: progress;
+}
+.sample-thumb {
+  height: 150px;
+  background: #f3f1ec;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border, #e7e3dc);
+}
+.sample-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sample-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px 14px;
+}
+.sample-title {
+  font-weight: 600;
+  font-size: 14.5px;
+}
+.sample-loc {
+  font-size: 12.5px;
+  color: var(--text-muted, #6b7280);
+}
+.sample-hl {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: #374151;
+}
+.sample-opening {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #111827;
+  color: #fff;
+  font-size: 12px;
+}
+.signin-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 22px;
+  margin-bottom: 24px;
+}
+.signin-card p {
+  margin: 0;
+}
+.my-docs {
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+.my-docs ul {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13.5px;
+}
+.my-docs .muted {
+  margin-left: 8px;
+  color: var(--text-muted, #9ca3af);
+  font-size: 12px;
+}
+.playground-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  border: 1px solid #c7d2fe;
+  background: #f5f7ff;
+  font-size: 13.5px;
+  color: #312e81;
+}
+.pg-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6366f1;
+}
+.pg-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
 }
 
 @media (max-width: 980px) {
