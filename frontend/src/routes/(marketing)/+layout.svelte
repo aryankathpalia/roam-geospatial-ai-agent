@@ -9,7 +9,7 @@
     <div class="nav-inner">
       <a href="/" class="brand">
         <span class="logo-mark">
-          <img src="/logo.svg" width="36" height="36" alt="" />
+          <img src="/logo.png" width="36" height="36" alt="" />
         </span>
         <span class="brand-name">ROAM</span>
       </a>

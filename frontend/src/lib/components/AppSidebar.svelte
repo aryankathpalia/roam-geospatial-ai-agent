@@ -12,7 +12,7 @@
 <aside class="sidebar">
   <a href="/" class="brand">
     <span class="logo-mark">
-      <img src="/logo.svg" width="30" height="30" alt="" />
+      <img src="/logo.png" width="30" height="30" alt="" />
     </span>
     <div class="brand-text">
       <span class="brand-title">ROAM</span>
