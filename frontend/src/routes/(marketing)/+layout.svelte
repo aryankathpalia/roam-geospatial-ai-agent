@@ -8,7 +8,8 @@
   <header class="nav">
     <div class="nav-inner">
       <a href="/" class="brand" aria-label="ROAM home">
-        <img class="brand-lockup" src="/logo-lockup.png" alt="ROAM" />
+        <img class="brand-icon" src="/logo.png" alt="" />
+        <span class="brand-name">ROAM</span>
       </a>
 
       <nav class="nav-links">
@@ -82,7 +83,7 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
   text-decoration: none;
   margin-right: auto;
 }
@@ -100,7 +101,7 @@
 .brand-name {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
-  font-size: 1.4rem;
+  font-size: 1.75rem;
   letter-spacing: 0.02em;
   color: var(--text);
 }
@@ -210,9 +211,9 @@
       gap: 12px;
     }
   }
-  .brand-lockup {
+  .brand-icon {
     display: block;
+    width: 38px;
     height: 38px;
-    width: auto;
   }
 </style>

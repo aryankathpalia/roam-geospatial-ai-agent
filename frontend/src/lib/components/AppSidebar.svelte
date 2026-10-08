@@ -11,8 +11,9 @@
 
 <aside class="sidebar">
   <a href="/" class="brand" aria-label="ROAM home">
+    <img class="brand-icon" src="/logo.png" alt="" />
     <div class="brand-text">
-      <img class="brand-lockup" src="/logo-lockup.png" alt="ROAM" />
+      <span class="brand-title">ROAM</span>
       <span class="brand-subtitle">Document intelligence</span>
     </div>
   </a>
@@ -76,7 +77,8 @@
 .brand-title {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
-  font-size: 0.98rem;
+  font-size: 1.3rem;
+  line-height: 1.1;
   color: var(--text);
 }
 
@@ -153,10 +155,9 @@
     display: none;
   }
 }
-.brand-lockup {
+.brand-icon {
   display: block;
+  width: 32px;
   height: 32px;
-  width: auto;
-  margin-bottom: 6px;
 }
 </style>
