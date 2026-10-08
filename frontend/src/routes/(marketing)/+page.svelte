@@ -232,9 +232,9 @@
       <div class="story-visual map-visual">
         <img
           src="/images/roam-placed.jpg"
-          alt="Four parcels from a survey plat, placed on satellite imagery in Washoe County, Nevada, each in its own colour"
+          alt="The four parcels from the plat above, placed on satellite imagery in Washoe County, Nevada, each in its own colour"
         />
-        <span class="scan-tag">SATELLITE &middot; WASHOE COUNTY, NV &middot; 4 PARCELS</span>
+        <span class="scan-tag">SATELLITE &middot; WASHOE COUNTY, NV &middot; PARCELS AB-1 TO AB-4</span>
       </div>
     </div>
 
