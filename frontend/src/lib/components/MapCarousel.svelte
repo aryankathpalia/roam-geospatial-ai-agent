@@ -103,7 +103,7 @@
   .carousel {
     position: relative;
     width: 100%;
-    max-width: 400px;
+    max-width: 340px;
     margin: 0 auto;
   }
 
@@ -126,7 +126,7 @@
 
   .frame {
     position: relative;
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 9 / 10;
     border-radius: 18px;
     overflow: hidden;
     background: #ece5d6;
@@ -262,7 +262,7 @@
   }
 
   .credit {
-    margin: 22px 0 0;
+    margin: 18px 0 0;
     text-align: center;
     font-size: 0.72rem;
     color: var(--muted);

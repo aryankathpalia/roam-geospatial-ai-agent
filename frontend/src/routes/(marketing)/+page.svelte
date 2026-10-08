@@ -155,7 +155,7 @@
         </p>
       </div>
       <div class="story-visual scan-visual">
-        <img src="/images/roam-detect.jpg" alt="ROAM's layout detection on a real survey plat: the parcel map, text blocks and the surveyor's seal, each boxed and labelled" />
+        <img src="/images/roam-detect.jpg" alt="A real tentative parcel map: ROAM finds the parcel drawing and traces its four parcels, each labelled with its area" />
       </div>
     </div>
 
@@ -237,9 +237,9 @@
       <div class="story-visual map-visual">
         <img
           src="/images/roam-placed.jpg"
-          alt="The four parcels from the plat above, placed on satellite imagery in Washoe County, Nevada, each in its own colour"
+          alt="The same four parcels, turned to north and placed on satellite imagery in Washoe County, Nevada"
         />
-        <span class="scan-tag">SATELLITE &middot; WASHOE COUNTY, NV &middot; PARCELS AB-1 TO AB-4</span>
+        <span class="scan-tag">SATELLITE &middot; WASHOE COUNTY, NV &middot; PARCELS 1 TO 4</span>
       </div>
     </div>
 
@@ -337,8 +337,8 @@
 }
 
 .hero-side {
-  align-self: center;
-  margin: -24px 0 40px;
+  align-self: start;
+  margin: 0 0 40px;
 }
 
 @media (max-width: 960px) {
