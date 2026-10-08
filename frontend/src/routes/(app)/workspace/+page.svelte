@@ -129,6 +129,19 @@
     if (sandboxSample && confirm('Discard your changes and start this sample again?')) openSample(sandboxSample, true);
   }
 
+  // the signed-in user's own uploads, listed under the upload box
+  let myDocuments: { id: string; filename: string | null; created_at: number | null }[] = [];
+  async function loadMyDocuments() {
+    try {
+      const res = await fetch(`${API_BASE}/me/documents`);
+      myDocuments = res.ok ? (await res.json()).documents : [];
+    } catch {
+      myDocuments = [];
+    }
+  }
+  $: if ($user) loadMyDocuments();
+  else myDocuments = [];
+
   async function openDocument(id: string, remember = true) {
     lastDocumentId = id;
     await resumeLastDocument(remember);
@@ -1629,6 +1642,19 @@
         {#if samplesError}<button class="link-btn" on:click={loadSample}>View an offline sample result →</button>{/if}
       </div>
     </section>
+    {#if myDocuments.length}
+      <section class="my-docs panel" aria-label="Your uploads">
+        <h2>Your uploads</h2>
+        <ul>
+          {#each myDocuments as d (d.id)}
+            <li>
+              <button class="link-btn" on:click={() => openDocument(d.id)}>{d.filename ?? d.id.slice(0, 8)}</button>
+              {#if d.created_at}<span class="muted">{new Date(d.created_at * 1000).toLocaleDateString()}</span>{/if}
+            </li>
+          {/each}
+        </ul>
+      </section>
+    {/if}
   {/if}
 
   {#if phase === 'processing'}
@@ -2978,6 +3004,27 @@ h1 {
 }
 .signin-card p {
   margin: 0;
+}
+.my-docs {
+  margin-top: 16px;
+  padding: 16px 20px;
+}
+.my-docs h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+.my-docs ul {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.my-docs .muted {
+  margin-left: 8px;
+  color: var(--text-muted, #9ca3af);
+  font-size: 12px;
 }
 .playground-banner {
   display: flex;
