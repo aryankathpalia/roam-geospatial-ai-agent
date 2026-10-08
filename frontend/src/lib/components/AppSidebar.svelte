@@ -4,7 +4,8 @@
   const navItems = [
     { name: 'Workspace', href: '/workspace' },
     { name: 'Boundary review', href: '/boundary-review' },
-    { name: 'Report', href: '/report' }
+    { name: 'Report', href: '/report' },
+    { name: 'Source document', href: '/source' }
   ];
 </script>
 

@@ -12,7 +12,7 @@ from pathlib import Path
 import io
 
 from fastapi import APIRouter, BackgroundTasks, File, HTTPException, Request, UploadFile
-from fastapi.responses import StreamingResponse
+from fastapi.responses import Response, StreamingResponse
 from PIL import Image
 from pydantic import BaseModel
 
@@ -273,6 +273,40 @@ def get_document(document_id: str, background_tasks: BackgroundTasks):
         "status": "processed" if (result.get("processing") or {}).get("complete", True) else "processing",
         "result": result,
     }
+
+
+@router.get("/{document_id}/original.pdf")
+def get_original_pdf(document_id: str):
+    """The uploaded PDF, as uploaded."""
+
+    path = DOCUMENT_ROOT / document_id / "original.pdf"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Original PDF not found")
+    return StreamingResponse(open(path, "rb"), media_type="application/pdf",
+                             headers={"Content-Disposition": f'inline; filename="roam-{document_id[:8]}.pdf"'})
+
+
+@router.get("/{document_id}/pages/{page_number}/thumb.jpg")
+def get_page_thumbnail(document_id: str, page_number: int):
+    """A small JPEG of a page for the source-document grid (made once, cached beside the pages)."""
+
+    from PIL import Image
+
+    src = DOCUMENT_ROOT / document_id / "pages" / f"page_{page_number:03d}.png"
+    if not src.exists():
+        raise HTTPException(status_code=404, detail="Rendered page not found")
+    thumb = DOCUMENT_ROOT / document_id / "page_thumbs" / f"page_{page_number:03d}.jpg"
+    if not thumb.exists():
+        thumb.parent.mkdir(parents=True, exist_ok=True)
+        Image.MAX_IMAGE_PIXELS = None
+        with Image.open(src) as im:
+            im = im.convert("RGB")
+            im.thumbnail((420, 420))
+            tmp = thumb.with_suffix(".tmp")
+            im.save(tmp, format="JPEG", quality=78)
+            tmp.replace(thumb)
+    return Response(content=thumb.read_bytes(), media_type="image/jpeg",
+                    headers={"Cache-Control": "public, max-age=86400"})
 
 
 @router.get("/{document_id}/pages/{page_number}.png")
