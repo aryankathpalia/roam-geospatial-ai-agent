@@ -150,13 +150,7 @@
         </p>
       </div>
       <div class="story-visual scan-visual">
-        <img src="/images/gallery-baist-dc.jpg" alt="Detected regions on a scanned real-estate atlas plate" />
-        <div class="detect-box" style="left:50.5%; top:58.8%; width:21%; height:31.7%;">
-          <span>ParcelMap</span>
-        </div>
-        <div class="detect-box" style="left:10.5%; top:9.5%; width:25%; height:14%;">
-          <span>Text</span>
-        </div>
+        <img src="/images/roam-detect.jpg" alt="ROAM's layout detection on a real survey plat: the parcel map, text blocks and the surveyor's seal, each boxed and labelled" />
       </div>
     </div>
 
@@ -237,10 +231,10 @@
       </div>
       <div class="story-visual map-visual">
         <img
-          src="/images/earth/khorinsky-russia.jpg"
-          alt="Satellite imagery of river valleys, ridgelines and scattered clouds over the Khorinsky district, Russia"
+          src="/images/roam-placed.jpg"
+          alt="Four parcels from a survey plat, placed on satellite imagery in Washoe County, Nevada, each in its own colour"
         />
-        <span class="scan-tag">SATELLITE &middot; KHORINSKY DISTRICT</span>
+        <span class="scan-tag">SATELLITE &middot; WASHOE COUNTY, NV &middot; 4 PARCELS</span>
       </div>
     </div>
 
@@ -480,7 +474,7 @@ h1 {
      block ~47-68.5% of the source image) inside the visible crop window
      at this box's aspect ratio -- recompute this if the image or the
      detect-box positions below change. */
-  object-position: 50% 22%;
+  object-position: 50% 50%;
 }
 
 .detect-box {
@@ -517,7 +511,7 @@ h1 {
 .map-visual .scan-tag {
   position: absolute;
   left: 14px;
-  bottom: 14px;
+  top: 14px; /* the map's own scale bar sits bottom-left */
   font-family: var(--mono);
   font-size: 0.64rem;
   letter-spacing: 0.05em;
