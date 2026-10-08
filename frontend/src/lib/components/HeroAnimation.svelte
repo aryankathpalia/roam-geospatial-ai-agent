@@ -221,9 +221,9 @@
     white-space: nowrap;
     pointer-events: none;
   }
-  .c1 { left: -6%; top: 10%; }
-  .c2 { left: -8%; top: 50%; }
-  .c3 { right: -6%; top: 12%; }
+  .c1 { left: -17%; top: 8%; }
+  .c2 { left: -19%; top: 52%; }
+  .c3 { right: -14%; top: 8%; }
   .k {
     font-size: 0.62rem;
     font-weight: 700;
