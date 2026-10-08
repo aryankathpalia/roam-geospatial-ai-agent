@@ -190,7 +190,7 @@
   .hero-anim {
     position: relative;
     width: 100%;
-    max-width: 480px;
+    max-width: 420px;
     margin: 0 auto;
   }
   svg {
