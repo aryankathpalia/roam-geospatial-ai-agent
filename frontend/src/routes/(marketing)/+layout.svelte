@@ -214,4 +214,11 @@
 .footer-links a:hover {
   color: var(--text);
 }
+  @media (min-width: 761px) {
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+  }
 </style>

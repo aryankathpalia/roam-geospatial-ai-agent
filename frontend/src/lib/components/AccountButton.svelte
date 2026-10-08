@@ -90,12 +90,18 @@
   .account {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 4px 6px 4px 4px;
-    border: 1px solid var(--border, #e5e2dc);
-    border-radius: 999px;
-    background: #fff;
-    font-size: 13px;
+    gap: 10px;
+    height: 44px;
+    box-sizing: border-box;
+    padding: 0 14px 0 8px;
+    border: 1px solid var(--line, #e5e2dc);
+    border-radius: 9px;
+    background: var(--surface, #fff);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  .account.compact {
+    padding-right: 12px;
   }
   .account img {
     width: 28px;
@@ -110,11 +116,17 @@
   }
   .out {
     border: 0;
+    padding: 0 0 0 10px;
+    border-left: 1px solid var(--line, #e5e2dc);
     background: none;
     font: inherit;
-    font-size: 12px;
-    color: #6b7280;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted, #6b7280);
     cursor: pointer;
+  }
+  .out:hover {
+    color: var(--text, #171613);
   }
   .err {
     margin: 4px 0 0;

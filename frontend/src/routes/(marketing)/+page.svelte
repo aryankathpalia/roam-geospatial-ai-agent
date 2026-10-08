@@ -1,5 +1,6 @@
 <script lang="ts">
   import AccountButton from '$lib/components/AccountButton.svelte';
+  import { user } from '$lib/auth';
   import { onMount } from 'svelte';
 
   let sample: any = null;
@@ -112,9 +113,15 @@
     </p>
     <div class="hero-actions">
       <a href="/workspace" class="btn btn-primary">Try a sample document</a>
-      <AccountButton text="continue_with" />
+      {#if $user}
+        <a href="/workspace" class="btn btn-ghost hero-own">Upload your own document</a>
+      {:else}
+        <AccountButton text="continue_with" />
+      {/if}
     </div>
-    <p class="hero-note">No sign-in needed to explore the samples. Sign in with Google to upload your own.</p>
+    <p class="hero-note">
+      {$user ? `Signed in as ${$user.name}.` : 'No sign-in needed to explore the samples. Sign in with Google to upload your own.'}
+    </p>
     <div class="hero-chips">
       {#each capabilities as c}
         <span class="chip">{c}</span>
@@ -806,6 +813,10 @@ h1 {
     grid-template-columns: 1fr;
   }
 }
+  .hero-own {
+    padding-block: 10px; /* the 1 px outline: same 44 px height as the filled button */
+    background: var(--surface, #fff);
+  }
   .hero-note {
     margin: 10px 0 0;
     font-size: 13px;
