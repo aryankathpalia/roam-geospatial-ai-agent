@@ -72,7 +72,6 @@
   let samples: Sample[] = [];
   let samplesError = '';
   let openingSample: string | null = null;
-  let myDocuments: { id: string; filename: string | null; created_at: number | null }[] = [];
 
   function playgrounds(): Record<string, string> {
     try {
@@ -94,16 +93,6 @@
       samplesError = `Could not reach the ROAM backend at ${API_BASE}.`;
     }
   }
-  async function loadMyDocuments() {
-    try {
-      const res = await fetch(`${API_BASE}/me/documents`);
-      myDocuments = res.ok ? (await res.json()).documents : [];
-    } catch {
-      myDocuments = [];
-    }
-  }
-  $: if ($user) loadMyDocuments();
-  else myDocuments = [];
 
   async function openSample(sample: Sample, fresh = false) {
     openingSample = sample.id;
@@ -1559,21 +1548,6 @@
     {/if}
   </header>
 
-  <!-- a signed-in user's own work comes before the samples -->
-  {#if (phase === 'idle' || phase === 'uploading' || phase === 'error') && $user && myDocuments.length}
-      <section class="my-docs panel" aria-label="Your documents">
-        <h2>Your documents</h2>
-        <ul>
-          {#each myDocuments.slice(0, 8) as d (d.id)}
-            <li>
-              <button class="link-btn" on:click={() => openDocument(d.id)}>{d.filename ?? d.id.slice(0, 8)}</button>
-              {#if d.created_at}<span class="muted">{new Date(d.created_at * 1000).toLocaleDateString()}</span>{/if}
-            </li>
-          {/each}
-        </ul>
-      </section>
-  {/if}
-
   {#if phase === 'idle' || phase === 'error'}
     <section class="gallery fade-up" aria-label="Sample documents">
       <div class="gallery-head">
@@ -2918,10 +2892,6 @@ h1 {
 }
 .gallery-head h2,
 .signin-card h2,
-.my-docs h2 {
-  margin: 0 0 4px;
-  font-size: 18px;
-}
 .gallery-head p,
 .signin-card p {
   margin: 0 0 14px;
@@ -3008,24 +2978,6 @@ h1 {
 }
 .signin-card p {
   margin: 0;
-}
-.my-docs {
-  padding: 16px 20px;
-  margin-bottom: 16px;
-}
-.my-docs ul {
-  list-style: none;
-  margin: 6px 0 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 13.5px;
-}
-.my-docs .muted {
-  margin-left: 8px;
-  color: var(--text-muted, #9ca3af);
-  font-size: 12px;
 }
 .playground-banner {
   display: flex;
