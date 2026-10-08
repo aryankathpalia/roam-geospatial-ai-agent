@@ -9,15 +9,7 @@
     <div class="nav-inner">
       <a href="/" class="brand">
         <span class="logo-mark">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M12 2 L21 7 V17 L12 22 L3 17 V7 Z"
-              stroke="currentColor"
-              stroke-width="1.6"
-              fill="none"
-            />
-            <circle cx="12" cy="12" r="2.6" fill="currentColor" />
-          </svg>
+          <img src="/logo.svg" width="36" height="36" alt="" />
         </span>
         <span class="brand-name">ROAM</span>
       </a>
@@ -105,7 +97,7 @@
   display: grid;
   place-items: center;
   color: var(--ink);
-  background: var(--surface-muted);
+  background: none;
 }
 
 .brand-name {

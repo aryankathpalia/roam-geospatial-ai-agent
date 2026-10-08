@@ -12,10 +12,7 @@
 <aside class="sidebar">
   <a href="/" class="brand">
     <span class="logo-mark">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path d="M12 2 L21 7 V17 L12 22 L3 17 V7 Z" stroke="currentColor" stroke-width="1.6" />
-        <circle cx="12" cy="12" r="2.4" fill="currentColor" />
-      </svg>
+      <img src="/logo.svg" width="30" height="30" alt="" />
     </span>
     <div class="brand-text">
       <span class="brand-title">ROAM</span>
@@ -69,7 +66,7 @@
   display: grid;
   place-items: center;
   color: var(--accent);
-  background: var(--accent-soft);
+  background: none;
   flex: 0 0 auto;
 }
 
