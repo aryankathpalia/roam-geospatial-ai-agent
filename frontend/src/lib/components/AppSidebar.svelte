@@ -10,12 +10,9 @@
 </script>
 
 <aside class="sidebar">
-  <a href="/" class="brand">
-    <span class="logo-mark">
-      <img src="/logo.png" width="30" height="30" alt="" />
-    </span>
+  <a href="/" class="brand" aria-label="ROAM home">
     <div class="brand-text">
-      <span class="brand-title">ROAM</span>
+      <img class="brand-lockup" src="/logo-lockup.png" alt="ROAM" />
       <span class="brand-subtitle">Document intelligence</span>
     </div>
   </a>
@@ -155,5 +152,11 @@
   .sidebar-footer {
     display: none;
   }
+}
+.brand-lockup {
+  display: block;
+  height: 38px;
+  width: auto;
+  margin-bottom: 6px;
 }
 </style>

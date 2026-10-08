@@ -7,11 +7,8 @@
 <div class="marketing-shell">
   <header class="nav">
     <div class="nav-inner">
-      <a href="/" class="brand">
-        <span class="logo-mark">
-          <img src="/logo.png" width="36" height="36" alt="" />
-        </span>
-        <span class="brand-name">ROAM</span>
+      <a href="/" class="brand" aria-label="ROAM home">
+        <img class="brand-lockup" src="/logo-lockup.png" alt="ROAM" />
       </a>
 
       <nav class="nav-links">
@@ -212,5 +209,10 @@
       align-items: center;
       gap: 12px;
     }
+  }
+  .brand-lockup {
+    display: block;
+    height: 46px;
+    width: auto;
   }
 </style>
