@@ -1588,7 +1588,7 @@
         <h2>Process your own document</h2>
         <p>Sign in with Google to upload a scanned deed, plat or survey PDF. Your documents are private to your account.</p>
       </div>
-      <AccountButton text="signin_with" width={260} />
+      <AccountButton text="signin_with" />
     </section>
   {/if}
 

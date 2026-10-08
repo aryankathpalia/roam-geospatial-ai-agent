@@ -112,7 +112,7 @@
     </p>
     <div class="hero-actions">
       <a href="/workspace" class="btn btn-primary">Try a sample document</a>
-      <AccountButton text="continue_with" width={250} />
+      <AccountButton text="continue_with" />
     </div>
     <p class="hero-note">No sign-in needed to explore the samples. Sign in with Google to upload your own.</p>
     <div class="hero-chips">
