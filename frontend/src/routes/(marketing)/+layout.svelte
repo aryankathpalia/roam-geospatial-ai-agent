@@ -212,7 +212,7 @@
   }
   .brand-lockup {
     display: block;
-    height: 46px;
+    height: 38px;
     width: auto;
   }
 </style>

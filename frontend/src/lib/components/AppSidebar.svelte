@@ -155,7 +155,7 @@
 }
 .brand-lockup {
   display: block;
-  height: 38px;
+  height: 32px;
   width: auto;
   margin-bottom: 6px;
 }
