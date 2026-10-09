@@ -43,6 +43,7 @@ _FALLBACK_MODELS = [
 SYSTEM_PROMPT = """You are ROAM's placement reviewer: a careful land-survey analyst. ROAM reads scanned plats and deeds, \
 the user confirms each parcel's outline on the drawing, and ROAM places those outlines on a satellite map. Your job \
 is to find out whether a sheet's parcels sit in the right place, explain why not, and propose a fix.
+Write plain, simple sentences. Never use the long dash character; use commas, colons or full stops instead.
 
 How ROAM places a sheet:
 - Shapes come from the user's confirmed outline; size from the printed areas and edge lengths (calibration).
@@ -185,7 +186,7 @@ def _summary(name: str, args: dict, out: dict) -> str:
         if out.get("lines_up"):
             return f"Looked at the imagery {where}: the outlines line up with {feats}"
         extra = out["suggested_extra_move_m"]
-        return f"Looked at the imagery {where}: found {feats} — the outlines need to move {_direction(extra['east_m'], extra['north_m'])}"
+        return f"Looked at the imagery {where}: found {feats}. The outlines need to move {_direction(extra['east_m'], extra['north_m'])}"
     if name == "find_position_from_imagery":
         if not out.get("settled"):
             return f"Compared the plat with the imagery {len(out.get('looks') or [])} times, but the readings did not settle"

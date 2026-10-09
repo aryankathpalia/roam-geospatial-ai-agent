@@ -121,9 +121,6 @@
         <AccountButton text="continue_with" />
       {/if}
     </div>
-    <p class="hero-note">
-      {$user ? `Signed in as ${$user.name}.` : 'No sign-in needed to explore the samples. Sign in with Google to upload your own.'}
-    </p>
     <div class="hero-chips">
       {#each capabilities as c}
         <span class="chip">{c}</span>
@@ -150,7 +147,7 @@
         <span class="story-index">01</span>
         <h3>Read any scan</h3>
         <p>
-          Every page is rendered and run through layout detection — text blocks, tables,
+          Every page is rendered and run through layout detection: text blocks, tables,
           seals and parcel-map drawings are located and OCR'd independently, so a dense
           survey plat doesn't drown out the deed text around it.
         </p>
@@ -166,7 +163,7 @@
         <h3>Extract the boundary calls</h3>
         <p>
           A vision model reads bearing-and-distance calls, tie points and basis-of-bearings
-          straight off the drawing — filtering out reference citations and interior
+          straight off the drawing, filtering out reference citations and interior
           dimensions that aren't part of the actual boundary.
         </p>
       </div>
@@ -231,7 +228,7 @@
         <h3>Reconstruct &amp; georeference</h3>
         <p>
           The traverse is walked corner-to-corner into real geometry, then projected onto
-          true WGS84 coordinates using an address geocoded straight out of the document —
+          true WGS84 coordinates using an address geocoded straight out of the document,
           no fixed coordinate zone assumed.
         </p>
       </div>
@@ -250,7 +247,7 @@
         <h3>Validate automatically</h3>
         <p>
           Closure precision, self-intersection and the document's own stated acreage are
-          cross-checked. Every parcel ships with an honest signal, pass or fail — the
+          cross-checked. Every parcel ships with an honest signal, pass or fail. The
           example on the right is a real result, not a staged one.
         </p>
       </div>
@@ -266,7 +263,7 @@
             <div class="gauge">
               <div class="gauge-row">
                 <span class="gauge-label">Closure precision</span>
-                <span class="mono gauge-value">{v.precision_ratio ? `1:${v.precision_ratio}` : '—'}</span>
+                <span class="mono gauge-value">{v.precision_ratio ? `1:${v.precision_ratio}` : '-'}</span>
               </div>
               <div class="gauge-track">
                 <div
@@ -285,7 +282,7 @@
             <dl class="validate-grid">
               <div><dt>Closure</dt><dd class="mono">{region.boundary_geojson_wgs84.properties.closure_error_ft} ft</dd></div>
               <div><dt>Perimeter</dt><dd class="mono">{v.perimeter_ft} ft</dd></div>
-              <div><dt>Area</dt><dd class="mono">{v.area_acres ? `${v.area_acres} ac` : '—'}</dd></div>
+              <div><dt>Area</dt><dd class="mono">{v.area_acres ? `${v.area_acres} ac` : '-'}</dd></div>
             </dl>
 
             {#if v.issues?.length}
@@ -307,7 +304,7 @@
 <section id="evidence" class="gallery">
   <div class="section-inner">
     <p class="kicker">Built for real documents</p>
-    <h2>Historical, hand-drawn, or modern — the boundary calls are the same math.</h2>
+    <h2>Historical, hand-drawn, or modern, the boundary calls are the same math.</h2>
     <div class="gallery-grid">
       <img src="/images/gallery-baist-dc.jpg" alt="1907 Baist's Real Estate Atlas of Washington, D.C." />
       <img src="/images/gallery-stapleton.jpg" alt="Historical atlas map of Stapleton, Staten Island" />
@@ -321,7 +318,7 @@
   <div class="section-inner cta-frame">
     <div class="cta-box panel-strong">
       <h2>From paper deed to living GIS layer.</h2>
-      <p>Extract cadastral geometry with a documented, inspectable pipeline — no manual digitizing.</p>
+      <p>Extract cadastral geometry with a documented, inspectable pipeline. No manual digitizing.</p>
       <a href="/workspace" class="btn btn-primary">Open Workspace →</a>
     </div>
   </div>
@@ -823,11 +820,6 @@ h1 {
   .hero-own {
     padding-block: 10px; /* the 1 px outline: same 44 px height as the filled button */
     background: var(--surface, #fff);
-  }
-  .hero-note {
-    margin: 10px 0 0;
-    font-size: 13px;
-    color: var(--text-muted, #6b7280);
   }
   .hero-actions {
     align-items: center;

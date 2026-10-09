@@ -4,13 +4,13 @@
   <p class="kicker">PARCEL GEOREFERENCING REPORT</p>
   <h1>{{ r.project.title }}</h1>
   <div class="kvblock">
-    <p class="kv"><b>Client:</b> {{ r.project.client or "—" }}</p>
-    <p class="kv"><b>Project reference:</b> {{ r.project.project_ref or "—" }}</p>
+    <p class="kv"><b>Client:</b> {{ r.project.client or "-" }}</p>
+    <p class="kv"><b>Project reference:</b> {{ r.project.project_ref or "-" }}</p>
     <p class="kv"><b>Prepared by:</b> {{ r.project.prepared_by }}</p>
     <p class="kv"><b>Date:</b> {{ r.generated_at[:10] }}</p>
     <p class="kv"><b>Source document:</b> {{ r.project.source_document }} ({{ r.project.source_pages }} pages)</p>
     <p class="kv"><b>Source type:</b> {{ r.project.source_type }}</p>
-    <p class="kv"><b>Jurisdiction:</b> {{ [r.project.county, r.project.state] | select | join(", ") or "—" }}</p>
+    <p class="kv"><b>Jurisdiction:</b> {{ [r.project.county, r.project.state] | select | join(", ") or "-" }}</p>
     <p class="kv"><b>Document ID:</b> {{ r.document_id }}</p>
   </div>
 
@@ -22,28 +22,28 @@
       <td>{{ r.summary.confirmed_locations }} of {{ r.summary.parcel_count }}</td>
       <td>{{ r.summary.approved }} of {{ r.summary.parcel_count }}</td>
       <td>{{ "%.3f"|format(r.summary.total_area_acres) }} ac</td>
-      <td>{{ ("%.3f ac"|format(r.summary.total_stated_acres)) if r.summary.total_stated_acres else "—" }}</td>
+      <td>{{ ("%.3f ac"|format(r.summary.total_stated_acres)) if r.summary.total_stated_acres else "-" }}</td>
     </tr>
   </table>
 
   <h2>2. Location</h2>
   <img src="location.png" width="540"/>
-  <p class="caption">Figure 1 — Site location ({{ "%.6f"|format(r.location.centre.lat) }}, {{ "%.6f"|format(r.location.centre.lon) }}).</p>
+  <p class="caption">Figure 1: Site location ({{ "%.6f"|format(r.location.centre.lat) }}, {{ "%.6f"|format(r.location.centre.lon) }}).</p>
 </div>
 
 <h2 class="newpage">3. Parcels over imagery</h2>
 <img src="parcels.png" width="540"/>
-<p class="caption">Figure 2 — Confirmed parcel outlines over satellite imagery.</p>
+<p class="caption">Figure 2: Confirmed parcel outlines over satellite imagery.</p>
 
 <h2>4. Parcel schedule</h2>
 <table class="grid small">
   <tr><th>ID</th><th>Parcel</th><th>APN</th><th>Stated area</th><th>Calc. area (sq ft)</th><th>Calc. (ac)</th><th>Diff</th><th>Perimeter (ft)</th><th>Placement</th><th>Location</th><th>Review</th></tr>
   {% for p in r.parcels %}
   <tr>
-    <td>{{ p.id }}</td><td>{{ p.label }}</td><td>{{ p.apn or p.parent_apn and ("parent " ~ p.parent_apn) or "—" }}</td>
-    <td>{{ p.stated_area_text or ("%.0f sq ft"|format(p.stated_area_sqft) if p.stated_area_sqft else "—") }}</td>
+    <td>{{ p.id }}</td><td>{{ p.label }}</td><td>{{ p.apn or p.parent_apn and ("parent " ~ p.parent_apn) or "-" }}</td>
+    <td>{{ p.stated_area_text or ("%.0f sq ft"|format(p.stated_area_sqft) if p.stated_area_sqft else "-") }}</td>
     <td>{{ "{:,.1f}".format(p.area_sqft) }}</td><td>{{ "%.4f"|format(p.area_acres) }}</td>
-    <td>{{ ("%.2f%%"|format(p.area_diff_pct)) if p.area_diff_pct is not none else "—" }}</td>
+    <td>{{ ("%.2f%%"|format(p.area_diff_pct)) if p.area_diff_pct is not none else "-" }}</td>
     <td>{{ "{:,.2f}".format(p.perimeter_ft) }}</td><td>{{ p.placement_label }}</td>
     <td class="{{ 'ok' if p.location_confirmed else 'warn' }}">{{ "Confirmed" if p.location_confirmed else "Approximate" }}</td>
     <td>{{ p.review_status }}</td>
@@ -55,7 +55,7 @@
 <div class="kvblock">
   <p class="kv"><b>Anchor method:</b> {{ r.location.anchor_method }}</p>
   <p class="kv"><b>Anchor source:</b> {{ r.location.anchor_source }}</p>
-  {% if r.location.county_parcel_service %}<p class="kv"><b>County parcel records:</b> {{ r.location.county_parcel_service }}{% if r.location.parent_apn %} — subject APN {{ r.location.parent_apn }}{% endif %}</p>{% endif %}
+  {% if r.location.county_parcel_service %}<p class="kv"><b>County parcel records:</b> {{ r.location.county_parcel_service }}{% if r.location.parent_apn %}, subject APN {{ r.location.parent_apn }}{% endif %}</p>{% endif %}
   {% if r.location.plss %}<p class="kv"><b>PLSS (as printed):</b> T{{ r.location.plss.township }}{{ r.location.plss.township_dir }} R{{ r.location.plss.range }}{{ r.location.plss.range_dir }} {{ r.location.plss.meridian or "" }}{% if r.location.plss.sections %}, Sec. {{ r.location.plss.sections | join(", ") }}{% endif %}</p>{% endif %}
   <p class="kv"><b>Coordinate systems:</b> {{ r.crs.geographic }}<br/>{{ r.crs.utm }}{% if r.crs.state_plane %}<br/>{{ r.crs.state_plane }}{% endif %}</p>
   <p class="kv"><b>Units:</b> {{ r.crs.units }}</p>
@@ -72,10 +72,10 @@
 <h2 class="parcel">6.{{ loop.index }} {{ p.label }}</h2>
 <div class="kvblock">
   <p class="kv"><b>Parcel ID:</b> {{ p.id }} (source page {{ p.page }})</p>
-  <p class="kv"><b>Area:</b> {{ "{:,.1f}".format(p.area_sqft) }} sq ft ({{ "%.4f"|format(p.area_acres) }} ac){% if p.stated_area_text %} — stated {{ p.stated_area_text }}{% endif %}</p>
-  <p class="kv"><b>Perimeter:</b> {{ "{:,.2f}".format(p.perimeter_ft) }} ft{% if p.closure_error_ft is not none %} — misclosure {{ "%.2f"|format(p.closure_error_ft) }} ft{% endif %}{% if p.precision_ratio %} — precision 1:{{ "{:,.0f}".format(p.precision_ratio) }}{% endif %}</p>
-  <p class="kv"><b>Placement:</b> {{ p.placement_label }} — location {{ "confirmed" if p.location_confirmed else "approximate" }}</p>
-  <p class="kv"><b>Review:</b> {{ p.review_status }}{% if p.notes %} — {{ p.notes }}{% endif %}</p>
+  <p class="kv"><b>Area:</b> {{ "{:,.1f}".format(p.area_sqft) }} sq ft ({{ "%.4f"|format(p.area_acres) }} ac){% if p.stated_area_text %}, stated {{ p.stated_area_text }}{% endif %}</p>
+  <p class="kv"><b>Perimeter:</b> {{ "{:,.2f}".format(p.perimeter_ft) }} ft{% if p.closure_error_ft is not none %}, misclosure {{ "%.2f"|format(p.closure_error_ft) }} ft{% endif %}{% if p.precision_ratio %}, precision 1:{{ "{:,.0f}".format(p.precision_ratio) }}{% endif %}</p>
+  <p class="kv"><b>Placement:</b> {{ p.placement_label }}, location {{ "confirmed" if p.location_confirmed else "approximate" }}</p>
+  <p class="kv"><b>Review:</b> {{ p.review_status }}{% if p.notes %}, {{ p.notes }}{% endif %}</p>
 </div>
 {% if p.calls %}
 <p class="sub">Record boundary calls (as read from the source drawing)</p>

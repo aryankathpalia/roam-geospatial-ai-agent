@@ -190,7 +190,7 @@
 
   function evidence(p: Proposal): string {
     const c = p.check;
-    if (!c) return p.from_user_instruction ? 'As you instructed — not checked against the imagery' : '';
+    if (!c) return p.from_user_instruction ? 'As you instructed, not checked against the imagery' : '';
     if (c.kind === 'imagery') return `Checked on the satellite imagery: lines up with ${c.features?.join(', ')}`;
     return `Checked against the county parcels: ${c.hugging_pct}% of the outline against a neighbour, ${c.overlap_pct}% overlap${c.corroborated ? ' (corroborated)' : ''}`;
   }

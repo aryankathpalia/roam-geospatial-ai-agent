@@ -1434,7 +1434,7 @@
     } catch (err: any) {
       errorMessage =
         err?.message?.includes('Failed to fetch') || err?.name === 'TypeError'
-          ? `Could not reach the ROAM backend at ${API_BASE}. It may be offline right now — try the sample result below instead.`
+          ? `Could not reach the ROAM backend at ${API_BASE}. It may be offline right now. Try the sample result below instead.`
           : `Upload failed: ${err.message}`;
       phase = 'error';
     }
@@ -1565,7 +1565,7 @@
     <section class="gallery fade-up" aria-label="Sample documents">
       <div class="gallery-head">
         <h2>Try a sample document</h2>
-        <p>Already processed — open one to explore the map, the parcels, the report and the AI review. You get your own copy: change anything, nothing is saved.</p>
+        <p>Already processed. Open one to explore the map, the parcels, the report and the AI review. You get your own copy: change anything, nothing is saved.</p>
       </div>
       {#if samplesError}<p class="gallery-err">{samplesError}</p>{/if}
       <div class="gallery-grid">
@@ -1677,7 +1677,7 @@
             </span>
             <span class="trace-label">
               {STAGE_LABELS[stage]}
-              <span class="trace-detail mono">{traceDetailByStage[stage] ?? '—'}</span>
+              <span class="trace-detail mono">{traceDetailByStage[stage] ?? '-'}</span>
             </span>
           </li>
         {/each}
@@ -1690,7 +1690,7 @@
       {#if sandboxOf}
         <div class="playground-banner panel">
           <span class="pg-dot"></span>
-          <span><strong>Playground copy</strong>{#if sandboxSample}&nbsp;of “{sandboxSample.title}”{/if} — move parcels, re-confirm boundaries, ask the AI. Nothing is saved: your copy is discarded when you leave.</span>
+          <span><strong>Playground copy</strong>{#if sandboxSample}&nbsp;of “{sandboxSample.title}”{/if}: move parcels, re-confirm boundaries, ask the AI. Nothing is saved: your copy is discarded when you leave.</span>
           <span class="pg-actions">
             <button class="btn btn-ghost btn-sm" on:click={resetPlayground}>Reset sample</button>
             <button class="btn btn-ghost btn-sm" on:click={reset}>All samples</button>
@@ -1700,18 +1700,18 @@
       {#if usingSample}
         <div class="sample-banner panel">
           <span class="status-dot"></span>
-          Showing a sample result — {result.source_note}
+          Showing a sample result: {result.source_note}
         </div>
       {/if}
 
       <div class="results-summary">
         <div class="stat panel">
           <span class="stat-label">Pages</span>
-          <span class="stat-value mono">{result.total_pages ?? result.pages?.length ?? '—'}</span>
+          <span class="stat-value mono">{result.total_pages ?? result.pages?.length ?? '-'}</span>
         </div>
         <div class="stat panel">
           <span class="stat-label">Need review</span>
-          <span class="stat-value mono">{result.pages_needing_review ?? '—'}</span>
+          <span class="stat-value mono">{result.pages_needing_review ?? '-'}</span>
         </div>
         <div class="stat panel">
           <span class="stat-label">Parcels</span>
@@ -1721,7 +1721,7 @@
 
       <div class="location-banner panel" class:ok={anchorPrecision === 'surveyed' || aliquotFit}>
         <strong>Location:</strong> {LOCATION_LABELS[anchorPrecision]}
-        {#if anchorSource}<span class="location-source">— {anchorSource}</span>{/if}
+        {#if anchorSource}<span class="location-source">· {anchorSource}</span>{/if}
         {#if aliquotFit}
           <span class="location-source">
             Confirmed parcels fitted onto the {aliquotFit.description} from BLM survey data: combined area
@@ -1737,7 +1737,7 @@
         <div class="location-banner panel" class:ok={boundaryConfirmedCount === boundaryCandidates.length}>
           <strong>Boundary confirmation:</strong>
           {boundaryConfirmedCount} of {boundaryCandidates.length} candidate parcel{boundaryCandidates.length === 1 ? '' : 's'} confirmed
-          <span class="location-source">— the target parcel's outline is what ROAM places on the map. Confirm it on the drawing to calibrate and place it.</span>
+          <span class="location-source">· The target parcel's outline is what ROAM places on the map. Confirm it on the drawing to calibrate and place it.</span>
           <a class="btn btn-ghost btn-sm" href={boundaryReviewHref()}>Confirm boundaries →</a>
           <a class="btn btn-ghost btn-sm" href={`/report?doc=${encodeURIComponent(documentId ?? '')}`}>Report &amp; export →</a>
         </div>
@@ -1802,7 +1802,7 @@
         <div class="region-list">
           {#if parcelRegions.length === 0 && allParcelRegions.length === 0}
             <div class="panel empty-state">
-              <p>No georeferenced parcel geometry in this result yet — vision extraction may not have found boundary calls on this document's ParcelMap regions.</p>
+              <p>No georeferenced parcel geometry in this result yet. Vision extraction may not have found boundary calls on this document's ParcelMap regions.</p>
             </div>
           {/if}
 
@@ -1822,7 +1822,7 @@
             {:else}
               <button class="ask-ai panel" on:click={() => openAgent(null)}>
                 <span class="ask-ai-icon" aria-hidden="true">✦</span>
-                <span><strong>Ask AI</strong> — something placed wrong? Describe it and the AI checks the evidence</span>
+                <span><strong>Ask AI</strong>: something placed wrong? Describe it and the AI checks the evidence</span>
               </button>
             {/if}
           {/if}
@@ -1830,7 +1830,7 @@
           <div class="palette panel move-panel">
             <label class="move-toggle">
               <input type="checkbox" bind:checked={moveMode} />
-              <span><strong>Move parcels</strong> — drag an outline on the map to drop it where it belongs</span>
+              <span><strong>Move parcels</strong>: drag an outline on the map to drop it where it belongs</span>
             </label>
             {#if moveMode}
               <label class="move-toggle sub">
@@ -1859,11 +1859,11 @@
           </div>
           {#if hiddenCount > 0}
             <button class="category-banner panel" on:click={() => (showAllCategories = true)}>
-              {hiddenCount} region{hiddenCount === 1 ? '' : 's'} likely not a boundary map (aerial, vicinity map, certificate) hidden — click to show
+              {hiddenCount} region{hiddenCount === 1 ? '' : 's'} likely not a boundary map (aerial, vicinity map, certificate) hidden. Click to show
             </button>
           {:else if showAllCategories && allParcelRegions.length}
             <button class="category-banner panel" on:click={() => (showAllCategories = false)}>
-              Showing all regions — click to hide likely non-plat content again
+              Showing all regions. Click to hide likely non-plat content again
             </button>
           {/if}
 
@@ -1917,9 +1917,9 @@
 
                 {#if v}
                   <dl class="region-metrics">
-                    <div><dt>Precision</dt><dd class="mono">{v.precision_ratio ? `1:${v.precision_ratio}` : '—'}</dd></div>
-                    <div><dt>Closure</dt><dd class="mono">{parcel.boundary_geojson_wgs84?.properties?.closure_error_ft ?? '—'} ft</dd></div>
-                    <div><dt>Area</dt><dd class="mono">{v.area_acres ? `${v.area_acres} ac` : '—'}</dd></div>
+                    <div><dt>Precision</dt><dd class="mono">{v.precision_ratio ? `1:${v.precision_ratio}` : '-'}</dd></div>
+                    <div><dt>Closure</dt><dd class="mono">{parcel.boundary_geojson_wgs84?.properties?.closure_error_ft ?? '-'} ft</dd></div>
+                    <div><dt>Area</dt><dd class="mono">{v.area_acres ? `${v.area_acres} ac` : '-'}</dd></div>
                   </dl>
 
                   {#if selectedKey === key && v.issues?.length}

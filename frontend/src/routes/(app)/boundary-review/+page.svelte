@@ -1185,7 +1185,7 @@
       <aside class="col left">
         {#if reading}
           <div class="notice">
-            ROAM is still reading the document — you can start outlining now.
+            ROAM is still reading the document. You can start outlining now.
             {#if showReprocessHint}
               <div class="stuck">
                 Taking longer than usual; the process may have been interrupted.
@@ -1198,7 +1198,7 @@
         {#each displayGroups as group, gi}
           {#if !group.primary && !group.copyOf && (gi === 0 || displayGroups.slice(0, gi).every((g) => g.primary || g.copyOf))}
             <h2 class="col-title other">Other maps in this document</h2>
-            <p class="muted small">Probably not this packet's own parcel map (reference surveys, aerial or location maps, other drawings) — still selectable.</p>
+            <p class="muted small">Probably not this packet's own parcel map (reference surveys, aerial or location maps, other drawings). Still selectable.</p>
           {/if}
           <section class="card sheet" class:active-sheet={selected && group.refs.some((r) => r.key === selectedKey)} class:other-sheet={!group.primary && !group.copyOf}>
             <div class="sheet-head">
@@ -1210,7 +1210,7 @@
             {#if group.duplicates.length > 0 && !group.copyOf}
               <p class="muted small">
                 Same {group.refs.length === 1 ? 'parcel' : 'parcels'} also on page{group.duplicates.length === 1 ? '' : 's'}
-                {group.duplicates.map((d) => d.pageNumber).join(', ')} — folded away.
+                {group.duplicates.map((d) => d.pageNumber).join(', ')}, folded away.
                 <button class="link" on:click={() => toggleCopies(group.pageNumber)}>{expandedCopies.has(group.pageNumber) ? 'Hide' : 'Show'}</button>
               </p>
             {/if}
@@ -1288,7 +1288,7 @@
           </div>
           <p class="tool-hint">
             {#if tool === 'pen'}Draw: click each corner in order{penPoints.length ? ` (${penPoints.length} placed)` : ''}. Click the first corner or press Enter to close · Esc cancels · hold Shift for 45°/90° turns.
-            {:else if tool === 'fill'}{fillBusy ? 'Filling…' : fillMsg || 'Fill: click inside a lot — the region its lines enclose becomes the outline.'}
+            {:else if tool === 'fill'}{fillBusy ? 'Filling…' : fillMsg || 'Fill: click inside a lot and the region its lines enclose becomes the outline.'}
             {:else if tool === 'rect'}Rectangle: drag from one corner to the opposite corner.
             {:else if tool === 'move'}Move: drag inside the shape · Rotate: drag outside it.
             {:else if tool === 'hand'}Hand: drag to move around the drawing.
@@ -1301,7 +1301,7 @@
             <label class="manual-name">
               <span>Parcel name</span>
               <input type="text" bind:value={manualName} placeholder="e.g. Parcel 1" />
-              <small>You are naming this parcel yourself — ROAM did not detect its identity.</small>
+              <small>You are naming this parcel yourself. ROAM did not detect its identity.</small>
             </label>
           {/if}
 
@@ -1424,7 +1424,7 @@
                       <small>As printed on the sheet. Re-confirm the boundary afterwards to recalibrate with it.</small>
                     </form>
                   {:else}
-                    <b>{selectedEntity.stated_area || '—'}</b>
+                    <b>{selectedEntity.stated_area || '-'}</b>
                     {#if selectedEntity.stated_area_edited && selectedEntity.stated_area_as_read}
                       <small>read as {selectedEntity.stated_area_as_read}</small>
                     {/if}
@@ -1488,9 +1488,9 @@
             >✓ Confirm boundary</button>
             {#if saveStatus === 'saving'}<p class="muted small">Saving…</p>{/if}
             {#if saveStatus === 'saved' && savedState === 'waiting_for_document'}
-              <p class="ok small">Saved ✓ — placed on the map automatically when ROAM finishes reading.</p>
+              <p class="ok small">Saved ✓. It will be placed on the map automatically when ROAM finishes reading.</p>
             {:else if saveStatus === 'saved' && georeferenced}
-              <p class="ok small">Saved ✓ — placed on the map. <a href={`/workspace?doc=${encodeURIComponent(documentId.trim())}`}>View →</a></p>
+              <p class="ok small">Saved ✓ and placed on the map. <a href={`/workspace?doc=${encodeURIComponent(documentId.trim())}`}>View →</a></p>
             {:else if saveStatus === 'saved'}
               <p class="ok small">Saved ✓ (outline stored; not yet placed).</p>
             {/if}

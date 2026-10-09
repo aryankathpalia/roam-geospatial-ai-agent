@@ -23,5 +23,5 @@ def ask(request: AskRequest):
     """
     return AskResponse(
         query=request.query,
-        answer="ROAM — coming soon.",
+        answer="ROAM: coming soon.",
     )

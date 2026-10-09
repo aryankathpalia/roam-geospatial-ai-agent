@@ -197,7 +197,7 @@ def pdf(report: dict, figs: dict[str, bytes] | None = None) -> bytes:
     doc = pymupdf.open("pdf", out.getvalue())
     title = report["project"]["title"][:90]
     for i, pg in enumerate(doc, 1):
-        pg.insert_text((40, 30), f"ROAM — {title}", fontsize=7, color=(0.55, 0.55, 0.55))
+        pg.insert_text((40, 30), f"ROAM | {title}", fontsize=7, color=(0.55, 0.55, 0.55))
         pg.insert_text((pg.rect.width - 90, pg.rect.height - 22), f"Page {i} of {len(doc)}", fontsize=7, color=(0.55, 0.55, 0.55))
     return doc.tobytes(deflate=True)
 

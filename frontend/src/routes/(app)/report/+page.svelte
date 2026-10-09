@@ -33,7 +33,7 @@
     ['rejected', 'Rejected']
   ];
   const EXPORTS = [
-    ['zip', 'Full deliverable package', 'ZIP — PDF report, GeoJSON, KML, shapefiles, CSVs, figures, metadata'],
+    ['zip', 'Full deliverable package', 'ZIP: PDF report, GeoJSON, KML, shapefiles, CSVs, figures, metadata'],
     ['pdf', 'PDF report', 'Summary, maps, parcel schedule, calls, coordinates, QA'],
     ['geojson', 'GeoJSON', 'WGS 84, with attributes'],
     ['kml', 'KML', 'Google Earth'],
@@ -125,7 +125,7 @@
 
   const exportHref = (fmt: string) => `${API_BASE}/documents/${documentId.trim()}/export/${fmt}`;
   const figure = (name: string) => `${API_BASE}/documents/${documentId.trim()}/report/figure/${name}?t=${figureStamp}`;
-  const fmt = (v: number | null | undefined, d = 2) => (v == null ? '—' : v.toLocaleString(undefined, { maximumFractionDigits: d, minimumFractionDigits: d }));
+  const fmt = (v: number | null | undefined, d = 2) => (v == null ? '-' : v.toLocaleString(undefined, { maximumFractionDigits: d, minimumFractionDigits: d }));
 </script>
 
 <div class="page">
@@ -153,7 +153,7 @@
     <section class="card exports">
       <div class="card-head">
         <h2>Export</h2>
-        {#if dirty}<span class="warn">Unsaved edits — save first so the exports include them.</span>{/if}
+        {#if dirty}<span class="warn">Unsaved edits. Save first so the exports include them.</span>{/if}
       </div>
       <div class="export-grid">
         {#each EXPORTS as [fmtKey, label, sub]}
@@ -202,11 +202,11 @@
     <section class="figures">
       <figure class="card">
         <img src={figure('location.png')} alt="Site location map" loading="lazy" />
-        <figcaption>Figure 1 — Site location</figcaption>
+        <figcaption>Figure 1: Site location</figcaption>
       </figure>
       <figure class="card">
         <img src={figure('parcels.png')} alt="Parcels over imagery" loading="lazy" />
-        <figcaption>Figure 2 — Parcels over imagery</figcaption>
+        <figcaption>Figure 2: Parcels over imagery</figcaption>
       </figure>
     </section>
 
@@ -227,9 +227,9 @@
               <tr>
                 <td><input bind:value={parcelDraft[p.id].label} /></td>
                 <td><input bind:value={parcelDraft[p.id].apn} placeholder={p.parent_apn ? `parent ${p.parent_apn}` : ''} /></td>
-                <td class="num">{p.stated_area_text ?? (p.stated_area_sqft ? `${fmt(p.stated_area_sqft, 0)} sq ft` : '—')}</td>
+                <td class="num">{p.stated_area_text ?? (p.stated_area_sqft ? `${fmt(p.stated_area_sqft, 0)} sq ft` : '-')}</td>
                 <td class="num">{fmt(p.area_sqft, 0)} sq ft<br /><small>{fmt(p.area_acres, 4)} ac</small></td>
-                <td class="num">{p.area_diff_pct == null ? '—' : `${fmt(p.area_diff_pct, 2)}%`}</td>
+                <td class="num">{p.area_diff_pct == null ? '-' : `${fmt(p.area_diff_pct, 2)}%`}</td>
                 <td>{p.placement_label}</td>
                 <td><span class="pill" class:good={p.location_confirmed}>{p.location_confirmed ? 'Confirmed' : 'Approximate'}</span></td>
                 <td>
@@ -287,8 +287,8 @@
     <section class="card">
       <h2>Georeferencing</h2>
       <dl class="kv">
-        <dt>Anchor</dt><dd>{report.location.anchor_method} — {report.location.anchor_source}</dd>
-        {#if report.location.county_parcel_service}<dt>County records</dt><dd>{report.location.county_parcel_service}{report.location.parent_apn ? ` — subject APN ${report.location.parent_apn}` : ''}</dd>{/if}
+        <dt>Anchor</dt><dd>{report.location.anchor_method}, {report.location.anchor_source}</dd>
+        {#if report.location.county_parcel_service}<dt>County records</dt><dd>{report.location.county_parcel_service}{report.location.parent_apn ? `, subject APN ${report.location.parent_apn}` : ''}</dd>{/if}
         <dt>Coordinate systems</dt><dd>{report.crs.geographic}; {report.crs.utm}{report.crs.state_plane ? `; ${report.crs.state_plane}` : ''}</dd>
         <dt>Centre</dt><dd>{report.location.centre.lat}, {report.location.centre.lon}</dd>
       </dl>
