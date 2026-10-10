@@ -17,6 +17,8 @@ Thumbs.db
 .env.*
 !.env.example
 !.env.test
+# public build setting (the backend URL), safe to commit
+!.env.production
 
 # Vite
 vite.config.js.timestamp-*

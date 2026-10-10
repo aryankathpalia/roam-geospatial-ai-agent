@@ -49,3 +49,10 @@ paddleocr
 # extraction). google-genai is the current SDK -- google-generativeai
 # is deprecated.
 google-genai
+
+# Google sign-in: verifying the ID token (app/core/auth.py)
+google-auth
+requests
+
+# PDF report template (app/services/report_export.py)
+jinja2

@@ -14,6 +14,13 @@ import modal
 
 app = modal.App("roam-backend")
 
+# Everything the app keeps on disk lives under data/ (relative to /code):
+# uploaded documents and their results, the sample gallery, the session
+# signing secret, map tile cache. A Volume keeps it across restarts and
+# redeploys; the API container commits it every few seconds.
+data_volume = modal.Volume.from_name("roam-data", create_if_missing=True)
+DATA_DIR = "/code/data"
+
 image = modal.Image.from_dockerfile(
     "app/Dockerfile",
     context_dir=".",
@@ -72,10 +79,16 @@ async def _modal_ocr_dispatcher(jobs: list[tuple[bytes, float]]) -> list[list]:
     # credit usage.
     memory=4096,
     timeout=600,
-    # Scale to zero shortly after the last request so idle time never
-    # burns the free monthly credit; a cold start costs ~5-10s.
-    scaledown_window=60,
+    # Scale to zero when idle so the free monthly credit isn't burnt, but
+    # stay up 20 minutes after the last request: a visitor waits for one
+    # cold start, then the rest of the visit is fast.
+    scaledown_window=1200,
     min_containers=0,
+    # One API container: the documents' state lives on the Volume and
+    # background jobs run inside this container, so a second copy would
+    # see stale files. It serves many requests at once (below).
+    max_containers=1,
+    volumes={DATA_DIR: data_volume},
     # GEMINI_API_KEY (vision escalation) -- created via:
     #   modal secret create roam-secrets --from-dotenv .env
     # pydantic-settings reads real process env vars regardless of
@@ -84,6 +97,7 @@ async def _modal_ocr_dispatcher(jobs: list[tuple[bytes, float]]) -> list[list]:
     # beyond this.
     secrets=[modal.Secret.from_name("roam-secrets")],
 )
+@modal.concurrent(max_inputs=32)
 @modal.asgi_app()
 def fastapi_app():
     from app.main import app as web_app
@@ -93,5 +107,20 @@ def fastapi_app():
     # process_document() reads this module attribute fresh on every
     # call, so setting it once here at container startup is enough.
     document_pipeline.DEFAULT_OCR_DISPATCHER = _modal_ocr_dispatcher
+
+    # Persist data/ to the Volume every few seconds (uploads, results,
+    # confirmations, playground copies).
+    import threading
+    import time
+
+    def _commit_loop():
+        while True:
+            time.sleep(5)
+            try:
+                data_volume.commit()
+            except Exception:
+                pass
+
+    threading.Thread(target=_commit_loop, daemon=True).start()
 
     return web_app
