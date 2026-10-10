@@ -94,9 +94,24 @@ def cleanup_sandboxes() -> int:
     return left
 
 
+# A playground copy shares these with its sample instead of copying them: they never change, and
+# copying ~20-40 MB of page images made opening a sample slow on storage without hard links.
+SHARED_WITH_SAMPLE = ("pages", "page_thumbs", "review_crops", "original.pdf")
+
+
+def doc_file(document_id: str, *parts: str) -> Path:
+    """A document's file; for a playground copy, the sample's when the copy has no own version."""
+
+    own = DOCUMENT_ROOT.joinpath(document_id, *parts)
+    if own.exists():
+        return own
+    parent = access(document_id).get("sandbox_of")
+    return DOCUMENT_ROOT.joinpath(parent, *parts) if parent else own
+
+
 def _link_tree(src: Path, dst: Path) -> None:
     for item in src.iterdir():
-        if item.name in ("result.json", "access.json", "report_cache", "thumb.jpg") or item.name.endswith(".tmp"):
+        if item.name in ("result.json", "access.json", "report_cache", "thumb.jpg", *SHARED_WITH_SAMPLE) or item.name.endswith(".tmp"):
             continue
         target = dst / item.name
         if item.is_dir():

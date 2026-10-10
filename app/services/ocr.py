@@ -45,6 +45,7 @@ large, confirmed improvement over no orientation handling at all.
 """
 
 import re
+import os
 import threading
 from dataclasses import dataclass
 
@@ -82,6 +83,10 @@ class OCRLine:
     bbox: tuple[float, float, float, float]  # x1, y1, x2, y2, page coordinates
 
 
+# "gpu" on the Modal OCR workers (modal_app.py); unset means Paddle's default (CPU here).
+_DEVICE = os.getenv("ROAM_OCR_DEVICE") or None
+
+
 def get_engine() -> PaddleOCR:
     """Load (and cache) the PaddleOCR engine, mobile preset."""
 
@@ -95,6 +100,7 @@ def get_engine() -> PaddleOCR:
             text_detection_model_name="PP-OCRv5_mobile_det",
             text_recognition_model_name="PP-OCRv5_mobile_rec",
             cpu_threads=8,
+            device=_DEVICE,
         )
 
     return _engine
@@ -149,6 +155,7 @@ def get_parcelmap_engine() -> PaddleOCR:
             text_detection_model_name="PP-OCRv5_mobile_det",
             text_recognition_model_name="PP-OCRv5_mobile_rec",
             cpu_threads=8,
+            device=_DEVICE,
         )
 
     return _parcelmap_engine

@@ -21,6 +21,7 @@ from typing import Any, Callable
 import httpx
 
 from app.services import apn as apn_service
+from app.services import doc_access
 from app.services import location_evidence
 
 _M_PER_DEG_LAT = 110_540.0
@@ -417,7 +418,7 @@ def _plat_image(result: dict, page: dict) -> bytes | None:
     from PIL import Image
 
     doc = result.get("document_id")
-    path = Path("data/documents") / doc / "pages" / f"page_{page['page_number']:03d}.png" if doc else None
+    path = doc_access.doc_file(doc, "pages", f"page_{page['page_number']:03d}.png") if doc else None
     if not path or not path.exists():
         return None
     region = next((r for r in page.get("regions", []) if any(p.get("human_confirmed") for p in r.get("parcels") or [])), None)

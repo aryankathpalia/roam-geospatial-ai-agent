@@ -40,7 +40,8 @@ def test_gate_and_playground_copy(world):
     new = c.post(f"/samples/{sid}/open").json()["document_id"]
     copy = doc_access.DOCUMENT_ROOT / new
     assert json.loads((copy / "result.json").read_text())["document_id"] == new
-    assert (copy / "pages" / "page_001.png").read_bytes() == b"png"
+    assert not (copy / "pages").exists()  # page images are shared with the sample, not copied
+    assert doc_access.doc_file(new, "pages", "page_001.png").read_bytes() == b"png"
     assert doc_access.can_write(new, None, False) and not doc_access.can_write(sid, None, False)
     assert c.post(f"/documents/{new}/reprocess").status_code == 403
     assert c.post("/documents/upload", files={"file": ("a.pdf", b"%PDF", "application/pdf")}).status_code == 401

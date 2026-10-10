@@ -2,6 +2,7 @@ import re
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 
 from app.core import auth
@@ -56,6 +57,19 @@ async def document_access(request: Request, call_next):
         doc_access.touch(document_id)
     return await call_next(request)
 
+
+class _GZipExceptStreams(GZipMiddleware):
+    """Compress responses (document results are ~100 KB of JSON) but leave the AI review's live
+    step stream alone: gzip would hold its small chunks back until enough piled up."""
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] == "http" and scope["path"].endswith("/stream"):
+            await self.app(scope, receive, send)
+        else:
+            await super().__call__(scope, receive, send)
+
+
+app.add_middleware(_GZipExceptStreams, minimum_size=1024)
 
 # Added after the gate so CORS headers also reach the gate's own refusals (the outermost middleware runs first).
 app.add_middleware(

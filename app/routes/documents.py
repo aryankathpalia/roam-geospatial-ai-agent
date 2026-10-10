@@ -21,6 +21,7 @@ from app.pipeline.document_pipeline import (
     process_document,
     recompute_parcel_from_calls,
 )
+from app.services import doc_access
 from app.services import progress as progress_tracker
 from app.services.pre_annotation import generate_pre_annotations
 from app.services.geometry import TraverseResult, traverse_to_geojson, walk_traverse
@@ -279,7 +280,7 @@ def get_document(document_id: str, background_tasks: BackgroundTasks):
 def get_original_pdf(document_id: str):
     """The uploaded PDF, as uploaded."""
 
-    path = DOCUMENT_ROOT / document_id / "original.pdf"
+    path = doc_access.doc_file(document_id, "original.pdf")
     if not path.exists():
         raise HTTPException(status_code=404, detail="Original PDF not found")
     return StreamingResponse(open(path, "rb"), media_type="application/pdf",
@@ -292,7 +293,7 @@ def get_page_thumbnail(document_id: str, page_number: int):
 
     from PIL import Image
 
-    src = DOCUMENT_ROOT / document_id / "pages" / f"page_{page_number:03d}.png"
+    src = doc_access.doc_file(document_id, "pages", f"page_{page_number:03d}.png")
     if not src.exists():
         raise HTTPException(status_code=404, detail="Rendered page not found")
     thumb = DOCUMENT_ROOT / document_id / "page_thumbs" / f"page_{page_number:03d}.jpg"
@@ -317,7 +318,7 @@ def get_page_image(document_id: str, page_number: int):
     corner coordinate) that sit just outside the detected bbox.
     """
 
-    page_path = DOCUMENT_ROOT / document_id / "pages" / f"page_{page_number:03d}.png"
+    page_path = doc_access.doc_file(document_id, "pages", f"page_{page_number:03d}.png")
     if not page_path.exists():
         raise HTTPException(status_code=404, detail=f"Rendered page not found: {page_path}")
     return StreamingResponse(open(page_path, "rb"), media_type="image/png")
@@ -352,7 +353,7 @@ def get_region_crop(document_id: str, page_number: int, region_index: int):
         raise HTTPException(status_code=404, detail="Region index out of range")
     region = page["regions"][region_index]
 
-    page_path = DOCUMENT_ROOT / document_id / "pages" / f"page_{page_number:03d}.png"
+    page_path = doc_access.doc_file(document_id, "pages", f"page_{page_number:03d}.png")
     if not page_path.exists():
         raise HTTPException(status_code=404, detail=f"Rendered page not found: {page_path}")
 
@@ -674,7 +675,7 @@ def _derive_confirmed_geometry(
         calibration_ocr_lines = None
         polygon_page_px = None
         try:
-            page_path = DOCUMENT_ROOT / document_id / "pages" / f"page_{body.page_number:03d}.png"
+            page_path = doc_access.doc_file(document_id, "pages", f"page_{body.page_number:03d}.png")
             with Image.open(page_path) as page_img:
                 page_w, page_h = page_img.size
                 bx, by, bw, bh = region["bbox"]
@@ -1896,7 +1897,7 @@ def _ensure_control_points(document_id: str, page_number: int) -> None:
         page["control_points"] = {"status": "reading", "started_at": time.time()}
         _save_result(document_id, result)
     try:
-        with Image.open(DOCUMENT_ROOT / document_id / "pages" / f"page_{page_number:03d}.png") as img:
+        with Image.open(doc_access.doc_file(document_id, "pages", f"page_{page_number:03d}.png")) as img:
             img.load()
             first_lines, _ = run_parcelmap_ocr(img)
             first = control_points.extract_control_points(first_lines, "ocr", positions_trusted=False)
@@ -2469,7 +2470,7 @@ def fill_region_at(document_id: str, page_number: int, region_index: int, body: 
     if page is None or not (0 <= region_index < len(page["regions"])):
         raise HTTPException(status_code=404, detail="No such page/region")
     region = page["regions"][region_index]
-    page_path = DOCUMENT_ROOT / document_id / "pages" / f"page_{page_number:03d}.png"
+    page_path = doc_access.doc_file(document_id, "pages", f"page_{page_number:03d}.png")
     if not page_path.exists():
         raise HTTPException(status_code=404, detail="Rendered page not found")
     return fill_region(crop_gray(page_path, region["bbox"], region.get("class")), body.x, body.y, body.gap)
