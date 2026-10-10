@@ -168,22 +168,41 @@
 
   <!-- floating cards, like the app's own panels -->
   <div class="card c1" style="opacity: {win(t, 1.9, 5.8)}; transform: translateY({(1 - ramp(t, 1.9, 2.3)) * 8}px)">
-    <span class="k">Layout detection</span>
-    <span class="v"><i class="sw" style="background:#d9581f"></i>ParcelMap · 0.97</span>
+    <div class="hd">
+      <svg class="ic" viewBox="0 0 16 16"><path d="M2 5V3a1 1 0 0 1 1-1h2M11 2h2a1 1 0 0 1 1 1v2M14 11v2a1 1 0 0 1-1 1h-2M5 14H3a1 1 0 0 1-1-1v-2M2 8h12" /></svg>
+      <span class="ttl">Layout detection</span>
+      <span class="pill">Done</span>
+    </div>
+    <div class="bd">
+      <div class="row"><span>Region</span><b><i class="sw" style="background:#d9581f"></i>ParcelMap</b></div>
+      <div class="row"><span>Confidence</span><b>0.97</b></div>
+      <div class="meter"><i style="width: {97 * ramp(t, 2.0, 2.8)}%"></i></div>
+    </div>
   </div>
   <div class="card c2" style="opacity: {win(t, 4.3, 6.5)}; transform: translateY({(1 - ramp(t, 4.3, 4.7)) * 8}px)">
-    <span class="k">Boundaries traced</span>
-    <span class="v">4 parcels · {totalAcres} ac</span>
-    <span class="rows">
+    <div class="hd">
+      <svg class="ic" viewBox="0 0 16 16"><path d="M3 12 6 3l7 3-2 7z" /><circle cx="3" cy="12" r="1.2" /><circle cx="6" cy="3" r="1.2" /><circle cx="13" cy="6" r="1.2" /><circle cx="11" cy="13" r="1.2" /></svg>
+      <span class="ttl">Boundaries traced</span>
+      <span class="pill">Done</span>
+    </div>
+    <div class="bd">
       {#each parcels as p}
-        <span><i class="sw" style="background:{p.colour}"></i>{p.label}<b>{p.acres.toFixed(2)} ac</b></span>
+        <div class="row"><span><i class="sw" style="background:{p.colour}"></i>{p.label}</span><b>{p.acres.toFixed(2)} ac</b></div>
       {/each}
-    </span>
+      <div class="row total"><span>Total</span><b>{totalAcres} ac</b></div>
+    </div>
   </div>
   <div class="card c3" style="opacity: {win(t, 8.1, 11.4)}; transform: translateY({(1 - ramp(t, 8.1, 8.5)) * 8}px)">
-    <span class="k">Placed on the map</span>
-    <span class="v"><i class="dot"></i>Fitted to county parcels</span>
-    <span class="sub">Washoe County, NV · closure 0.00 ft</span>
+    <div class="hd">
+      <svg class="ic" viewBox="0 0 16 16"><path d="M8 14s4.5-4.2 4.5-7.5a4.5 4.5 0 0 0-9 0C3.5 9.8 8 14 8 14z" /><circle cx="8" cy="6.5" r="1.6" /></svg>
+      <span class="ttl">Placement</span>
+      <span class="pill">Placed</span>
+    </div>
+    <div class="bd">
+      <div class="row"><span>Method</span><b>County parcel fit</b></div>
+      <div class="row"><span>Location</span><b>Washoe County, NV</b></div>
+      <div class="row"><span>Closure</span><b>0.00 ft</b></div>
+    </div>
   </div>
 
   <ol class="steps">
@@ -209,72 +228,102 @@
 
   .card {
     position: absolute;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    padding: 9px 12px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(8px);
+    min-width: 176px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(10px);
     border: 1px solid rgba(23, 22, 19, 0.08);
-    box-shadow: 0 12px 28px -12px rgba(23, 22, 19, 0.35);
+    box-shadow:
+      0 1px 2px rgba(23, 22, 19, 0.06),
+      0 16px 32px -16px rgba(23, 22, 19, 0.28);
     white-space: nowrap;
     pointer-events: none;
+    font-size: 0.7rem;
+    color: var(--ink);
   }
   .c1 { left: -17%; top: 8%; }
   .c2 { left: -19%; top: 52%; }
   .c3 { right: -14%; top: 8%; }
-  .k {
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .v {
+  .hd {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    font-size: 0.86rem;
-    color: var(--ink);
+    gap: 7px;
+    padding: 8px 10px 7px;
+    border-bottom: 1px solid rgba(23, 22, 19, 0.07);
   }
-  .sub {
-    font-size: 0.7rem;
-    color: var(--muted);
+  .ic {
+    width: 13px;
+    height: 13px;
+    flex: none;
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
-  .rows {
-    display: grid;
-    gap: 2px;
-    margin-top: 3px;
-    font-size: 0.7rem;
-    color: var(--muted);
+  .ttl {
+    font-weight: 600;
+    font-size: 0.72rem;
   }
-  .rows span {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .rows b {
+  .pill {
     margin-left: auto;
-    padding-left: 14px;
-    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: #1f7a45;
+    background: rgba(47, 158, 91, 0.12);
+  }
+  .bd {
+    display: grid;
+    gap: 4px;
+    padding: 8px 10px 9px;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    color: var(--muted);
+  }
+  .row span,
+  .row b {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .row b {
     font-weight: 500;
     color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .row.total {
+    margin-top: 2px;
+    padding-top: 5px;
+    border-top: 1px dashed rgba(23, 22, 19, 0.12);
+  }
+  .row.total span,
+  .row.total b {
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .meter {
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(23, 22, 19, 0.07);
+    overflow: hidden;
+  }
+  .meter i {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
   }
   .sw {
-    width: 8px;
-    height: 8px;
-    border-radius: 2px;
-    flex: none;
-  }
-  .dot {
     width: 7px;
     height: 7px;
-    border-radius: 50%;
-    background: #2f9e5b;
-    box-shadow: 0 0 0 3px rgba(47, 158, 91, 0.18);
+    border-radius: 2px;
+    flex: none;
   }
 
   .steps {
