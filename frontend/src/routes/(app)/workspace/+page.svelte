@@ -72,6 +72,7 @@
   let samples: Sample[] = [];
   let samplesError = '';
   let openingSample: string | null = null;
+  let openingSlow = false; // still opening after a few seconds: the backend is waking from idle
 
   function playgrounds(): Record<string, string> {
     try {
@@ -86,7 +87,9 @@
 
   async function loadSamples() {
     try {
-      const res = await fetch(`${API_BASE}/samples`);
+      // The gallery ships with the site (static/samples/), so it shows at once even while the
+      // backend is still waking from idle; only opening a sample needs the backend.
+      const res = await fetch('/samples/samples.json');
       if (!res.ok) throw new Error(`${res.status}`);
       samples = (await res.json()).samples;
     } catch {
@@ -96,6 +99,8 @@
 
   async function openSample(sample: Sample, fresh = false) {
     openingSample = sample.id;
+    openingSlow = false;
+    const slowTimer = setTimeout(() => (openingSlow = true), 3000);
     errorMessage = '';
     try {
       // reuse this tab's copy unless asked for a fresh one
@@ -121,6 +126,7 @@
       errorMessage = `Could not open the sample: ${err.message}`;
       phase = 'error';
     } finally {
+      clearTimeout(slowTimer);
       openingSample = null;
     }
   }
@@ -1571,13 +1577,13 @@
       <div class="gallery-grid">
         {#each samples as sm (sm.id)}
           <button class="sample-card panel" disabled={openingSample !== null} on:click={() => openSample(sm)}>
-            <div class="sample-thumb"><img src={`${API_BASE}${sm.thumbnail}`} alt={`Plat: ${sm.title}`}/></div>
+            <div class="sample-thumb"><img src={sm.thumbnail} alt={`Plat: ${sm.title}`}/></div>
             <div class="sample-body">
               <span class="sample-title">{sm.title}</span>
               <span class="sample-loc">{sm.location} · {sm.pages} pages · {sm.parcels} parcels</span>
               <span class="sample-hl">{sm.highlight}</span>
             </div>
-            {#if openingSample === sm.id}<span class="sample-opening">Opening…</span>{/if}
+            {#if openingSample === sm.id}<span class="sample-opening">{openingSlow ? 'Waking the server…' : 'Opening…'}</span>{/if}
           </button>
         {/each}
       </div>

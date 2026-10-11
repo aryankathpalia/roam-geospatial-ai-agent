@@ -1,0 +1,64 @@
+{
+ "samples": [
+  {
+   "id": "d29364ff-8a19-4328-a23f-895eab8ff6b4",
+   "title": "Tentative parcel map, four lots",
+   "location": "Washoe County, Nevada",
+   "pages": 14,
+   "parcels": 4,
+   "page": 14,
+   "highlight": "Placed from a printed state-plane coordinate, confirmed by the county's parcel records",
+   "thumbnail": "/samples/d29364ff-8a19-4328-a23f-895eab8ff6b4.jpg"
+  },
+  {
+   "id": "4726676d-a915-45c7-9520-dfd3c5de388e",
+   "title": "Parcel map, three-way split",
+   "location": "Washoe County, Nevada",
+   "pages": 31,
+   "parcels": 3,
+   "page": 31,
+   "highlight": "Seated on the county's own record for the parent parcel's APN",
+   "thumbnail": "/samples/4726676d-a915-45c7-9520-dfd3c5de388e.jpg"
+  },
+  {
+   "id": "b4c6b8bf-e44a-459a-a8bd-0f631164fcb7",
+   "title": "Tentative parcel map, four parcels",
+   "location": "Washoe County, Nevada",
+   "pages": 44,
+   "parcels": 4,
+   "page": 12,
+   "highlight": "Drawing turned 63° off north, corrected by fitting to the county parcels",
+   "thumbnail": "/samples/b4c6b8bf-e44a-459a-a8bd-0f631164fcb7.jpg"
+  },
+  {
+   "id": "4cd94d2b-3b97-440a-8dac-51e081c92f83",
+   "title": "Family trust parcel map, three parcels",
+   "location": "Washoe County, Nevada",
+   "pages": 16,
+   "parcels": 3,
+   "page": 16,
+   "highlight": "Ground coordinates converted to grid, then seated between the neighbouring parcels",
+   "thumbnail": "/samples/4cd94d2b-3b97-440a-8dac-51e081c92f83.jpg"
+  },
+  {
+   "id": "00ac0121-8bf0-4371-8d72-2b79fc143a73",
+   "title": "Fire protection district parcel map",
+   "location": "Foothill Road, Reno, Nevada",
+   "pages": 33,
+   "parcels": 2,
+   "page": 32,
+   "highlight": "Survey control points read off the sheet and bound to the parcel corners",
+   "thumbnail": "/samples/00ac0121-8bf0-4371-8d72-2b79fc143a73.jpg"
+  },
+  {
+   "id": "d76403ea-0dac-44c0-84c0-56f54176bd50",
+   "title": "Lot line adjustment, three parcels",
+   "location": "El Centro, California",
+   "pages": 33,
+   "parcels": 3,
+   "page": 25,
+   "highlight": "Only a street address to go on: try “Reset position”, then ask the AI to place it from the satellite imagery",
+   "thumbnail": "/samples/d76403ea-0dac-44c0-84c0-56f54176bd50.jpg"
+  }
+ ]
+}
