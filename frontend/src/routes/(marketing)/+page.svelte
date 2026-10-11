@@ -3,91 +3,6 @@
   import MapCarousel from '$lib/components/MapCarousel.svelte';
   import HeroAnimation from '$lib/components/HeroAnimation.svelte';
   import { user } from '$lib/auth';
-  import { onMount } from 'svelte';
-
-  let sample: any = null;
-  let region: any = null;
-  let previewPath = '';
-  let previewPoints: [number, number][] = [];
-
-  // Mirrors app/services/geometry.py's quadrant-bearing-to-azimuth and
-  // traverse-walking logic in JS, so the small polygon sketch next to
-  // the boundary_calls table is drawn from the SAME real data, not a
-  // decorative stand-in shape.
-  function bearingToAzimuth(bearing: string): number | null {
-    const m = bearing
-      .replace('�', '°')
-      .match(/([NSns])\s*(\d+(?:\.\d+)?)\s*[°*ov]?\s*(?:(\d+(?:\.\d+)?)['′]?\s*)?(?:(\d+(?:\.\d+)?)["″]?\s*)?([EWew])/);
-    if (!m) return null;
-    const angle = parseFloat(m[2]) + (parseFloat(m[3]) || 0) / 60 + (parseFloat(m[4]) || 0) / 3600;
-    const ns = m[1].toUpperCase();
-    const ew = m[5].toUpperCase();
-    if (ns === 'N' && ew === 'E') return angle;
-    if (ns === 'S' && ew === 'E') return 180 - angle;
-    if (ns === 'S' && ew === 'W') return 180 + angle;
-    if (ns === 'N' && ew === 'W') return 360 - angle;
-    return null;
-  }
-
-  function walkTraverse(calls: { bearing: string; distance: string }[]): [number, number][] {
-    let x = 0;
-    let y = 0;
-    const pts: [number, number][] = [[0, 0]];
-    for (const call of calls) {
-      const az = bearingToAzimuth(call.bearing);
-      const dist = parseFloat((call.distance || '').replace(/[^\d.]/g, ''));
-      if (az === null || isNaN(dist)) continue;
-      const rad = (az * Math.PI) / 180;
-      x += dist * Math.sin(rad);
-      y += dist * Math.cos(rad);
-      pts.push([x, y]);
-    }
-    return pts;
-  }
-
-  function pointsToSvgPath(pts: [number, number][], size = 160, pad = 22): string {
-    const xs = pts.map((p) => p[0]);
-    const ys = pts.map((p) => p[1]);
-    const minX = Math.min(...xs);
-    const maxX = Math.max(...xs);
-    const minY = Math.min(...ys);
-    const maxY = Math.max(...ys);
-    const spanX = maxX - minX || 1;
-    const spanY = maxY - minY || 1;
-    const scale = Math.min((size - pad * 2) / spanX, (size - pad * 2) / spanY);
-    return pts
-      .map(([x, y], i) => {
-        const sx = pad + (x - minX) * scale;
-        const sy = size - (pad + (y - minY) * scale); // flip: north (+y) goes up on screen
-        return `${i === 0 ? 'M' : 'L'}${sx.toFixed(1)},${sy.toFixed(1)}`;
-      })
-      .join(' ');
-  }
-
-  onMount(async () => {
-    const res = await fetch('/sample-data/sample-result.json');
-    sample = await res.json();
-    // Page 9's "Parcel 2" -- a real, multi-sided extracted boundary from
-    // an actual live ROAM run, used throughout this page instead of any
-    // placeholder numbers. A ParcelMap region can hold more than one
-    // parcel (see app/services/vision.py's Parcel Target Resolver), so
-    // this looks one level into region.parcels rather than assuming a
-    // region IS a single parcel.
-    outer: for (const page of sample.pages) {
-      for (const r of page.regions) {
-        for (const parcel of r.parcels ?? []) {
-          if (parcel.boundary_geojson_wgs84) {
-            region = parcel;
-            break outer;
-          }
-        }
-      }
-    }
-    if (region) {
-      previewPoints = walkTraverse(region.resolved_boundary_calls ?? region.vision_geometry.boundary_calls);
-      previewPath = pointsToSvgPath(previewPoints);
-    }
-  });
 
   const capabilities = [
     'Any quadrant bearing format',
@@ -95,13 +10,6 @@
     'Free-text address geocoding',
     'GeoJSON out, ready for any GIS stack'
   ];
-
-  // A conservative gauge scale for the precision-ratio bar -- see
-  // app/services/spatial_validation.py's own _MIN_ACCEPTABLE_PRECISION_RATIO
-  // comment for why 1:2000 is used as a generic, loose minimum rather
-  // than a claimed regulatory threshold.
-  const GAUGE_MAX = 2500;
-  const GAUGE_THRESHOLD = 2000;
 </script>
 
 <section class="hero">
@@ -160,65 +68,18 @@
     <div class="story-row reverse">
       <div class="story-copy">
         <span class="story-index">02</span>
-        <h3>Extract the boundary calls</h3>
+        <h3>Confirm the boundaries</h3>
         <p>
-          A vision model reads bearing-and-distance calls, tie points and basis-of-bearings
-          straight off the drawing, filtering out reference citations and interior
-          dimensions that aren't part of the actual boundary.
+          ROAM lists every parcel it finds on the sheet with its stated area. You trace or
+          adjust each outline in a fast editor, with corners that snap to neighbouring
+          parcels, and see its area and perimeter update live against the printed figure.
         </p>
       </div>
-      <div class="story-visual">
-        <div class="calls-panel panel">
-          <div class="calls-head">
-            <span class="dot-label">boundary_calls</span>
-            {#if region}<span class="mono small">{region.vision_geometry.parcel_label}</span>{/if}
-          </div>
-          <div class="calls-body">
-            <div class="calls-table">
-              {#if region}
-                {#each region.resolved_boundary_calls ?? region.vision_geometry.boundary_calls as call, i}
-                  <div class="call-row mono">
-                    <span class="call-vertex">{i + 1}</span>
-                    <span class="call-bearing">{call.bearing.replace('�', '°')}</span>
-                    <span class="muted call-distance">{call.distance}</span>
-                  </div>
-                {/each}
-              {:else}
-                <div class="calls-loading skeleton" style="height:200px"></div>
-              {/if}
-            </div>
-            <div class="calls-sketch">
-              {#if previewPath}
-                <svg viewBox="0 0 160 160" width="140" height="140">
-                  <path
-                    d={previewPath}
-                    fill="rgba(217,88,31,0.12)"
-                    stroke="#d9581f"
-                    stroke-width="2"
-                    stroke-linejoin="round"
-                  />
-                  {#each previewPoints as p, i}
-                    {@const xs = previewPoints.map((pt) => pt[0])}
-                    {@const ys = previewPoints.map((pt) => pt[1])}
-                    {@const minX = Math.min(...xs)}
-                    {@const maxX = Math.max(...xs)}
-                    {@const minY = Math.min(...ys)}
-                    {@const maxY = Math.max(...ys)}
-                    {@const scale = Math.min(116 / (maxX - minX || 1), 116 / (maxY - minY || 1))}
-                    {@const sx = 22 + (p[0] - minX) * scale}
-                    {@const sy = 160 - (22 + (p[1] - minY) * scale)}
-                    {#if i < previewPoints.length - 1 || previewPoints.length === 1}
-                      <circle cx={sx} cy={sy} r="2.6" fill="#d9581f" />
-                    {/if}
-                  {/each}
-                </svg>
-                <span class="calls-sketch-label">walked traverse</span>
-              {:else}
-                <div class="skeleton" style="width:140px;height:140px;border-radius:8px"></div>
-              {/if}
-            </div>
-          </div>
-        </div>
+      <div class="story-visual shot-visual">
+        <img
+          src="/images/roam-boundary.jpg"
+          alt="ROAM's boundary editor on the same plat: the four parcels listed with their stated areas, parcel AB-1 traced on the drawing, and its computed area and perimeter"
+        />
       </div>
     </div>
 
@@ -227,9 +88,10 @@
         <span class="story-index">03</span>
         <h3>Reconstruct &amp; georeference</h3>
         <p>
-          The traverse is walked corner-to-corner into real geometry, then projected onto
-          true WGS84 coordinates using an address geocoded straight out of the document,
-          no fixed coordinate zone assumed.
+          ROAM works out the drawing's scale and orientation, then places the parcels on the
+          real map from the strongest evidence printed on the sheet. This plat carries a
+          state-plane coordinate, and the placement is confirmed against the county's own
+          parcel records.
         </p>
       </div>
       <div class="story-visual map-visual">
@@ -244,58 +106,19 @@
     <div class="story-row reverse">
       <div class="story-copy">
         <span class="story-index">04</span>
-        <h3>Validate automatically</h3>
+        <h3>Validate and export</h3>
         <p>
-          Closure precision, self-intersection and the document's own stated acreage are
-          cross-checked. Every parcel ships with an honest signal, pass or fail. The
-          example on the right is a real result, not a staged one.
+          Every parcel is checked against the document's own stated area and the county's
+          parcel records, and gets an honest status. The report collects the maps, the
+          parcel schedule and the evidence, ready to export as PDF, GeoJSON, KML, shapefiles
+          or CSV. This is the real result for the same plat, not a staged one.
         </p>
       </div>
-      <div class="story-visual earth-wash">
-        <div class="validate-panel panel">
-          {#if region}
-            {@const v = region.spatial_validation}
-            <div class="validate-head">
-              <span class="pill {v.valid ? 'ok' : 'high'}">{v.valid ? 'Valid' : 'Needs review'}</span>
-              <span class="mono small muted">{region.vision_geometry.parcel_label}</span>
-            </div>
-
-            <div class="gauge">
-              <div class="gauge-row">
-                <span class="gauge-label">Closure precision</span>
-                <span class="mono gauge-value">{v.precision_ratio ? `1:${v.precision_ratio}` : '-'}</span>
-              </div>
-              <div class="gauge-track">
-                <div
-                  class="gauge-fill"
-                  class:fail={!v.valid}
-                  style="width:{Math.min(100, ((v.precision_ratio || 0) / GAUGE_MAX) * 100)}%"
-                ></div>
-                <div class="gauge-threshold" style="left:{(GAUGE_THRESHOLD / GAUGE_MAX) * 100}%"></div>
-              </div>
-              <div class="gauge-scale">
-                <span>1:0</span>
-                <span>1:{GAUGE_THRESHOLD} min</span>
-              </div>
-            </div>
-
-            <dl class="validate-grid">
-              <div><dt>Closure</dt><dd class="mono">{region.boundary_geojson_wgs84.properties.closure_error_ft} ft</dd></div>
-              <div><dt>Perimeter</dt><dd class="mono">{v.perimeter_ft} ft</dd></div>
-              <div><dt>Area</dt><dd class="mono">{v.area_acres ? `${v.area_acres} ac` : '-'}</dd></div>
-            </dl>
-
-            {#if v.issues?.length}
-              <ul class="validate-issues">
-                {#each v.issues as issue}
-                  <li>{issue}</li>
-                {/each}
-              </ul>
-            {/if}
-          {:else}
-            <div class="skeleton" style="height:200px"></div>
-          {/if}
-        </div>
+      <div class="story-visual shot-visual">
+        <img
+          src="/images/roam-report.jpg"
+          alt="ROAM's report for the same four parcels: all four locations confirmed, the site and parcel maps, and the parcel schedule comparing stated and calculated areas"
+        />
       </div>
     </div>
   </div>
@@ -475,6 +298,17 @@ h1 {
   align-items: stretch;
 }
 
+/* real app screenshots (steps 02 and 04): shown whole, at their own height */
+.story-visual.shot-visual {
+  height: auto;
+  background: #f7f6f3;
+}
+.shot-visual img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .scan-visual img {
   display: block;
   width: 100%;
@@ -530,204 +364,6 @@ h1 {
   padding: 5px 9px;
   border-radius: 999px;
   backdrop-filter: blur(4px);
-}
-
-.calls-panel,
-.validate-panel {
-  padding: 20px 22px;
-  height: 100%;
-  width: 100%;
-  overflow-y: auto;
-}
-
-.calls-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--line-soft);
-}
-
-.dot-label {
-  font-size: 0.72rem;
-  color: var(--muted-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.small {
-  font-size: 0.78rem;
-}
-
-.calls-body {
-  display: flex;
-  gap: 20px;
-  align-items: center;
-}
-
-.calls-table {
-  flex: 1;
-  min-width: 0;
-}
-
-.call-row {
-  display: grid;
-  grid-template-columns: 20px 1fr auto;
-  align-items: center;
-  gap: 10px;
-  padding: 7px 0;
-  font-size: 0.84rem;
-  border-bottom: 1px solid var(--line-soft);
-}
-
-.call-row:last-child {
-  border-bottom: none;
-}
-
-.call-vertex {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--surface-muted);
-  color: var(--muted);
-  font-size: 0.66rem;
-  display: grid;
-  place-items: center;
-}
-
-.call-distance {
-  text-align: right;
-}
-
-.muted {
-  color: var(--muted);
-}
-
-.calls-sketch {
-  flex: 0 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding-left: 20px;
-  border-left: 1px solid var(--line-soft);
-}
-
-.calls-sketch-label {
-  font-size: 0.62rem;
-  color: var(--muted-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.validate-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 18px;
-}
-
-.gauge {
-  margin-bottom: 18px;
-}
-
-.gauge-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 7px;
-}
-
-.gauge-label {
-  font-size: 0.78rem;
-  color: var(--muted);
-}
-
-.gauge-value {
-  font-size: 0.92rem;
-  font-weight: 700;
-}
-
-.gauge-track {
-  position: relative;
-  height: 8px;
-  border-radius: 999px;
-  background: var(--surface-muted);
-  overflow: visible;
-}
-
-.gauge-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: var(--ok);
-  min-width: 3px;
-}
-
-.gauge-fill.fail {
-  background: var(--danger);
-}
-
-.gauge-threshold {
-  position: absolute;
-  top: -3px;
-  width: 2px;
-  height: 14px;
-  background: var(--ink);
-  opacity: 0.35;
-}
-
-.gauge-scale {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 6px;
-  font-size: 0.66rem;
-  color: var(--muted-dim);
-}
-
-.validate-grid {
-  margin: 0 0 14px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line-soft);
-}
-
-.validate-grid dt {
-  font-size: 0.68rem;
-  color: var(--muted-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.validate-grid dd {
-  margin: 3px 0 0;
-  font-size: 0.92rem;
-  font-weight: 600;
-}
-
-.validate-issues {
-  margin: 0;
-  padding: 14px 0 0 18px;
-  border-top: 1px solid var(--line-soft);
-  font-size: 0.8rem;
-  color: var(--muted);
-  line-height: 1.5;
-}
-
-.validate-issues li + li {
-  margin-top: 6px;
-}
-
-.earth-wash {
-  background-image: linear-gradient(rgba(247, 246, 243, 0.88), rgba(247, 246, 243, 0.88)), url('/images/earth/amazon-river.jpg');
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  align-items: stretch;
-  padding: 14px;
-  width: 100%;
 }
 
 .gallery {
