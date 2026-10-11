@@ -1,0 +1,215 @@
+{
+  "international": [
+    {
+      "document": "Canada, Caledon draft plan",
+      "true": "CA",
+      "detected": "CA",
+      "rule": "CA",
+      "anchor": {
+        "method": "geocoded (town)",
+        "query": "ALBION, ONTARIO, Canada",
+        "lat": 43.2016014,
+        "lon": -79.7959767
+      },
+      "seconds": {
+        "detect": 5.7,
+        "anchor": 7.7
+      }
+    },
+    {
+      "document": "Canada, Ottawa draft plan",
+      "true": "CA",
+      "detected": "CA",
+      "rule": "CA",
+      "anchor": {
+        "method": "geocoded (street)",
+        "query": "Prince of Wales Drive, Ottawa, Ontario, Canada",
+        "lat": 45.2950852,
+        "lon": -75.7012231
+      },
+      "seconds": {
+        "detect": 5.8,
+        "anchor": 2.0
+      }
+    },
+    {
+      "document": "New Zealand, DP 514130 (Auckland)",
+      "true": "NZ",
+      "detected": "NZ",
+      "rule": "NZ",
+      "anchor": {
+        "method": "LINZ parcel appellation",
+        "lat": -36.905019307544386,
+        "lon": 174.79030659587832,
+        "parcels_found": [
+          "Lot 8 DP 514130",
+          "Lot 6 DP 514130",
+          "Lot 5 DP 514130",
+          "Lot 4 DP 514130",
+          "Lot 3 DP 514130",
+          "Lot 2 DP 514130"
+        ],
+        "checked": [
+          "Lot 8 DP 514130",
+          "Lot 6 DP 514130",
+          "Lot 5 DP 514130",
+          "Lot 4 DP 514130",
+          "Lot 3 DP 514130",
+          "Lot 2 DP 514130"
+        ],
+        "area_checks": [
+          {
+            "lot": "Lot 8 DP 514130",
+            "printed_m2": 124.0,
+            "linz_m2": 131
+          },
+          {
+            "lot": "Lot 6 DP 514130",
+            "printed_m2": 136.0,
+            "linz_m2": 39
+          },
+          {
+            "lot": "Lot 5 DP 514130",
+            "printed_m2": 127.0,
+            "linz_m2": 223
+          },
+          {
+            "lot": "Lot 4 DP 514130",
+            "printed_m2": 127.0,
+            "linz_m2": 29
+          },
+          {
+            "lot": "Lot 3 DP 514130",
+            "printed_m2": 93.0,
+            "linz_m2": 184
+          },
+          {
+            "lot": "Lot 2 DP 514130",
+            "printed_m2": 126.0,
+            "linz_m2": 127
+          }
+        ],
+        "record_title_matches": []
+      },
+      "seconds": {
+        "detect": 5.7,
+        "anchor": 16.6
+      }
+    },
+    {
+      "document": "New Zealand, DP 564472 (Canterbury)",
+      "true": "NZ",
+      "detected": "NZ",
+      "rule": "NZ",
+      "anchor": {
+        "method": "LINZ parcel appellation",
+        "lat": -42.51430019049114,
+        "lon": 173.36489316064186,
+        "parcels_found": [
+          "Lot 1 DP 73074",
+          "Lot 1 DP 324915",
+          "Lot 2 DP 324915",
+          "Lot 1 DP 76948",
+          "Lot 3 DP 324915"
+        ],
+        "checked": [
+          "Lot 1 DP 73074",
+          "Lot 1 DP 324915",
+          "Lot 2 DP 324915",
+          "Lot 1 DP 76948",
+          "Lot 3 DP 324915"
+        ],
+        "area_checks": [],
+        "record_title_matches": [
+          "100378"
+        ]
+      },
+      "seconds": {
+        "detect": 4.2,
+        "anchor": 13.5
+      }
+    },
+    {
+      "document": "UK, Sheffield title plan",
+      "true": "GB",
+      "detected": "GB",
+      "rule": "GB",
+      "anchor": {
+        "method": "OS grid reference SK3390SW",
+        "lat": 53.408023927640684,
+        "lon": -1.5012975408363374,
+        "km_from_true_location": 0.41
+      },
+      "seconds": {
+        "detect": 6.0,
+        "anchor": 0.0
+      }
+    }
+  ],
+  "us_regression": [
+    {
+      "sample": "Tentative parcel map, four lots",
+      "location": "Washoe County, Nevada",
+      "detected": "US",
+      "rule": "US",
+      "evidence": [
+        "WASHOE COUNTY"
+      ],
+      "seconds": 5.8
+    },
+    {
+      "sample": "Parcel map, three-way split",
+      "location": "Washoe County, Nevada",
+      "detected": "US",
+      "rule": "US",
+      "evidence": [
+        "WASHOE COUNTY",
+        "NEVADA"
+      ],
+      "seconds": 6.6
+    },
+    {
+      "sample": "Tentative parcel map, four parcels",
+      "location": "Washoe County, Nevada",
+      "detected": "US",
+      "rule": null,
+      "evidence": [
+        "NEVADA"
+      ],
+      "seconds": 5.6
+    },
+    {
+      "sample": "Family trust parcel map, three parcels",
+      "location": "Washoe County, Nevada",
+      "detected": "US",
+      "rule": null,
+      "evidence": [
+        "NEVADA",
+        "WASHOE COUNTY"
+      ],
+      "seconds": 5.1
+    },
+    {
+      "sample": "Fire protection district parcel map",
+      "location": "Foothill Road, Reno, Nevada",
+      "detected": "US",
+      "rule": "US",
+      "evidence": [
+        "WASHOE COUNTY",
+        "NEVADA"
+      ],
+      "seconds": 5.5
+    },
+    {
+      "sample": "Lot line adjustment, three parcels",
+      "location": "El Centro, California",
+      "detected": "US",
+      "rule": null,
+      "evidence": [
+        "CALIFORNIA",
+        "EL CENTRO, CA"
+      ],
+      "seconds": 5.8
+    }
+  ]
+}

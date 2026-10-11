@@ -1,0 +1,241 @@
+[
+  {
+    "document": "Canada, Caledon draft plan",
+    "page": 1,
+    "true_country": "CA",
+    "model_country": "CA",
+    "rule_country": "CA",
+    "signals": {
+      "CA": 2
+    },
+    "evidence": [
+      "ONTARIO"
+    ],
+    "datum": null,
+    "parcel_reference": "PART 1 OF LOT 18 CONCESSION 9",
+    "place": {
+      "road": "MOUNT PLEASANT ROAD",
+      "locality": "CALEDON",
+      "city": null,
+      "region": "PEEL",
+      "postcode": null
+    },
+    "geocoded": {
+      "query": "MOUNT PLEASANT ROAD, CALEDON, Canada",
+      "level": "road",
+      "lat": 43.9181794,
+      "lon": -79.7428425,
+      "name": "Mount Pleasant Road, Bolton, Caledon, Peel Region, Ontario, L7E 5R7, Canada"
+    },
+    "lot": "1",
+    "stated_area_m2": 25800.0,
+    "walk": null
+  },
+  {
+    "document": "Canada, Ottawa draft plan",
+    "page": 1,
+    "true_country": "CA",
+    "model_country": "CA",
+    "rule_country": "CA",
+    "signals": {
+      "US": 1,
+      "CA": 2
+    },
+    "evidence": [
+      "CITY OF OTTAWA"
+    ],
+    "datum": "NAD83",
+    "parcel_reference": "LOTS 11 AND 12, REGISTERED PLAN 404",
+    "place": {
+      "road": "PRINCE OF WALES DRIVE",
+      "locality": null,
+      "city": "OTTAWA",
+      "region": "ONTARIO",
+      "postcode": null
+    },
+    "geocoded": {
+      "query": "PRINCE OF WALES DRIVE, OTTAWA, Canada",
+      "level": "road",
+      "lat": 45.3911353,
+      "lon": -75.7076919,
+      "name": "Prince Of Wales Drive, River, Ottawa, Eastern Ontario, Ontario, K1Y 4J3, Canada"
+    },
+    "lot": null,
+    "stated_area_m2": null,
+    "walk": null
+  },
+  {
+    "document": "New Zealand, DP 514130 (Auckland)",
+    "page": 10,
+    "true_country": "NZ",
+    "model_country": "NZ",
+    "rule_country": "NZ",
+    "signals": {
+      "NZ": 1
+    },
+    "evidence": [
+      "North Auckland",
+      "Auckland Council"
+    ],
+    "datum": null,
+    "parcel_reference": "Lots 1 to 8 being a subdivision of Lot 2 DP 60057 and Lot 3 DP 38526",
+    "place": {
+      "road": "RAWHITI ROAD",
+      "locality": null,
+      "city": null,
+      "region": "North Auckland",
+      "postcode": null
+    },
+    "geocoded": {
+      "query": "RAWHITI ROAD, New Zealand",
+      "level": "road",
+      "lat": -36.9056499,
+      "lon": 174.7911508,
+      "name": "Rawhiti Road, Oranga, One Tree Hill, Maungakiekie-Tāmaki, Auckland, 1040, New Zealand / Aotearoa"
+    },
+    "lot": null,
+    "stated_area_m2": null,
+    "walk": null
+  },
+  {
+    "document": "New Zealand, DP 564472 (Canterbury)",
+    "page": 8,
+    "true_country": "NZ",
+    "model_country": "NZ",
+    "rule_country": "NZ",
+    "signals": {
+      "NZ": 1
+    },
+    "evidence": [
+      "Canterbury"
+    ],
+    "datum": null,
+    "parcel_reference": "Walkway over Lot 2 DP 324915",
+    "place": {
+      "road": null,
+      "locality": null,
+      "city": null,
+      "region": "Canterbury",
+      "postcode": null
+    },
+    "geocoded": {
+      "query": "Canterbury, New Zealand",
+      "level": "town",
+      "lat": -43.4941761,
+      "lon": 171.8098448,
+      "name": "Canterbury, New Zealand / Aotearoa"
+    },
+    "lot": "Lot 2 DP 324915",
+    "stated_area_m2": null,
+    "walk": null
+  },
+  {
+    "document": "UK, Sheffield title plan",
+    "page": 2,
+    "true_country": "GB",
+    "model_country": "GB",
+    "rule_country": "GB",
+    "signals": {
+      "GB": 1
+    },
+    "evidence": [
+      "HM Land Registry"
+    ],
+    "datum": null,
+    "parcel_reference": "SYK614112",
+    "place": {
+      "road": null,
+      "locality": null,
+      "city": "Sheffield",
+      "region": "South Yorkshire",
+      "postcode": null
+    },
+    "geocoded": {
+      "query": "South Yorkshire, United Kingdom",
+      "level": "town",
+      "lat": 53.4815334,
+      "lon": -1.3810422,
+      "name": "South Yorkshire, Derbyshire, South Yorkshire, England, United Kingdom",
+      "km_from_true_location": 11.64
+    },
+    "lot": "SYK614112",
+    "stated_area_m2": null,
+    "walk": null
+  },
+  {
+    "document": "US, Washoe four lots (control)",
+    "page": 14,
+    "true_country": "US",
+    "model_country": "US",
+    "rule_country": "US",
+    "signals": {
+      "US": 2
+    },
+    "evidence": [
+      "WASHOE COUNTY",
+      "NEVADA"
+    ],
+    "datum": "NAD 83",
+    "parcel_reference": "APN: 017-150-35",
+    "place": {
+      "road": "BIG SMOKEY DR",
+      "locality": "WASHOE COUNTY",
+      "city": null,
+      "region": "NEVADA",
+      "postcode": null
+    },
+    "geocoded": {
+      "query": "BIG SMOKEY DR, WASHOE COUNTY, United States",
+      "level": "road",
+      "lat": 39.378584,
+      "lon": -119.7247222,
+      "name": "Big Smokey Drive, Washoe County, Nevada, 89521, United States",
+      "km_from_true_location": 0.23
+    },
+    "lot": "PARCEL AB-1",
+    "stated_area_m2": 2478.71,
+    "walk": {
+      "calls": 4,
+      "unparsed": 0,
+      "styles": [
+        "quadrant"
+      ],
+      "perimeter_m": 199.27,
+      "misclosure_m": 0.011,
+      "precision": "1:18606",
+      "area_m2": 2480.2
+    }
+  },
+  {
+    "document": "US, Washoe four parcels (control)",
+    "page": 12,
+    "true_country": "US",
+    "model_country": "US",
+    "rule_country": null,
+    "signals": {},
+    "evidence": [
+      "WASHOE COUNTY",
+      "NEVADA"
+    ],
+    "datum": null,
+    "parcel_reference": "PARCEL 1",
+    "place": {
+      "road": null,
+      "locality": null,
+      "city": null,
+      "region": "WASHOE COUNTY",
+      "postcode": null
+    },
+    "geocoded": {
+      "query": "WASHOE COUNTY, United States",
+      "level": "town",
+      "lat": 40.5849048,
+      "lon": -119.6131606,
+      "name": "Washoe County, Nevada, United States",
+      "km_from_true_location": 87.1
+    },
+    "lot": "PARCEL 1",
+    "stated_area_m2": 40509.0,
+    "walk": null
+  }
+]
