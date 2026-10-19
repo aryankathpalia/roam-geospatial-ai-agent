@@ -296,7 +296,7 @@ def get_page_thumbnail(document_id: str, page_number: int):
     src = doc_access.doc_file(document_id, "pages", f"page_{page_number:03d}.png")
     if not src.exists():
         raise HTTPException(status_code=404, detail="Rendered page not found")
-    thumb = DOCUMENT_ROOT / document_id / "page_thumbs" / f"page_{page_number:03d}.jpg"
+    thumb = doc_access.cache_dir(document_id, "page_thumbs") / f"page_{page_number:03d}.jpg"
     if not thumb.exists():
         thumb.parent.mkdir(parents=True, exist_ok=True)
         Image.MAX_IMAGE_PIXELS = None
@@ -357,16 +357,21 @@ def get_region_crop(document_id: str, page_number: int, region_index: int):
     if not page_path.exists():
         raise HTTPException(status_code=404, detail=f"Rendered page not found: {page_path}")
 
-    x, y, w, h = region["bbox"]
+    # Cutting a region out of a 7200 x 4800 page and re-encoding it took ~3 s on every request, so it is
+    # cached beside the page (keyed by the padded box, so a change to the padding makes a fresh one).
     with Image.open(page_path) as page_image:
-        page_image = page_image.convert("RGB")
         page_w, page_h = page_image.size
-        crop = page_image.crop(padded_crop_box(region["bbox"], page_w, page_h, region.get("class")))
-
-    buffer = io.BytesIO()
-    crop.save(buffer, format="PNG")
-    buffer.seek(0)
-    return StreamingResponse(buffer, media_type="image/png")
+        box = tuple(int(round(v)) for v in padded_crop_box(region["bbox"], page_w, page_h, region.get("class")))
+        cached = doc_access.cache_dir(document_id, "crop_cache") / (
+            f"p{page_number:03d}_r{region_index}_{box[0]}_{box[1]}_{box[2]}_{box[3]}.png"
+        )
+        if not cached.exists():
+            cached.parent.mkdir(parents=True, exist_ok=True)
+            tmp = cached.with_suffix(".tmp")
+            page_image.convert("RGB").crop(box).save(tmp, format="PNG", compress_level=3)
+            tmp.replace(cached)
+    return Response(content=cached.read_bytes(), media_type="image/png",
+                    headers={"Cache-Control": "private, max-age=3600"})
 
 
 class RecomputeRequest(BaseModel):

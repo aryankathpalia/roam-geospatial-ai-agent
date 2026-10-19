@@ -109,6 +109,13 @@ def doc_file(document_id: str, *parts: str) -> Path:
     return DOCUMENT_ROOT.joinpath(parent, *parts) if parent else own
 
 
+def cache_dir(document_id: str, name: str) -> Path:
+    """A folder for derived, never-edited files (thumbnails, region crops). A playground copy uses its
+    sample's, so each is made once for every visitor instead of once per copy."""
+
+    return DOCUMENT_ROOT / (access(document_id).get("sandbox_of") or document_id) / name
+
+
 def _link_tree(src: Path, dst: Path) -> None:
     for item in src.iterdir():
         if item.name in ("result.json", "access.json", "report_cache", "thumb.jpg", *SHARED_WITH_SAMPLE) or item.name.endswith(".tmp"):
