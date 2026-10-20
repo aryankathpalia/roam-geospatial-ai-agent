@@ -4,7 +4,7 @@
   import { boundaryRefs, primaryCandidates } from '$lib/boundaryCandidates';
   import AgentChat from '$lib/AgentChat.svelte';
   import AccountButton from '$lib/components/AccountButton.svelte';
-  import { user } from '$lib/auth';
+  import { user, authHeaders } from '$lib/auth';
   import { setCurrentDocument } from '$lib/currentDocument';
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
@@ -1406,8 +1406,14 @@
     queueMicrotask(renderMap);
   }
 
+  let uploadName = '';
+  let uploadSent = 0;
+  let uploadTotal = 0;
+  const mb = (b: number) => (b / 1048576).toFixed(1);
+  $: uploadPct = uploadTotal ? Math.min(100, Math.round((uploadSent / uploadTotal) * 100)) : 0;
+
   async function uploadFile(file: File) {
-    if (file.type !== 'application/pdf') {
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
       errorMessage = 'Only PDF documents are supported.';
       phase = 'error';
       return;
@@ -1420,17 +1426,44 @@
 
     const formData = new FormData();
     formData.append('file', file);
+    uploadName = file.name;
+    uploadSent = 0;
+    uploadTotal = file.size;
 
     try {
-      const res = await fetch(`${API_BASE}/documents/upload`, {
-        method: 'POST',
-        body: formData
+      // XMLHttpRequest, not fetch: it reports upload progress, so a slow connection shows a moving
+      // bar instead of a spinner that looks stuck.
+      const data = await new Promise<any>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${API_BASE}/documents/upload`);
+        for (const [k, v] of Object.entries(authHeaders())) xhr.setRequestHeader(k, v);
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            uploadSent = e.loaded;
+            uploadTotal = e.total;
+          }
+        };
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              resolve(JSON.parse(xhr.responseText));
+            } catch {
+              reject(new Error('the server sent an unexpected reply'));
+            }
+          } else {
+            let detail = '';
+            try {
+              detail = JSON.parse(xhr.responseText).detail ?? '';
+            } catch {
+              detail = '';
+            }
+            reject(new Error(detail || `the server answered ${xhr.status}`));
+          }
+        };
+        xhr.onerror = () => reject(new Error('interrupted'));
+        xhr.onabort = () => reject(new Error('interrupted'));
+        xhr.send(formData);
       });
-      if (!res.ok) {
-        const body = await res.text();
-        throw new Error(`${res.status}: ${body.slice(0, 200)}`);
-      }
-      const data = await res.json();
       rememberDocumentId(data.document_id ?? null);
       processingDocId = data.document_id ?? null;
       processingStartedAt = Date.now();
@@ -1439,8 +1472,8 @@
       startPolling();
     } catch (err: any) {
       errorMessage =
-        err?.message?.includes('Failed to fetch') || err?.name === 'TypeError'
-          ? 'ROAM could not be reached right now. Please try again in a moment, or open the sample result below.'
+        err?.message === 'interrupted'
+          ? 'The upload was interrupted. Check your connection and try again, and keep this page open until it finishes.'
           : `Upload failed: ${err.message}`;
       phase = 'error';
     }
@@ -1610,9 +1643,16 @@
       on:drop={onDrop}
     >
       {#if phase === 'uploading'}
-        <div class="dz-state">
-          <div class="spinner"></div>
-          <p>Uploading file…</p>
+        <div class="dz-state upload-state">
+          <p class="dz-title">{uploadPct < 100 ? 'Uploading' : 'Starting processing'}</p>
+          <p class="upload-name">{uploadName}</p>
+          <div class="upload-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow={uploadPct}>
+            <span style="width: {uploadPct}%"></span>
+          </div>
+          <p class="dz-sub">
+            {#if uploadPct < 100}{mb(uploadSent)} of {mb(uploadTotal)} MB · {uploadPct}%{:else}File received, preparing the pages…{/if}
+          </p>
+          <p class="upload-hint">Keep this page open until the upload finishes.</p>
         </div>
       {:else}
         <div class="dz-state">
@@ -2189,6 +2229,37 @@ h1 {
   padding: 0;
 }
 
+.upload-state {
+  width: min(420px, 100%);
+}
+.upload-name {
+  margin: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+.upload-bar {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.upload-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.25s ease;
+}
+.upload-hint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--muted-dim, var(--muted));
+}
 .spinner {
   width: 26px;
   height: 26px;

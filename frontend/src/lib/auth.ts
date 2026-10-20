@@ -65,6 +65,11 @@ function save(t: string | null, u: User | null) {
   }
 }
 
+/** The session header, for requests that cannot go through the wrapped fetch (an upload with progress). */
+export function authHeaders(): Record<string, string> {
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export function signOut() {
   save(null, null);
   (window as any).google?.accounts?.id?.disableAutoSelect?.();

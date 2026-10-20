@@ -1,4 +1,5 @@
 import asyncio
+import shutil
 import copy
 import json
 import logging
@@ -81,7 +82,9 @@ async def upload_document(request: Request, file: UploadFile = File(...)):
     # 1. Validate uploaded file
     # --------------------------------------------------
 
-    if file.content_type != "application/pdf":
+    # The browser's reported type is not reliable (some send "application/x-pdf" or nothing at
+    # all for a real PDF), so the file's own first bytes decide; see the check after reading it.
+    if file.content_type not in ("application/pdf", "application/x-pdf", "application/octet-stream", "", None)             and not (file.filename or "").lower().endswith(".pdf"):
         raise HTTPException(
             status_code=400,
             detail="Only PDF documents are supported.",
@@ -106,6 +109,9 @@ async def upload_document(request: Request, file: UploadFile = File(...)):
     pdf_path = document_dir / "original.pdf"
 
     contents = await file.read()
+    if b"%PDF" not in contents[:1024]:
+        shutil.rmtree(document_dir, ignore_errors=True)
+        raise HTTPException(status_code=400, detail="Only PDF documents are supported.")
     pdf_path.write_bytes(contents)
     user = getattr(request.state, "user", None)
     if user:
