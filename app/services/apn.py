@@ -31,7 +31,11 @@ _APN_RE = re.compile(
     r"\bA\.?\s?P\.?\s?N\.?\s*(?:NO\.?|#|:|=)?\s*(\d{2,3})[-\s.](\d{2,4})[-\s.](\d{2,3})\b", re.IGNORECASE
 )
 
-_HTTP_TIMEOUT = 20.0
+_HTTP_TIMEOUT = 10.0
+# The county servers stall now and then (a request that normally takes 0.3 s hangs past the timeout):
+# each APN gets this many tries, and one that still fails is skipped instead of losing the rest.
+_LOOKUP_ATTEMPTS = 3
+_MAX_FAILED_STREAK = 2
 _MAX_LOOKUPS = 25
 # A parcel the document names must lie this close to the coarse anchor to count at all ...
 _NEAR_ANCHOR_M = 30_000.0
@@ -176,6 +180,20 @@ def _lookup(client: httpx.Client, svc: _Service, apn: str) -> ApnParcel | None:
     )
 
 
+class ApnLookupUnavailable(RuntimeError):
+    """The county service failed and nothing was found: the answer is unknown, not "no parcels"."""
+
+
+def _lookup_retrying(client: httpx.Client, svc: _Service, apn: str) -> ApnParcel | None:
+    for attempt in range(_LOOKUP_ATTEMPTS):
+        try:
+            return _lookup(client, svc, apn)
+        except httpx.HTTPError:
+            if attempt == _LOOKUP_ATTEMPTS - 1:
+                raise
+    return None
+
+
 def resolve_apn_site(
     text: str, state_name: str | None, near_lat: float, near_lon: float,
     subject: list[str] | None = None, extra: list[str] | None = None, radius_m: float = _NEAR_ANCHOR_M,
@@ -196,19 +214,28 @@ def resolve_apn_site(
 
     for svc in services:
         found: list[ApnParcel] = []
-        try:
-            with httpx.Client(headers={"User-Agent": "ROAM/1.0"}) as client:
-                for apn in apns:
-                    parcel = None
+        failures = streak = 0
+        with httpx.Client(headers={"User-Agent": "ROAM/1.0"}) as client:
+            for apn in apns:
+                parcel = None
+                try:
                     for variant in apn_variants(apn):
-                        parcel = _lookup(client, svc, variant)
+                        parcel = _lookup_retrying(client, svc, variant)
                         if parcel:
                             break
-                    if parcel and _metres(parcel.centroid, (near_lon, near_lat)) <= radius_m:
-                        found.append(parcel)
-        except (httpx.HTTPError, ValueError, KeyError) as exc:
-            logger.warning("APN lookup via %s failed: %s", svc.name, exc)
+                except (httpx.HTTPError, ValueError, KeyError) as exc:
+                    failures += 1
+                    streak += 1
+                    logger.warning("APN lookup of %s via %s failed: %s", apn, svc.name, exc)
+                    if streak >= _MAX_FAILED_STREAK:
+                        break  # the server is down, not one APN: stop waiting on it
+                    continue
+                streak = 0
+                if parcel and _metres(parcel.centroid, (near_lon, near_lat)) <= radius_m:
+                    found.append(parcel)
         if not found:
+            if failures:
+                raise ApnLookupUnavailable(f"{svc.name}: {failures} of {len(apns)} lookups failed")
             continue
         lons = sorted(p.centroid[0] for p in found)
         lats = sorted(p.centroid[1] for p in found)

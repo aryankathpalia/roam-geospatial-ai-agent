@@ -35,7 +35,7 @@ from app.services.georeference import (
     georeference_traverse_to_geojson,
 )
 from app.services.plss import resolve_plss_anchor
-from app.services.apn import COARSE_ANCHOR_RADIUS_M, resolve_apn_site
+from app.services.apn import COARSE_ANCHOR_RADIUS_M, ApnLookupUnavailable, resolve_apn_site
 from app.services import location_evidence
 from app.services.geometry import (
     align_to_shared_edge,
@@ -418,16 +418,22 @@ async def process_document(
     # layer: real parcel polygons on the ground, used after confirmation to seat the outlines between their
     # neighbours (app/routes/documents.py::_fit_sheet_to_apn). Evidence only -- the anchor is unchanged.
     apn_site = None
+    apn_retry = None
     if anchor_lat is not None and anchor_lon is not None:
+        coarse = (anchor or {}).get("precision") == ANCHOR_CITY
+        apn_query = {
+            "text": doc_text, "state_name": anchor_state, "near_lat": anchor_lat, "near_lon": anchor_lon,
+            "subject": location_evidence.subject_apns(evidence),
+            "extra": [a["apn"] for a in (evidence or {}).get("apns", [])],
+            **({"radius_m": COARSE_ANCHOR_RADIUS_M} if coarse else {}),
+        }
         try:
-            coarse = (anchor or {}).get("precision") == ANCHOR_CITY
-            site = resolve_apn_site(
-                doc_text, anchor_state, anchor_lat, anchor_lon,
-                subject=location_evidence.subject_apns(evidence),
-                extra=[a["apn"] for a in (evidence or {}).get("apns", [])],
-                **({"radius_m": COARSE_ANCHOR_RADIUS_M} if coarse else {}),
-            )
+            site = resolve_apn_site(**apn_query)
             apn_site = site.to_dict() if site else None
+        except ApnLookupUnavailable:
+            # The county server stalled: keep the query so confirming a sheet can try again
+            # (app/routes/documents.py::_retry_apn_site) instead of losing the county fit for good.
+            site, apn_retry = None, {**apn_query, "text": None}
         except Exception:  # noqa: BLE001 -- a county service hiccup must not fail the document
             site, apn_site = None, None
         if apn_site:
@@ -534,6 +540,7 @@ async def process_document(
         "anchor_lon": anchor_lon,
         "anchor": anchor,
         "apn_site": apn_site,
+        **({"apn_retry": apn_retry} if apn_retry else {}),
         "location_evidence": evidence,
         "processing": {"complete": True},
     }

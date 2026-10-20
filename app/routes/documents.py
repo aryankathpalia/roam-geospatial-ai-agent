@@ -999,6 +999,29 @@ def _requeue_orphaned_verifications(document_id: str, result: dict) -> list[tupl
     return out
 
 
+def _retry_apn_site(result: dict) -> dict | None:
+    """
+    The county parcel lookup again, for a document whose lookup during processing hit a stalled county
+    server (result["apn_retry"], see document_pipeline). Without it the sheet cannot be seated on the
+    county parcels and confirming falls back to reading the printed coordinates (minutes of OCR).
+    """
+
+    from app.services.apn import ApnLookupUnavailable, resolve_apn_site
+
+    query = result.get("apn_retry")
+    if not query or result.get("apn_site"):
+        return None
+    text = "\n".join(r.get("ocr_text") or "" for p in result.get("pages", []) for r in p.get("regions", []))
+    try:
+        site = resolve_apn_site(**{**query, "text": text})
+    except ApnLookupUnavailable as exc:
+        logging.getLogger(__name__).warning("county parcel lookup still unavailable: %s", exc)
+        return None
+    except Exception:  # noqa: BLE001 -- the fit is extra evidence; confirming must not fail over it
+        return None
+    return site.to_dict() if site else None
+
+
 def _verify_confirmation_inner(document_id: str, body, confirmation_id: str) -> None:
     """
     Background half of confirm-boundary: runs calibration and absolute
@@ -1026,12 +1049,16 @@ def _verify_confirmation_inner(document_id: str, body, confirmation_id: str) -> 
     except Exception as exc:  # noqa: BLE001 -- never leave a parcel "pending" forever
         failure = f"{type(exc).__name__}: {exc}"
         logging.getLogger(__name__).warning("verification failed for %s: %s", document_id, failure)
+    retried_site = _retry_apn_site(snapshot) if failure is None else None
 
     with _RESULT_LOCK:
         try:
             result = _load_result(document_id)
         except HTTPException:
             return
+        if retried_site and not result.get("apn_site"):
+            result["apn_site"] = retried_site
+            result.pop("apn_retry", None)
         located = _locate_parcel(result, body)
         if located is None:
             return
