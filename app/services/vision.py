@@ -34,9 +34,11 @@ import io
 import json
 import logging
 import math
+import re
 import threading
 import time
 from collections import deque
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from google import genai
 from google.genai import errors as genai_errors
@@ -135,24 +137,20 @@ def _wait_for_token_budget(tokens_needed: int) -> None:
     window to clear first, same as any other call.
     """
 
-    with _token_budget_lock:
-        now = time.monotonic()
-        while _token_usage and now - _token_usage[0][0] > 60:
-            _token_usage.popleft()
+    while True:
+        with _token_budget_lock:
+            now = time.monotonic()
+            while _token_usage and now - _token_usage[0][0] > 60:
+                _token_usage.popleft()
 
-        used = sum(tokens for _, tokens in _token_usage)
-        if used > 0 and used + tokens_needed > _TOKEN_BUDGET_PER_MINUTE:
+            used = sum(tokens for _, tokens in _token_usage)
+            if used == 0 or used + tokens_needed <= _TOKEN_BUDGET_PER_MINUTE:
+                _token_usage.append((now, tokens_needed))
+                return
             sleep_for = 60 - (now - _token_usage[0][0]) + 0.5
-        else:
-            sleep_for = 0
 
-        if sleep_for <= 0:
-            _token_usage.append((now, tokens_needed))
-            return
-
-    time.sleep(sleep_for)
-    with _token_budget_lock:
-        _token_usage.append((time.monotonic(), tokens_needed))
+        # re-checked after waking: another thread may have used the window in the meantime
+        time.sleep(max(sleep_for, 0.5))
 
 
 _REQUEST_TIMEOUT_MS = 240_000
@@ -179,6 +177,48 @@ _ALL_MODELS_BUSY_BACKOFF_S = [20, 60]
 # tier caps it at 20 requests/day (see app/core/config.py), and it's
 # ~8.6x slower per call than the default (measured: 143s vs 17s mean).
 ESCALATION_MODEL = "gemini-3.5-flash"
+
+
+_PARALLEL_REGION_READS = 2
+_MAX_TILES_PER_REQUEST = 64
+
+
+def _split_by_tiles(chunk: list[tuple[int, list[Image.Image]]]) -> list[list[tuple[int, list[Image.Image]]]]:
+    """Greedily regroup one token-budget chunk so no request carries more than _MAX_TILES_PER_REQUEST
+    tiles; a chunk already under the cap comes back unchanged."""
+
+    if sum(len(tiles) for _, tiles in chunk) <= _MAX_TILES_PER_REQUEST:
+        return [chunk]
+    parts: list[list[tuple[int, list[Image.Image]]]] = []
+    current: list[tuple[int, list[Image.Image]]] = []
+    count = 0
+    for region in chunk:
+        n = len(region[1])
+        if current and count + n > _MAX_TILES_PER_REQUEST:
+            parts.append(current)
+            current, count = [], 0
+        current.append(region)
+        count += n
+    if current:
+        parts.append(current)
+    return parts
+
+
+def _generate_with_quota_retry(client: genai.Client, **kwargs):
+    """_generate_with_fallback, waiting out a per-minute quota error (429) once instead of failing the
+    region. Two parallel reads can briefly overshoot the free tier's per-minute token cap; failing
+    there would send the region to the slow escalation retry for no reason."""
+
+    try:
+        return _generate_with_fallback(client, **kwargs)
+    except genai_errors.ClientError as exc:
+        if getattr(exc, "code", None) != 429:
+            raise
+        match = re.search(r"retry in ([\d.]+)s", str(exc))
+        delay = min(60.0, float(match.group(1)) + 1.0) if match else 30.0
+        logger.warning("Gemini per-minute quota reached; retrying in %.0fs", delay)
+        time.sleep(delay)
+        return _generate_with_fallback(client, **kwargs)
 
 
 def _generate_with_fallback(client: genai.Client, primary_model: str | None = None, **kwargs):
@@ -1135,78 +1175,93 @@ def extract_parcel_geometries_batch(
         return []
 
     client = _get_client()
-    chunks = _chunk_regions_by_token_budget(images)
+    # A request is also capped by tile count, not only by tokens. Packing a whole document into one
+    # request (110+ tiles on a real 4-map packet) was too much for the model: it either ran past the
+    # request timeout or came back empty, which then forced the slow escalation retry. Documents
+    # under the cap are sent exactly as before; bigger ones are split into requests of at most
+    # _MAX_TILES_PER_REQUEST tiles (a single larger region still goes alone), read a few at a time.
+    chunks = [part for chunk in _chunk_regions_by_token_budget(images) for part in _split_by_tiles(chunk)]
+
+    def read_chunk(chunk: list[tuple[int, list[Image.Image]]]) -> list[dict]:
+        all_parts: list[types.Part] = []
+        region_layout_lines = []
+        image_tokens = 0
+        for region_idx, tiles in chunk:
+            region_layout_lines.append(f"Region {region_idx}: {len(tiles)} piece(s)")
+            for tile in tiles:
+                image_tokens += _estimate_image_tokens(tile)
+                buffer = io.BytesIO()
+                tile.convert("RGB").save(buffer, format="PNG")
+                all_parts.append(
+                    types.Part.from_bytes(data=buffer.getvalue(), mime_type="image/png")
+                )
+
+        read_prompt = _DOCUMENT_TILE_PROMPT_TEMPLATE.format(
+            region_count=len(chunk),
+            region_layout="\n".join(region_layout_lines),
+        )
+
+        _wait_for_rate_limit()
+        _wait_for_token_budget(image_tokens + _estimate_text_tokens(read_prompt))
+        read_response = _generate_with_quota_retry(
+            client,
+            primary_model=model,
+            contents=all_parts + [read_prompt],
+            # Transcription, not creative generation -- same
+            # determinism rationale as the structuring call below.
+            config=types.GenerateContentConfig(temperature=0),
+        )
+        notes = (read_response.text or "").strip()
+
+        if not notes:
+            return []
+
+        region_indices = [region_idx for region_idx, _ in chunk]
+        structure_prompt = _BATCH_STRUCTURE_PROMPT.format(
+            region_count=len(chunk),
+            region_list=", ".join(f"Region {i}" for i in region_indices),
+            notes=notes,
+        )
+
+        _wait_for_rate_limit()
+        _wait_for_token_budget(_estimate_text_tokens(structure_prompt))
+        structure_response = _generate_with_quota_retry(
+            client,
+            primary_model=model,
+            contents=[structure_prompt],
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=_BATCH_RESPONSE_SCHEMA,
+                # This step is structured data extraction from fixed
+                # notes, not creative generation -- temperature=0
+                # minimizes run-to-run variance (confirmed via a real
+                # diagnostic: identical input crops produced visibly
+                # different parcel/call attributions across repeated
+                # default-temperature runs).
+                temperature=0,
+            ),
+        )
+        items = json.loads(structure_response.text).get("parcels", [])
+        if len(chunk) == 1:
+            # one region per request: every parcel in the reply belongs to it, whatever index the
+            # model wrote back
+            for item in items:
+                item["region_index"] = chunk[0][0]
+        return items
 
     by_index: dict[int, list[dict]] = {}
-
     failed: dict[int, Exception] = {}
-    for chunk in chunks:
-        try:
-            all_parts: list[types.Part] = []
-            region_layout_lines = []
-            image_tokens = 0
-            for region_idx, tiles in chunk:
-                region_layout_lines.append(f"Region {region_idx}: {len(tiles)} piece(s)")
-                for tile in tiles:
-                    image_tokens += _estimate_image_tokens(tile)
-                    buffer = io.BytesIO()
-                    tile.convert("RGB").save(buffer, format="PNG")
-                    all_parts.append(
-                        types.Part.from_bytes(data=buffer.getvalue(), mime_type="image/png")
-                    )
-
-            read_prompt = _DOCUMENT_TILE_PROMPT_TEMPLATE.format(
-                region_count=len(chunk),
-                region_layout="\n".join(region_layout_lines),
-            )
-
-            _wait_for_rate_limit()
-            _wait_for_token_budget(image_tokens + _estimate_text_tokens(read_prompt))
-            read_response = _generate_with_fallback(
-                client,
-                primary_model=model,
-                contents=all_parts + [read_prompt],
-                # Transcription, not creative generation -- same
-                # determinism rationale as the structuring call below.
-                config=types.GenerateContentConfig(temperature=0),
-            )
-            notes = read_response.text.strip()
-
-            if not notes:
-                continue
-
-            region_indices = [region_idx for region_idx, _ in chunk]
-            structure_prompt = _BATCH_STRUCTURE_PROMPT.format(
-                region_count=len(chunk),
-                region_list=", ".join(f"Region {i}" for i in region_indices),
-                notes=notes,
-            )
-
-            _wait_for_rate_limit()
-            _wait_for_token_budget(_estimate_text_tokens(structure_prompt))
-            structure_response = _generate_with_fallback(
-                client,
-                primary_model=model,
-                contents=[structure_prompt],
-                config=types.GenerateContentConfig(
-                    response_mime_type="application/json",
-                    response_schema=_BATCH_RESPONSE_SCHEMA,
-                    # This step is structured data extraction from fixed
-                    # notes, not creative generation -- temperature=0
-                    # minimizes run-to-run variance (confirmed via a real
-                    # diagnostic: identical input crops produced visibly
-                    # different parcel/call attributions across repeated
-                    # default-temperature runs).
-                    temperature=0,
-                ),
-            )
-            parsed = json.loads(structure_response.text)
-            for item in parsed.get("parcels", []):
-                by_index.setdefault(item["region_index"], []).append(item)
-        except Exception as exc:  # noqa: BLE001 -- isolate one chunk's failure
-            logger.warning("Vision chunk failed for regions %s: %s", [r for r, _ in chunk], exc)
-            for region_idx, _ in chunk:
-                failed[region_idx] = exc
+    with ThreadPoolExecutor(max_workers=_PARALLEL_REGION_READS) as pool:
+        futures = {pool.submit(read_chunk, chunk): chunk for chunk in chunks}
+        for future in as_completed(futures):
+            chunk = futures[future]
+            try:
+                for item in future.result():
+                    by_index.setdefault(item["region_index"], []).append(item)
+            except Exception as exc:  # noqa: BLE001 -- isolate one region's failure
+                logger.warning("Vision chunk failed for regions %s: %s", [r for r, _ in chunk], exc)
+                for region_idx, _ in chunk:
+                    failed[region_idx] = exc
 
     results: list[list[dict] | Exception] = []
     for region_idx in range(1, len(images) + 1):
