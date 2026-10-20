@@ -93,7 +93,7 @@
       if (!res.ok) throw new Error(`${res.status}`);
       samples = (await res.json()).samples;
     } catch {
-      samplesError = `Could not reach the ROAM backend at ${API_BASE}.`;
+      samplesError = 'The samples could not be loaded right now. Please try again in a moment.';
     }
   }
 
@@ -1440,7 +1440,7 @@
     } catch (err: any) {
       errorMessage =
         err?.message?.includes('Failed to fetch') || err?.name === 'TypeError'
-          ? `Could not reach the ROAM backend at ${API_BASE}. It may be offline right now. Try the sample result below instead.`
+          ? 'ROAM could not be reached right now. Please try again in a moment, or open the sample result below.'
           : `Upload failed: ${err.message}`;
       phase = 'error';
     }
@@ -1639,7 +1639,6 @@
       {/if}
 
       <div class="dz-footer">
-        <span>API target: <code class="mono">{API_BASE}</code></span>
         {#if lastDocumentId}
           <button class="link-btn" on:click={() => resumeLastDocument()} disabled={resuming}>
             {resuming ? 'Resuming…' : 'Resume last document →'}
