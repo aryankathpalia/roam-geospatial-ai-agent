@@ -368,15 +368,17 @@ def get_region_crop(document_id: str, page_number: int, region_index: int):
     with Image.open(page_path) as page_image:
         page_w, page_h = page_image.size
         box = tuple(int(round(v)) for v in padded_crop_box(region["bbox"], page_w, page_h, region.get("class")))
+        # Lossless WebP: the same pixels as the PNG at about 40% of the bytes (720 KB -> 285 KB on a
+        # 2200 x 1700 plat), which is most of the wait on a slow connection.
         cached = doc_access.cache_dir(document_id, "crop_cache") / (
-            f"p{page_number:03d}_r{region_index}_{box[0]}_{box[1]}_{box[2]}_{box[3]}.png"
+            f"p{page_number:03d}_r{region_index}_{box[0]}_{box[1]}_{box[2]}_{box[3]}.webp"
         )
         if not cached.exists():
             cached.parent.mkdir(parents=True, exist_ok=True)
             tmp = cached.with_suffix(".tmp")
-            page_image.convert("RGB").crop(box).save(tmp, format="PNG", compress_level=3)
+            page_image.convert("RGB").crop(box).save(tmp, format="WEBP", lossless=True, method=6)
             tmp.replace(cached)
-    return Response(content=cached.read_bytes(), media_type="image/png",
+    return Response(content=cached.read_bytes(), media_type="image/webp",
                     headers={"Cache-Control": "private, max-age=3600"})
 
 
@@ -2416,7 +2418,9 @@ def _report_for(document_id: str) -> dict:
 def get_report(document_id: str):
     """The report model the viewer shows (and every export is rendered from)."""
 
-    return _report_for(document_id)
+    report = _report_for(document_id)
+    _prefetch_report_figures(document_id, report)
+    return report
 
 
 @router.put("/{document_id}/report/edits")
@@ -2443,21 +2447,61 @@ def report_figure(document_id: str, name: str):
     from fastapi.responses import Response
     from app.services import static_map
 
-    if name not in ("parcels.png", "location.png"):
+    if name not in _REPORT_FIGURES:
         raise HTTPException(status_code=404, detail="Unknown figure")
-    report = _report_for(document_id)
+    path = _report_figure_file(document_id, _report_for(document_id), name)
+    return Response(content=path.read_bytes(), media_type="image/jpeg",
+                    headers={"Cache-Control": "private, max-age=3600"})
+
+
+_REPORT_FIGURES = ("parcels.png", "location.png")
+_FIGURE_LOCKS: dict[str, threading.Lock] = {}
+_FIGURE_LOCKS_GUARD = threading.Lock()
+
+
+def _report_figure_file(document_id: str, report: dict, name: str):
+    """
+    The viewer's copy of a report figure, rendered once per parcel geometry (the key is the rings and
+    labels, so an edit makes a fresh one). Kept with the sample for a playground copy, so every visitor
+    shares it, and as a JPEG: satellite imagery is ~2 MB as PNG and ~0.3 MB as JPEG. The exports
+    render their own figures and are unaffected.
+    """
+
+    import hashlib
+    import io
+    from app.services import static_map
+
     rings = [p["ring"] for p in report["parcels"]]
     labels = [p["label"] for p in report["parcels"]]
     key = hashlib.sha1(json.dumps([name, rings, labels]).encode()).hexdigest()[:16]
-    cache = DOCUMENT_ROOT / document_id / "report_cache" / f"{key}.png"
-    if not cache.exists():
-        cache.parent.mkdir(parents=True, exist_ok=True)
-        png = (
-            static_map.render(rings, labels, width=1400, height=1000) if name == "parcels.png"
-            else static_map.render(rings, zoom_out=5, marker_only=True, place_labels=True, width=1400, height=800)
-        )
-        cache.write_bytes(png)
-    return Response(content=cache.read_bytes(), media_type="image/png")
+    cache = doc_access.cache_dir(document_id, "report_cache") / f"{key}.jpg"
+    with _FIGURE_LOCKS_GUARD:
+        lock = _FIGURE_LOCKS.setdefault(str(cache), threading.Lock())
+    with lock:  # the prefetch and the browser's request render it once, not twice
+        if not cache.exists():
+            cache.parent.mkdir(parents=True, exist_ok=True)
+            png = (
+                static_map.render(rings, labels, width=1400, height=1000) if name == "parcels.png"
+                else static_map.render(rings, zoom_out=5, marker_only=True, place_labels=True, width=1400, height=800)
+            )
+            tmp = cache.with_suffix(".tmp")
+            Image.open(io.BytesIO(png)).convert("RGB").save(tmp, format="JPEG", quality=88)
+            tmp.replace(cache)
+    return cache
+
+
+def _prefetch_report_figures(document_id: str, report: dict) -> None:
+    """Starts rendering both figures, side by side, as soon as the report is opened: the browser only
+    asks for them once the page has drawn, and each takes ~8 s the first time (map tiles)."""
+
+    def one(name: str) -> None:
+        try:
+            _report_figure_file(document_id, report, name)
+        except Exception as exc:  # noqa: BLE001 -- the figure request itself will retry and report it
+            logging.getLogger(__name__).warning("report figure prefetch failed for %s: %s", document_id, exc)
+
+    for name in _REPORT_FIGURES:
+        threading.Thread(target=one, args=(name,), daemon=True).start()
 
 
 @router.get("/{document_id}/export/{fmt}")
